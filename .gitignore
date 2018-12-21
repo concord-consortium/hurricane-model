@@ -1,2 +1,7 @@
-.DS_Store
+coverage
+dist
+node_modules
+npm-error.log
+
+# Editors
 .idea
