@@ -37,7 +37,7 @@ module.exports = (env, argv) => {
           }
         },
         {
-          test: /\.(sa|sc|c)ss$/i,
+          test: /\.(sa|sc)ss$/i,
           use: [
             devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
             {
@@ -51,6 +51,13 @@ module.exports = (env, argv) => {
             },
             'postcss-loader',
             'sass-loader'
+          ]
+        },
+        {
+          test: /\.css$/i,
+          use: [
+            devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+            'css-loader'
           ]
         },
         {
