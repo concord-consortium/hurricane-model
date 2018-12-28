@@ -1,15 +1,14 @@
 import { UIModel, UIModelType } from "./ui";
+import { MapModel } from "./map";
 
 export interface IStores {
   ui: UIModelType;
+  map: MapModel;
 }
 
-export interface ICreateStores {
-  ui?: UIModelType;
-}
-
-export function createStores(params?: ICreateStores): IStores {
+export function createStores(): IStores {
   return {
-    ui: params && params.ui || UIModel.create({})
+    ui: UIModel.create({}),
+    map: new MapModel()
   };
 }
