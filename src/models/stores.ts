@@ -1,14 +1,14 @@
 import { UIModel, UIModelType } from "./ui";
-import { MapModel } from "./map";
+import { SimulationModel } from "./simulation";
 
 export interface IStores {
   ui: UIModelType;
-  map: MapModel;
+  simulation: SimulationModel;
 }
 
 export function createStores(): IStores {
   return {
     ui: UIModel.create({}),
-    map: new MapModel()
+    simulation: new SimulationModel()
   };
 }

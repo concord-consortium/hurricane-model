@@ -5,6 +5,6 @@ describe("stores object", () => {
     const stores = createStores();
     expect(stores).toBeDefined();
     expect(stores.ui).toBeDefined();
-    expect(stores.map).toBeDefined();
+    expect(stores.simulation).toBeDefined();
   });
 });

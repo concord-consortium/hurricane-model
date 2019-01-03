@@ -1,0 +1,16 @@
+.highPressure, .lowPressure {
+  color: white;
+  font-size: 40px;
+  margin-left: -15px !important;
+  margin-top: -30px !important;
+  font-weight: bold;
+  text-shadow: 1px 1px 10px #999;
+}
+
+.highPressure {
+  color: #19c0ea;
+}
+
+.lowPressure {
+  color: #ff2525;
+}
