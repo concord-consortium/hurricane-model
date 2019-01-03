@@ -14,9 +14,9 @@ const uTempFile = '__u_data_temp'
 const vTempFile = '__v_data_temp'
 
 // Limit data to lat/lon range, as our model will be focused on the northern part of the Atlantic ocean.
-const minLat = 0;
-const maxLat = 70;
-const minLon = -100;
+const minLat = -10;
+const maxLat = 80;
+const minLon = -120;
 const maxLon = 0;
 
 // Scale wind vectors for GeoJSON conversion, so visualization looks cleaner.
@@ -82,7 +82,7 @@ lat.forEach((latValue, latIdx) => {
       // Simple format.
       result.windVectors.push({
         lat: latValue,
-        lon: lonValue,
+        lng: lonValue,
         u: uwnd[valueIdx],
         v: vwnd[valueIdx]
       });
