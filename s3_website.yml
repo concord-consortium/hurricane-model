@@ -5,7 +5,7 @@ s3_key_prefix: hurricane-model
 s3_endpoint: us-east-1
 gzip: true
 
-cloudfront_distribution_id: E1YPVV3YLYS4J7
+cloudfront_distribution_id: EQIX20MHCT9IN
 cloudfront_invalidate_root: true
 cloudfront_wildcard_invalidation: true
 
@@ -28,4 +28,4 @@ cloudfront_distribution_config:
   aliases:
     quantity: 1
     items:
-      - hurricane-model.concord.org
+      - hurricane.concord.org
