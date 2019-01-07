@@ -4,3 +4,7 @@ declare module "*.scss";
 declare module "react-leaflet-canvas-layer";
 declare module "kd-tree-javascript";
 declare module "my-canvas-layer";
+declare module "*.svg" {
+  const content: any;
+  export default content;
+}

@@ -5,6 +5,7 @@ import { Map, TileLayer, Marker } from "react-leaflet";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import config from "../config";
 import * as Leaflet from "leaflet";
+import * as hurricaneSvg from "../assets/hurricane.svg";
 
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
@@ -17,6 +18,10 @@ const bounds: [[number, number], [number, number]] = [[10, -80], [50, -10]];
 
 const highPressureIcon = new Leaflet.DivIcon({className: css.highPressure, html: "H"});
 const lowPressureIcon = new Leaflet.DivIcon({className: css.lowPressure, html: "L"});
+const hurricaneIcon = new Leaflet.DivIcon({
+  className: css.hurricane,
+  html: `<div class="${css.hurricaneContainer}">${hurricaneSvg}</div>`
+});
 
 @inject("stores")
 @observer
@@ -69,6 +74,12 @@ export class MapView extends BaseComponent<IProps, IState> {
             icon={lowPressureIcon}
             onDrag={this.handleLowPressureDrag}
             draggable={true}
+          />
+        }
+        {
+          <Marker
+            position={this.stores.simulation.hurricanePos}
+            icon={hurricaneIcon}
           />
         }
       </Map>

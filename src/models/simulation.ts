@@ -45,6 +45,8 @@ export class SimulationModel {
   @observable public highPressure: ICoordinates | null = {lat: 30, lng: -28};
   @observable public lowPressure: ICoordinates | null = {lat: 38, lng: -80};
 
+  @observable public hurricanePos: ICoordinates = {lat: 15, lng: -20};
+
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
   @computed get baseWind() {
