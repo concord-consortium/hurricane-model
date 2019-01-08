@@ -8,8 +8,9 @@ export interface ICoordinates {
   lng: number;
 }
 
-export const latLonDistance = (p1: ICoordinates, p2: ICoordinates) => {
-  const R = 6371; // Radius of the earth in km
+const earthRadius = 6378; // km
+
+export const latLngDistance = (p1: ICoordinates, p2: ICoordinates) => {
   const dLat = deg2rad(p2.lat - p1.lat);  // deg2rad below
   const dLon = deg2rad(p2.lng - p1.lng);
   const a =
@@ -18,7 +19,14 @@ export const latLonDistance = (p1: ICoordinates, p2: ICoordinates) => {
     Math.sin(dLon / 2) * Math.sin(dLon / 2)
   ;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in km
+  return earthRadius * c; // Distance in km
+};
+
+export const latLngPlusVector = (p: ICoordinates, vec: IVector) => {
+  return {
+    lat: p.lat  + (vec.v / earthRadius) * (180 / Math.PI),
+    lng: p.lng + (vec.u / earthRadius) * (180 / Math.PI) / Math.cos(p.lat * Math.PI / 180)
+  };
 };
 
 export const deg2rad = (deg: number) => {

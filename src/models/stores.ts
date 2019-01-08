@@ -7,8 +7,10 @@ export interface IStores {
 }
 
 export function createStores(): IStores {
-  return {
+  const stores = {
     ui: UIModel.create({}),
     simulation: new SimulationModel()
   };
+  (window as any).simulation = stores.simulation;
+  return stores;
 }
