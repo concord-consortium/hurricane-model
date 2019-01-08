@@ -1,15 +1,14 @@
 import { UIModel, UIModelType } from "./ui";
+import { SimulationModel } from "./simulation";
 
 export interface IStores {
   ui: UIModelType;
+  simulation: SimulationModel;
 }
 
-export interface ICreateStores {
-  ui?: UIModelType;
-}
-
-export function createStores(params?: ICreateStores): IStores {
+export function createStores(): IStores {
   return {
-    ui: params && params.ui || UIModel.create({})
+    ui: UIModel.create({}),
+    simulation: new SimulationModel()
   };
 }

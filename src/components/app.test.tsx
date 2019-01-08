@@ -1,13 +1,16 @@
 import * as React from "react";
 import { AppComponent } from "./app";
 import { mount } from "enzyme";
-import { UIModel } from "../models/ui";
+import { createStores } from "../models/stores";
+import { Provider } from "mobx-react";
 
 describe("App component", () => {
-  const stores = {
-    ui: UIModel.create({})
-  };
+  const stores = createStores();
   it("renders without crashing", () => {
-    mount(<AppComponent stores={stores} />);
+    mount(
+      <Provider stores={stores}>
+        <AppComponent />
+      </Provider>
+    );
   });
 });
