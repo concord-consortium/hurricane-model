@@ -42,7 +42,7 @@ interface IState {}
 @inject("stores")
 @observer
 export class PixiWindLayer extends BaseComponent<IProps, IState> {
-  private pixiApp: PIXI.Application | null = null;
+  public pixiApp: PIXI.Application | null = null;
 
   public componentDidMount(): void {
     autorun(() => {
@@ -77,23 +77,30 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
     const stage = this.pixiApp!.stage;
     const data = this.stores.simulation.windIncBounds;
     const latLngToContainerPoint = this.stores.simulation.latLngToContainerPoint;
-    stage.removeChildren();
-    data.forEach((w: any) => {
+    data.forEach((w: any, idx: number) => {
+      // Try to reuse Pixi arrows.
+      const updateOnly = !!stage.children[idx];
+      const arrowContainer = updateOnly ? (stage.children[idx] as PIXI.Container) : new PIXI.Container();
       const length = vectorScale * Math.sqrt(w.u * w.u + w.v * w.v);
       const lineScale = new PIXI.Point(1, length);
       const point = latLngToContainerPoint([w.lat, w.lng]);
       const rotation = Math.atan2(w.u, w.v);
-      const cont = new PIXI.Container();
-      cont.x = point.x;
-      cont.y = point.y;
-      cont.rotation = rotation;
-      const line = new PIXI.Sprite(lineTexture);
+      arrowContainer.x = point.x;
+      arrowContainer.y = point.y;
+      arrowContainer.rotation = rotation;
+      const line = updateOnly ? arrowContainer.children[0] : new PIXI.Sprite(lineTexture);
       line.scale = lineScale;
-      cont.addChild(line);
-      const arrow = new PIXI.Sprite(arrowTexture);
+      const arrow = updateOnly ? arrowContainer.children[1] : new PIXI.Sprite(arrowTexture);
       arrow.y = -length;
-      cont.addChild(arrow);
-      stage.addChild(cont);
+      if (!updateOnly) {
+        arrowContainer.addChild(line);
+        arrowContainer.addChild(arrow);
+        stage.addChild(arrowContainer);
+      }
     });
+    // Remove unnecessary arrows.
+    if (stage.children.length > data.length) {
+      stage.removeChildren(data.length);
+    }
   }
 }

@@ -9,7 +9,7 @@ declare module "react-leaflet" {
   }
 
   interface MapProps {
-    onViewportChanged: () => void;
+    onViewportChanged?: () => void;
   }
 }
 
