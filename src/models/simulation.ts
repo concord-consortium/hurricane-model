@@ -63,8 +63,8 @@ export class SimulationModel {
   @observable public season: Season = config.season;
 
   // Pressure systems affect winds.
-  @observable public highPressure: ICoordinates | null = {lat: 30, lng: -28};
-  @observable public lowPressure: ICoordinates | null = {lat: 38, lng: -80};
+  @observable public highPressure: ICoordinates = {lat: 30, lng: -28};
+  @observable public lowPressure: ICoordinates = {lat: 38, lng: -80};
 
   @observable public hurricanePos: ICoordinates = initialHurricanePosition;
   @observable public hurricaneSpeed: IVector = initialHurricaneSpeed;
@@ -78,31 +78,30 @@ export class SimulationModel {
   }
 
   @computed get wind() {
-    if (!this.highPressure && !this.lowPressure) {
-      return this.baseWind;
-    }
     const result: IWindPoint[] = [];
     this.baseWind.forEach(w => {
       const newWind = Object.assign({}, w);
-      const distFromHighP = distanceTo(this.highPressure!, w);
-      const distFromLowP = distanceTo(this.lowPressure!, w);
+      const distFromHighP = distanceTo(this.highPressure, w);
+      const distFromLowP = distanceTo(this.lowPressure, w);
       let lowPWindMod = {u: 0, v: 0};
       let highPWindMod = {u: 0, v: 0};
-      if (distFromLowP && distFromLowP < pressureSystemRange) {
-        const perpendVec = perpendicular({u: w.lng - this.lowPressure!.lng, v: w.lat - this.lowPressure!.lat}, false);
+      if (distFromLowP < pressureSystemRange) {
+        const perpendVec = perpendicular({u: w.lng - this.lowPressure.lng, v: w.lat - this.lowPressure.lat}, false);
         const targetLength = (1 - distFromLowP / pressureSystemRange) * pressureSystemStrength;
         const targetWind = setLength(rotate(w, angle(perpendVec) + pressureSystemAngleOffset), targetLength);
         lowPWindMod = transform(w, targetWind, 1 - Math.pow(distFromLowP / pressureSystemRange, 4));
       }
       if (distFromHighP && distFromHighP < pressureSystemRange) {
-        const perpendVec = perpendicular({u: w.lng - this.highPressure!.lng, v: w.lat - this.highPressure!.lat}, true);
+        const perpendVec = perpendicular({u: w.lng - this.highPressure.lng, v: w.lat - this.highPressure.lat}, true);
         const targetLength = distFromHighP / pressureSystemRange * pressureSystemStrength;
         const targetWind = setLength(rotate(w, angle(perpendVec) + pressureSystemAngleOffset), targetLength);
         highPWindMod = transform(w, targetWind, 1 - Math.pow(distFromHighP / pressureSystemRange, 4));
       }
       let pressureAffectedWind = {u: 0, v: 0};
       if (length(highPWindMod) && length(lowPWindMod)) {
-        pressureAffectedWind = transform(highPWindMod, lowPWindMod, 0.5);
+        const hf = distFromHighP / pressureSystemRange;
+        const lf = distFromLowP / pressureSystemRange;
+        pressureAffectedWind = transform(highPWindMod, lowPWindMod, hf / (hf + lf));
       } else if (length(highPWindMod)) {
         pressureAffectedWind = highPWindMod;
       } else if (length(lowPWindMod)) {
