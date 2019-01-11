@@ -6,8 +6,12 @@ import * as juneWind from "../../wind-data-json/jun-simple.json";
 import * as septWind from "../../wind-data-json/sep-simple.json";
 import { kdTree } from "kd-tree-javascript";
 import {
-  ICoordinates, IVector, rotate, length, transform, latLngDistance, angle, setLength, perpendicular, latLngPlusVector
+  ICoordinates, IVector, rotate, length, transform, angle, setLength, perpendicular, latLngPlusVector
 } from "../math-utils";
+import {
+  headingTo, moveTo, distanceTo
+} from "geolocation-utils";
+
 import config from "../config";
 
 type Season = "winter" | "spring" | "summer" | "fall";
@@ -28,19 +32,21 @@ const windData: IWindDataset = {
   fall: septWind.windVectors
 };
 
-const pressureSystemRange = 3000; // km
+const pressureSystemRange = 3000000; // m
 const pressureSystemStrength = 10;
 const pressureSystemAngleOffset = 0.3; // radians
 
 const timestep = 1;
 // Ratio describing how hard is the global wind pushing hurricane.
-const globalWindToHurricaneAcceleration = 0.05;
+const globalWindToHurricaneAcceleration = 50;
 // The bigger momentum, the longer hurricane will follow its own path, ignoring global wind.
 const hurricaneMomentum = 0.95;
 
 const initialHurricanePosition = {lat: 15, lng: -20};
 const initialHurricaneSpeed = {u: 0, v: 0};
 const initialHurricaneAcceleration = {u: 0, v: 0};
+
+const minPressureSystemDistance = 700000; // m
 
 export class SimulationModel {
   // Region boundaries.
@@ -75,8 +81,8 @@ export class SimulationModel {
     const result: IWindPoint[] = [];
     this.baseWind.forEach(w => {
       const newWind = Object.assign({}, w);
-      const distFromHighP = latLngDistance(this.highPressure!, w);
-      const distFromLowP = latLngDistance(this.lowPressure!, w);
+      const distFromHighP = distanceTo(this.highPressure!, w);
+      const distFromLowP = distanceTo(this.lowPressure!, w);
       let lowPWindMod = {u: 0, v: 0};
       let highPWindMod = {u: 0, v: 0};
       if (distFromLowP && distFromLowP < pressureSystemRange) {
@@ -109,7 +115,7 @@ export class SimulationModel {
   }
 
   @computed get windKdTree() {
-    return new kdTree(this.wind, latLngDistance, ["lat", "lng"]);
+    return new kdTree(this.wind, distanceTo, ["lat", "lng"]);
   }
 
   @computed get windIncBounds() {
@@ -130,11 +136,21 @@ export class SimulationModel {
   }
 
   @action.bound public setHighPressure(center: ICoordinates) {
-    this.highPressure = center;
+    if (this.lowPressure && distanceTo(center, this.lowPressure) > minPressureSystemDistance) {
+      this.highPressure = center;
+    } else {
+      const heading = headingTo(this.lowPressure, center);
+      this.highPressure = moveTo(this.lowPressure, { heading, distance: minPressureSystemDistance * 1.1 });
+    }
   }
 
   @action.bound public setLowPressure(center: ICoordinates) {
-    this.lowPressure = center;
+    if (this.highPressure && distanceTo(center, this.highPressure) > minPressureSystemDistance) {
+      this.lowPressure = center;
+    } else {
+      const heading = headingTo(this.highPressure, center);
+      this.lowPressure = moveTo(this.highPressure, { heading, distance: minPressureSystemDistance * 1.1 });
+    }
   }
 
   @action.bound public tick() {

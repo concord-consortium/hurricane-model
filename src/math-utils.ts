@@ -8,24 +8,12 @@ export interface ICoordinates {
   lng: number;
 }
 
-const earthRadius = 6378; // km
-
-export const latLngDistance = (p1: ICoordinates, p2: ICoordinates) => {
-  const dLat = deg2rad(p2.lat - p1.lat);  // deg2rad below
-  const dLon = deg2rad(p2.lng - p1.lng);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(p1.lat)) * Math.cos(deg2rad(p2.lat)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2)
-  ;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return earthRadius * c; // Distance in km
-};
+const earthRadius = 6378000; // m
 
 export const latLngPlusVector = (p: ICoordinates, vec: IVector) => {
   return {
     lat: p.lat  + (vec.v / earthRadius) * (180 / Math.PI),
-    lng: p.lng + (vec.u / earthRadius) * (180 / Math.PI) / Math.cos(p.lat * Math.PI / 180)
+    lng: p.lng + (vec.u / earthRadius) * (180 / Math.PI) / Math.cos(deg2rad(p.lat))
   };
 };
 
