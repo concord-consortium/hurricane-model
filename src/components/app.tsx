@@ -2,6 +2,7 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapView } from "./map-view";
+import { BottomBar } from "./bottom-bar";
 
 import * as css from "./app.scss";
 
@@ -16,6 +17,7 @@ export class AppComponent extends BaseComponent<IProps, IState> {
     return (
       <div className={css.app}>
         <MapView />
+        <BottomBar />
       </div>
     );
   }

@@ -110,6 +110,9 @@
   },
   "dependencies": {
     "@inlet/react-pixi": "^0.4.2",
+    "@material-ui/core": "3.7.1",
+    "@material-ui/icons": "^3.0.2",
+    "geolocation-utils": "^1.1.1",
     "kd-tree-javascript": "^1.0.3",
     "leaflet": "^1.3.4",
     "mobx": "^5.8.0",
