@@ -5,7 +5,7 @@ import {BaseComponent, IBaseProps} from "./base";
 import * as PIXI from "pixi.js";
 import {autorun} from "mobx";
 
-const vectorScale = 4;
+const vectorScale = 2;
 const vectorWidth = 2;
 const arrowHeadSize = 4;
 
@@ -75,7 +75,7 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
 
   private updateArrows() {
     const stage = this.pixiApp!.stage;
-    const data = this.stores.simulation.windIncBounds;
+    const data = this.stores.simulation.windIncHurricane;
     const latLngToContainerPoint = this.stores.simulation.latLngToContainerPoint;
     data.forEach((w: any, idx: number) => {
       // Try to reuse Pixi arrows.

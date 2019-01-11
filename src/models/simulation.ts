@@ -36,11 +36,14 @@ const pressureSystemRange = 3000000; // m
 const pressureSystemStrength = 10;
 const pressureSystemAngleOffset = 0.3; // radians
 
+const hurricaneRange = 1200000; // m
+const hurricaneStrength = 30;
+
 const timestep = 1;
 // Ratio describing how hard is the global wind pushing hurricane.
-const globalWindToHurricaneAcceleration = 50;
+const globalWindToHurricaneAcceleration = 70;
 // The bigger momentum, the longer hurricane will follow its own path, ignoring global wind.
-const hurricaneMomentum = 0.95;
+const hurricaneMomentum = 0.96;
 
 const initialHurricanePosition = {lat: 15, lng: -20};
 const initialHurricaneSpeed = {u: 0, v: 0};
@@ -122,6 +125,26 @@ export class SimulationModel {
     return this.wind.filter(p =>
       p.lng >= this.west && p.lng <= this.east && p.lat >= this.south && p.lat <= this.north
     );
+  }
+
+  // Note that his data is used ONLY for rendering. Hurricane simulation uses data without effect of the
+  // hurricane itself.
+  @computed get windIncHurricane() {
+    const result: IWindPoint[] = [];
+    this.windIncBounds.forEach(w => {
+      const newWind = Object.assign({}, w);
+      const distFromHurricane = distanceTo(this.hurricanePos, w);
+      if (distFromHurricane < hurricaneRange) {
+        const perpendVec = perpendicular({u: w.lng - this.hurricanePos.lng, v: w.lat - this.hurricanePos.lat}, false);
+        const targetLength = (1 - distFromHurricane / hurricaneRange) * hurricaneStrength;
+        const targetWind = setLength(rotate(w, angle(perpendVec) + pressureSystemAngleOffset), targetLength);
+        const hurricaneMod = transform(w, targetWind, 1 - Math.pow(distFromHurricane / hurricaneRange, 4));
+        newWind.u = hurricaneMod.u;
+        newWind.v = hurricaneMod.v;
+      }
+      result.push(newWind);
+    });
+    return result;
   }
 
   @action.bound public updateMap(map: Map) {
