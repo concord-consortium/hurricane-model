@@ -1,16 +1,49 @@
-.highPressure, .lowPressure {
-  color: white;
-  font-size: 40px;
-  margin-left: -15px !important;
-  margin-top: -30px !important;
-  font-weight: bold;
-  text-shadow: 1px 1px 10px #999;
-}
+@import "common.scss";
 
-.highPressure {
-  color: #19c0ea;
-}
+.mapView {
+  width: 100%;
+  height: calc(100% - #{$bottomBarHeight});
 
-.lowPressure {
-  color: #ff2525;
+  .highPressure, .lowPressure {
+    color: white;
+    font-size: 40px;
+    margin-left: -15px !important;
+    margin-top: -30px !important;
+    font-weight: bold;
+    text-shadow: 1px 1px 10px #999;
+  }
+
+  .highPressure {
+    color: #19c0ea;
+  }
+
+  .lowPressure {
+    color: #ff2525;
+  }
+
+  .hurricane {
+    @keyframes rotation {
+      from {
+        transform: rotate(359deg);
+      }
+      to {
+        transform: rotate(0deg);
+      }
+    }
+
+    .hurricaneContainer {
+      transform-origin: top left;
+      animation: rotation 4s infinite linear;
+    }
+
+    svg {
+      transform: scale3d(0.25, 0.25, 1);
+      transform-origin: top left;
+      margin-left: -25px;
+      margin-top: -25px;
+      path {
+        fill: white;
+      }
+    }
+  }
 }

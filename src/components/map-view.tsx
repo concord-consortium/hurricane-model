@@ -5,6 +5,7 @@ import { Map, TileLayer, Marker } from "react-leaflet";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import config from "../config";
 import * as Leaflet from "leaflet";
+import * as hurricaneSvg from "../assets/hurricane.svg";
 
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
@@ -17,6 +18,10 @@ const bounds: [[number, number], [number, number]] = [[10, -80], [50, -10]];
 
 const highPressureIcon = new Leaflet.DivIcon({className: css.highPressure, html: "H"});
 const lowPressureIcon = new Leaflet.DivIcon({className: css.lowPressure, html: "L"});
+const hurricaneIcon = new Leaflet.DivIcon({
+  className: css.hurricane,
+  html: `<div class="${css.hurricaneContainer}">${hurricaneSvg}</div>`
+});
 
 @inject("stores")
 @observer
@@ -34,44 +39,52 @@ export class MapView extends BaseComponent<IProps, IState> {
 
   public render() {
     return (
-      <Map ref={this.mapRef}
-           maxBounds={config.navigation ? undefined : bounds}
-           dragging={config.navigation}
-           zoomControl={config.navigation}
-           doubleClickZoom={config.navigation}
-           scrollWheelZoom={config.navigation}
-           boxZoom={config.navigation}
-           keyboard={config.navigation}
-           style={{width: "100%", height: "100%"}}
-           onViewportChanged={this.handleViewportChanged}
-           zoom={5}
-           center={[30, -45]}
-      >
-        <PixiWindLayer />
-        <TileLayer
-          attribution={"Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid,"
-          + " IGN, IGP, UPR-EGP, and the GIS User Community"}
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        />
-        {
-          this.stores.simulation.highPressure &&
-          <Marker
-            position={this.stores.simulation.highPressure}
-            icon={highPressureIcon}
-            onDrag={this.handleHighPressureDrag}
-            draggable={true}
+      <div className={css.mapView}>
+        <Map ref={this.mapRef}
+             maxBounds={config.navigation ? undefined : bounds}
+             dragging={config.navigation}
+             zoomControl={config.navigation}
+             doubleClickZoom={config.navigation}
+             scrollWheelZoom={config.navigation}
+             boxZoom={config.navigation}
+             keyboard={config.navigation}
+             style={{width: "100%", height: "100%"}}
+             onViewportChanged={this.handleViewportChanged}
+             zoom={5}
+             center={[30, -45]}
+        >
+          <PixiWindLayer />
+          <TileLayer
+            attribution={"Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping,"
+            + "Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"}
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
+          {
+            this.stores.simulation.highPressure &&
+            <Marker
+              position={this.stores.simulation.highPressure}
+              icon={highPressureIcon}
+              onDrag={this.handleHighPressureDrag}
+              draggable={true}
+            />
+            }
+          {
+            this.stores.simulation.lowPressure &&
+            <Marker
+              position={this.stores.simulation.lowPressure}
+              icon={lowPressureIcon}
+              onDrag={this.handleLowPressureDrag}
+              draggable={true}
+            />
           }
-        {
-          this.stores.simulation.lowPressure &&
-          <Marker
-            position={this.stores.simulation.lowPressure}
-            icon={lowPressureIcon}
-            onDrag={this.handleLowPressureDrag}
-            draggable={true}
-          />
-        }
-      </Map>
+          {
+            <Marker
+              position={this.stores.simulation.hurricanePos}
+              icon={hurricaneIcon}
+            />
+          }
+        </Map>
+      </div>
     );
   }
 
