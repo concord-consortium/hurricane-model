@@ -20,7 +20,8 @@ interface IPressureSystemOptions {
 
 const pressureSystemRange = 2500000; // m
 const pressureSystemStrength = 1200000;
-const pressureSystemAngleOffsetDeg = 15; // deg
+const lowPressureSysAngleOffset = 20; // deg
+const highPressureSysAngleOffset = 8; // deg
 // When wind is far enough from the center of the pressure system, pressure system effect is lower
 // and we start smoothing it out.
 const smoothPressureSystemRatio = 0.75;
@@ -29,9 +30,9 @@ const smoothPressureSystemRatio = 0.75;
 const minPressureSystemDistance = 700000; // m
 
 // Ratio describing how hard is the global wind pushing hurricane.
-const globalWindToAcceleration = 70;
+const globalWindToAcceleration = 100;
 // The bigger momentum, the longer hurricane will follow its own path, ignoring global wind.
-const pressureSysMomentum = 0.975;
+const pressureSysMomentum = 0.92;
 
 const minDistToOtherSystems = (sys: PressureSystem, otherSystems: PressureSystem[]) => {
   const dists = otherSystems.map(ps => distanceTo(ps.center, sys.center));
@@ -71,7 +72,8 @@ export class PressureSystem {
   public applyToWindPoint = (wind: IWindPoint) => {
     wind = Object.assign({}, wind);
     const direction = this.type === "high" ? 1 : -1;
-    const heading = headingTo(this.center, wind) + 90 * direction - pressureSystemAngleOffsetDeg;
+    const offset = this.type === "high" ? highPressureSysAngleOffset : lowPressureSysAngleOffset;
+    const heading = headingTo(this.center, wind) + 90 * direction - offset;
     const distNormalized = distanceTo(this.center, wind) / this.range;
     const exp = this.type === "high" ? 0.25 : 4;
     const distExp = Math.pow(distNormalized, exp);

@@ -36,8 +36,8 @@ const hurricaneStrength = 2700000;
 
 const timestep = 1;
 
-const initialHurricanePosition = {lat: 15, lng: -20};
-const initialHurricaneSpeed = {u: -20000, v: 0};
+const initialHurricanePosition = {lat: 20, lng: -20};
+const initialHurricaneSpeed = {u: 0, v: 0};
 
 export class SimulationModel {
   // Region boundaries.
@@ -54,19 +54,27 @@ export class SimulationModel {
   @observable public pressureSystems: PressureSystem[] = [
     new PressureSystem({
       type: "high",
-      center: {lat: 30, lng: -28}
+      center: {lat: 33, lng: -31},
+      strength: 1200000,
+      range: 3200000
     }),
     new PressureSystem({
       type: "high",
-      center: {lat: 35, lng: -5}
+      center: {lat: 33.5, lng: -59.25},
+      strength: 800000,
+      range: 2000000
     }),
     new PressureSystem({
       type: "low",
-      center: {lat: 38, lng: -80}
+      center: {lat: 42, lng: -94},
+      strength: 1300000,
+      range: 2000000
     }),
     new PressureSystem({
       type: "low",
-      center: {lat: 48, lng: -95}
+      center: {lat: 54, lng: -89},
+      strength: 700000,
+      range: 1500000
     })
   ];
 
