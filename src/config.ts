@@ -12,7 +12,26 @@ const DEFAULT_CONFIG: any = {
   // Sets base wind data (and sea temperature in the future). "fall", "winter", "spring", or "summer".
   season: "fall",
   // If set to false, user won"t be able to drag and zoom map.
-  navigation: false
+  navigation: false,
+
+  timestep: 1,
+  hurricaneRange: 1000000, // m
+  hurricaneStrength: 2700000,
+  initialHurricanePosition: {lat: 20, lng: -20},
+  initialHurricaneSpeed: {u: 0, v: 0},
+  pressureSystemRange: 2500000, // m
+  pressureSystemStrength: 1200000,
+  lowPressureSysAngleOffset: 20, // deg
+  highPressureSysAngleOffset: 8, // deg
+  // When wind is far enough from the center of the pressure system, pressure system effect is lower
+  // and we start smoothing it out.
+  smoothPressureSystemRatio: 0.75,
+  // Min distance between two pressure systems.
+  minPressureSystemDistance: 700000, // m
+  // Ratio describing how hard is the global wind pushing hurricane.
+  globalWindToAcceleration: 100,
+  // The bigger momentum, the longer hurricane will follow its own path, ignoring global wind.
+  pressureSysMomentum: 0.92
 };
 
 const urlConfig: any = {};
