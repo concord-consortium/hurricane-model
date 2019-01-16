@@ -14,7 +14,7 @@ interface IPressureSystemOptions {
   type: PressureSystemType;
   center: ICoordinates;
   strength?: number;
-  range?: number;
+  strengthGradient?: number;
   acceleration?: IVector;
   speed?: IVector;
 }
@@ -33,21 +33,25 @@ const minDistToOtherSystems = (sys: PressureSystem, otherSystems: PressureSystem
 export class PressureSystem {
   @observable public type: PressureSystemType;
   @observable public center: ICoordinates;
-  @observable public range = config.pressureSystemRange;
+  @observable public strengthGradient = config.pressureSystemIntensityGradient;
   @observable public strength = config.pressureSystemStrength;
 
   public speed = {u: 0, v: 0};
 
   public lastCorrectCenter: ICoordinates;
 
+  public get range() {
+    return this.strength * this.strengthGradient;
+  }
+
   constructor(props: IPressureSystemOptions) {
     this.type = props.type;
     this.center = props.center;
-    if (props.range !== undefined) {
-      this.range = props.range;
-    }
     if (props.strength !== undefined) {
       this.strength = props.strength;
+    }
+    if (props.strengthGradient !== undefined) {
+      this.strengthGradient = props.strengthGradient;
     }
     if (props.speed !== undefined) {
       this.speed = props.speed;

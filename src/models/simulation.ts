@@ -46,35 +46,31 @@ export class SimulationModel {
   @observable public pressureSystems: PressureSystem[] = [
     new PressureSystem({
       type: "high",
-      center: {lat: 33, lng: -31},
-      strength: 1200000,
-      range: 3200000
+      center: {lat: 34, lng: -29},
+      strength: 1500000
     }),
     new PressureSystem({
       type: "high",
-      center: {lat: 33.5, lng: -59.25},
-      strength: 800000,
-      range: 2000000
+      center: {lat: 34, lng: -53},
+      strength: 1000000
     }),
     new PressureSystem({
       type: "low",
-      center: {lat: 42, lng: -94},
-      strength: 1300000,
-      range: 2000000
+      center: {lat: 39, lng: -92},
+      strength: 900000
     }),
     new PressureSystem({
       type: "low",
       center: {lat: 54, lng: -89},
-      strength: 700000,
-      range: 1500000
+      strength: 700000
     })
   ];
 
   @observable public hurricane: PressureSystem = new PressureSystem({
     type: "hurricane",
     center: config.initialHurricanePosition,
-    range: config.hurricaneRange,
     strength: config.hurricaneStrength,
+    strengthGradient: config.hurricaneStrengthGradient,
     speed: config.initialHurricaneSpeed
   });
 

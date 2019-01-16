@@ -15,14 +15,14 @@ const DEFAULT_CONFIG: any = {
   navigation: false,
 
   timestep: 1,
-  hurricaneRange: 1000000, // m
-  hurricaneStrength: 2700000,
-  initialHurricanePosition: {lat: 20, lng: -20},
-  initialHurricaneSpeed: {u: 0, v: 0},
-  pressureSystemRange: 2500000, // m
   pressureSystemStrength: 1200000,
+  pressureSystemIntensityGradient: 2,
   lowPressureSysAngleOffset: 20, // deg
   highPressureSysAngleOffset: 8, // deg
+  hurricaneStrength: 2700000,
+  hurricaneStrengthGradient: 0.37,
+  initialHurricanePosition: {lat: 20, lng: -20},
+  initialHurricaneSpeed: {u: 0, v: 0},
   // When wind is far enough from the center of the pressure system, pressure system effect is lower
   // and we start smoothing it out.
   smoothPressureSystemRatio: 0.75,
