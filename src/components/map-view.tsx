@@ -60,26 +60,20 @@ export class MapView extends BaseComponent<IProps, IState> {
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
           {
-            this.stores.simulation.highPressure &&
-            <Marker
-              position={this.stores.simulation.highPressure}
-              icon={highPressureIcon}
-              onDrag={this.handleHighPressureDrag}
-              draggable={true}
-            />
-            }
-          {
-            this.stores.simulation.lowPressure &&
-            <Marker
-              position={this.stores.simulation.lowPressure}
-              icon={lowPressureIcon}
-              onDrag={this.handleLowPressureDrag}
-              draggable={true}
-            />
+            this.stores.simulation.pressureSystems.map((ps, idx) =>
+              <Marker
+                key={idx}
+                position={ps.center}
+                icon={ps.type === "high" ? highPressureIcon : lowPressureIcon}
+                onDrag={this.handlePressureSysDrag.bind(this, idx)}
+                onDragEnd={this.handlePressureSysDragEnd.bind(this, idx)}
+                draggable={true}
+              />
+            )
           }
           {
             <Marker
-              position={this.stores.simulation.hurricanePos}
+              position={this.stores.simulation.hurricane.center}
               icon={hurricaneIcon}
             />
           }
@@ -106,11 +100,11 @@ export class MapView extends BaseComponent<IProps, IState> {
     }
   }
 
-  private handleHighPressureDrag = (e: Leaflet.LeafletMouseEvent) => {
-    this.stores.simulation.setHighPressure(e.latlng);
+  private handlePressureSysDrag = (idx: number, e: Leaflet.LeafletMouseEvent) => {
+    this.stores.simulation.setPressureSysCenter(idx, e.latlng);
   }
 
-  private handleLowPressureDrag = (e: Leaflet.LeafletMouseEvent) => {
-    this.stores.simulation.setLowPressure(e.latlng);
+  private handlePressureSysDragEnd = (idx: number) => {
+    this.stores.simulation.checkPressureSystem(idx);
   }
 }
