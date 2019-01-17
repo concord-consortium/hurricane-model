@@ -31,14 +31,6 @@ const windData: IWindDataset = {
   fall: septWind.windVectors
 };
 
-const hurricaneRange = 1000000; // m
-const hurricaneStrength = 2700000;
-
-const timestep = 1;
-
-const initialHurricanePosition = {lat: 15, lng: -20};
-const initialHurricaneSpeed = {u: -20000, v: 0};
-
 export class SimulationModel {
   // Region boundaries.
   @observable public east = 180;
@@ -54,28 +46,32 @@ export class SimulationModel {
   @observable public pressureSystems: PressureSystem[] = [
     new PressureSystem({
       type: "high",
-      center: {lat: 30, lng: -28}
+      center: {lat: 34, lng: -29},
+      strength: 1500000
     }),
     new PressureSystem({
       type: "high",
-      center: {lat: 35, lng: -5}
+      center: {lat: 34, lng: -53},
+      strength: 1000000
     }),
     new PressureSystem({
       type: "low",
-      center: {lat: 38, lng: -80}
+      center: {lat: 39, lng: -92},
+      strength: 900000
     }),
     new PressureSystem({
       type: "low",
-      center: {lat: 48, lng: -95}
+      center: {lat: 54, lng: -89},
+      strength: 700000
     })
   ];
 
   @observable public hurricane: PressureSystem = new PressureSystem({
     type: "hurricane",
-    center: initialHurricanePosition,
-    range: hurricaneRange,
-    strength: hurricaneStrength,
-    speed: initialHurricaneSpeed
+    center: config.initialHurricanePosition,
+    strength: config.hurricaneStrength,
+    strengthGradient: config.hurricaneStrengthGradient,
+    speed: config.initialHurricaneSpeed
   });
 
   @observable public simulationStarted = false;
@@ -154,7 +150,7 @@ export class SimulationModel {
 
   @action.bound public tick() {
     const windSpeed = this.windAt(this.hurricane.center);
-    this.hurricane.move(windSpeed, timestep);
+    this.hurricane.move(windSpeed, config.timestep);
     if (this.simulationStarted) {
       requestAnimationFrame(this.tick);
     }
@@ -171,8 +167,8 @@ export class SimulationModel {
 
   @action.bound public reset() {
     this.simulationStarted = false;
-    this.hurricane.center = initialHurricanePosition;
-    this.hurricane.speed = initialHurricaneSpeed;
+    this.hurricane.center = config.initialHurricanePosition;
+    this.hurricane.speed = config.initialHurricaneSpeed;
   }
 
   public windAt(point: ICoordinates) {

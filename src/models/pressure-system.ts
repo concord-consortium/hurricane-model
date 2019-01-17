@@ -6,6 +6,7 @@ import {
 import {
   headingTo, moveTo, distanceTo
 } from "geolocation-utils";
+import config from "../config";
 
 type PressureSystemType = "high" | "low" | "hurricane";
 
@@ -13,25 +14,10 @@ interface IPressureSystemOptions {
   type: PressureSystemType;
   center: ICoordinates;
   strength?: number;
-  range?: number;
+  strengthGradient?: number;
   acceleration?: IVector;
   speed?: IVector;
 }
-
-const pressureSystemRange = 2500000; // m
-const pressureSystemStrength = 1200000;
-const pressureSystemAngleOffsetDeg = 15; // deg
-// When wind is far enough from the center of the pressure system, pressure system effect is lower
-// and we start smoothing it out.
-const smoothPressureSystemRatio = 0.75;
-
-// Min distance between two pressure systems.
-const minPressureSystemDistance = 700000; // m
-
-// Ratio describing how hard is the global wind pushing hurricane.
-const globalWindToAcceleration = 70;
-// The bigger momentum, the longer hurricane will follow its own path, ignoring global wind.
-const pressureSysMomentum = 0.975;
 
 const minDistToOtherSystems = (sys: PressureSystem, otherSystems: PressureSystem[]) => {
   const dists = otherSystems.map(ps => distanceTo(ps.center, sys.center));
@@ -47,21 +33,25 @@ const minDistToOtherSystems = (sys: PressureSystem, otherSystems: PressureSystem
 export class PressureSystem {
   @observable public type: PressureSystemType;
   @observable public center: ICoordinates;
-  @observable public range = pressureSystemRange;
-  @observable public strength = pressureSystemStrength;
+  @observable public strengthGradient = config.pressureSystemIntensityGradient;
+  @observable public strength = config.pressureSystemStrength;
 
   public speed = {u: 0, v: 0};
 
   public lastCorrectCenter: ICoordinates;
 
+  public get range() {
+    return this.strength * this.strengthGradient;
+  }
+
   constructor(props: IPressureSystemOptions) {
     this.type = props.type;
     this.center = props.center;
-    if (props.range !== undefined) {
-      this.range = props.range;
-    }
     if (props.strength !== undefined) {
       this.strength = props.strength;
+    }
+    if (props.strengthGradient !== undefined) {
+      this.strengthGradient = props.strengthGradient;
     }
     if (props.speed !== undefined) {
       this.speed = props.speed;
@@ -71,15 +61,16 @@ export class PressureSystem {
   public applyToWindPoint = (wind: IWindPoint) => {
     wind = Object.assign({}, wind);
     const direction = this.type === "high" ? 1 : -1;
-    const heading = headingTo(this.center, wind) + 90 * direction - pressureSystemAngleOffsetDeg;
+    const offset = this.type === "high" ? config.highPressureSysAngleOffset : config.lowPressureSysAngleOffset;
+    const heading = headingTo(this.center, wind) + 90 * direction - offset;
     const distNormalized = distanceTo(this.center, wind) / this.range;
     const exp = this.type === "high" ? 0.25 : 4;
     const distExp = Math.pow(distNormalized, exp);
     const length = this.type === "high" ? distExp * this.strength : (1 - distExp) * this.strength;
     const prependVecEnd = moveTo(wind, {distance: length, heading});
     let newWind = {u: prependVecEnd.lng - wind.lng, v: prependVecEnd.lat - wind.lat};
-    if (distNormalized > smoothPressureSystemRatio) {
-      const ratio = (distNormalized - smoothPressureSystemRatio) / (1 - smoothPressureSystemRatio);
+    if (distNormalized > config.smoothPressureSystemRatio) {
+      const ratio = (distNormalized - config.smoothPressureSystemRatio) / (1 - config.smoothPressureSystemRatio);
       newWind = vecAverage([wind, newWind], [ratio, 1 - ratio]);
     }
     wind.u = newWind.u;
@@ -89,23 +80,23 @@ export class PressureSystem {
 
   public move = (windSpeed: IVector, timestep: number) => {
     // Simple Euler integration. Global wind speed is used to push / accelerate hurricane center.
-    this.speed.u *= pressureSysMomentum;
-    this.speed.v *= pressureSysMomentum;
-    this.speed.u += windSpeed.u * globalWindToAcceleration * timestep;
-    this.speed.v += windSpeed.v * globalWindToAcceleration * timestep;
+    this.speed.u *= config.pressureSysMomentum;
+    this.speed.v *= config.pressureSysMomentum;
+    this.speed.u += windSpeed.u * config.globalWindToAcceleration * timestep;
+    this.speed.v += windSpeed.v * config.globalWindToAcceleration * timestep;
     const posDiff = {u: this.speed.u * timestep, v: this.speed.v * timestep};
     this.center = latLngPlusVector(this.center, posDiff);
   }
 
   @action.bound public setCenter(center: ICoordinates, pressureSystems: PressureSystem[]) {
-    if (minDistToOtherSystems(this, pressureSystems) >= minPressureSystemDistance) {
+    if (minDistToOtherSystems(this, pressureSystems) >= config.minPressureSystemDistance) {
       this.lastCorrectCenter = center;
     }
     this.center = center;
   }
 
   @action.bound public checkPressureSystem(pressureSystems: PressureSystem[]) {
-    if (this.lastCorrectCenter && minDistToOtherSystems(this, pressureSystems) <= minPressureSystemDistance) {
+    if (this.lastCorrectCenter && minDistToOtherSystems(this, pressureSystems) <= config.minPressureSystemDistance) {
       this.center = this.lastCorrectCenter;
     }
   }
