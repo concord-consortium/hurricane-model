@@ -8,7 +8,7 @@ import {
 } from "geolocation-utils";
 import config from "../config";
 
-type PressureSystemType = "high" | "low" | "hurricane";
+export type PressureSystemType = "high" | "low" | "hurricane";
 
 interface IPressureSystemOptions {
   type: PressureSystemType;
@@ -93,6 +93,10 @@ export class PressureSystem {
       this.lastCorrectCenter = center;
     }
     this.center = center;
+  }
+
+  @action.bound public setStrength(value: number) {
+    this.strength = value;
   }
 
   @action.bound public checkPressureSystem(pressureSystems: PressureSystem[]) {

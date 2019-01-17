@@ -140,12 +140,12 @@ export class SimulationModel {
     this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
   }
 
-  @action.bound public setPressureSysCenter(idx: number, center: ICoordinates) {
-    this.pressureSystems[idx].setCenter(center, this.pressureSystems);
+  @action.bound public setPressureSysCenter(pressureSystem: PressureSystem, center: ICoordinates) {
+    pressureSystem.setCenter(center, this.pressureSystems);
   }
 
-  @action.bound public checkPressureSystem(idx: number) {
-    this.pressureSystems[idx].checkPressureSystem(this.pressureSystems);
+  @action.bound public checkPressureSystem(pressureSystem: PressureSystem) {
+    pressureSystem.checkPressureSystem(this.pressureSystems);
   }
 
   @action.bound public tick() {
