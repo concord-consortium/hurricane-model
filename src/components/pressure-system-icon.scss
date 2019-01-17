@@ -1,0 +1,49 @@
+.pressureSystemIcon {
+  display: inline-block;
+  color: white;
+  font-size: 50px;
+  font-weight: bold;
+  text-shadow: 1px 1px 10px #999;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  margin-left: -35px !important;
+  margin-top: -35px !important;
+}
+
+.label {
+  margin-top: -10px;
+  color: white;
+  font-size: 18px;
+}
+
+.highPressure {
+  color: #19c0ea;
+}
+
+.lowPressure {
+  color: #ff2525;
+}
+
+.sliderContainer {
+  display: inline-block;
+  margin-left: 20px;
+  height: 35px;
+}
+
+.slider {
+  background: black;
+  .thumb {
+    background-color: white;
+    &:hover {
+      box-shadow: 0 0 0 9px rgba(255, 255, 255, 0.25);
+    }
+  }
+  .track {
+    background-color: white;
+  }
+  .trackAfter {
+    opacity: 0.7;
+  }
+}
+

@@ -8,10 +8,11 @@ import {autorun} from "mobx";
 const vectorScale = 2;
 const vectorWidth = 2;
 const arrowHeadSize = 4;
+const color = 0xcdcdcd;
 
 const lineTexture = (() => {
   const graph = new PIXI.Graphics();
-  graph.beginFill(0xffffff);
+  graph.beginFill(color);
   graph.drawRect(0, 0, vectorWidth, 1);
   graph.endFill();
   const tex = graph.generateCanvasTexture(1, 2);
@@ -22,7 +23,7 @@ const lineTexture = (() => {
 
 const arrowTexture = (() => {
   const graph = new PIXI.Graphics();
-  graph.beginFill(0xffffff);
+  graph.beginFill(color);
   graph.drawPolygon([
     0, 0,
     arrowHeadSize * 0.5 * vectorWidth,

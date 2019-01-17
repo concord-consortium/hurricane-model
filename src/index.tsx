@@ -5,7 +5,7 @@ import * as ReactDOM from "react-dom";
 import { AppComponent } from "./components/app";
 import { createStores } from "./models/stores";
 
-const stores = createStores();
+export const stores = createStores();
 
 ReactDOM.render(
   <Provider stores={stores}>
