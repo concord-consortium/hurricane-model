@@ -4,6 +4,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import { Map, TileLayer, Marker } from "react-leaflet";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
+import { HurricaneTrack } from "./hurricane-track";
 import config from "../config";
 import * as Leaflet from "leaflet";
 import * as hurricaneSvg from "../assets/hurricane.svg";
@@ -59,6 +60,7 @@ export class MapView extends BaseComponent<IProps, IState> {
             + "Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"}
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
+          <HurricaneTrack />
           {
             this.stores.simulation.pressureSystems.map((ps, idx) =>
               <PressureSystemMarker

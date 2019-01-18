@@ -1,14 +1,4 @@
-export interface IVector {
-  u: number;
-  v: number;
-}
-
-export interface ICoordinates {
-  lat: number;
-  lng: number;
-}
-
-export interface IWindPoint extends IVector, ICoordinates {}
+import { ICoordinates, IVector } from "./types";
 
 const earthRadius = 6378000; // m
 
