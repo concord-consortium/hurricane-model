@@ -38,7 +38,7 @@ export class SimulationModel {
   @observable public south = -90;
   @observable public zoom = 4;
 
-  @observable hurricaneTrack: ITrackPoint[] = [];
+  @observable public hurricaneTrack: ITrackPoint[] = [];
   public time = 0;
 
   // Current season, sets wind and sea temperature (in the future).
@@ -155,7 +155,7 @@ export class SimulationModel {
       this.hurricaneTrack.push({
         position: this.hurricane.center,
         strength: this.hurricane.strength
-      })
+      });
     }
     const windSpeed = this.windAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
