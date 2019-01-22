@@ -40,3 +40,42 @@ pressure systems in contrast to `<month>-avg-wind.png` images showing NOAA avera
 
 Simple format (`<month>-simple.json` files) will be used by the model itself. GeoJSON is a bit verbose and its 
 main advantage is that we can simply visualize it using various online tools. 
+
+## Sea Surface Temperature
+
+Sea Surface Temperature (SST) affects intensity of the hurricane. The warmer ocean is, the more intense hurricane gets.
+This model uses data coming from NASA:
+- https://podaac.jpl.nasa.gov/dataset/MODIS_AQUA_L3_SST_MID-IR_MONTHLY_4KM_NIGHTTIME_V2014.0
+- ftp://podaac-ftp.jpl.nasa.gov/allData/modis/L3/aqua/4um/v2014.0/4km/monthly/2018/
+
+Interactive visualization:
+- https://worldview.earthdata.nasa.gov/?p=geographic&l=MODIS_Aqua_L3_SST_MidIR_4km_Night_Monthly,Reference_Labels(hidden),Reference_Features,Coastlines(hidden)&t=2018-09-19-T00%3A00%3A00Z&z=3&v=-144.11630581918422,-22.21990140009921,35.883694180815795,68.41291109990078
+
+`sea-surface-temp-netcdf` directory contains monthly mean data for four months representing different seasons:
+
+- December -> winter
+- March -> spring
+- June -> summer
+- September -> fall
+
+Original data is in NetCDF format (binary). It's been converted to PNG images using `scripts/convert-sea-surface-temp-to-png.js` script.
+
+```bash
+node --max-old-space-size=4092 scripts/convert-sea-surface-temp-to-png.js <dataset> <png-file-output>, e.g.:
+node --max-old-space-size=4092 scripts/convert-sea-surface-temp-to-png.js sea-surface-temp-netcdf/dec.nc sea-surface-temp-json/dec.png 
+```
+ 
+Note that `--max-old-space-size=4092` param is required, as reading converted files takes a lot of memory.
+Points that are over land, not sea, will be transparent.
+
+This script uses `src/temperature-scale.js` file to map between temperatures and colors.
+
+The same helper is used by the simulation engine to do the reverse mapping - color to temperature.
+It lets us use the same image data for visualization and simulation needs. PNG has lots of advantages compared to raw
+JSON data. It's compressed and lets us cover area way more precisely than JSON data with similar size.
+
+**IMPORTANT**
+If you ever change anything in `src/temperature-scale.js`, remember to run all the conversion scripts and generate
+sea surface temperature images again. They need to stay in sync with temperature scale.
+
+
