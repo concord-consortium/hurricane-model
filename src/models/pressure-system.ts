@@ -1,8 +1,7 @@
 import { action, observable } from "mobx";
 import { kdTree } from "kd-tree-javascript";
-import {
-  ICoordinates, IVector, IWindPoint, latLngPlusVector, vecAverage
-} from "../math-utils";
+import { ICoordinates, IVector, IWindPoint } from "../types";
+import { latLngPlusVector, vecAverage } from "../math-utils";
 import {
   headingTo, moveTo, distanceTo
 } from "geolocation-utils";

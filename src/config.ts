@@ -31,7 +31,9 @@ const DEFAULT_CONFIG: any = {
   // Ratio describing how hard is the global wind pushing hurricane.
   globalWindToAcceleration: 100,
   // The bigger momentum, the longer hurricane will follow its own path, ignoring global wind.
-  pressureSysMomentum: 0.92
+  pressureSysMomentum: 0.92,
+  // Length of single track segment in model ticks.
+  trackSegmentLength: 25
 };
 
 const urlConfig: any = {};

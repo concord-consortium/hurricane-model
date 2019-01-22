@@ -6,9 +6,8 @@ import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
 import * as septWind from "../../wind-data-json/sep-simple.json";
 import { kdTree } from "kd-tree-javascript";
-import {
-  ICoordinates, IWindPoint, vecAverage
-} from "../math-utils";
+import { ICoordinates, IWindPoint, ITrackPoint } from "../types";
+import { vecAverage } from "../math-utils";
 import {
   headingTo, moveTo, distanceTo
 } from "geolocation-utils";
@@ -38,6 +37,9 @@ export class SimulationModel {
   @observable public west = -180;
   @observable public south = -90;
   @observable public zoom = 4;
+
+  @observable public hurricaneTrack: ITrackPoint[] = [];
+  public time = 0;
 
   // Current season, sets wind and sea temperature (in the future).
   @observable public season: Season = config.season;
@@ -149,8 +151,15 @@ export class SimulationModel {
   }
 
   @action.bound public tick() {
+    if (this.time % config.trackSegmentLength === 0) {
+      this.hurricaneTrack.push({
+        position: this.hurricane.center,
+        strength: this.hurricane.strength
+      });
+    }
     const windSpeed = this.windAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
+    this.time += config.timestep;
     if (this.simulationStarted) {
       requestAnimationFrame(this.tick);
     }
@@ -169,6 +178,8 @@ export class SimulationModel {
     this.simulationStarted = false;
     this.hurricane.center = config.initialHurricanePosition;
     this.hurricane.speed = config.initialHurricaneSpeed;
+    this.hurricaneTrack = [];
+    this.time = 0;
   }
 
   public windAt(point: ICoordinates) {
