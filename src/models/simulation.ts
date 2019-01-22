@@ -200,6 +200,8 @@ export class SimulationModel {
     const windSpeed = this.windAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
     this.time += config.timestep;
+    // tslint:disable-next-line:no-console
+    console.log(this.seaSurfaceTempAt(this.hurricane.center));
     if (this.simulationStarted) {
       requestAnimationFrame(this.tick);
     }
@@ -268,21 +270,18 @@ export class SimulationModel {
   }
 
   private updateSeaSurfaceTempData() {
-    // Download image and parse its content.
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", this.seaSurfaceTempImgUrl, true);
-    xhr.responseType = "arraybuffer";
-    xhr.onload = () => {
-      if (xhr.status === 200){
-        const png = new PNG();
-        png.parse(xhr.response, (err, validPng) => {
-          if (err) {
-            throw err;
-          }
-          this.seaSurfaceTempData = validPng;
+    fetch(this.seaSurfaceTempImgUrl).then(response => {
+      if (response.ok) {
+        response.arrayBuffer().then(buffer => {
+          const png = new PNG();
+          png.parse(Buffer.from(buffer), (err, validPng) => {
+            if (err) {
+              throw err;
+            }
+            this.seaSurfaceTempData = validPng;
+          });
         });
       }
-    };
-    xhr.send();
+    });
   }
 }
