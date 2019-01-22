@@ -1,7 +1,7 @@
 import * as React from "react";
 import {inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { Map, TileLayer, Marker } from "react-leaflet";
+import { Map, TileLayer, Marker, ImageOverlay } from "react-leaflet";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
 import { HurricaneTrack } from "./hurricane-track";
@@ -18,6 +18,8 @@ interface IState {}
 
 // Show North Atlantic.
 const bounds: [[number, number], [number, number]] = [[10, -80], [50, -10]];
+
+const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
 
 const hurricaneIcon = new Leaflet.DivIcon({
   className: css.hurricane,
@@ -39,6 +41,7 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public render() {
+    const sim = this.stores.simulation;
     return (
       <div className={css.mapView}>
         <Map ref={this.mapRef}
@@ -55,6 +58,11 @@ export class MapView extends BaseComponent<IProps, IState> {
              center={[30, -45]}
         >
           <PixiWindLayer />
+          <ImageOverlay
+            opacity={0.8}
+            url={sim.seaSurfaceTempImgUrl}
+            bounds={imageOverlayBounds}
+          />
           <TileLayer
             attribution={"Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping,"
             + "Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"}
@@ -62,16 +70,16 @@ export class MapView extends BaseComponent<IProps, IState> {
           />
           <HurricaneTrack />
           {
-            this.stores.simulation.pressureSystems.map((ps, idx) =>
+            sim.pressureSystems.map((ps, idx) =>
               <PressureSystemMarker
                 key={idx}
                 model={ps}
-              />,
+              />
             )
           }
           {
             <Marker
-              position={this.stores.simulation.hurricane.center}
+              position={sim.hurricane.center}
               icon={hurricaneIcon}
             />
           }

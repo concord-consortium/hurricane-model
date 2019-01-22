@@ -8,7 +8,8 @@ import {autorun} from "mobx";
 const vectorScale = 2;
 const vectorWidth = 2;
 const arrowHeadSize = 4;
-const color = 0xcdcdcd;
+const color = 0xffffff;
+const opacity = 0.75;
 
 const lineTexture = (() => {
   const graph = new PIXI.Graphics();
@@ -86,6 +87,7 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
       const lineScale = new PIXI.Point(1, length);
       const point = latLngToContainerPoint([w.lat, w.lng]);
       const rotation = Math.atan2(w.u, w.v);
+      arrowContainer.alpha = opacity;
       arrowContainer.x = point.x;
       arrowContainer.y = point.y;
       arrowContainer.rotation = rotation;
