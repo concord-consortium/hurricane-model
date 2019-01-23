@@ -10,6 +10,7 @@
     "jsx-wrap-multiline": false,
     "max-classes-per-file": false,
     "no-console": false,
+    "no-bitwise": false,
     "no-debugger": false,
     "no-empty-interface": false,
     "no-unused-expression": [true, "allow-fast-null-checks"],

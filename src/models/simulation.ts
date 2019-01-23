@@ -1,16 +1,22 @@
-import { LatLngExpression, Point, Map} from "leaflet";
-import {action, observable, computed} from "mobx";
+import { LatLngExpression, Point, Map, CRS } from "leaflet";
+import { action, observable, computed, autorun } from "mobx";
 import { PressureSystem } from "./pressure-system";
 import * as decWind from "../../wind-data-json/dec-simple.json";
 import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
 import * as septWind from "../../wind-data-json/sep-simple.json";
+import * as decSeaTemp from "../../sea-surface-temp-img/dec.png";
+import * as marchSeaTemp from "../../sea-surface-temp-img/mar.png";
+import * as juneSeaTemp from "../../sea-surface-temp-img/jun.png";
+import * as septSeaTemp from "../../sea-surface-temp-img/sep.png";
 import { kdTree } from "kd-tree-javascript";
 import { ICoordinates, IWindPoint, ITrackPoint } from "../types";
 import { vecAverage } from "../math-utils";
 import {
   headingTo, moveTo, distanceTo
 } from "geolocation-utils";
+import { invertedTemperatureScale } from "../temperature-scale";
+import { PNG } from "pngjs";
 
 import config from "../config";
 
@@ -23,11 +29,25 @@ interface IWindDataset {
   fall: IWindPoint[];
 }
 
+interface ISSTImages {
+  winter: string;
+  spring: string;
+  summer: string;
+  fall: string;
+}
+
 const windData: IWindDataset = {
   winter: decWind.windVectors,
   spring: marchWind.windVectors,
   summer: juneWind.windVectors,
   fall: septWind.windVectors
+};
+
+const sstImages: ISSTImages = {
+  winter: decSeaTemp,
+  spring: marchSeaTemp,
+  summer: juneSeaTemp,
+  fall: septSeaTemp
 };
 
 export class SimulationModel {
@@ -43,6 +63,8 @@ export class SimulationModel {
 
   // Current season, sets wind and sea temperature (in the future).
   @observable public season: Season = config.season;
+
+  @observable public seaSurfaceTempData: PNG | null = null;
 
   // Pressure systems affect winds.
   @observable public pressureSystems: PressureSystem[] = [
@@ -78,12 +100,23 @@ export class SimulationModel {
 
   @observable public simulationStarted = false;
 
+  constructor() {
+    autorun(() => {
+      // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
+      // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
+      // data is always updated when necessary.
+      this.updateSeaSurfaceTempData();
+    });
+  }
+
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
+  // Wind data not affected by custom pressure systems.
   @computed get baseWind() {
     return windData[this.season];
   }
 
+  // Wind data affected by custom pressure systems.
   @computed get wind() {
     const result: IWindPoint[] = [];
     this.baseWind.forEach(w => {
@@ -106,16 +139,19 @@ export class SimulationModel {
     return result;
   }
 
+  // Helper structure.
   @computed get windKdTree() {
     return new kdTree(this.wind, distanceTo, ["lat", "lng"]);
   }
 
+  // Wind data affected by custom pressure systems and limited to current bounds.
   @computed get windIncBounds() {
     return this.wind.filter(p =>
       p.lng >= this.west && p.lng <= this.east && p.lat >= this.south && p.lat <= this.north
     );
   }
 
+  // Wind data affected by custom pressure systems, hurricane, and limited to current bounds.
   // Note that his data is used ONLY for rendering. Hurricane simulation uses data without effect of the
   // hurricane itself.
   @computed get windIncHurricane() {
@@ -129,6 +165,10 @@ export class SimulationModel {
       }
     });
     return result;
+  }
+
+  @computed get seaSurfaceTempImgUrl() {
+    return sstImages[this.season];
   }
 
   @action.bound public updateMap(map: Map) {
@@ -160,6 +200,8 @@ export class SimulationModel {
     const windSpeed = this.windAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
     this.time += config.timestep;
+    // tslint:disable-next-line:no-console
+    console.log(this.seaSurfaceTempAt(this.hurricane.center));
     if (this.simulationStarted) {
       requestAnimationFrame(this.tick);
     }
@@ -198,5 +240,48 @@ export class SimulationModel {
     avg.u /= distWeightSum;
     avg.v /= distWeightSum;
     return avg;
+  }
+
+  public seaSurfaceTempAt(position: LatLngExpression) {
+    // This function uses parsed PNG image data and inverted temperature scale to get numeric value.
+    const pngData = this.seaSurfaceTempData;
+    if (!pngData) {
+      return null;
+    }
+    // A bit of math here. EPSG3857 is a standard projection that we use.
+    const zoom = CRS.EPSG3857.zoom(pngData.width);
+    const point = CRS.EPSG3857.latLngToPoint(position, zoom);
+    const x = Math.round(point.x);
+    const y = Math.round(point.y);
+    // This is specific to pngjs library being used here.
+    const idx = (pngData.width * y + x) << 2;
+    const r = pngData.data[idx];
+    const g = pngData.data[idx + 1];
+    const b = pngData.data[idx + 2];
+    const a = pngData.data[idx + 3];
+    if (a === 0) {
+      // Note that scripts that generate SST images, use transparent pixels for land.
+      return null;
+    }
+    // Format and whitespace are very important. That's how D3 scale returns color value.
+    // It needs to match invertedTemperatureScale domain.
+    const color = `rgb(${r}, ${g}, ${b})`;
+    return invertedTemperatureScale(color);
+  }
+
+  private updateSeaSurfaceTempData() {
+    fetch(this.seaSurfaceTempImgUrl).then(response => {
+      if (response.ok) {
+        response.arrayBuffer().then(buffer => {
+          const png = new PNG();
+          png.parse(Buffer.from(buffer), (err, validPng) => {
+            if (err) {
+              throw err;
+            }
+            this.seaSurfaceTempData = validPng;
+          });
+        });
+      }
+    });
   }
 }
