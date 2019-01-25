@@ -9,7 +9,7 @@ import config from "../config";
 
 export type PressureSystemType = "high" | "low" | "hurricane";
 
-interface IPressureSystemOptions {
+export interface IPressureSystemOptions {
   type: PressureSystemType;
   center: ICoordinates;
   strength?: number;
@@ -17,6 +17,9 @@ interface IPressureSystemOptions {
   acceleration?: IVector;
   speed?: IVector;
 }
+
+// Limit pressure systems only to the northern hemisphere.
+const minLat = 10;
 
 const minDistToOtherSystems = (sys: PressureSystem, otherSystems: PressureSystem[]) => {
   const dists = otherSystems.map(ps => distanceTo(ps.center, sys.center));
@@ -88,6 +91,7 @@ export class PressureSystem {
   }
 
   @action.bound public setCenter(center: ICoordinates, pressureSystems: PressureSystem[]) {
+    center.lat = Math.max(minLat, center.lat);
     if (minDistToOtherSystems(this, pressureSystems) >= config.minPressureSystemDistance) {
       this.lastCorrectCenter = center;
     }
