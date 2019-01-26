@@ -34,7 +34,11 @@ describe("PressureSystemMarker component", () => {
       </Provider>
     );
     const marker = (wrapper.find(PressureSystemMarker).instance() as any).wrappedInstance as PressureSystemMarker;
-    marker.handlePressureSysDrag({latlng: {lat: 1, lng: 2} as LatLng} as LeafletMouseEvent);
-    expect(model.center).toEqual({lat: 1, lng: 2});
+    marker.handlePressureSysDrag({latlng: {lat: 20, lng: 30} as LatLng} as LeafletMouseEvent);
+    expect(model.center).toEqual({lat: 20, lng: 30});
+
+    marker.handlePressureSysDrag({latlng: {lat: 0, lng: 30} as LatLng} as LeafletMouseEvent);
+    // Limit lat to 10, don't let users drag the pressure system to southern hemisphere.
+    expect(model.center).toEqual({lat: 10, lng: 30});
   });
 });

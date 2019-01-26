@@ -1,6 +1,6 @@
 import { LatLngExpression, Point, Map, CRS } from "leaflet";
 import { action, observable, computed, autorun } from "mobx";
-import { PressureSystem } from "./pressure-system";
+import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import * as decWind from "../../wind-data-json/dec-simple.json";
 import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
@@ -10,11 +10,9 @@ import * as marchSeaTemp from "../../sea-surface-temp-img/mar.png";
 import * as juneSeaTemp from "../../sea-surface-temp-img/jun.png";
 import * as septSeaTemp from "../../sea-surface-temp-img/sep.png";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IWindPoint, ITrackPoint } from "../types";
+import { ICoordinates, IWindPoint, ITrackPoint, IVector } from "../types";
 import { vecAverage } from "../math-utils";
-import {
-  headingTo, moveTo, distanceTo
-} from "geolocation-utils";
+import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
 
@@ -36,19 +34,48 @@ interface ISSTImages {
   fall: string;
 }
 
-const windData: IWindDataset = {
+export interface ISimulationOptions {
+  season?: Season;
+  pressureSystems?: IPressureSystemOptions[];
+  hurricane?: IPressureSystemOptions;
+}
+
+export const windData: IWindDataset = {
   winter: decWind.windVectors,
   spring: marchWind.windVectors,
   summer: juneWind.windVectors,
   fall: septWind.windVectors
 };
 
-const sstImages: ISSTImages = {
+export const sstImages: ISSTImages = {
   winter: decSeaTemp,
   spring: marchSeaTemp,
   summer: juneSeaTemp,
   fall: septSeaTemp
 };
+
+const defaultPressureSystems: IPressureSystemOptions[] = [
+  {
+    type: "high",
+    center: {lat: 34, lng: -29},
+    strength: 1500000
+  },
+  {
+    type: "high",
+    center: {lat: 34, lng: -53},
+    strength: 1000000
+  },
+  {
+    type: "low",
+    center: {lat: 39, lng: -92},
+    strength: 900000
+  },
+  {
+    type: "low",
+    center: {lat: 54, lng: -89},
+    strength: 700000
+  }
+];
 
 export class SimulationModel {
   // Region boundaries.
@@ -62,33 +89,12 @@ export class SimulationModel {
   public time = 0;
 
   // Current season, sets wind and sea temperature (in the future).
-  @observable public season: Season = config.season;
+  @observable public season: Season;
 
   @observable public seaSurfaceTempData: PNG | null = null;
 
   // Pressure systems affect winds.
-  @observable public pressureSystems: PressureSystem[] = [
-    new PressureSystem({
-      type: "high",
-      center: {lat: 34, lng: -29},
-      strength: 1500000
-    }),
-    new PressureSystem({
-      type: "high",
-      center: {lat: 34, lng: -53},
-      strength: 1000000
-    }),
-    new PressureSystem({
-      type: "low",
-      center: {lat: 39, lng: -92},
-      strength: 900000
-    }),
-    new PressureSystem({
-      type: "low",
-      center: {lat: 54, lng: -89},
-      strength: 700000
-    })
-  ];
+  @observable public pressureSystems: PressureSystem[] = [];
 
   @observable public hurricane: PressureSystem = new PressureSystem({
     type: "hurricane",
@@ -100,7 +106,15 @@ export class SimulationModel {
 
   @observable public simulationStarted = false;
 
-  constructor() {
+  // Callbacks used by tests.
+  public _seaSurfaceTempDataParsed: () => void;
+
+  constructor(options?: ISimulationOptions) {
+    if (!options) {
+      options = {};
+    }
+    this.season = options.season || config.season;
+    this.pressureSystems = (options.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
     autorun(() => {
       // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
       // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
@@ -224,9 +238,16 @@ export class SimulationModel {
     this.time = 0;
   }
 
-  public windAt(point: ICoordinates) {
+  public windAt(point: ICoordinates): IVector {
     const wind = this.windKdTree;
     const nearestPoints = wind.nearest(point, 4);
+    const perfectHit = nearestPoints.filter((sr: any) => sr[1] === 0);
+    // There's some point with distance equal to 0. Simply return it.
+    if (perfectHit.length > 0) {
+      const p = perfectHit[0][0];
+      return { u: p.u, v: p.v };
+    }
+    // Otherwise, average neighbouring points.
     const avg = {
       u: 0,
       v: 0
@@ -279,6 +300,10 @@ export class SimulationModel {
               throw err;
             }
             this.seaSurfaceTempData = validPng;
+            // Callback used for testing.
+            if (this._seaSurfaceTempDataParsed) {
+              this._seaSurfaceTempDataParsed();
+            }
           });
         });
       }
