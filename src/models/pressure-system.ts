@@ -1,16 +1,14 @@
 import { action, observable } from "mobx";
 import { kdTree } from "kd-tree-javascript";
 import { ICoordinates, IVector, IWindPoint } from "../types";
-import { latLngPlusVector, vecAverage } from "../math-utils";
-import {
-  headingTo, moveTo, distanceTo
-} from "geolocation-utils";
+import { vecAverage } from "../math-utils";
+import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import config from "../config";
 
-export type PressureSystemType = "high" | "low" | "hurricane";
+export type PressureSystemType = "high" | "low";
 
 export interface IPressureSystemOptions {
-  type: PressureSystemType;
+  type?: PressureSystemType;
   center: ICoordinates;
   strength?: number;
   strengthGradient?: number;
@@ -38,8 +36,6 @@ export class PressureSystem {
   @observable public strengthGradient = config.pressureSystemIntensityGradient;
   @observable public strength = config.pressureSystemStrength;
 
-  public speed = {u: 0, v: 0};
-
   public lastCorrectCenter: ICoordinates;
 
   public get range() {
@@ -47,16 +43,13 @@ export class PressureSystem {
   }
 
   constructor(props: IPressureSystemOptions) {
-    this.type = props.type;
+    this.type = props.type || "low";
     this.center = props.center;
     if (props.strength !== undefined) {
       this.strength = props.strength;
     }
     if (props.strengthGradient !== undefined) {
       this.strengthGradient = props.strengthGradient;
-    }
-    if (props.speed !== undefined) {
-      this.speed = props.speed;
     }
   }
 
@@ -78,16 +71,6 @@ export class PressureSystem {
     wind.u = newWind.u;
     wind.v = newWind.v;
     return wind;
-  }
-
-  public move = (windSpeed: IVector, timestep: number) => {
-    // Simple Euler integration. Global wind speed is used to push / accelerate hurricane center.
-    this.speed.u *= config.pressureSysMomentum;
-    this.speed.v *= config.pressureSysMomentum;
-    this.speed.u += windSpeed.u * config.globalWindToAcceleration * timestep;
-    this.speed.v += windSpeed.v * config.globalWindToAcceleration * timestep;
-    const posDiff = {u: this.speed.u * timestep, v: this.speed.v * timestep};
-    this.center = latLngPlusVector(this.center, posDiff);
   }
 
   @action.bound public setCenter(center: ICoordinates, pressureSystems: PressureSystem[]) {

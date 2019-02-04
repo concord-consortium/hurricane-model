@@ -1,6 +1,7 @@
 import { LatLngExpression, Point, Map, CRS } from "leaflet";
 import { action, observable, computed, autorun } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
+import { Hurricane } from "./hurricane";
 import * as decWind from "../../wind-data-json/dec-simple.json";
 import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
@@ -96,8 +97,7 @@ export class SimulationModel {
   // Pressure systems affect winds.
   @observable public pressureSystems: PressureSystem[] = [];
 
-  @observable public hurricane: PressureSystem = new PressureSystem({
-    type: "hurricane",
+  @observable public hurricane: Hurricane = new Hurricane({
     center: config.initialHurricanePosition,
     strength: config.hurricaneStrength,
     strengthGradient: config.hurricaneStrengthGradient,
@@ -212,10 +212,10 @@ export class SimulationModel {
       });
     }
     const windSpeed = this.windAt(this.hurricane.center);
+    const sst = this.seaSurfaceTempAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
     this.time += config.timestep;
-    // tslint:disable-next-line:no-console
-    console.log(this.seaSurfaceTempAt(this.hurricane.center));
+
     if (this.simulationStarted) {
       requestAnimationFrame(this.tick);
     }
