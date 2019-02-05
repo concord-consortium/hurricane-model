@@ -4,10 +4,10 @@ import { BaseComponent, IBaseProps } from "./base";
 import { Map, TileLayer, Marker, ImageOverlay } from "react-leaflet";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
+import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneTrack } from "./hurricane-track";
 import config from "../config";
 import * as Leaflet from "leaflet";
-import * as hurricaneSvg from "../assets/hurricane.svg";
 import { stores } from "../index";
 
 import * as css from "./map-view.scss";
@@ -20,11 +20,6 @@ interface IState {}
 const bounds: [[number, number], [number, number]] = [[10, -80], [50, -10]];
 
 const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
-
-const hurricaneIcon = new Leaflet.DivIcon({
-  className: css.hurricane,
-  html: `<div class="${css.hurricaneContainer}">${hurricaneSvg}</div>`
-});
 
 @inject("stores")
 @observer
@@ -77,12 +72,7 @@ export class MapView extends BaseComponent<IProps, IState> {
               />
             )
           }
-          {
-            <Marker
-              position={sim.hurricane.center}
-              icon={hurricaneIcon}
-            />
-          }
+          <HurricaneMarker />
         </Map>
       </div>
     );
