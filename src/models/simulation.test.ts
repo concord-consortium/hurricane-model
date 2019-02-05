@@ -58,7 +58,7 @@ describe("SimulationModel store", () => {
           {
             type: "high",
             center: {lat: 10, lng: 0},
-            strength: 1500000
+            strength: 13
           }
         ]
       });
@@ -84,7 +84,7 @@ describe("SimulationModel store", () => {
           {
             type: "low",
             center: {lat: 10, lng: 0},
-            strength: 1500000
+            strength: 14
           }
         ]
       });
@@ -109,7 +109,7 @@ describe("SimulationModel store", () => {
         const sim = new SimulationModel(options);
         sim.hurricane.center = {lat: 10, lng: 0};
         // Make it super strong so it affects two wind points that we have.
-        sim.hurricane.strength = 10000000;
+        sim.hurricane.strength = 102;
         expect(sim.windIncHurricane.length).toEqual(2);
         expect(sim.windIncHurricane).not.toEqual(fallWind);
         // Vector pointing down and slightly inwards.
@@ -192,7 +192,7 @@ describe("SimulationModel store", () => {
       expect(sim.hurricane.move).toHaveBeenCalled();
       expect(sim.seaSurfaceTempAt).toHaveBeenCalled();
       expect(sim.hurricaneTrack.length).toBeGreaterThan(0);
-      expect(sim.hurricaneTrack[0].strength).toEqual(sim.hurricane.strength);
+      expect(sim.hurricaneTrack[0].category).toEqual(sim.hurricane.category);
       expect(sim.hurricaneTrack[0].position).toEqual(oldPos);
     });
   });
@@ -203,7 +203,7 @@ describe("SimulationModel store", () => {
       sim.time = 123;
       sim.hurricane.center = {lat: 33, lng: 123};
       sim.hurricane.speed = {u: 123, v: 123};
-      sim.hurricaneTrack = [{strength: 123, position: {lat: 33, lng: 123}}];
+      sim.hurricaneTrack = [{category: 1, position: {lat: 33, lng: 123}}];
       sim.reset();
       expect(sim.time).toEqual(0);
       expect(sim.hurricane.center).toEqual(config.initialHurricanePosition);

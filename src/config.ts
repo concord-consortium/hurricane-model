@@ -15,12 +15,12 @@ const DEFAULT_CONFIG: any = {
   navigation: false,
 
   timestep: 1,
-  pressureSystemStrength: 1200000,
-  pressureSystemIntensityGradient: 2,
+  pressureSystemStrength: 15,
+  pressureSystemIntensityGradient: 200000,
   lowPressureSysAngleOffset: 20, // deg
   highPressureSysAngleOffset: 8, // deg
-  hurricaneStrength: 2700000,
-  hurricaneStrengthGradient: 0.37,
+  hurricaneStrength: 24,
+  hurricaneStrengthGradient: 18000,
   initialHurricanePosition: {lat: 20, lng: -20},
   initialHurricaneSpeed: {u: 0, v: 0},
   // When wind is far enough from the center of the pressure system, pressure system effect is lower
@@ -33,7 +33,11 @@ const DEFAULT_CONFIG: any = {
   // The bigger momentum, the longer hurricane will follow its own path, ignoring global wind.
   pressureSysMomentum: 0.92,
   // Length of single track segment in model ticks.
-  trackSegmentLength: 25
+  trackSegmentLength: 15,
+  // How often SST and hurricane intensity change should be updated.
+  // Smaller value means more checks and more averaged results. Larger value means that values are picked less
+  // frequently and the final results are more random (smaller number of samples, more variability).
+  sstCheckInterval: 100
 };
 
 const urlConfig: any = {};

@@ -6,8 +6,8 @@ import Slider from "@material-ui/lab/Slider";
 
 import * as css from "./pressure-system-icon.scss";
 
-export const minStrength = 300000;
-export const maxStrength = 1800000;
+export const minStrength = 3;
+export const maxStrength = 20;
 export const mbLabelRange = 13;
 
 interface IProps extends IBaseProps {

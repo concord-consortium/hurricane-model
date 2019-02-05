@@ -59,22 +59,22 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
   {
     type: "high",
     center: {lat: 34, lng: -29},
-    strength: 1500000
+    strength: 15
   },
   {
     type: "high",
     center: {lat: 34, lng: -53},
-    strength: 1000000
+    strength: 10
   },
   {
     type: "low",
     center: {lat: 39, lng: -92},
-    strength: 900000
+    strength: 9
   },
   {
     type: "low",
     center: {lat: 54, lng: -89},
-    strength: 700000
+    strength: 7
   }
 ];
 
@@ -208,12 +208,18 @@ export class SimulationModel {
     if (this.time % config.trackSegmentLength === 0) {
       this.hurricaneTrack.push({
         position: this.hurricane.center,
-        strength: this.hurricane.strength
+        category: this.hurricane.category
       });
     }
     const windSpeed = this.windAt(this.hurricane.center);
-    const sst = this.seaSurfaceTempAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
+
+    if (this.time % config.sstCheckInterval === 0) {
+      const sst = this.seaSurfaceTempAt(this.hurricane.center) || 0;
+      this.hurricane.setStrengthChangeFromSST(sst);
+    }
+    this.hurricane.updateStrength();
+
     this.time += config.timestep;
 
     if (this.simulationStarted) {
@@ -232,10 +238,9 @@ export class SimulationModel {
 
   @action.bound public reset() {
     this.simulationStarted = false;
-    this.hurricane.center = config.initialHurricanePosition;
-    this.hurricane.speed = config.initialHurricaneSpeed;
     this.hurricaneTrack = [];
     this.time = 0;
+    this.hurricane.reset();
   }
 
   public windAt(point: ICoordinates): IVector {

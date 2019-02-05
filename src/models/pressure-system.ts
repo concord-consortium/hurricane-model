@@ -44,7 +44,7 @@ export class PressureSystem {
 
   constructor(props: IPressureSystemOptions) {
     this.type = props.type || "low";
-    this.center = props.center;
+    this.center = Object.assign({}, props.center);
     if (props.strength !== undefined) {
       this.strength = props.strength;
     }
@@ -62,8 +62,10 @@ export class PressureSystem {
     const exp = this.type === "high" ? 0.25 : 4;
     const distExp = Math.pow(distNormalized, exp);
     const length = this.type === "high" ? distExp * this.strength : (1 - distExp) * this.strength;
-    const prependVecEnd = moveTo(wind, {distance: length, heading});
-    let newWind = {u: prependVecEnd.lng - wind.lng, v: prependVecEnd.lat - wind.lat};
+    const newPos = moveTo(wind, {distance: length, heading});
+    const u = distanceTo({lng: newPos.lng, lat: 0}, {lng: wind.lng, lat: 0}) * (newPos.lng > wind.lng ? 1 : -1);
+    const v = distanceTo({lng: 0, lat: newPos.lat}, {lng: 0, lat: wind.lat}) * (newPos.lat > wind.lat ? 1 : -1);
+    let newWind = { u, v };
     if (distNormalized > config.smoothPressureSystemRatio) {
       const ratio = (distNormalized - config.smoothPressureSystemRatio) / (1 - config.smoothPressureSystemRatio);
       newWind = vecAverage([wind, newWind], [ratio, 1 - ratio]);
