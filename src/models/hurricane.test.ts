@@ -25,7 +25,7 @@ describe("Hurricane store", () => {
       expect(hurricane.category).toEqual(4);
       hurricane.strength = 90; // m/s
       expect(hurricane.category).toEqual(5);
-    })
+    });
   });
 
   describe("move", () => {
@@ -97,14 +97,14 @@ describe("Hurricane store", () => {
 
   describe("reset", () => {
     it("should basic params of the hurricane back to the initial options", () => {
-      const options = {
+      const params = {
         center: {lat: 10, lng: 10},
         speed: {u: 1, v: 2},
         strength: 45,
         strengthGradient: 5000,
 
       };
-      const hurricane = new Hurricane(options);
+      const hurricane = new Hurricane(params);
       hurricane.center.lat = 50;
       hurricane.speed.u = 50;
       hurricane.strength = 123;
@@ -113,12 +113,12 @@ describe("Hurricane store", () => {
 
       hurricane.reset();
 
-      expect(hurricane.center).toEqual(options.center);
-      expect(hurricane.center).not.toBe(options.center);
-      expect(hurricane.speed).toEqual(options.speed);
-      expect(hurricane.speed).not.toBe(options.speed);
-      expect(hurricane.strength).toEqual(options.strength);
-      expect(hurricane.strengthGradient).toEqual(options.strengthGradient);
+      expect(hurricane.center).toEqual(params.center);
+      expect(hurricane.center).not.toBe(params.center);
+      expect(hurricane.speed).toEqual(params.speed);
+      expect(hurricane.speed).not.toBe(params.speed);
+      expect(hurricane.strength).toEqual(params.strength);
+      expect(hurricane.strengthGradient).toEqual(params.strengthGradient);
       expect(hurricane.strengthChange).toEqual(0);
     });
   });

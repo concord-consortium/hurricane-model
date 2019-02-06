@@ -191,7 +191,8 @@ describe("SimulationModel store", () => {
       const oldPos = sim.hurricane.center;
       sim.tick();
       expect(sim.time).toBeGreaterThan(0);
-      expect(sim.hurricaneTrack[0].position).toEqual(oldPos);expect(sim.hurricane.move).toHaveBeenCalled();
+      expect(sim.hurricaneTrack[0].position).toEqual(oldPos);
+      expect(sim.hurricane.move).toHaveBeenCalled();
       expect(sim.seaSurfaceTempAt).toHaveBeenCalled();
       expect(sim.hurricane.setStrengthChangeFromSST).toHaveBeenCalled();
       expect(sim.hurricane.updateStrength).toHaveBeenCalled();
