@@ -29,6 +29,7 @@ export class HurricaneMarker extends BaseComponent<IProps, IState> {
   public render() {
     const hurricane = this.stores.simulation.hurricane;
     const categoryCssClass = css["category" + hurricane.category];
+    const temp = this.stores.simulation.seaSurfaceTempAt(hurricane.center);
     return (
       <LeafletCustomMarker position={hurricane.center} draggable={false}>
         <div className={`${css.hurricaneIcon} ${categoryCssClass}`}>
@@ -38,6 +39,12 @@ export class HurricaneMarker extends BaseComponent<IProps, IState> {
           <div className={css.categoryNumber}>
             { hurricane.category }
           </div>
+          {
+            temp !== null &&
+            <div className={css.temp}>
+              { temp.toFixed(2) }°C
+            </div>
+          }
         </div>
       </LeafletCustomMarker>
     );

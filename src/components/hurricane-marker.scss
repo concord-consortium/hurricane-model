@@ -46,6 +46,22 @@
     text-shadow: 1px 1px 6px #000;
   }
 
+  .temp {
+    font-size: 13px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 100px;
+    margin-left: -25px;
+    margin-top: -25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 1px 1px 6px #000;
+  }
+
   &.category0 {
     svg path {
       fill: $cat0Color;
