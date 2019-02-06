@@ -12,8 +12,6 @@ export interface IPressureSystemOptions {
   center: ICoordinates;
   strength?: number;
   strengthGradient?: number;
-  acceleration?: IVector;
-  speed?: IVector;
 }
 
 // Limit pressure systems only to the northern hemisphere.

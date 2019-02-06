@@ -16,7 +16,6 @@ import { vecAverage } from "../math-utils";
 import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
-
 import config from "../config";
 
 type Season = "winter" | "spring" | "summer" | "fall";
@@ -212,7 +211,7 @@ export class SimulationModel {
   @action.bound public tick() {
     if (this.time % config.trackSegmentLength === 0) {
       this.hurricaneTrack.push({
-        position: this.hurricane.center,
+        position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category
       });
     }

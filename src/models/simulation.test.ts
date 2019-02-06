@@ -183,31 +183,36 @@ describe("SimulationModel store", () => {
     it("increases simulation time, moves hurricane and saves it track", () => {
       const sim = new SimulationModel(options);
       sim.hurricane.move = jest.fn();
+      sim.hurricane.setStrengthChangeFromSST = jest.fn();
+      sim.hurricane.updateStrength = jest.fn();
       sim.seaSurfaceTempAt = jest.fn();
       expect(sim.time).toEqual(0);
       expect(sim.hurricaneTrack.length).toEqual(0);
       const oldPos = sim.hurricane.center;
       sim.tick();
       expect(sim.time).toBeGreaterThan(0);
-      expect(sim.hurricane.move).toHaveBeenCalled();
+      expect(sim.hurricaneTrack[0].position).toEqual(oldPos);expect(sim.hurricane.move).toHaveBeenCalled();
       expect(sim.seaSurfaceTempAt).toHaveBeenCalled();
+      expect(sim.hurricane.setStrengthChangeFromSST).toHaveBeenCalled();
+      expect(sim.hurricane.updateStrength).toHaveBeenCalled();
       expect(sim.hurricaneTrack.length).toBeGreaterThan(0);
       expect(sim.hurricaneTrack[0].category).toEqual(sim.hurricane.category);
       expect(sim.hurricaneTrack[0].position).toEqual(oldPos);
+      expect(sim.hurricaneTrack[0].position).not.toBe(oldPos); // we expect a copy
     });
   });
 
   describe("reset", () => {
     it("restores initial settings", () => {
       const sim = new SimulationModel(options);
+      sim.hurricane.reset = jest.fn();
       sim.time = 123;
       sim.hurricane.center = {lat: 33, lng: 123};
       sim.hurricane.speed = {u: 123, v: 123};
       sim.hurricaneTrack = [{category: 1, position: {lat: 33, lng: 123}}];
       sim.reset();
       expect(sim.time).toEqual(0);
-      expect(sim.hurricane.center).toEqual(config.initialHurricanePosition);
-      expect(sim.hurricane.speed).toEqual(config.initialHurricaneSpeed);
+      expect(sim.hurricane.reset).toHaveBeenCalled();
       expect(sim.hurricaneTrack.length).toEqual(0);
     });
   });
