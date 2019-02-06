@@ -100,6 +100,8 @@ export class Hurricane extends PressureSystem {
     this.strength = props.strength !== undefined ? props.strength : config.hurricaneStrength;
     this.center = Object.assign({}, props.center || config.initialHurricanePosition);
     this.speed = Object.assign({}, props.speed || config.initialHurricaneSpeed);
+    this.strengthGradient = props.strengthGradient !== undefined ?
+      props.strengthGradient : config.hurricaneStrengthGradient;
     this.strengthChange = 0;
   }
 }
