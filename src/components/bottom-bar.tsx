@@ -17,9 +17,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const started = this.stores.simulation.simulationStarted;
+    const ready = this.stores.simulation.ready;
     return (
       <div className={css.bottomBar}>
-        <Button onClick={started ? this.stores.simulation.stop : this.stores.simulation.start}>
+        <Button onClick={started ? this.stores.simulation.stop : this.stores.simulation.start} disabled={!ready}>
           { started ? <span><PauseIcon/> Stop</span> : <span><PlayArrowIcon/> Start</span> }
         </Button>
         <Button onClick={this.stores.simulation.reset}><RestartIcon/> Restart</Button>

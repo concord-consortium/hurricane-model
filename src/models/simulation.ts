@@ -123,6 +123,11 @@ export class SimulationModel {
     });
   }
 
+  // Simulation is not ready to be started until SST data is downloaded.
+  @computed get ready() {
+    return this.seaSurfaceTempData !== null;
+  }
+
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
   // Wind data not affected by custom pressure systems.
@@ -214,7 +219,7 @@ export class SimulationModel {
     const windSpeed = this.windAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
 
-    if (this.time % config.sstCheckInterval === 0) {
+    if (this.time > 0 && this.time % config.sstCheckInterval === 0) {
       const sst = this.seaSurfaceTempAt(this.hurricane.center) || 0;
       this.hurricane.setStrengthChangeFromSST(sst);
     }
