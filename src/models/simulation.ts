@@ -219,8 +219,8 @@ export class SimulationModel {
     const windSpeed = this.windAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
 
-    if (this.time > 0 && this.time % config.sstCheckInterval === 0) {
-      const sst = this.seaSurfaceTempAt(this.hurricane.center) || 0;
+    if (this.time % config.sstCheckInterval === 0) {
+      const sst = this.seaSurfaceTempAt(this.hurricane.center);
       this.hurricane.setStrengthChangeFromSST(sst);
     }
     this.hurricane.updateStrength();
@@ -292,6 +292,7 @@ export class SimulationModel {
     const a = pngData.data[idx + 3];
     if (a === 0) {
       // Note that scripts that generate SST images, use transparent pixels for land.
+      // Use 20*C as dummy value of temperature for land. It's cool enough to slowly make hurricane disappear.
       return null;
     }
     // Format and whitespace are very important. That's how D3 scale returns color value.

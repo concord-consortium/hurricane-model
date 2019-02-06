@@ -60,15 +60,24 @@ export class Hurricane extends PressureSystem {
     this.center = latLngPlusVector(this.center, posDiff);
   }
 
-  public setStrengthChangeFromSST(sst: number) {
+  public setStrengthChangeFromSST(sst: number | null) {
+    if (sst === null) {
+      // Use X*C as a dummy value when SST is not available -> when hurricane is over land.
+      // X*C should cool enough to slowly make hurricane disappear. If this value is lower, it will
+      // increase speed of hurricane weakening, if it's higher, it will decrease it.
+      sst = -10; // *C
+    }
+    // There's bunch of number here. Tweaking them will affect how fast hurricanes are growing or dissipating.
+    // It's based on empirical tests, so the model looks realistic (as much as it can).
     if (sst < cat1SSTThreshold) {
-      this.strengthChange = -0.1 + -0.1 * Math.random();
+      const diff = (sst - cat1SSTThreshold) / 300;
+      this.strengthChange = diff - 0.05 * Math.random();
       this.cat3SSTThresholdReached = false;
     } else if (sst > cat1SSTThreshold && sst < cat3SSTThreshold) {
-      this.strengthChange = Math.random() * 0.17 - 0.02;
+      this.strengthChange = Math.random() * 0.2 - 0.02;
       this.cat3SSTThresholdReached = false;
     } else {
-      this.strengthChange = Math.random() * 0.11 - 0.01;
+      this.strengthChange = Math.random() * 0.15 - 0.01;
       this.cat3SSTThresholdReached = true;
     }
   }
