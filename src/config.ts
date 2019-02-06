@@ -37,7 +37,9 @@ const DEFAULT_CONFIG: any = {
   // How often SST and hurricane intensity change should be updated.
   // Smaller value means more checks and more averaged results. Larger value means that values are picked less
   // frequently and the final results are more random (smaller number of samples, more variability).
-  sstCheckInterval: 60
+  sstCheckInterval: 60,
+  // Whether model is deterministic or random. Use true if you want your results to be replicable.
+  deterministic: false
 };
 
 const urlConfig: any = {};

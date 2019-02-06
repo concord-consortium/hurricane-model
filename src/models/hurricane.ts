@@ -4,6 +4,7 @@ import { computed } from "mobx";
 import { latLngPlusVector } from "../math-utils";
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 import config from "../config";
+import { random } from "../seedrandom";
 
 // Sea surface temperature 28.25*C is an important value. Sea needs to be warmer than that so the hurricane
 // can get stronger than category 3. Based on following the research:
@@ -71,13 +72,13 @@ export class Hurricane extends PressureSystem {
     // It's based on empirical tests, so the model looks realistic (as much as it can).
     if (sst < cat1SSTThreshold) {
       const diff = (sst - cat1SSTThreshold) / 300;
-      this.strengthChange = diff - 0.05 * Math.random();
+      this.strengthChange = diff - 0.05 * random();
       this.cat3SSTThresholdReached = false;
     } else if (sst > cat1SSTThreshold && sst < cat3SSTThreshold) {
-      this.strengthChange = Math.random() * 0.2 - 0.02;
+      this.strengthChange = random() * 0.2 - 0.02;
       this.cat3SSTThresholdReached = false;
     } else {
-      this.strengthChange = Math.random() * 0.15 - 0.01;
+      this.strengthChange = random() * 0.15 - 0.01;
       this.cat3SSTThresholdReached = true;
     }
   }
