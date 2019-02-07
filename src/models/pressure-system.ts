@@ -10,6 +10,8 @@ export type PressureSystemType = "high" | "low";
 export interface IPressureSystemOptions {
   type?: PressureSystemType;
   center: ICoordinates;
+  // Strength represents a max wind speed in a given pressure system, in m/s.
+  // Typical range is between 5-25m/s. Stronger pressure system might be considered a storm or a hurricane.
   strength?: number;
 }
 
