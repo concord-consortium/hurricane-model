@@ -11,14 +11,12 @@ import * as marchSeaTemp from "../../sea-surface-temp-img/mar.png";
 import * as juneSeaTemp from "../../sea-surface-temp-img/jun.png";
 import * as septSeaTemp from "../../sea-surface-temp-img/sep.png";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IWindPoint, ITrackPoint, IVector } from "../types";
+import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season } from "../types";
 import { vecAverage } from "../math-utils";
 import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
 import config from "../config";
-
-type Season = "winter" | "spring" | "summer" | "fall";
 
 interface IWindDataset {
   winter: IWindPoint[];
@@ -126,6 +124,10 @@ export class SimulationModel {
     return this.seaSurfaceTempData !== null;
   }
 
+  @computed get loading() {
+    return this.seaSurfaceTempData === null;
+  }
+
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
   // Wind data not affected by custom pressure systems.
@@ -197,6 +199,10 @@ export class SimulationModel {
     this.zoom = map.getZoom();
 
     this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
+  }
+
+  @action.bound public setSeason(season: Season) {
+    this.season = season;
   }
 
   @action.bound public setPressureSysCenter(pressureSystem: PressureSystem, center: ICoordinates) {
@@ -300,6 +306,8 @@ export class SimulationModel {
   }
 
   private updateSeaSurfaceTempData() {
+    // Set data to null so the model know that it's not available while the new one is being downloaded.
+    this.seaSurfaceTempData = null;
     fetch(this.seaSurfaceTempImgUrl).then(response => {
       if (response.ok) {
         response.arrayBuffer().then(buffer => {

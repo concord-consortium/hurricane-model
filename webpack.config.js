@@ -46,7 +46,7 @@ module.exports = (env, argv) => {
                 modules: true,
                 sourceMap: true,
                 importLoaders: 1,
-                localIdentName: '[name]--[local]--__hurricane-model-v1__'
+                localIdentName: '[name]--[local]--__hurr-v1__'
               }
             },
             'postcss-loader',
