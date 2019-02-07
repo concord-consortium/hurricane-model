@@ -124,6 +124,10 @@ export class SimulationModel {
     return this.seaSurfaceTempData !== null;
   }
 
+  @computed get loading() {
+    return this.seaSurfaceTempData === null;
+  }
+
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
   // Wind data not affected by custom pressure systems.
