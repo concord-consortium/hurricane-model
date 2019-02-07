@@ -4,8 +4,8 @@ import {inject, observer} from "mobx-react";
 import {BaseComponent, IBaseProps} from "./base";
 import * as PIXI from "pixi.js";
 import {autorun} from "mobx";
+import {IVector, IWindPoint} from "../types";
 
-const vectorScale = 2;
 const vectorWidth = 2;
 const arrowHeadSize = 4;
 const color = 0xffffff;
@@ -37,6 +37,11 @@ const arrowTexture = (() => {
   tex.defaultAnchor = new PIXI.Point(0.5, 0.5);
   return tex;
 })();
+
+// Use this function to tweak visual length of the wind arrows.
+const arrowLengthFunc = (vec: IVector) => {
+  return Math.pow(4 * Math.sqrt(vec.u * vec.u + vec.v * vec.v), 0.55) + 2;
+};
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -79,11 +84,11 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
     const stage = this.pixiApp!.stage;
     const data = this.stores.simulation.windIncHurricane;
     const latLngToContainerPoint = this.stores.simulation.latLngToContainerPoint;
-    data.forEach((w: any, idx: number) => {
+    data.forEach((w: IWindPoint, idx: number) => {
       // Try to reuse Pixi arrows.
       const updateOnly = !!stage.children[idx];
       const arrowContainer = updateOnly ? (stage.children[idx] as PIXI.Container) : new PIXI.Container();
-      const length = vectorScale * Math.sqrt(w.u * w.u + w.v * w.v);
+      const length = arrowLengthFunc(w);
       const lineScale = new PIXI.Point(1, length);
       const point = latLngToContainerPoint([w.lat, w.lng]);
       const rotation = Math.atan2(w.u, w.v);
