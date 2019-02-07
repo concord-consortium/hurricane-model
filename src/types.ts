@@ -14,3 +14,5 @@ export interface ITrackPoint {
   position: ICoordinates;
   category: number;
 }
+
+export type Season = "winter" | "spring" | "summer" | "fall";

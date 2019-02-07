@@ -4,6 +4,7 @@ import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { BottomBar } from "./bottom-bar";
 import Button from "@material-ui/core/Button";
+import Select from "@material-ui/core/Select";
 
 describe("BottomBar component", () => {
   let stores = createStores();
@@ -11,13 +12,15 @@ describe("BottomBar component", () => {
     stores = createStores();
   });
 
-  it("renders buttons", () => {
+  it("renders basic components", () => {
     const wrapper = mount(
       <Provider stores={stores}>
         <BottomBar />
       </Provider>
     );
     expect(wrapper.find(Button).length).toEqual(2);
+    expect(wrapper.text()).toEqual(expect.stringContaining("Season"));
+    expect(wrapper.find(Select).length).toEqual(1);
   });
 
   it("start button is disabled until model is ready", () => {
