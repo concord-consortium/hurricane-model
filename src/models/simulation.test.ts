@@ -1,5 +1,6 @@
 import { SimulationModel, ISimulationOptions, windData, sstImages } from "./simulation";
 import config from "../config";
+import { PNG } from "pngjs";
 const fs = require("fs");
 
 const options: ISimulationOptions = {
@@ -233,6 +234,15 @@ describe("SimulationModel store", () => {
       sim.simulationStarted = true;
       sim.stop();
       expect(sim.simulationStarted).toEqual(false);
+    });
+  });
+
+  describe("ready", () => {
+    it("is false until SST data is downloaded", () => {
+      const sim = new SimulationModel(options);
+      expect(sim.ready).toEqual(false);
+      sim.seaSurfaceTempData = new PNG();
+      expect(sim.ready).toEqual(true);
     });
   });
 });
