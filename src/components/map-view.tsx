@@ -1,13 +1,12 @@
 import * as React from "react";
 import {inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { Map, TileLayer, Marker, ImageOverlay } from "react-leaflet";
+import { Map, TileLayer, ImageOverlay } from "react-leaflet";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
+import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneTrack } from "./hurricane-track";
 import config from "../config";
-import * as Leaflet from "leaflet";
-import * as hurricaneSvg from "../assets/hurricane.svg";
 import { stores } from "../index";
 
 import * as css from "./map-view.scss";
@@ -21,23 +20,18 @@ const bounds: [[number, number], [number, number]] = [[10, -80], [50, -10]];
 
 const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
 
-const hurricaneIcon = new Leaflet.DivIcon({
-  className: css.hurricane,
-  html: `<div class="${css.hurricaneContainer}">${hurricaneSvg}</div>`
-});
-
 @inject("stores")
 @observer
 export class MapView extends BaseComponent<IProps, IState> {
   private mapRef = React.createRef<Map>();
 
   public componentDidMount() {
-    window.addEventListener("resize", this.setSize);
-    setTimeout(this.setSize, 1);
+    window.addEventListener("resize", this.handleWindowResize);
+    setTimeout(this.handleWindowResize, 1);
   }
 
   public componentWillUnmount(): void {
-    window.removeEventListener("resize", this.setSize);
+    window.removeEventListener("resize", this.handleWindowResize);
   }
 
   public render() {
@@ -77,23 +71,18 @@ export class MapView extends BaseComponent<IProps, IState> {
               />
             )
           }
-          {
-            <Marker
-              position={sim.hurricane.center}
-              icon={hurricaneIcon}
-            />
-          }
+          <HurricaneMarker />
         </Map>
       </div>
     );
   }
 
-  get leafletMap() {
+  public get leafletMap() {
     const map = this.mapRef.current;
     return map && map.leafletElement;
   }
 
-  private setSize = () => {
+  public handleWindowResize = () => {
     if (this.leafletMap) {
       this.leafletMap.invalidateSize(false);
       this.leafletMap.fitBounds(bounds);

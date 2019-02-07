@@ -1,6 +1,7 @@
 import { LatLngExpression, Point, Map, CRS } from "leaflet";
 import { action, observable, computed, autorun } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
+import { Hurricane } from "./hurricane";
 import * as decWind from "../../wind-data-json/dec-simple.json";
 import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
@@ -15,7 +16,6 @@ import { vecAverage } from "../math-utils";
 import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
-
 import config from "../config";
 
 type Season = "winter" | "spring" | "summer" | "fall";
@@ -58,22 +58,22 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
   {
     type: "high",
     center: {lat: 34, lng: -29},
-    strength: 1500000
+    strength: 15
   },
   {
     type: "high",
     center: {lat: 34, lng: -53},
-    strength: 1000000
+    strength: 10
   },
   {
     type: "low",
     center: {lat: 39, lng: -92},
-    strength: 900000
+    strength: 9
   },
   {
     type: "low",
     center: {lat: 54, lng: -89},
-    strength: 700000
+    strength: 7
   }
 ];
 
@@ -96,11 +96,9 @@ export class SimulationModel {
   // Pressure systems affect winds.
   @observable public pressureSystems: PressureSystem[] = [];
 
-  @observable public hurricane: PressureSystem = new PressureSystem({
-    type: "hurricane",
+  @observable public hurricane: Hurricane = new Hurricane({
     center: config.initialHurricanePosition,
     strength: config.hurricaneStrength,
-    strengthGradient: config.hurricaneStrengthGradient,
     speed: config.initialHurricaneSpeed
   });
 
@@ -121,6 +119,11 @@ export class SimulationModel {
       // data is always updated when necessary.
       this.updateSeaSurfaceTempData();
     });
+  }
+
+  // Simulation is not ready to be started until SST data is downloaded.
+  @computed get ready() {
+    return this.seaSurfaceTempData !== null;
   }
 
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
@@ -207,15 +210,21 @@ export class SimulationModel {
   @action.bound public tick() {
     if (this.time % config.trackSegmentLength === 0) {
       this.hurricaneTrack.push({
-        position: this.hurricane.center,
-        strength: this.hurricane.strength
+        position: Object.assign({}, this.hurricane.center),
+        category: this.hurricane.category
       });
     }
     const windSpeed = this.windAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
+
+    if (this.time % config.sstCheckInterval === 0) {
+      const sst = this.seaSurfaceTempAt(this.hurricane.center);
+      this.hurricane.setStrengthChangeFromSST(sst);
+    }
+    this.hurricane.updateStrength();
+
     this.time += config.timestep;
-    // tslint:disable-next-line:no-console
-    console.log(this.seaSurfaceTempAt(this.hurricane.center));
+
     if (this.simulationStarted) {
       requestAnimationFrame(this.tick);
     }
@@ -232,10 +241,9 @@ export class SimulationModel {
 
   @action.bound public reset() {
     this.simulationStarted = false;
-    this.hurricane.center = config.initialHurricanePosition;
-    this.hurricane.speed = config.initialHurricaneSpeed;
     this.hurricaneTrack = [];
     this.time = 0;
+    this.hurricane.reset();
   }
 
   public windAt(point: ICoordinates): IVector {
@@ -282,6 +290,7 @@ export class SimulationModel {
     const a = pngData.data[idx + 3];
     if (a === 0) {
       // Note that scripts that generate SST images, use transparent pixels for land.
+      // Use 20*C as dummy value of temperature for land. It's cool enough to slowly make hurricane disappear.
       return null;
     }
     // Format and whitespace are very important. That's how D3 scale returns color value.

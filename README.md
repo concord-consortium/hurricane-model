@@ -43,7 +43,7 @@ main advantage is that we can simply visualize it using various online tools.
 
 ## Sea Surface Temperature
 
-Sea Surface Temperature (SST) affects intensity of the hurricane. The warmer ocean is, the more intense hurricane gets.
+Sea Surface Temperature (SST) affects intensity of the hurricane. The warmer ocean is, the more likely is the strong hurricane. 
 This model uses data coming from NASA:
 - https://podaac.jpl.nasa.gov/dataset/MODIS_AQUA_L3_SST_MID-IR_MONTHLY_4KM_NIGHTTIME_V2014.0
 - ftp://podaac-ftp.jpl.nasa.gov/allData/modis/L3/aqua/4um/v2014.0/4km/monthly/2018/
@@ -78,4 +78,22 @@ JSON data. It's compressed and lets us cover area way more precisely than JSON d
 If you ever change anything in `src/temperature-scale.js`, remember to run all the conversion scripts and generate
 sea surface temperature images again. They need to stay in sync with temperature scale.
 
+## Sea Surface Temperature impact on the hurricane intensity
 
+The model rules are based on the results of this research:
+
+https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2006GL025757
+
+These results suggest that there's no strong correlation between SST and hurricane intensity, but there's a clear, 
+visible SST threshold necessary for hurricane to become a major one (category 3 or more). Researchers found this value 
+to be 28.25°C.
+
+We're using a few generic rules to convert SST into intensity (check `models/hurricane.ts` class):
+
+- if temperature is lower than 26, the hurricane will get weaker
+- if temperature is higher than 26 but lower than 28.25, the hurricane will get stronger (most likely), 
+  but it cannot get stronger than category 2
+- if temperature is higher than 28.25, the hurricane will get stronger (most likely) and it can become a major one (category 3, 4 or 5) 
+
+All these rules use random number generator to add variability to results (to make it more similar to real life and 
+account for other, non-SST related factors that affect hurricane strength).

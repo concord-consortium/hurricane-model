@@ -1,21 +1,18 @@
-import { action, observable } from "mobx";
+import { action, observable, computed } from "mobx";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IVector, IWindPoint } from "../types";
-import { latLngPlusVector, vecAverage } from "../math-utils";
-import {
-  headingTo, moveTo, distanceTo
-} from "geolocation-utils";
+import { ICoordinates, IWindPoint } from "../types";
+import { vecAverage } from "../math-utils";
+import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import config from "../config";
 
-export type PressureSystemType = "high" | "low" | "hurricane";
+export type PressureSystemType = "high" | "low";
 
 export interface IPressureSystemOptions {
-  type: PressureSystemType;
+  type?: PressureSystemType;
   center: ICoordinates;
+  // Strength represents a max wind speed in a given pressure system, in m/s.
+  // Typical range is between 5-25m/s. Stronger pressure system might be considered a storm or a hurricane.
   strength?: number;
-  strengthGradient?: number;
-  acceleration?: IVector;
-  speed?: IVector;
 }
 
 // Limit pressure systems only to the northern hemisphere.
@@ -35,28 +32,20 @@ const minDistToOtherSystems = (sys: PressureSystem, otherSystems: PressureSystem
 export class PressureSystem {
   @observable public type: PressureSystemType;
   @observable public center: ICoordinates;
-  @observable public strengthGradient = config.pressureSystemIntensityGradient;
   @observable public strength = config.pressureSystemStrength;
-
-  public speed = {u: 0, v: 0};
 
   public lastCorrectCenter: ICoordinates;
 
-  public get range() {
-    return this.strength * this.strengthGradient;
+  @computed public get range() {
+    // Range is proportional to strength.
+    return this.strength * 200000;
   }
 
   constructor(props: IPressureSystemOptions) {
-    this.type = props.type;
-    this.center = props.center;
+    this.type = props.type || "low";
+    this.center = Object.assign({}, props.center);
     if (props.strength !== undefined) {
       this.strength = props.strength;
-    }
-    if (props.strengthGradient !== undefined) {
-      this.strengthGradient = props.strengthGradient;
-    }
-    if (props.speed !== undefined) {
-      this.speed = props.speed;
     }
   }
 
@@ -69,8 +58,10 @@ export class PressureSystem {
     const exp = this.type === "high" ? 0.25 : 4;
     const distExp = Math.pow(distNormalized, exp);
     const length = this.type === "high" ? distExp * this.strength : (1 - distExp) * this.strength;
-    const prependVecEnd = moveTo(wind, {distance: length, heading});
-    let newWind = {u: prependVecEnd.lng - wind.lng, v: prependVecEnd.lat - wind.lat};
+    const newPos = moveTo(wind, {distance: length, heading});
+    const u = distanceTo({lng: newPos.lng, lat: 0}, {lng: wind.lng, lat: 0}) * (newPos.lng > wind.lng ? 1 : -1);
+    const v = distanceTo({lng: 0, lat: newPos.lat}, {lng: 0, lat: wind.lat}) * (newPos.lat > wind.lat ? 1 : -1);
+    let newWind = { u, v };
     if (distNormalized > config.smoothPressureSystemRatio) {
       const ratio = (distNormalized - config.smoothPressureSystemRatio) / (1 - config.smoothPressureSystemRatio);
       newWind = vecAverage([wind, newWind], [ratio, 1 - ratio]);
@@ -78,16 +69,6 @@ export class PressureSystem {
     wind.u = newWind.u;
     wind.v = newWind.v;
     return wind;
-  }
-
-  public move = (windSpeed: IVector, timestep: number) => {
-    // Simple Euler integration. Global wind speed is used to push / accelerate hurricane center.
-    this.speed.u *= config.pressureSysMomentum;
-    this.speed.v *= config.pressureSysMomentum;
-    this.speed.u += windSpeed.u * config.globalWindToAcceleration * timestep;
-    this.speed.v += windSpeed.v * config.globalWindToAcceleration * timestep;
-    const posDiff = {u: this.speed.u * timestep, v: this.speed.v * timestep};
-    this.center = latLngPlusVector(this.center, posDiff);
   }
 
   @action.bound public setCenter(center: ICoordinates, pressureSystems: PressureSystem[]) {

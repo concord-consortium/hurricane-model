@@ -1,0 +1,97 @@
+@import "common.scss";
+
+.hurricaneIcon {
+  @keyframes rotation {
+    from {
+      transform: rotate(359deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
+  }
+
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  margin-top: -50px;
+
+  .svgContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: top left;
+    animation: rotation 4s infinite linear;
+
+    svg {
+      width: 70px;
+      height: 70px;
+      margin-left: -35px;
+      margin-top: -35px;
+    }
+  }
+
+  .categoryNumber {
+    font-size: 19px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    margin-left: -25px;
+    margin-top: -25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 1px 1px 6px #000;
+  }
+
+  .temp {
+    font-size: 12px;
+    line-height: 15px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 100px;
+    margin-left: -40px;
+    margin-top: -15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    text-shadow: 1px 1px 6px #000;
+  }
+
+  &.category0 {
+    svg path {
+      fill: $cat0Color;
+    }
+  }
+  &.category1 {
+    svg path {
+      fill: $cat1Color;
+    }
+  }
+  &.category2 {
+    svg path {
+      fill: $cat2Color;
+    }
+  }
+  &.category3 {
+    svg path {
+      fill: $cat3Color;
+    }
+  }
+  &.category4 {
+    svg path {
+      fill: $cat4Color;
+    }
+  }
+  &.category5 {
+    svg path {
+      fill: $cat5Color;
+    }
+  }
+}

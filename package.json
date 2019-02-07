@@ -44,7 +44,7 @@
     "test:all": "npm-run-all build test start",
     "test:coverage": "jest --coverage",
     "test:debug": "node --nolazy --inspect-brk ./node_modules/.bin/jest --runInBand --no-cache",
-    "test:watch": "jest --watchAll",
+    "test:watch": "jest --watch",
     "test:coverage:watch": "jest --coverage --watchAll",
     "test:cypress": "cypress run",
     "test:cypress:open": "cypress open",
@@ -71,6 +71,7 @@
     "@types/react": "^16.7.18",
     "@types/react-dom": "^16.0.11",
     "@types/react-leaflet": "^1.1.6",
+    "@types/seedrandom": "^2.4.27",
     "@types/uuid": "^3.4.4",
     "autoprefixer": "^9.4.3",
     "babel-core": "^6.26.3",
@@ -129,6 +130,7 @@
     "react-dom": "^16.7.0",
     "react-leaflet": "^2.2.0",
     "react-leaflet-canvas-layer": "^1.0.0",
-    "react-pixi-fiber": "^0.7.0"
+    "react-pixi-fiber": "^0.7.0",
+    "seedrandom": "^2.4.4"
   }
 }

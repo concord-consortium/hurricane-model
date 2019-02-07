@@ -1,5 +1,6 @@
 import { SimulationModel, ISimulationOptions, windData, sstImages } from "./simulation";
 import config from "../config";
+import { PNG } from "pngjs";
 const fs = require("fs");
 
 const options: ISimulationOptions = {
@@ -58,7 +59,7 @@ describe("SimulationModel store", () => {
           {
             type: "high",
             center: {lat: 10, lng: 0},
-            strength: 1500000
+            strength: 13
           }
         ]
       });
@@ -84,7 +85,7 @@ describe("SimulationModel store", () => {
           {
             type: "low",
             center: {lat: 10, lng: 0},
-            strength: 1500000
+            strength: 14
           }
         ]
       });
@@ -109,21 +110,21 @@ describe("SimulationModel store", () => {
         const sim = new SimulationModel(options);
         sim.hurricane.center = {lat: 10, lng: 0};
         // Make it super strong so it affects two wind points that we have.
-        sim.hurricane.strength = 10000000;
+        sim.hurricane.strength = 140;
         expect(sim.windIncHurricane.length).toEqual(2);
         expect(sim.windIncHurricane).not.toEqual(fallWind);
         // Vector pointing down and slightly inwards.
         let p = sim.windIncHurricane[0];
         expect(p.u).toBeGreaterThan(29);
         expect(p.u).toBeLessThan(30);
-        expect(p.v).toBeLessThan(-84);
-        expect(p.v).toBeGreaterThan(-85);
+        expect(p.v).toBeLessThan(-81);
+        expect(p.v).toBeGreaterThan(-82);
         // Vector pointing up and slightly inwards.
         p = sim.windIncHurricane[1];
-        expect(p.u).toBeLessThan(-32);
-        expect(p.u).toBeGreaterThan(-33);
-        expect(p.v).toBeGreaterThan(83);
-        expect(p.v).toBeLessThan(84);
+        expect(p.u).toBeLessThan(-30);
+        expect(p.u).toBeGreaterThan(-31);
+        expect(p.v).toBeGreaterThan(80);
+        expect(p.v).toBeLessThan(81);
       });
     });
   });
@@ -183,31 +184,37 @@ describe("SimulationModel store", () => {
     it("increases simulation time, moves hurricane and saves it track", () => {
       const sim = new SimulationModel(options);
       sim.hurricane.move = jest.fn();
+      sim.hurricane.setStrengthChangeFromSST = jest.fn();
+      sim.hurricane.updateStrength = jest.fn();
       sim.seaSurfaceTempAt = jest.fn();
       expect(sim.time).toEqual(0);
       expect(sim.hurricaneTrack.length).toEqual(0);
       const oldPos = sim.hurricane.center;
       sim.tick();
       expect(sim.time).toBeGreaterThan(0);
+      expect(sim.hurricaneTrack[0].position).toEqual(oldPos);
       expect(sim.hurricane.move).toHaveBeenCalled();
       expect(sim.seaSurfaceTempAt).toHaveBeenCalled();
+      expect(sim.hurricane.setStrengthChangeFromSST).toHaveBeenCalled();
+      expect(sim.hurricane.updateStrength).toHaveBeenCalled();
       expect(sim.hurricaneTrack.length).toBeGreaterThan(0);
-      expect(sim.hurricaneTrack[0].strength).toEqual(sim.hurricane.strength);
+      expect(sim.hurricaneTrack[0].category).toEqual(sim.hurricane.category);
       expect(sim.hurricaneTrack[0].position).toEqual(oldPos);
+      expect(sim.hurricaneTrack[0].position).not.toBe(oldPos); // we expect a copy
     });
   });
 
   describe("reset", () => {
     it("restores initial settings", () => {
       const sim = new SimulationModel(options);
+      sim.hurricane.reset = jest.fn();
       sim.time = 123;
       sim.hurricane.center = {lat: 33, lng: 123};
       sim.hurricane.speed = {u: 123, v: 123};
-      sim.hurricaneTrack = [{strength: 123, position: {lat: 33, lng: 123}}];
+      sim.hurricaneTrack = [{category: 1, position: {lat: 33, lng: 123}}];
       sim.reset();
       expect(sim.time).toEqual(0);
-      expect(sim.hurricane.center).toEqual(config.initialHurricanePosition);
-      expect(sim.hurricane.speed).toEqual(config.initialHurricaneSpeed);
+      expect(sim.hurricane.reset).toHaveBeenCalled();
       expect(sim.hurricaneTrack.length).toEqual(0);
     });
   });
@@ -227,6 +234,15 @@ describe("SimulationModel store", () => {
       sim.simulationStarted = true;
       sim.stop();
       expect(sim.simulationStarted).toEqual(false);
+    });
+  });
+
+  describe("ready", () => {
+    it("is false until SST data is downloaded", () => {
+      const sim = new SimulationModel(options);
+      expect(sim.ready).toEqual(false);
+      sim.seaSurfaceTempData = new PNG();
+      expect(sim.ready).toEqual(true);
     });
   });
 });

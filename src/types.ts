@@ -12,5 +12,5 @@ export interface IWindPoint extends IVector, ICoordinates {}
 
 export interface ITrackPoint {
   position: ICoordinates;
-  strength: number;
+  category: number;
 }
