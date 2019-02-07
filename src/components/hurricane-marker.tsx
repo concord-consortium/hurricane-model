@@ -25,28 +25,40 @@ const hurricaneSVGIcon = (
 @inject("stores")
 @observer
 export class HurricaneMarker extends BaseComponent<IProps, IState> {
+  public render() {
+    const hurricane = this.stores.simulation.hurricane;
+    return (
+      <LeafletCustomMarker position={hurricane.center} draggable={false}>
+        <HurricaneIcon />
+      </LeafletCustomMarker>
+    );
+  }
+}
 
+// Keep it as separate class so it's easier to test it.
+// Note that LeafletCustomMarker does rendering in a pretty awkward way, so it's hard to test these components together.
+@inject("stores")
+@observer
+export class HurricaneIcon extends BaseComponent<IProps, IState> {
   public render() {
     const hurricane = this.stores.simulation.hurricane;
     const categoryCssClass = css["category" + hurricane.category];
     const temp = this.stores.simulation.seaSurfaceTempAt(hurricane.center);
     return (
-      <LeafletCustomMarker position={hurricane.center} draggable={false}>
-        <div className={`${css.hurricaneIcon} ${categoryCssClass}`}>
-          <div className={css.svgContainer}>
-            { hurricaneSVGIcon }
-          </div>
-          <div className={css.categoryNumber}>
-            { hurricane.category }
-          </div>
-          {
-            temp !== null &&
-            <div className={css.temp}>
-              { temp.toFixed(2) }°C
-            </div>
-          }
+      <div className={`${css.hurricaneIcon} ${categoryCssClass}`}>
+        <div className={css.svgContainer}>
+          { hurricaneSVGIcon }
         </div>
-      </LeafletCustomMarker>
+        <div className={css.categoryNumber} data-test="hurricane-category">
+          { hurricane.category }
+        </div>
+        {
+          temp !== null &&
+          <div className={css.temp}>
+            sea temp: { temp.toFixed(2) }°C
+          </div>
+        }
+      </div>
     );
   }
 }
