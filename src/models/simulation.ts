@@ -121,7 +121,7 @@ export class SimulationModel {
 
   // Simulation is not ready to be started until SST data is downloaded.
   @computed get ready() {
-    return this.seaSurfaceTempData !== null;
+    return this.seaSurfaceTempData !== null && this.hurricane.active;
   }
 
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
@@ -226,6 +226,11 @@ export class SimulationModel {
     this.hurricane.updateStrength();
 
     this.time += config.timestep;
+
+    if (!this.hurricane.active) {
+      // Stop the model when hurricane gets too weak.
+      this.stop();
+    }
 
     if (this.simulationStarted) {
       requestAnimationFrame(this.tick);

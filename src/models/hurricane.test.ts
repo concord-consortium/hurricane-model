@@ -28,6 +28,16 @@ describe("Hurricane store", () => {
     });
   });
 
+  describe("active", () => {
+    it("should depend on hurricane strength", () => {
+      const hurricane = new Hurricane(options);
+      hurricane.strength = 5; // m/s
+      expect(hurricane.active).toEqual(false);
+      hurricane.strength = 35; // m/s
+      expect(hurricane.active).toEqual(true);
+    });
+  });
+
   describe("move", () => {
     it("should change hurricane position using its current speed and wind sped", () => {
       const hurricane = new Hurricane(options);

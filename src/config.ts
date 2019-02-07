@@ -13,17 +13,18 @@ const DEFAULT_CONFIG: any = {
   season: "fall",
   // If set to false, user won"t be able to drag and zoom map.
   navigation: false,
-
   timestep: 1,
-  pressureSystemStrength: 15,
+  pressureSystemStrength: 15, // max wind speed, m/s
   lowPressureSysAngleOffset: 20, // deg
   highPressureSysAngleOffset: 8, // deg
-  hurricaneStrength: 24,
+  hurricaneStrength: 24, // max wind speed, m/s
   initialHurricanePosition: {lat: 20, lng: -20},
   initialHurricaneSpeed: {u: 0, v: 0},
   // When wind is far enough from the center of the pressure system, pressure system effect is lower
   // and we start smoothing it out.
   smoothPressureSystemRatio: 0.75,
+  // If hurricane is weaker, the model will stop and the hurricane will disappear.
+  minHurricaneStrength: 10, // max wind speed, m/s
   // Min distance between two pressure systems.
   minPressureSystemDistance: 700000, // m
   // Ratio describing how hard is the global wind pushing hurricane.

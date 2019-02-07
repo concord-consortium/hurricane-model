@@ -238,11 +238,13 @@ describe("SimulationModel store", () => {
   });
 
   describe("ready", () => {
-    it("is false until SST data is downloaded", () => {
+    it("is false until SST data is downloaded and the hurricane is active", () => {
       const sim = new SimulationModel(options);
       expect(sim.ready).toEqual(false);
       sim.seaSurfaceTempData = new PNG();
       expect(sim.ready).toEqual(true);
+      sim.hurricane.strength = 0;
+      expect(sim.ready).toEqual(false);
     });
   });
 });

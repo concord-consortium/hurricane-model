@@ -56,6 +56,11 @@ export class Hurricane extends PressureSystem {
     return currentCategory;
   }
 
+  // When hurricane gets weak enough, hide it and stop the model.
+  @computed public get active(): boolean {
+    return this.strength > config.minHurricaneStrength;
+  }
+
   public move(windSpeed: IVector, timestep: number) {
     // Simple Euler integration. Global wind speed is used to push / accelerate hurricane center.
     this.speed.u *= config.pressureSysMomentum;
