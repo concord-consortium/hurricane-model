@@ -1,6 +1,6 @@
-import { action, observable } from "mobx";
+import { action, observable, computed } from "mobx";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IVector, IWindPoint } from "../types";
+import { ICoordinates, IWindPoint } from "../types";
 import { vecAverage } from "../math-utils";
 import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import config from "../config";
@@ -11,7 +11,6 @@ export interface IPressureSystemOptions {
   type?: PressureSystemType;
   center: ICoordinates;
   strength?: number;
-  strengthGradient?: number;
 }
 
 // Limit pressure systems only to the northern hemisphere.
@@ -31,13 +30,13 @@ const minDistToOtherSystems = (sys: PressureSystem, otherSystems: PressureSystem
 export class PressureSystem {
   @observable public type: PressureSystemType;
   @observable public center: ICoordinates;
-  @observable public strengthGradient = config.pressureSystemIntensityGradient;
   @observable public strength = config.pressureSystemStrength;
 
   public lastCorrectCenter: ICoordinates;
 
-  public get range() {
-    return this.strength * this.strengthGradient;
+  @computed public get range() {
+    // Range is proportional to strength.
+    return this.strength * 200000;
   }
 
   constructor(props: IPressureSystemOptions) {
@@ -45,9 +44,6 @@ export class PressureSystem {
     this.center = Object.assign({}, props.center);
     if (props.strength !== undefined) {
       this.strength = props.strength;
-    }
-    if (props.strengthGradient !== undefined) {
-      this.strengthGradient = props.strengthGradient;
     }
   }
 

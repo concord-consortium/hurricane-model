@@ -99,7 +99,6 @@ export class SimulationModel {
   @observable public hurricane: Hurricane = new Hurricane({
     center: config.initialHurricanePosition,
     strength: config.hurricaneStrength,
-    strengthGradient: config.hurricaneStrengthGradient,
     speed: config.initialHurricaneSpeed
   });
 

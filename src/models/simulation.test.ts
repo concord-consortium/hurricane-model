@@ -110,21 +110,21 @@ describe("SimulationModel store", () => {
         const sim = new SimulationModel(options);
         sim.hurricane.center = {lat: 10, lng: 0};
         // Make it super strong so it affects two wind points that we have.
-        sim.hurricane.strength = 102;
+        sim.hurricane.strength = 140;
         expect(sim.windIncHurricane.length).toEqual(2);
         expect(sim.windIncHurricane).not.toEqual(fallWind);
         // Vector pointing down and slightly inwards.
         let p = sim.windIncHurricane[0];
         expect(p.u).toBeGreaterThan(29);
         expect(p.u).toBeLessThan(30);
-        expect(p.v).toBeLessThan(-84);
-        expect(p.v).toBeGreaterThan(-85);
+        expect(p.v).toBeLessThan(-81);
+        expect(p.v).toBeGreaterThan(-82);
         // Vector pointing up and slightly inwards.
         p = sim.windIncHurricane[1];
-        expect(p.u).toBeLessThan(-32);
-        expect(p.u).toBeGreaterThan(-33);
-        expect(p.v).toBeGreaterThan(83);
-        expect(p.v).toBeLessThan(84);
+        expect(p.u).toBeLessThan(-30);
+        expect(p.u).toBeGreaterThan(-31);
+        expect(p.v).toBeGreaterThan(80);
+        expect(p.v).toBeLessThan(81);
       });
     });
   });

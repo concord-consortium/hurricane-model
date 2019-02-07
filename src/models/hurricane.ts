@@ -41,6 +41,11 @@ export class Hurricane extends PressureSystem {
     this.initialProps = props;
   }
 
+  @computed public get range() {
+    // Hurricane range is a bit different than a pressure system range.
+    return Math.pow(this.strength, 0.7) * 45000;
+  }
+
   @computed public get category(): number {
     let currentCategory = -1;
     hurricaneMaxWindSpeedByCategory.forEach((maxSpeed, category) => {
@@ -100,8 +105,6 @@ export class Hurricane extends PressureSystem {
     this.strength = props.strength !== undefined ? props.strength : config.hurricaneStrength;
     this.center = Object.assign({}, props.center || config.initialHurricanePosition);
     this.speed = Object.assign({}, props.speed || config.initialHurricaneSpeed);
-    this.strengthGradient = props.strengthGradient !== undefined ?
-      props.strengthGradient : config.hurricaneStrengthGradient;
     this.strengthChange = 0;
   }
 }

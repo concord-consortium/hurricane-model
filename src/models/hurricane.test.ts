@@ -101,14 +101,12 @@ describe("Hurricane store", () => {
         center: {lat: 10, lng: 10},
         speed: {u: 1, v: 2},
         strength: 45,
-        strengthGradient: 5000,
 
       };
       const hurricane = new Hurricane(params);
       hurricane.center.lat = 50;
       hurricane.speed.u = 50;
       hurricane.strength = 123;
-      hurricane.strengthGradient = 123123;
       hurricane.strengthChange = 150;
 
       hurricane.reset();
@@ -118,7 +116,6 @@ describe("Hurricane store", () => {
       expect(hurricane.speed).toEqual(params.speed);
       expect(hurricane.speed).not.toBe(params.speed);
       expect(hurricane.strength).toEqual(params.strength);
-      expect(hurricane.strengthGradient).toEqual(params.strengthGradient);
       expect(hurricane.strengthChange).toEqual(0);
     });
   });

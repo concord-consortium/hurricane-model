@@ -16,11 +16,9 @@ const DEFAULT_CONFIG: any = {
 
   timestep: 1,
   pressureSystemStrength: 15,
-  pressureSystemIntensityGradient: 200000,
   lowPressureSysAngleOffset: 20, // deg
   highPressureSysAngleOffset: 8, // deg
   hurricaneStrength: 24,
-  hurricaneStrengthGradient: 18000,
   initialHurricanePosition: {lat: 20, lng: -20},
   initialHurricaneSpeed: {u: 0, v: 0},
   // When wind is far enough from the center of the pressure system, pressure system effect is lower
