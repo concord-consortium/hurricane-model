@@ -50,5 +50,5 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     this.stores.simulation.setSeason(event.target.value as Season);
-  };
+  }
 }

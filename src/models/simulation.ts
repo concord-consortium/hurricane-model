@@ -197,7 +197,7 @@ export class SimulationModel {
     this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
   }
 
-  @action.bound setSeason(season: Season) {
+  @action.bound public setSeason(season: Season) {
     this.season = season;
   }
 

@@ -21,4 +21,18 @@ context("Test the Hurricane Model app", () => {
     cy.get('[data-test="season-select"]').should("not.contain.text", "Fall");
     cy.get('[data-test="season-select"]').should("contain.text", "Spring");
   });
+
+  it("lets user start and stop the model", () => {
+    cy.window().then((win: any) => {
+      const oldHurrLng = win.simulation.hurricane.center.lng;
+      cy.get('[data-test="start-button"]').should("be.visible");
+      cy.get('[data-test="start-button"]').click();
+      cy.wait(500).then(() => {
+        const newHurrLng = win.simulation.hurricane.center.lng;
+        // Wind always goes from east to west.
+        expect(newHurrLng).to.be.below(oldHurrLng);
+        cy.get('[data-test="start-button"]').click();
+      });
+    });
+  });
 });
