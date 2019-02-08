@@ -287,5 +287,5 @@ describe("SimulationModel store", () => {
       expect(sim.hurricane.active).toEqual(false);
       expect(sim.pressureSystems[0].strength).toBeGreaterThan(15); // around ~ 15 + 11
     });
-  })
+  });
 });

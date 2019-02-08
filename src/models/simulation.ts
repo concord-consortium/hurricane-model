@@ -102,10 +102,10 @@ export class SimulationModel {
 
   @observable public simulationStarted = false;
 
-  private initialOptions: ISimulationOptions;
-
   // Callbacks used by tests.
   public _seaSurfaceTempDataParsed: () => void;
+
+  private initialOptions: ISimulationOptions;
 
   constructor(options?: ISimulationOptions) {
     if (!options) {
@@ -269,7 +269,8 @@ export class SimulationModel {
     this.hurricaneTrack = [];
     this.time = 0;
     this.hurricane.reset();
-    this.pressureSystems = (this.initialOptions.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
+    this.pressureSystems =
+      (this.initialOptions.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
   }
 
   @action.bound public removePressureSystem(ps: PressureSystem) {
