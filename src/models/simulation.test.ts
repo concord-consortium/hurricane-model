@@ -1,6 +1,7 @@
 import { SimulationModel, ISimulationOptions, windData, sstImages } from "./simulation";
 import config from "../config";
 import { PNG } from "pngjs";
+import {distanceTo} from "geolocation-utils";
 const fs = require("fs");
 
 const options: ISimulationOptions = {
@@ -93,14 +94,14 @@ describe("SimulationModel store", () => {
       expect(sim.wind).not.toEqual(fallWind);
       // Vector pointing down and slightly inwards.
       p = sim.windAt({lat: 10, lng: -10});
-      expect(p.u).toBeGreaterThan(4);
-      expect(p.u).toBeLessThan(5);
+      expect(p.u).toBeGreaterThan(5);
+      expect(p.u).toBeLessThan(6);
       expect(p.v).toBeLessThan(-12);
       expect(p.v).toBeGreaterThan(-13);
       // Vector pointing up and slightly inwards.
       p = sim.windAt({lat: 10, lng: 10});
-      expect(p.u).toBeLessThan(-4);
-      expect(p.u).toBeGreaterThan(-5);
+      expect(p.u).toBeLessThan(-5);
+      expect(p.u).toBeGreaterThan(-6);
       expect(p.v).toBeGreaterThan(12);
       expect(p.v).toBeLessThan(13);
     });
@@ -115,16 +116,16 @@ describe("SimulationModel store", () => {
         expect(sim.windIncHurricane).not.toEqual(fallWind);
         // Vector pointing down and slightly inwards.
         let p = sim.windIncHurricane[0];
-        expect(p.u).toBeGreaterThan(29);
-        expect(p.u).toBeLessThan(30);
-        expect(p.v).toBeLessThan(-81);
-        expect(p.v).toBeGreaterThan(-82);
+        expect(p.u).toBeGreaterThan(33);
+        expect(p.u).toBeLessThan(34);
+        expect(p.v).toBeLessThan(-80);
+        expect(p.v).toBeGreaterThan(-81);
         // Vector pointing up and slightly inwards.
         p = sim.windIncHurricane[1];
-        expect(p.u).toBeLessThan(-30);
-        expect(p.u).toBeGreaterThan(-31);
-        expect(p.v).toBeGreaterThan(80);
-        expect(p.v).toBeLessThan(81);
+        expect(p.u).toBeLessThan(-34);
+        expect(p.u).toBeGreaterThan(-35);
+        expect(p.v).toBeGreaterThan(79);
+        expect(p.v).toBeLessThan(80);
       });
     });
   });
@@ -238,11 +239,53 @@ describe("SimulationModel store", () => {
   });
 
   describe("ready", () => {
-    it("is false until SST data is downloaded", () => {
+    it("is false until SST data is downloaded and the hurricane is active", () => {
       const sim = new SimulationModel(options);
       expect(sim.ready).toEqual(false);
       sim.seaSurfaceTempData = new PNG();
       expect(sim.ready).toEqual(true);
+      sim.hurricane.strength = 0;
+      expect(sim.ready).toEqual(false);
+    });
+  });
+
+  describe("low pressure system and hurricane interaction", () => {
+    test("low pressure system removed from the model if it's weaker than hurricane", () => {
+      const sim = new SimulationModel({
+        pressureSystems: [
+          {
+            type: "low",
+            center: {lat: 20, lng: -20},
+            strength: 7
+          }
+        ]
+      });
+      sim.hurricane.center.lat = 20;
+      sim.hurricane.center.lng = -19.9;
+      sim.hurricane.strength = 40;
+      expect(sim.pressureSystems.length).toEqual(1);
+      sim.tick();
+      expect(sim.pressureSystems.length).toEqual(0);
+      expect(sim.hurricane.strength).toBeGreaterThan(40); // around ~ 40 + 7
+    });
+
+    test("hurricane gets inactive if it's weaker than low pressure system", () => {
+      const sim = new SimulationModel({
+        pressureSystems: [
+          {
+            type: "low",
+            center: {lat: 20, lng: -20},
+            strength: 15
+          }
+        ]
+      });
+      sim.hurricane.center.lat = 20;
+      sim.hurricane.center.lng = -19.9;
+      sim.hurricane.strength = 11;
+      expect(sim.hurricane.active).toEqual(true);
+      sim.tick();
+      expect(sim.hurricane.active).toEqual(false);
+      expect(sim.pressureSystems[0].strength).toBeGreaterThan(15); // around ~ 15 + 11
     });
   });
 });

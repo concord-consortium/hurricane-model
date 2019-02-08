@@ -71,7 +71,9 @@ export class MapView extends BaseComponent<IProps, IState> {
               />
             )
           }
-          <HurricaneMarker />
+          {
+            sim.hurricane.active && <HurricaneMarker />
+          }
         </Map>
       </div>
     );

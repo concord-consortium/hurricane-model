@@ -11,7 +11,11 @@ import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 
 describe("MapView component", () => {
-  const stores = createStores();
+  let stores = createStores();
+  beforeEach(() => {
+    stores = createStores();
+  });
+
   it("renders (React) Leaflet map and basic components (hurricane, pressure systems, sst, wind layers, etc.)", () => {
     const wrapper = mount(
       <Provider stores={stores}>
@@ -24,5 +28,17 @@ describe("MapView component", () => {
     expect(wrapper.find(HurricaneMarker).length).toEqual(1);
     expect(wrapper.find(PressureSystemMarker).length).toEqual(4);
     expect(wrapper.find(HurricaneTrack).length).toEqual(1);
+  });
+
+  it("doesn't render hurricane if it's not active", () => {
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <MapView />
+      </Provider>
+    );
+    expect(wrapper.find(HurricaneMarker).length).toEqual(1);
+    stores.simulation.hurricane.setStrength(0);
+    wrapper.update();
+    expect(wrapper.find(HurricaneMarker).length).toEqual(0);
   });
 });
