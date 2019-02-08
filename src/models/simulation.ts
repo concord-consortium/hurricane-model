@@ -102,6 +102,8 @@ export class SimulationModel {
 
   @observable public simulationStarted = false;
 
+  private initialOptions: ISimulationOptions;
+
   // Callbacks used by tests.
   public _seaSurfaceTempDataParsed: () => void;
 
@@ -109,6 +111,7 @@ export class SimulationModel {
     if (!options) {
       options = {};
     }
+    this.initialOptions = options;
     this.season = options.season || config.season;
     this.pressureSystems = (options.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
     autorun(() => {
@@ -227,6 +230,21 @@ export class SimulationModel {
 
     this.time += config.timestep;
 
+    this.pressureSystems.filter(ps => ps.type === "low").forEach(lps => {
+      if (distanceTo(lps.center, this.hurricane.center) < config.minPressureSystemMergeDistance) {
+        // Weaker system gets merged into stronger one. In most cases it will be low pressure system getting
+        // merged into hurricane.
+        if (lps.strength <= this.hurricane.strength) {
+          this.hurricane.strength += lps.strength;
+          this.removePressureSystem(lps);
+        } else {
+          lps.strength += this.hurricane.strength;
+          // Make hurricane inactive.
+          this.hurricane.setStrength(0);
+        }
+      }
+    });
+
     if (!this.hurricane.active) {
       // Stop the model when hurricane gets too weak.
       this.stop();
@@ -251,6 +269,14 @@ export class SimulationModel {
     this.hurricaneTrack = [];
     this.time = 0;
     this.hurricane.reset();
+    this.pressureSystems = (this.initialOptions.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
+  }
+
+  @action.bound public removePressureSystem(ps: PressureSystem) {
+    const idx = this.pressureSystems.indexOf(ps);
+    if (idx !== -1) {
+      this.pressureSystems.splice(idx, 1);
+    }
   }
 
   public windAt(point: ICoordinates): IVector {

@@ -15,7 +15,7 @@ const DEFAULT_CONFIG: any = {
   navigation: false,
   timestep: 1,
   pressureSystemStrength: 15, // max wind speed, m/s
-  lowPressureSysAngleOffset: 20, // deg
+  lowPressureSysAngleOffset: 23, // deg
   highPressureSysAngleOffset: 8, // deg
   hurricaneStrength: 24, // max wind speed, m/s
   initialHurricanePosition: {lat: 20, lng: -20},
@@ -27,6 +27,8 @@ const DEFAULT_CONFIG: any = {
   minHurricaneStrength: 10, // max wind speed, m/s
   // Min distance between two pressure systems.
   minPressureSystemDistance: 700000, // m
+  // Min distance between low pressure systems and hurricane required for them to merge together.
+  minPressureSystemMergeDistance: 400000, // m
   // Ratio describing how hard is the global wind pushing hurricane.
   globalWindToAcceleration: 100,
   // The bigger momentum, the longer hurricane will follow its own path, ignoring global wind.
