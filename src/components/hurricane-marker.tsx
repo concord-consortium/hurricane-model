@@ -3,6 +3,7 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import * as css from "./hurricane-marker.scss";
+import config from "../config";
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -35,6 +36,16 @@ export class HurricaneMarker extends BaseComponent<IProps, IState> {
   }
 }
 
+const hurrStrengthToOpacity = (strength: number) => {
+  // Gradually fade away hurricane when it gets really weak and it's going to disappear soon.
+  const range = 5;
+  const threshold = config.minHurricaneStrength + range;
+  if (strength < threshold) {
+    return 1 - (threshold - strength) / range;
+  }
+  return 1;
+};
+
 // Keep it as separate class so it's easier to test it.
 // Note that LeafletCustomMarker does rendering in a pretty awkward way, so it's hard to test these components together.
 @inject("stores")
@@ -44,12 +55,13 @@ export class HurricaneIcon extends BaseComponent<IProps, IState> {
     const hurricane = this.stores.simulation.hurricane;
     const categoryCssClass = css["category" + hurricane.category];
     const temp = this.stores.simulation.seaSurfaceTempAt(hurricane.center);
+    const opacity = hurrStrengthToOpacity(hurricane.strength);
     return (
       <div className={`${css.hurricaneIcon} ${categoryCssClass}`}>
-        <div className={css.svgContainer}>
+        <div className={css.svgContainer} style={{ opacity }}>
           { hurricaneSVGIcon }
         </div>
-        <div className={css.categoryNumber} data-test="hurricane-category">
+        <div className={css.categoryNumber} data-test="hurricane-category" style={{ opacity }}>
           { hurricane.category }
         </div>
         {
