@@ -15,7 +15,7 @@ export class HurricaneTrack extends BaseComponent<IProps, IState> {
     const { hurricaneTrack, hurricane } = this.stores.simulation;
     return hurricaneTrack.map((point: ITrackPoint, idx: number) => {
       const nextPos = idx + 1 < hurricaneTrack.length ? hurricaneTrack[idx + 1].position : hurricane.center;
-      const segmentClass = css.segment + ' ' + css["segmentCategory" + point.category];
+      const segmentClass = css.segment + " " + css["segmentCategory" + point.category];
       return <Polyline key={idx} className={segmentClass} positions={[point.position, nextPos]} weight={5} />;
     });
   }

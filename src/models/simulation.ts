@@ -241,7 +241,7 @@ export class SimulationModel {
       this.landfalls.push({
         position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category
-      })
+      });
     }
 
     this.time += config.timestep;

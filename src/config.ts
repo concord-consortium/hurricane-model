@@ -40,7 +40,9 @@ const DEFAULT_CONFIG: any = {
   // frequently and the final results are more random (smaller number of samples, more variability).
   sstCheckInterval: 60,
   // Whether model is deterministic or random. Use true if you want your results to be replicable.
-  deterministic: false
+  deterministic: false,
+  // Each time the landfall happens the model will show a clickable rectangle around it so user can zoom in.
+  markLandfall: true
 };
 
 const urlConfig: any = {};

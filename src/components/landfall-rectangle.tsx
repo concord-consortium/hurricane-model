@@ -9,7 +9,7 @@ import * as css from "./landfall-rectangle.scss";
 interface IProps extends IBaseProps {
   position: ICoordinates;
   category: number;
-  leaflet: LeafletContext
+  leaflet: LeafletContext;
 }
 interface IState {}
 
@@ -23,7 +23,11 @@ class LandfallRectangleBase extends BaseComponent<IProps, IState> {
     const { category } = this.props;
     const categoryCssClass = css["category" + category];
     return (
-      <Rectangle className={`${css.landfallRectangle} ${categoryCssClass}`} bounds={this.getBounds()} onClick={this.handleClick} />
+      <Rectangle
+        className={`${css.landfallRectangle} ${categoryCssClass}`}
+        bounds={this.getBounds()}
+        onClick={this.handleClick}
+      />
     );
   }
 
@@ -32,13 +36,13 @@ class LandfallRectangleBase extends BaseComponent<IProps, IState> {
     return [
       [position.lat - height * 0.5, position.lng - width * 0.5],
       [position.lat + height * 0.5, position.lng + width * 0.5]
-    ]
+    ];
   }
 
   public handleClick = () => {
     const { map } = this.props.leaflet;
     if (map) {
-      map.flyToBounds(this.getBounds())
+      map.flyToBounds(this.getBounds());
     }
   }
 }
