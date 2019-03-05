@@ -11,7 +11,7 @@ import * as marchSeaTemp from "../../sea-surface-temp-img/mar.png";
 import * as juneSeaTemp from "../../sea-surface-temp-img/jun.png";
 import * as septSeaTemp from "../../sea-surface-temp-img/sep.png";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season } from "../types";
+import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall } from "../types";
 import { vecAverage } from "../math-utils";
 import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
@@ -91,6 +91,9 @@ export class SimulationModel {
 
   @observable public seaSurfaceTempData: PNG | null = null;
 
+  // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
+  @observable public simulationFinished = false;
+
   // Pressure systems affect winds.
   @observable public pressureSystems: PressureSystem[] = [];
 
@@ -101,6 +104,8 @@ export class SimulationModel {
   });
 
   @observable public simulationStarted = false;
+
+  @observable public landfalls: ILandfall[] = [];
 
   // Callbacks used by tests.
   public _seaSurfaceTempDataParsed: () => void;
@@ -226,11 +231,18 @@ export class SimulationModel {
     const windSpeed = this.windAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
 
+    const sst = this.seaSurfaceTempAt(this.hurricane.center);
     if (this.time % config.sstCheckInterval === 0) {
-      const sst = this.seaSurfaceTempAt(this.hurricane.center);
       this.hurricane.setStrengthChangeFromSST(sst);
     }
     this.hurricane.updateStrength();
+
+    if (sst === null && this.landfalls.length === 0) {
+      this.landfalls.push({
+        position: Object.assign({}, this.hurricane.center),
+        category: this.hurricane.category
+      })
+    }
 
     this.time += config.timestep;
 
@@ -252,6 +264,7 @@ export class SimulationModel {
     if (!this.hurricane.active) {
       // Stop the model when hurricane gets too weak.
       this.stop();
+      this.simulationFinished = true;
     }
 
     if (this.simulationStarted) {
@@ -270,7 +283,9 @@ export class SimulationModel {
 
   @action.bound public reset() {
     this.simulationStarted = false;
+    this.simulationFinished = false;
     this.hurricaneTrack = [];
+    this.landfalls = [];
     this.time = 0;
     this.hurricane.reset();
     this.pressureSystems =

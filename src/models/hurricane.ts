@@ -78,7 +78,7 @@ export class Hurricane extends PressureSystem {
       // increase speed of hurricane weakening, if it's higher, it will decrease it.
       sst = -10; // *C
     }
-    // There's bunch of number here. Tweaking them will affect how fast hurricanes are growing or dissipating.
+    // There's a bunch of numbers here. Tweaking them will affect how fast hurricanes are growing or dissipating.
     // It's based on empirical tests, so the model looks realistic (as much as it can).
     if (sst < cat1SSTThreshold) {
       const diff = (sst - cat1SSTThreshold) / 300;

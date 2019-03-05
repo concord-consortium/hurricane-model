@@ -1,11 +1,12 @@
 import * as React from "react";
 import {inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { Map, TileLayer, ImageOverlay } from "react-leaflet";
+import {Map, TileLayer, ImageOverlay, Viewport} from "react-leaflet";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
 import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneTrack } from "./hurricane-track";
+import { LandfallRectangle } from "./landfall-rectangle";
 import config from "../config";
 import { stores } from "../index";
 
@@ -17,6 +18,7 @@ interface IState {}
 
 // Show North Atlantic.
 const bounds: [[number, number], [number, number]] = [[10, -80], [50, -10]];
+const maxBounds: [[number, number], [number, number]] = [[-10, -120], [80, -0]];
 
 const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
 
@@ -39,7 +41,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     return (
       <div className={css.mapView}>
         <Map ref={this.mapRef}
-             maxBounds={config.navigation ? undefined : bounds}
+             maxBounds={maxBounds}
              dragging={config.navigation}
              zoomControl={config.navigation}
              doubleClickZoom={config.navigation}
@@ -63,6 +65,11 @@ export class MapView extends BaseComponent<IProps, IState> {
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
           <HurricaneTrack />
+          {
+            sim.landfalls.map((lf, idx) =>
+              <LandfallRectangle key={idx} position={lf.position} category={lf.category} />
+            )
+          }
           {
             sim.pressureSystems.map((ps, idx) =>
               <PressureSystemMarker

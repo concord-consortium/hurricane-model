@@ -15,4 +15,9 @@ export interface ITrackPoint {
   category: number;
 }
 
+export interface ILandfall {
+  position: ICoordinates;
+  category: number;
+}
+
 export type Season = "winter" | "spring" | "summer" | "fall";
