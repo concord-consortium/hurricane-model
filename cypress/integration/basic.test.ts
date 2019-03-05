@@ -24,11 +24,11 @@ context("Test the Hurricane Model app", () => {
 
   it("lets user start and stop the model", () => {
     cy.window().then((win: any) => {
-      const oldHurrLng = win.simulation.hurricane.center.lng;
+      const oldHurrLng = win.stores.simulation.hurricane.center.lng;
       cy.get('[data-test="start-button"]').should("be.visible");
       cy.get('[data-test="start-button"]').click();
       cy.wait(500).then(() => {
-        const newHurrLng = win.simulation.hurricane.center.lng;
+        const newHurrLng = win.stores.simulation.hurricane.center.lng;
         // Wind always goes from east to west.
         expect(newHurrLng).to.be.below(oldHurrLng);
         cy.get('[data-test="start-button"]').click();

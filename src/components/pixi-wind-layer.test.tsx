@@ -54,17 +54,13 @@ describe("PixiWindLayer component", () => {
     expect(windLayer.pixiApp).not.toEqual(null);
     expect(windLayer.pixiApp!.stage.children.length).toEqual(arrowsCount);
 
-    const newMap = {
-      getBounds: () => ({
-        getWest: () => -10,
-        getEast: () => 10,
-        getNorth: () => 10,
-        getSouth: () => -10,
-      }),
-      getZoom: () => 10,
-      latLngToContainerPoint: () => ({x: 0, y: 0})
+    const newBounds = {
+      getWest: () => -10,
+      getEast: () => 10,
+      getNorth: () => 10,
+      getSouth: () => -10,
     };
-    stores.simulation.updateMap((newMap as any) as Leaflet.Map);
+    stores.simulation.updateBounds((newBounds as any) as Leaflet.LatLngBounds);
 
     const newArrowsCount = stores.simulation.windIncBounds.length;
     expect(newArrowsCount).toBeLessThan(arrowsCount);

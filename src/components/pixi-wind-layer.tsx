@@ -83,7 +83,7 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
   private updateArrows() {
     const stage = this.pixiApp!.stage;
     const data = this.stores.simulation.windIncHurricane;
-    const latLngToContainerPoint = this.stores.simulation.latLngToContainerPoint;
+    const latLngToContainerPoint = this.stores.ui.latLngToContainerPoint;
     data.forEach((w: IWindPoint, idx: number) => {
       // Try to reuse Pixi arrows.
       const updateOnly = !!stage.children[idx];

@@ -46,4 +46,11 @@
       }
     }
   }
+
+  .resetViewBtn {
+    cursor: pointer;
+    svg {
+      margin-top: 3px;
+    }
+  }
 }

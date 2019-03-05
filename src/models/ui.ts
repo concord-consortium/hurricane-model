@@ -1,15 +1,16 @@
-import { types } from "mobx-state-tree";
+import {action, observable} from "mobx";
+import {LatLngExpression, Map, Point} from "leaflet";
 
-export const UIModel = types
-  .model("UI", {
-    sampleText: "Hello World"
-  })
-  .actions((self) => {
-    return {
-      setSampleText(text: string) {
-        self.sampleText = text;
-      }
-    };
-  });
+export class UIModel {
+  @observable public mapModified = false;
+  @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
-export type UIModelType = typeof UIModel.Type;
+  @action.bound public mapUpdated(map: Map) {
+    this.mapModified = true;
+    this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
+  }
+
+  @action.bound public mapReset() {
+    this.mapModified = false;
+  }
+}

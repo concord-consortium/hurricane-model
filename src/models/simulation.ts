@@ -1,4 +1,4 @@
-import { LatLngExpression, Point, Map, CRS } from "leaflet";
+import {LatLngExpression, Point, Map, CRS, LatLngBounds} from "leaflet";
 import { action, observable, computed, autorun } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
@@ -76,12 +76,11 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
 ];
 
 export class SimulationModel {
-  // Region boundaries.
+  // Region boundaries. Used only for optimization.
   @observable public east = 180;
   @observable public north = 90;
   @observable public west = -180;
   @observable public south = -90;
-  @observable public zoom = 4;
 
   @observable public hurricaneTrack: ITrackPoint[] = [];
   public time = 0;
@@ -135,8 +134,6 @@ export class SimulationModel {
   @computed get loading() {
     return this.seaSurfaceTempData === null;
   }
-
-  @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
   // Wind data not affected by custom pressure systems.
   @computed get baseWind() {
@@ -198,15 +195,11 @@ export class SimulationModel {
     return sstImages[this.season];
   }
 
-  @action.bound public updateMap(map: Map) {
-    const bounds = map.getBounds();
+  @action.bound public updateBounds(bounds: LatLngBounds) {
     this.east = bounds.getEast();
     this.north = bounds.getNorth();
     this.west = bounds.getWest();
     this.south = bounds.getSouth();
-    this.zoom = map.getZoom();
-
-    this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
   }
 
   @action.bound public setSeason(season: Season) {
@@ -237,7 +230,7 @@ export class SimulationModel {
     }
     this.hurricane.updateStrength();
 
-    if (sst === null && this.landfalls.length === 0) {
+    if (config.markLandfall && sst === null && this.landfalls.length === 0) {
       this.landfalls.push({
         position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category

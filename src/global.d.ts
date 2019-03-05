@@ -13,3 +13,4 @@ declare module "*.png" {
   export = value;
 }
 declare module "geolocation-utils";
+declare module "react-leaflet-control";
