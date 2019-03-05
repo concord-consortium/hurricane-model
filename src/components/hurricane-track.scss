@@ -1,26 +1,29 @@
 @import "common.scss";
 
-.segmentCategory0 {
-  stroke: $cat0Color;
-}
+.segment {
+  cursor: inherit !important;
 
-.segmentCategory1 {
-  stroke: $cat1Color;
-}
+  &.segmentCategory0 {
+    stroke: $cat0Color;
+  }
 
-.segmentCategory2 {
-  stroke: $cat2Color;
-}
+  &.segmentCategory1 {
+    stroke: $cat1Color;
+  }
 
-.segmentCategory3 {
-  stroke: $cat3Color;
-}
+  &.segmentCategory2 {
+    stroke: $cat2Color;
+  }
 
-.segmentCategory4 {
-  stroke: $cat4Color;
-}
+  &.segmentCategory3 {
+    stroke: $cat3Color;
+  }
 
-.segmentCategory5 {
-  stroke: $cat5Color;
-}
+  &.segmentCategory4 {
+    stroke: $cat4Color;
+  }
 
+  &.segmentCategory5 {
+    stroke: $cat5Color;
+  }
+}
