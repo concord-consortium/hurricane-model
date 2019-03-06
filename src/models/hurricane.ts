@@ -76,7 +76,7 @@ export class Hurricane extends PressureSystem {
       // Use X*C as a dummy value when SST is not available -> when hurricane is over land.
       // X*C should cool enough to slowly make hurricane disappear. If this value is lower, it will
       // increase speed of hurricane weakening, if it's higher, it will decrease it.
-      sst = -10; // *C
+      sst = -70; // *C
     }
     // There's a bunch of numbers here. Tweaking them will affect how fast hurricanes are growing or dissipating.
     // It's based on empirical tests, so the model looks realistic (as much as it can).
