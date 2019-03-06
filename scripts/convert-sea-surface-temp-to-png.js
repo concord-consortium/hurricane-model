@@ -20,6 +20,22 @@ const maxLat = 80;
 const minLon = -120;
 const maxLon = 0;
 
+// Lakes area, don't treat it as sea.
+const minLonLakes = -96;
+const maxLonLakes = -75;
+const minLatLakes = 40;
+const maxLatLakes = 50;
+
+const latInValidArea = lat => {
+  return lat > minLat && lat < maxLat;
+}
+const lonInValidArea = lon => {
+  return lon > minLon && lon < maxLon;
+}
+const latLonInLakesArea = (lat, lon) => {
+  return lat > minLatLakes && lat < maxLatLakes && lon > minLonLakes && lon < maxLonLakes;
+}
+
 // This value is defined in netcdf file in one of the params. Temperatures in NetCDF format needs to be multiplied
 // by this param to get a real value in *C.
 const tempScale = 0.005;
@@ -47,7 +63,7 @@ const result = [];
 
 console.log("Generating JSON...");
 lat.forEach((latValue, latIdx) => {
-  if (latValue < minLat || latValue > maxLat) {
+  if (!latInValidArea(latValue)) {
     return;
   }
   lon.forEach((lonValue, lonIdx) => {
@@ -55,7 +71,10 @@ lat.forEach((latValue, latIdx) => {
       // convert [0, 360] range to [-180, 180].
       lonValue = lonValue - 360;
     }
-    if (lonValue < minLon || lonValue > maxLon) {
+    if (!lonInValidArea(lonValue)) {
+      return;
+    }
+    if (latLonInLakesArea(latValue, lonValue)) {
       return;
     }
     const valueIdx = latIdx * lon.length + lonIdx;

@@ -1,6 +1,6 @@
 context("Test the Hurricane Model app", () => {
   beforeEach(() => {
-    cy.visit("");
+    cy.visit("/");
   });
 
   it("renders Leaflet map", () => {
