@@ -12,8 +12,8 @@ interface IProps extends IBaseProps {
 }
 interface IState {}
 
-const width = 12; // lng deg
-const height = 7; // lat deg
+const width = 8; // lng deg
+const height = 4; // lat deg
 
 @inject("stores")
 @observer

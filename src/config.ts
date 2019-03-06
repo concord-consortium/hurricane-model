@@ -42,7 +42,7 @@ const DEFAULT_CONFIG: any = {
   // Whether model is deterministic or random. Use true if you want your results to be replicable.
   deterministic: false,
   // Each time the landfall happens the model will show a clickable rectangle around it so user can zoom in.
-  markLandfall: true
+  markLandfalls: true
 };
 
 const urlConfig: any = {};
