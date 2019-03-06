@@ -1,15 +1,14 @@
 import * as React from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { Rectangle, withLeaflet, LeafletContext } from "react-leaflet";
+import { Rectangle } from "react-leaflet";
 import { ICoordinates } from "../types";
-import { LatLngBoundsExpression } from "leaflet";
+import {LatLngBoundsLiteral} from "leaflet";
 import * as css from "./landfall-rectangle.scss";
 
 interface IProps extends IBaseProps {
   position: ICoordinates;
   category: number;
-  leaflet: LeafletContext;
 }
 interface IState {}
 
@@ -18,7 +17,7 @@ const height = 7; // lat deg
 
 @inject("stores")
 @observer
-class LandfallRectangleBase extends BaseComponent<IProps, IState> {
+export class LandfallRectangle extends BaseComponent<IProps, IState> {
   public render() {
     const { category } = this.props;
     const categoryCssClass = css["category" + category];
@@ -31,7 +30,7 @@ class LandfallRectangleBase extends BaseComponent<IProps, IState> {
     );
   }
 
-  public getBounds(): LatLngBoundsExpression {
+  public getBounds(): LatLngBoundsLiteral {
     const { position } = this.props;
     return [
       [position.lat - height * 0.5, position.lng - width * 0.5],
@@ -40,11 +39,6 @@ class LandfallRectangleBase extends BaseComponent<IProps, IState> {
   }
 
   public handleClick = () => {
-    const { map } = this.props.leaflet;
-    if (map) {
-      map.flyToBounds(this.getBounds());
-    }
+    this.stores.ui.setZoomedInView(this.getBounds());
   }
 }
-
-export const LandfallRectangle = withLeaflet(LandfallRectangleBase);

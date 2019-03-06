@@ -20,6 +20,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const sim = this.stores.simulation;
+    const ui = this.stores.ui;
     return (
       <div className={css.bottomBar}>
         <Button
@@ -43,6 +44,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             <MenuItem value="fall">Fall</MenuItem>
             <MenuItem value="winter">Winter</MenuItem>
         </Select>
+        {
+          ui.zoomedInView &&
+          <Button onClick={this.stores.ui.setNorthAtlanticView}>Return to full map</Button>
+        }
         </div>
       </div>
     );
