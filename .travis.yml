@@ -14,10 +14,9 @@ install:
   - travis_retry npm ci
   - travis_retry cypress install
 script:
+  - npm rum test:coverage
+  - npm run start & wait-on http://localhost:8080
+  - npm run test:cypress
   - npm run build
-  - npm run test:coverage -- --runInBand
-  - npm run start &
-  - wait-on http://localhost:8080
-  - $(npm bin)/cypress run --config video=false
 after_success:
   - ./s3_deploy.sh
