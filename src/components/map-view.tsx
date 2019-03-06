@@ -103,7 +103,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           />
           <HurricaneTrack />
           {
-            !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
+            sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
               <LandfallRectangle key={idx} position={lf.position} category={lf.category} />
             )
           }
