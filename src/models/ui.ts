@@ -2,7 +2,7 @@ import {action, observable} from "mobx";
 import {LatLngExpression, Map, Point, LatLngBoundsLiteral} from "leaflet";
 
 // North Atlantic.
-const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, -10]];
+export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, -10]];
 
 export class UIModel {
   @observable public initialBounds = NorthAtlanticInitialBounds;
