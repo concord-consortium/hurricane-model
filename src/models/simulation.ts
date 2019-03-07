@@ -77,7 +77,7 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
 
 // Landfall is detected when hurricane moves from sea to land. To avoid detecting too many landfalls, assume that
 // hurricane needs to travel over sea for some time before next landfall is detected.
-const minStepsOverSeaToDetectLandfall = 10;
+export const minStepsOverSeaToDetectLandfall = 10;
 
 export class SimulationModel {
   // Region boundaries. Used only for optimization.
@@ -115,7 +115,7 @@ export class SimulationModel {
 
   private initialOptions: ISimulationOptions;
 
-  private numberOfStepsOverSea = 0;
+  public numberOfStepsOverSea = 0;
 
   constructor(options?: ISimulationOptions) {
     if (!options) {
@@ -236,7 +236,7 @@ export class SimulationModel {
     }
     this.hurricane.updateStrength();
 
-    if (config.markLandfalls && sst === null && this.numberOfStepsOverSea > minStepsOverSeaToDetectLandfall) {
+    if (config.markLandfalls && sst === null && this.numberOfStepsOverSea >= minStepsOverSeaToDetectLandfall) {
       this.landfalls.push({
         position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category

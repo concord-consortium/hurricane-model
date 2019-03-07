@@ -1,4 +1,6 @@
-import { SimulationModel, ISimulationOptions, windData, sstImages } from "./simulation";
+import {
+  SimulationModel, ISimulationOptions, windData, sstImages, minStepsOverSeaToDetectLandfall
+} from "./simulation";
 import config from "../config";
 import { PNG } from "pngjs";
 import {distanceTo} from "geolocation-utils";
@@ -202,7 +204,30 @@ describe("SimulationModel store", () => {
       expect(sim.hurricaneTrack[0].category).toEqual(sim.hurricane.category);
       expect(sim.hurricaneTrack[0].position).toEqual(oldPos);
       expect(sim.hurricaneTrack[0].position).not.toBe(oldPos); // we expect a copy
+      expect(sim.numberOfStepsOverSea).toEqual(1);
     });
+
+    it("handles landfall detection", () => {
+      const sim = new SimulationModel(options);
+      expect(sim.numberOfStepsOverSea).toEqual(0);
+
+      sim.seaSurfaceTempAt = jest.fn().mockImplementation(() => null); // null => land
+      sim.tick();
+      expect(sim.numberOfStepsOverSea).toEqual(0);
+
+      sim.seaSurfaceTempAt = jest.fn().mockImplementation(() => 28); // temperature value => sea
+      for(let i = 0; i < minStepsOverSeaToDetectLandfall; i++) sim.tick();
+      expect(sim.numberOfStepsOverSea).toEqual(minStepsOverSeaToDetectLandfall);
+      expect(sim.landfalls.length).toEqual(0);
+
+      sim.seaSurfaceTempAt = jest.fn().mockImplementation(() => null); // null => land
+      sim.tick();
+      expect(sim.numberOfStepsOverSea).toEqual(0); // counter is reset now
+      expect(sim.landfalls.length).toEqual(1); // but landfall has been detected
+      const landfall = sim.landfalls[0];
+      expect(landfall.position).toEqual(sim.hurricane.center);
+      expect(landfall.category).toEqual(sim.hurricane.category);
+    })
   });
 
   describe("reset", () => {
@@ -213,10 +238,14 @@ describe("SimulationModel store", () => {
       sim.hurricane.center = {lat: 33, lng: 123};
       sim.hurricane.speed = {u: 123, v: 123};
       sim.hurricaneTrack = [{category: 1, position: {lat: 33, lng: 123}}];
+      sim.landfalls = [{category: 1, position: {lat: 33, lng: 123}}];
+      sim.numberOfStepsOverSea = 123;
       sim.reset();
       expect(sim.time).toEqual(0);
       expect(sim.hurricane.reset).toHaveBeenCalled();
       expect(sim.hurricaneTrack.length).toEqual(0);
+      expect(sim.landfalls.length).toEqual(0);
+      expect(sim.numberOfStepsOverSea).toEqual(0);
     });
   });
 
