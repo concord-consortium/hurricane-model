@@ -80,57 +80,6 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
 export const minStepsOverSeaToDetectLandfall = 10;
 
 export class SimulationModel {
-  // Region boundaries. Used only for optimization.
-  @observable public east = 180;
-  @observable public north = 90;
-  @observable public west = -180;
-  @observable public south = -90;
-
-  @observable public hurricaneTrack: ITrackPoint[] = [];
-  public time = 0;
-
-  // Current season, sets wind and sea temperature (in the future).
-  @observable public season: Season;
-
-  @observable public seaSurfaceTempData: PNG | null = null;
-
-  // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
-  @observable public simulationFinished = false;
-
-  // Pressure systems affect winds.
-  @observable public pressureSystems: PressureSystem[] = [];
-
-  @observable public hurricane: Hurricane = new Hurricane({
-    center: config.initialHurricanePosition,
-    strength: config.hurricaneStrength,
-    speed: config.initialHurricaneSpeed
-  });
-
-  @observable public simulationStarted = false;
-
-  @observable public landfalls: ILandfall[] = [];
-
-  // Callbacks used by tests.
-  public _seaSurfaceTempDataParsed: () => void;
-
-  private initialOptions: ISimulationOptions;
-
-  public numberOfStepsOverSea = 0;
-
-  constructor(options?: ISimulationOptions) {
-    if (!options) {
-      options = {};
-    }
-    this.initialOptions = options;
-    this.season = options.season || config.season;
-    this.pressureSystems = (options.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
-    autorun(() => {
-      // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
-      // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
-      // data is always updated when necessary.
-      this.updateSeaSurfaceTempData();
-    });
-  }
 
   // Simulation is not ready to be started until SST data is downloaded.
   @computed get ready() {
@@ -200,6 +149,57 @@ export class SimulationModel {
   @computed get seaSurfaceTempImgUrl() {
     return sstImages[this.season];
   }
+  // Region boundaries. Used only for optimization.
+  @observable public east = 180;
+  @observable public north = 90;
+  @observable public west = -180;
+  @observable public south = -90;
+
+  @observable public hurricaneTrack: ITrackPoint[] = [];
+  public time = 0;
+
+  // Current season, sets wind and sea temperature (in the future).
+  @observable public season: Season;
+
+  @observable public seaSurfaceTempData: PNG | null = null;
+
+  // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
+  @observable public simulationFinished = false;
+
+  // Pressure systems affect winds.
+  @observable public pressureSystems: PressureSystem[] = [];
+
+  @observable public hurricane: Hurricane = new Hurricane({
+    center: config.initialHurricanePosition,
+    strength: config.hurricaneStrength,
+    speed: config.initialHurricaneSpeed
+  });
+
+  @observable public simulationStarted = false;
+
+  @observable public landfalls: ILandfall[] = [];
+
+  // Callbacks used by tests.
+  public _seaSurfaceTempDataParsed: () => void;
+
+  public numberOfStepsOverSea = 0;
+
+  private initialOptions: ISimulationOptions;
+
+  constructor(options?: ISimulationOptions) {
+    if (!options) {
+      options = {};
+    }
+    this.initialOptions = options;
+    this.season = options.season || config.season;
+    this.pressureSystems = (options.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
+    autorun(() => {
+      // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
+      // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
+      // data is always updated when necessary.
+      this.updateSeaSurfaceTempData();
+    });
+  }
 
   @action.bound public updateBounds(bounds: LatLngBounds) {
     this.east = bounds.getEast();
@@ -248,7 +248,6 @@ export class SimulationModel {
     } else {
       this.numberOfStepsOverSea = 0;
     }
-
 
     this.time += config.timestep;
 

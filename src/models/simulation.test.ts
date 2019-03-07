@@ -216,7 +216,7 @@ describe("SimulationModel store", () => {
       expect(sim.numberOfStepsOverSea).toEqual(0);
 
       sim.seaSurfaceTempAt = jest.fn().mockImplementation(() => 28); // temperature value => sea
-      for(let i = 0; i < minStepsOverSeaToDetectLandfall; i++) sim.tick();
+      for (let i = 0; i < minStepsOverSeaToDetectLandfall; i++) sim.tick();
       expect(sim.numberOfStepsOverSea).toEqual(minStepsOverSeaToDetectLandfall);
       expect(sim.landfalls.length).toEqual(0);
 
@@ -227,7 +227,7 @@ describe("SimulationModel store", () => {
       const landfall = sim.landfalls[0];
       expect(landfall.position).toEqual(sim.hurricane.center);
       expect(landfall.category).toEqual(sim.hurricane.category);
-    })
+    });
   });
 
   describe("reset", () => {
