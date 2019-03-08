@@ -9,6 +9,7 @@ function getURLParam(name: string) {
 }
 
 const DEFAULT_CONFIG: any = {
+  authoring: false,
   // Sets base wind data (and sea temperature in the future). "fall", "winter", "spring", or "summer".
   season: "fall",
   // If set to false, user won"t be able to drag and zoom map.
