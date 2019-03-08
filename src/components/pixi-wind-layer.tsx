@@ -40,7 +40,7 @@ const arrowTexture = (() => {
 
 // Use this function to tweak visual length of the wind arrows.
 const arrowLengthFunc = (vec: IVector) => {
-  return Math.pow(4 * Math.sqrt(vec.u * vec.u + vec.v * vec.v), 0.55) + 2;
+  return Math.pow(4 * Math.sqrt(vec.u * vec.u + vec.v * vec.v), 0.55) + 4;
 };
 
 interface IProps extends IBaseProps {}

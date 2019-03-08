@@ -37,32 +37,32 @@ describe("PixiWindLayer component", () => {
 
     const windLayer = (wrapper.find(PixiWindLayer).instance() as any).wrappedInstance as PixiWindLayer;
     expect(windLayer.pixiApp).not.toEqual(null);
-    expect(windLayer.pixiApp!.stage.children.length).toEqual(stores.simulation.windIncBounds.length);
+    expect(windLayer.pixiApp!.stage.children.length).toEqual(stores.simulation.windWithinBounds.length);
   });
 
   it("ensures that number of Pixi objects is always equal to number of wind arrows", () => {
     const wrapper = mount(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <Map center={[0, 0]} zoom={4}>
           <PixiWindLayer/>
         </Map>
       </Provider>
     );
-    const arrowsCount = stores.simulation.windIncBounds.length;
+    const arrowsCount = stores.simulation.windWithinBounds.length;
 
     const windLayer = (wrapper.find(PixiWindLayer).instance() as any).wrappedInstance as PixiWindLayer;
     expect(windLayer.pixiApp).not.toEqual(null);
     expect(windLayer.pixiApp!.stage.children.length).toEqual(arrowsCount);
 
     const newBounds = {
-      getWest: () => -10,
-      getEast: () => 10,
-      getNorth: () => 10,
-      getSouth: () => -10,
+      getWest: () => -40,
+      getEast: () => 40,
+      getNorth: () => 40,
+      getSouth: () => -40,
     };
     stores.simulation.updateBounds((newBounds as any) as Leaflet.LatLngBounds);
 
-    const newArrowsCount = stores.simulation.windIncBounds.length;
+    const newArrowsCount = stores.simulation.windWithinBounds.length;
     expect(newArrowsCount).toBeLessThan(arrowsCount);
     expect(windLayer.pixiApp!.stage.children.length).toEqual(newArrowsCount);
   });

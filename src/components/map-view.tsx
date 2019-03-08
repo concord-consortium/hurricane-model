@@ -48,7 +48,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           // Also, apply small padding (3%) as it feels better and otherwise Leaflet is triggering another animations.
           const maxBounds = map.getBounds().pad(0.03);
           const minZoom = map.getZoom();
-          map.setMinZoom(minZoom);
+          // map.setMinZoom(minZoom);
           map.setMaxBounds(maxBounds);
           this._programmaticMapUpdate = false;
         });
@@ -75,7 +75,7 @@ export class MapView extends BaseComponent<IProps, IState> {
              style={{width: "100%", height: "100%"}}
              zoomControl={false}
              onViewportChanged={this.handleViewportChanged}
-             zoom={5}
+             zoom={4}
              center={[30, -45]}
         >
           { navigation && <ZoomControl position="topleft"/> }

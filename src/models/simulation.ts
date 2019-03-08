@@ -80,80 +80,11 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
 export const minStepsOverSeaToDetectLandfall = 10;
 
 export class SimulationModel {
-
-  // Simulation is not ready to be started until SST data is downloaded.
-  @computed get ready() {
-    return this.seaSurfaceTempData !== null && this.hurricane.active;
-  }
-
-  @computed get loading() {
-    return this.seaSurfaceTempData === null;
-  }
-
-  // Wind data not affected by custom pressure systems.
-  @computed get baseWind() {
-    return windData[this.season];
-  }
-
-  // Wind data affected by custom pressure systems.
-  @computed get wind() {
-    const result: IWindPoint[] = [];
-    this.baseWind.forEach(w => {
-      const pressureSysWinds: IWindPoint[] = [];
-      const pressureSysWeights: number[] = [];
-      this.pressureSystems.forEach(ps => {
-        const dist = distanceTo(ps.center, w);
-        if (dist < ps.range) {
-          pressureSysWinds.push(ps.applyToWindPoint(w));
-          pressureSysWeights.push(1 - dist / ps.range);
-        }
-      });
-      if (pressureSysWinds.length > 0) {
-        const newWind = vecAverage(pressureSysWinds, pressureSysWeights);
-        result.push(Object.assign({}, w, newWind));
-      } else {
-        result.push(w);
-      }
-    });
-    return result;
-  }
-
-  // Helper structure.
-  @computed get windKdTree() {
-    return new kdTree(this.wind, distanceTo, ["lat", "lng"]);
-  }
-
-  // Wind data affected by custom pressure systems and limited to current bounds.
-  @computed get windIncBounds() {
-    return this.wind.filter(p =>
-      p.lng >= this.west && p.lng <= this.east && p.lat >= this.south && p.lat <= this.north
-    );
-  }
-
-  // Wind data affected by custom pressure systems, hurricane, and limited to current bounds.
-  // Note that his data is used ONLY for rendering. Hurricane simulation uses data without effect of the
-  // hurricane itself.
-  @computed get windIncHurricane() {
-    const result: IWindPoint[] = [];
-    this.windIncBounds.forEach(w => {
-      const dist = distanceTo(this.hurricane.center, w);
-      if (dist < this.hurricane.range) {
-        result.push(this.hurricane.applyToWindPoint(w));
-      } else {
-        result.push(w);
-      }
-    });
-    return result;
-  }
-
-  @computed get seaSurfaceTempImgUrl() {
-    return sstImages[this.season];
-  }
   // Region boundaries. Used only for optimization.
-  @observable public east = 180;
-  @observable public north = 90;
-  @observable public west = -180;
-  @observable public south = -90;
+  @observable public east = 45;
+  @observable public north = 45;
+  @observable public west = -45;
+  @observable public south = -45;
 
   @observable public hurricaneTrack: ITrackPoint[] = [];
   public time = 0;
@@ -199,6 +130,95 @@ export class SimulationModel {
       // data is always updated when necessary.
       this.updateSeaSurfaceTempData();
     });
+  }
+
+  @computed get areaWidth() {
+    return this.east - this.west;
+  }
+
+  // Simulation is not ready to be started until SST data is downloaded.
+  @computed get ready() {
+    return this.seaSurfaceTempData !== null && this.hurricane.active;
+  }
+
+  @computed get loading() {
+    return this.seaSurfaceTempData === null;
+  }
+
+  // Wind data not affected by custom pressure systems.
+  @computed get baseWind() {
+    return windData[this.season];
+  }
+
+  // Wind data affected by custom pressure systems.
+  @computed get wind() {
+    const result: IWindPoint[] = [];
+    this.baseWind.forEach(w => {
+      const pressureSysWinds: IWindPoint[] = [];
+      const pressureSysWeights: number[] = [];
+      this.pressureSystems.forEach(ps => {
+        const dist = distanceTo(ps.center, w);
+        if (dist < ps.range) {
+          pressureSysWinds.push(ps.applyToWindPoint(w));
+          pressureSysWeights.push(1 - dist / ps.range);
+        }
+      });
+      if (pressureSysWinds.length > 0) {
+        const newWind = vecAverage(pressureSysWinds, pressureSysWeights);
+        result.push(Object.assign({}, w, newWind));
+      } else {
+        result.push(w);
+      }
+    });
+    return result;
+  }
+
+  // Helper structure.
+  @computed get windKdTree() {
+    return new kdTree(this.wind, distanceTo, ["lat", "lng"]);
+  }
+
+  // Wind data affected by custom pressure systems and limited to current bounds.
+  @computed get windWithinBounds() {
+    if (this.areaWidth > 40) {
+      // It would be too slow to re-generate wind data for zoomed-out view. Also, the default amount of arrows
+      // works well for this view. We can only limit their number so they more clear.
+      const nth = Math.max(1, Math.round(this.areaWidth / 90));
+      return this.wind.filter((p, idx) =>
+        idx % nth === 0 && p.lng >= this.west && p.lng <= this.east && p.lat >= this.south && p.lat <= this.north
+      );
+    }
+    // Otherwise, generate custom arrows for given area.
+    const result = [];
+    const diff = this.areaWidth / 30;
+    for (let lat = this.south; lat < Math.ceil(this.north); lat += diff) {
+      for (let lng = this.west; lng < Math.ceil(this.east); lng += diff) {
+        const w = this.windAt({lat, lng});
+        const wp = {lat, lng, u: w.u, v: w.v};
+        result.push(wp);
+      }
+    }
+    return result;
+  }
+
+  // Wind data affected by custom pressure systems, hurricane, and limited to current bounds.
+  // Note that his data is used ONLY for rendering. Hurricane simulation uses data without effect of the
+  // hurricane itself.
+  @computed get windIncHurricane() {
+    const result: IWindPoint[] = [];
+    this.windWithinBounds.forEach(w => {
+      const dist = distanceTo(this.hurricane.center, w);
+      if (dist < this.hurricane.range) {
+        result.push(this.hurricane.applyToWindPoint(w));
+      } else {
+        result.push(w);
+      }
+    });
+    return result;
+  }
+
+  @computed get seaSurfaceTempImgUrl() {
+    return sstImages[this.season];
   }
 
   @action.bound public updateBounds(bounds: LatLngBounds) {
