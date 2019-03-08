@@ -20,6 +20,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const sim = this.stores.simulation;
+    const ui = this.stores.ui;
     return (
       <div className={css.bottomBar}>
         <Button
@@ -29,7 +30,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         >
           { sim.simulationStarted ? <span><PauseIcon/> Stop</span> : <span><PlayArrowIcon/> Start</span> }
         </Button>
-        <Button onClick={this.stores.simulation.reset}><RestartIcon/> Restart</Button>
+        <Button data-test="restart-button" onClick={this.handleReset}><RestartIcon/> Restart</Button>
         <div className={css.seasonSelect}>
           <span className={css.label}>Season:</span>
           <Select
@@ -43,6 +44,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             <MenuItem value="fall">Fall</MenuItem>
             <MenuItem value="winter">Winter</MenuItem>
         </Select>
+        {
+          ui.zoomedInView &&
+          <Button onClick={this.stores.ui.setNorthAtlanticView}>Return to full map</Button>
+        }
         </div>
       </div>
     );
@@ -50,5 +55,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     this.stores.simulation.setSeason(event.target.value as Season);
+  }
+
+  public handleReset = () => {
+    this.stores.simulation.reset();
+    this.stores.ui.setNorthAtlanticView();
   }
 }

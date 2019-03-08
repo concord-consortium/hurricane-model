@@ -1,13 +1,17 @@
 import * as React from "react";
-import {inject, observer } from "mobx-react";
+import { observe } from "mobx";
+import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { Map, TileLayer, ImageOverlay } from "react-leaflet";
+import { Map, TileLayer, ImageOverlay, ZoomControl } from "react-leaflet";
+import Control from "react-leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
 import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneTrack } from "./hurricane-track";
+import { LandfallRectangle } from "./landfall-rectangle";
 import config from "../config";
 import { stores } from "../index";
+import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
 
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
@@ -15,19 +19,41 @@ import "leaflet/dist/leaflet.css";
 interface IProps extends IBaseProps {}
 interface IState {}
 
-// Show North Atlantic.
-const bounds: [[number, number], [number, number]] = [[10, -80], [50, -10]];
-
 const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
 
 @inject("stores")
 @observer
 export class MapView extends BaseComponent<IProps, IState> {
   private mapRef = React.createRef<Map>();
+  private _programmaticMapUpdate = false;
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
     setTimeout(this.handleWindowResize, 1);
+    // Observe some properties manually. React-leaflet implementation is incomplete in some cases. Some properties
+    // work only on the initial load, but it's impossible to update them later. That's why we need to access
+    // Leaflet API directly.
+    observe(this.stores.ui, "initialBounds", () => {
+      const map = this.leafletMap;
+      if (map) {
+        // Remove restrictions for a moment so flyToBounds works correctly.
+        map.setMinZoom(1);
+        map.setMaxBounds([[-Infinity, -Infinity], [Infinity, Infinity]]);
+        this._programmaticMapUpdate = true;
+        map.flyToBounds(this.stores.ui.initialBounds);
+        map.once("moveend", () => {
+          // Calculate max bounds to be the area which is visible at the moment. It'll depend on the screen size.
+          // Since it's initially visible, we don't want to restrict users more when they zoom in and Leaflet can
+          // apply max bounds more precisely (that's why we don't use bounds as max bounds).
+          // Also, apply small padding (3%) as it feels better and otherwise Leaflet is triggering another animations.
+          const maxBounds = map.getBounds().pad(0.03);
+          const minZoom = map.getZoom();
+          map.setMinZoom(minZoom);
+          map.setMaxBounds(maxBounds);
+          this._programmaticMapUpdate = false;
+        });
+      }
+    });
   }
 
   public componentWillUnmount(): void {
@@ -36,21 +62,34 @@ export class MapView extends BaseComponent<IProps, IState> {
 
   public render() {
     const sim = this.stores.simulation;
+    const ui = this.stores.ui;
+    const navigation = ui.zoomedInView || config.navigation;
     return (
       <div className={css.mapView}>
         <Map ref={this.mapRef}
-             maxBounds={config.navigation ? undefined : bounds}
-             dragging={config.navigation}
-             zoomControl={config.navigation}
-             doubleClickZoom={config.navigation}
-             scrollWheelZoom={config.navigation}
-             boxZoom={config.navigation}
-             keyboard={config.navigation}
+             dragging={navigation}
+             doubleClickZoom={navigation}
+             scrollWheelZoom={navigation}
+             boxZoom={navigation}
+             keyboard={navigation}
              style={{width: "100%", height: "100%"}}
+             zoomControl={false}
              onViewportChanged={this.handleViewportChanged}
              zoom={5}
              center={[30, -45]}
         >
+          { navigation && <ZoomControl position="topleft"/> }
+          {
+            navigation && ui.mapModifiedByUser &&
+            <Control position="topleft" className="leaflet-bar">
+              <a className={css.resetViewBtn}
+                 onClick={this.resetView}
+                 title="Reset view" role="button" aria-label="Reset view"
+              >
+                <CenterFocusStrong/>
+              </a>
+            </Control>
+          }
           <PixiWindLayer />
           <ImageOverlay
             opacity={0.8}
@@ -63,6 +102,11 @@ export class MapView extends BaseComponent<IProps, IState> {
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
           <HurricaneTrack />
+          {
+            sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
+              <LandfallRectangle key={idx} position={lf.position} category={lf.category} />
+            )
+          }
           {
             sim.pressureSystems.map((ps, idx) =>
               <PressureSystemMarker
@@ -87,13 +131,18 @@ export class MapView extends BaseComponent<IProps, IState> {
   public handleWindowResize = () => {
     if (this.leafletMap) {
       this.leafletMap.invalidateSize(false);
-      this.leafletMap.fitBounds(bounds);
     }
+    this.resetView();
+  }
+
+  public resetView = () => {
+    this.stores.ui.resetMapView();
   }
 
   private handleViewportChanged = () => {
     if (this.leafletMap) {
-      this.stores.simulation.updateMap(this.leafletMap);
+      this.stores.simulation.updateBounds(this.leafletMap.getBounds());
+      this.stores.ui.mapUpdated(this.leafletMap, this._programmaticMapUpdate);
     }
   }
 }

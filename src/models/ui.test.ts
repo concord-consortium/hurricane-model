@@ -1,26 +1,65 @@
-import { UIModel, UIModelType } from "./ui";
+import { UIModel, NorthAtlanticInitialBounds } from "./ui";
+import { Map } from "leaflet";
 
-describe("ui model", () => {
-  let ui: UIModelType;
-
-  beforeEach(() => {
-    ui = UIModel.create({});
+describe("UI model", () => {
+  it("can be created without errors", () => {
+    const ui = new UIModel();
+    expect(ui.initialBounds).toEqual(NorthAtlanticInitialBounds);
+    expect(ui.zoomedInView).toEqual(false);
+    expect(ui.mapModifiedByUser).toEqual(false);
+    expect(ui.latLngToContainerPoint).toBeDefined();
   });
 
-  it("has default values", () => {
-    expect(ui.sampleText).toBe("Hello World");
-  });
+  describe("mapUpdated", () => {
+    it("updates latLngToContainerPoint and mapModifiedByUser", () => {
+      const ui = new UIModel();
+      const map = new Map(document.createElement("div"));
+      const oldLatLngToContainerPoint = ui.latLngToContainerPoint;
 
-  it("uses override values", () => {
-    ui = UIModel.create({
-      sampleText: "foo"
+      ui.mapUpdated(map, true);
+      expect(ui.latLngToContainerPoint).not.toEqual(oldLatLngToContainerPoint);
+      expect(ui.mapModifiedByUser).toEqual(false);
+
+      ui.mapUpdated(map, false);
+      expect(ui.mapModifiedByUser).toEqual(true);
     });
-    expect(ui.sampleText).toBe("foo");
   });
 
-  it("sets new values", () => {
-    ui.setSampleText("bar");
-    expect(ui.sampleText).toBe("bar");
+  describe("resetMapView", () => {
+    it("updates initialBounds and mapModifiedByUser", () => {
+      const ui = new UIModel();
+      const oldInitialBounds = ui.initialBounds;
+      ui.resetMapView();
+      // Bounds should be the same, but it should be a newly craeted object, so view code can detect this change.
+      expect(ui.initialBounds).not.toBe(oldInitialBounds);
+      expect(ui.initialBounds).toEqual(oldInitialBounds);
+      expect(ui.mapModifiedByUser).toEqual(false);
+    });
   });
 
+  describe("setInitialBounds", () => {
+    it("updates initialBounds", () => {
+      const ui = new UIModel();
+      ui.setInitialBounds([[1, 2], [5, 10]]);
+      expect(ui.initialBounds).toEqual([[1, 2], [5, 10]]);
+    });
+  });
+
+  describe("setZoomedInView", () => {
+    it("updates initialBounds", () => {
+      const ui = new UIModel();
+      ui.setZoomedInView([[1, 2], [5, 10]]);
+      expect(ui.initialBounds).toEqual([[1, 2], [5, 10]]);
+      expect(ui.zoomedInView).toEqual(true);
+    });
+  });
+
+  describe("setNorthAtlanticView", () => {
+    it("updates initialBounds", () => {
+      const ui = new UIModel();
+      ui.setNorthAtlanticView();
+      expect(ui.initialBounds).toEqual(NorthAtlanticInitialBounds);
+      expect(ui.zoomedInView).toEqual(false);
+    });
+  });
 });

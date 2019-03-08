@@ -1,4 +1,4 @@
-import { LatLngExpression, Point, Map, CRS } from "leaflet";
+import {LatLngExpression, Point, Map, CRS, LatLngBounds} from "leaflet";
 import { action, observable, computed, autorun } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
@@ -11,7 +11,7 @@ import * as marchSeaTemp from "../../sea-surface-temp-img/mar.png";
 import * as juneSeaTemp from "../../sea-surface-temp-img/jun.png";
 import * as septSeaTemp from "../../sea-surface-temp-img/sep.png";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season } from "../types";
+import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall } from "../types";
 import { vecAverage } from "../math-utils";
 import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
@@ -75,52 +75,11 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
   }
 ];
 
+// Landfall is detected when hurricane moves from sea to land. To avoid detecting too many landfalls, assume that
+// hurricane needs to travel over sea for some time before next landfall is detected.
+export const minStepsOverSeaToDetectLandfall = 10;
+
 export class SimulationModel {
-  // Region boundaries.
-  @observable public east = 180;
-  @observable public north = 90;
-  @observable public west = -180;
-  @observable public south = -90;
-  @observable public zoom = 4;
-
-  @observable public hurricaneTrack: ITrackPoint[] = [];
-  public time = 0;
-
-  // Current season, sets wind and sea temperature (in the future).
-  @observable public season: Season;
-
-  @observable public seaSurfaceTempData: PNG | null = null;
-
-  // Pressure systems affect winds.
-  @observable public pressureSystems: PressureSystem[] = [];
-
-  @observable public hurricane: Hurricane = new Hurricane({
-    center: config.initialHurricanePosition,
-    strength: config.hurricaneStrength,
-    speed: config.initialHurricaneSpeed
-  });
-
-  @observable public simulationStarted = false;
-
-  // Callbacks used by tests.
-  public _seaSurfaceTempDataParsed: () => void;
-
-  private initialOptions: ISimulationOptions;
-
-  constructor(options?: ISimulationOptions) {
-    if (!options) {
-      options = {};
-    }
-    this.initialOptions = options;
-    this.season = options.season || config.season;
-    this.pressureSystems = (options.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
-    autorun(() => {
-      // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
-      // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
-      // data is always updated when necessary.
-      this.updateSeaSurfaceTempData();
-    });
-  }
 
   // Simulation is not ready to be started until SST data is downloaded.
   @computed get ready() {
@@ -130,8 +89,6 @@ export class SimulationModel {
   @computed get loading() {
     return this.seaSurfaceTempData === null;
   }
-
-  @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
   // Wind data not affected by custom pressure systems.
   @computed get baseWind() {
@@ -192,16 +149,63 @@ export class SimulationModel {
   @computed get seaSurfaceTempImgUrl() {
     return sstImages[this.season];
   }
+  // Region boundaries. Used only for optimization.
+  @observable public east = 180;
+  @observable public north = 90;
+  @observable public west = -180;
+  @observable public south = -90;
 
-  @action.bound public updateMap(map: Map) {
-    const bounds = map.getBounds();
+  @observable public hurricaneTrack: ITrackPoint[] = [];
+  public time = 0;
+
+  // Current season, sets wind and sea temperature (in the future).
+  @observable public season: Season;
+
+  @observable public seaSurfaceTempData: PNG | null = null;
+
+  // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
+  @observable public simulationFinished = false;
+
+  // Pressure systems affect winds.
+  @observable public pressureSystems: PressureSystem[] = [];
+
+  @observable public hurricane: Hurricane = new Hurricane({
+    center: config.initialHurricanePosition,
+    strength: config.hurricaneStrength,
+    speed: config.initialHurricaneSpeed
+  });
+
+  @observable public simulationStarted = false;
+
+  @observable public landfalls: ILandfall[] = [];
+
+  // Callbacks used by tests.
+  public _seaSurfaceTempDataParsed: () => void;
+
+  public numberOfStepsOverSea = 0;
+
+  private initialOptions: ISimulationOptions;
+
+  constructor(options?: ISimulationOptions) {
+    if (!options) {
+      options = {};
+    }
+    this.initialOptions = options;
+    this.season = options.season || config.season;
+    this.pressureSystems = (options.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
+    autorun(() => {
+      // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
+      // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
+      // data is always updated when necessary.
+      this.updateSeaSurfaceTempData();
+    });
+  }
+
+  @action.bound public updateBounds(bounds: LatLngBounds) {
     this.east = bounds.getEast();
     this.north = bounds.getNorth();
     this.west = bounds.getWest();
     this.south = bounds.getSouth();
-    this.zoom = map.getZoom();
-
-    this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
   }
 
   @action.bound public setSeason(season: Season) {
@@ -226,11 +230,24 @@ export class SimulationModel {
     const windSpeed = this.windAt(this.hurricane.center);
     this.hurricane.move(windSpeed, config.timestep);
 
+    const sst = this.seaSurfaceTempAt(this.hurricane.center);
     if (this.time % config.sstCheckInterval === 0) {
-      const sst = this.seaSurfaceTempAt(this.hurricane.center);
       this.hurricane.setStrengthChangeFromSST(sst);
     }
     this.hurricane.updateStrength();
+
+    if (config.markLandfalls && sst === null && this.numberOfStepsOverSea >= minStepsOverSeaToDetectLandfall) {
+      this.landfalls.push({
+        position: Object.assign({}, this.hurricane.center),
+        category: this.hurricane.category
+      });
+    }
+
+    if (sst !== null) {
+      this.numberOfStepsOverSea += 1;
+    } else {
+      this.numberOfStepsOverSea = 0;
+    }
 
     this.time += config.timestep;
 
@@ -252,6 +269,7 @@ export class SimulationModel {
     if (!this.hurricane.active) {
       // Stop the model when hurricane gets too weak.
       this.stop();
+      this.simulationFinished = true;
     }
 
     if (this.simulationStarted) {
@@ -270,11 +288,14 @@ export class SimulationModel {
 
   @action.bound public reset() {
     this.simulationStarted = false;
+    this.simulationFinished = false;
     this.hurricaneTrack = [];
+    this.landfalls = [];
     this.time = 0;
     this.hurricane.reset();
     this.pressureSystems =
       (this.initialOptions.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
+    this.numberOfStepsOverSea = 0;
   }
 
   @action.bound public removePressureSystem(ps: PressureSystem) {

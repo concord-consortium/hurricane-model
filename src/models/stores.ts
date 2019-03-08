@@ -1,16 +1,16 @@
-import { UIModel, UIModelType } from "./ui";
+import { UIModel } from "./ui";
 import { SimulationModel } from "./simulation";
 
 export interface IStores {
-  ui: UIModelType;
+  ui: UIModel;
   simulation: SimulationModel;
 }
 
 export function createStores(): IStores {
   const stores = {
-    ui: UIModel.create({}),
+    ui: new UIModel(),
     simulation: new SimulationModel()
   };
-  (window as any).simulation = stores.simulation;
+  (window as any).stores = stores;
   return stores;
 }

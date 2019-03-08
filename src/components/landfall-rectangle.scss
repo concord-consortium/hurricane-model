@@ -1,0 +1,30 @@
+@import "common.scss";
+
+.landfallRectangle {
+  fill-opacity: 0.1;
+
+  &.category0 {
+    stroke: $cat0Color;
+    fill: $cat0Color;
+  }
+  &.category1 {
+    stroke: $cat1Color;
+    fill: $cat1Color;
+  }
+  &.category2 {
+    stroke: $cat2Color;
+    fill: $cat2Color;
+  }
+  &.category3 {
+    stroke: $cat3Color;
+    fill: $cat3Color;
+  }
+  &.category4 {
+    stroke: $cat4Color;
+    fill: $cat4Color;
+  }
+  &.category5 {
+    stroke: $cat5Color;
+    fill: $cat5Color;
+  }
+}
