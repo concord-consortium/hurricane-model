@@ -1,5 +1,5 @@
 import * as React from "react";
-import { autorun } from "mobx";
+import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { Map, TileLayer, ImageOverlay, ZoomControl } from "react-leaflet";
@@ -33,7 +33,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     // Observe some properties manually. React-leaflet implementation is incomplete in some cases. Some properties
     // work only on the initial load, but it's impossible to update them later. That's why we need to access
     // Leaflet API directly.
-    autorun(() => {
+    observe(this.stores.ui, "initialBounds", () => {
       const map = this.leafletMap;
       if (map) {
         // Remove restrictions for a moment so flyToBounds works correctly.
