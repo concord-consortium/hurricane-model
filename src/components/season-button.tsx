@@ -20,7 +20,7 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
       <Button
         onClick={this.handleSeasonChange}
         className={css.seasonButton}
-        data-test="season-select"
+        data-test="season-button"
       >
         <span>
           <span className={css.seasonValue}>{ sim.season }</span>

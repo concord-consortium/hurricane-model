@@ -8,18 +8,15 @@ context("Test the Hurricane Model app", () => {
   });
 
   it("lets user change season", () => {
-    cy.get('[data-test="season-select"]').should("be.visible");
-    cy.get('[data-test="season-select"]').should("contain.text", "Fall");
-    cy.get('[data-test="season-select"]').click();
-    cy.get('[data-value="summer"]').should("be.visible");
-    cy.get('[data-value="fall"]').should("be.visible");
-    cy.get('[data-value="winter"]').should("be.visible");
-    cy.get('[data-value="spring"]').should("be.visible");
-
-    cy.get('[data-value="spring"]').click();
-    cy.get('[data-value="fall"]').should("not.be.visible");
-    cy.get('[data-test="season-select"]').should("not.contain.text", "Fall");
-    cy.get('[data-test="season-select"]').should("contain.text", "Spring");
+    cy.contains(".season-button--seasonValue--__hurr-v1__", "fall");
+    cy.get('[data-test="season-button"]').click();
+    cy.contains(".season-button--seasonValue--__hurr-v1__", "winter");
+    cy.get('[data-test="season-button"]').click();
+    cy.contains(".season-button--seasonValue--__hurr-v1__", "spring");
+    cy.get('[data-test="season-button"]').click();
+    cy.contains(".season-button--seasonValue--__hurr-v1__", "summer");
+    cy.get('[data-test="season-button"]').click();
+    cy.contains(".season-button--seasonValue--__hurr-v1__", "fall");
   });
 
   it("lets user start and stop the model", () => {
