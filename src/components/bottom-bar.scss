@@ -1,8 +1,6 @@
 @import "common.scss";
 
 $overflowHeight: 14px;
-$borderWidth: 1px;
-$borderStyle: $borderWidth solid #797979;
 
 // Covers part of the border, just below the rounded corner.
 %borderCover {
@@ -10,15 +8,15 @@ $borderStyle: $borderWidth solid #797979;
   display: block;
   position: absolute;
   height: $bottomBarHeight;
-  width: $borderWidth;
-  bottom: $borderWidth;
+  width: $bottomBarBorderWidth;
+  bottom: $bottomBarBorderWidth;
   background: #fff;
 }
 
 .bottomBar {
   display: flex;
   justify-content: center;
-  border-top: $borderStyle;
+  border-top: $bottomBarBorderStyle;
 
   // Base styles that ensure that given container sticks out from the bottom bar, has a nice, round corners and its border
   // matches rest of the bottom bar correctly.
@@ -28,41 +26,30 @@ $borderStyle: $borderWidth solid #797979;
     z-index: 1000;
     background: #fff;
     border-radius: 0;
-    border-top: $borderStyle;
+    border-top: $bottomBarBorderStyle;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     position: relative;
     // Left border is necessary so the rounded corner looks good (otherwise, border would end in the middle of curve).
-    border-left: $borderStyle;
+    border-left: $bottomBarBorderStyle;
     // However, it needs to be mostly covered.
     &:before {
       @extend %borderCover;
-      left: -$borderWidth;
+      left: -$bottomBarBorderWidth;
     }
     // Right border is necessary so the rounded corner looks good (otherwise, border would end in the middle of curve).
-    border-right: $borderStyle;
+    border-right: $bottomBarBorderStyle;
     // However, it needs to be mostly covered.
     &:after {
       @extend %borderCover;
-      right: -$borderWidth;
+      right: -$bottomBarBorderWidth;
     }
     margin-left: 5px;
     margin-right: 5px;
   }
 
-  .seasonSelect {
-    position: absolute;
-    left: 30px;
-    padding-top: 3px;
-  }
-
-  .label {
-    color: #666;
-    margin-right: 10px;
-  }
-
   .tallButton {
-    width: 60px;
+    min-width: 60px;
     height: 100%;
     border-radius: 0;
     &:first-child {

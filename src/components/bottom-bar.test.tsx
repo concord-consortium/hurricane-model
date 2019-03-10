@@ -3,8 +3,8 @@ import { mount } from "enzyme";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { BottomBar } from "./bottom-bar";
+import { SeasonButton } from "./season-button";
 import Button from "@material-ui/core/Button";
-import Select from "@material-ui/core/Select";
 
 describe("BottomBar component", () => {
   let stores = createStores();
@@ -18,9 +18,8 @@ describe("BottomBar component", () => {
         <BottomBar />
       </Provider>
     );
-    expect(wrapper.find(Button).length).toEqual(2);
-    expect(wrapper.text()).toEqual(expect.stringContaining("Season"));
-    expect(wrapper.find(Select).length).toEqual(1);
+    expect(wrapper.find(Button).length).toEqual(3);
+    expect(wrapper.find(SeasonButton).length).toEqual(1);
   });
 
   it("start button is disabled until model is ready", () => {
