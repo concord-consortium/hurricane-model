@@ -14,6 +14,7 @@ $overflowHeight: 14px;
 }
 
 .bottomBar {
+  color: #666;
   display: flex;
   justify-content: center;
   border-top: $bottomBarBorderStyle;
@@ -45,8 +46,12 @@ $overflowHeight: 14px;
       @extend %borderCover;
       right: -$bottomBarBorderWidth;
     }
-    margin-left: 5px;
-    margin-right: 5px;
+    margin-left: -$bottomBarBorderWidth;
+  }
+
+  .playbackContainer {
+    margin-left: 10px;
+    margin-right: 10px;
   }
 
   .logo {

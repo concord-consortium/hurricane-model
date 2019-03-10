@@ -8,14 +8,11 @@
   &:last-child {
     border-top-right-radius: 10px;
   }
-  &:hover {
-    background: #f2f2f2;
-  }
   svg {
     display: block;
     height: 30px;
     width: 30px;
-    margin: 0 auto;
+    margin: 12px auto 0 auto;
     path {
       fill: #666666;
     }

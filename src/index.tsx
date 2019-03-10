@@ -5,26 +5,17 @@ import config from "./config";
 import * as seedrandom from "./seedrandom";
 import { AppComponent } from "./components/app";
 import { createStores } from "./models/stores";
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import { MuiThemeProvider } from "@material-ui/core/styles";
+import hurricanesTheme from "./material-ui-theme";
 
 // Setup seedrandom helper.
 seedrandom.initialize(config.deterministic);
 
 export const stores = createStores();
 
-const theme = createMuiTheme({
-  typography: {
-    useNextVariants: true,
-    fontFamily: "Lato, Arial, sans-serif",
-    button: {
-      textTransform: "none"
-    }
-  },
-});
-
 ReactDOM.render(
   <Provider stores={stores}>
-    <MuiThemeProvider theme={theme}>
+    <MuiThemeProvider theme={hurricanesTheme}>
       <AppComponent />
     </MuiThemeProvider>
   </Provider>,
