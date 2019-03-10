@@ -2,7 +2,7 @@ import * as React from "react";
 import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { Map, TileLayer, ImageOverlay, ZoomControl } from "react-leaflet";
+import { Map, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
 import Control from "react-leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
@@ -73,10 +73,11 @@ export class MapView extends BaseComponent<IProps, IState> {
              boxZoom={navigation}
              keyboard={navigation}
              style={{width: "100%", height: "100%"}}
-             zoomControl={false}
              onViewportChanged={this.handleViewportChanged}
              zoom={5}
              center={[30, -45]}
+             zoomControl={false}
+             attributionControl={false}
         >
           { navigation && <ZoomControl position="topleft"/> }
           {
@@ -90,6 +91,7 @@ export class MapView extends BaseComponent<IProps, IState> {
               </a>
             </Control>
           }
+          <AttributionControl position="topright" />
           <PixiWindLayer />
           <ImageOverlay
             opacity={0.8}

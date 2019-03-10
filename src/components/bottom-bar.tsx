@@ -4,9 +4,9 @@ import { BaseComponent, IBaseProps } from "./base";
 import Button from "@material-ui/core/Button";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import PauseIcon from "@material-ui/icons/Pause";
-import RestartIcon from "@material-ui/icons/SkipPrevious";
+import StartIcon from "../assets/start.svg";
+import PauseIcon from "../assets/pause.svg";
+import RestartIcon from "../assets/restart.svg";
 import { Season } from "../types";
 
 import * as css from "./bottom-bar.scss";
@@ -23,14 +23,19 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     return (
       <div className={css.bottomBar}>
-        <Button
-          onClick={sim.simulationStarted ? sim.stop : sim.start}
-          disabled={!sim.ready}
-          data-test="start-button"
-        >
-          { sim.simulationStarted ? <span><PauseIcon/> Stop</span> : <span><PlayArrowIcon/> Start</span> }
-        </Button>
-        <Button data-test="restart-button" onClick={this.handleReset}><RestartIcon/> Restart</Button>
+        <div className={css.widgetGroup}>
+          <Button
+            onClick={sim.simulationStarted ? sim.stop : sim.start}
+            disabled={!sim.ready}
+            className={css.tallButton}
+            data-test="start-button"
+          >
+            { sim.simulationStarted ? <span><PauseIcon/> Stop</span> : <span><StartIcon /> Start</span> }
+          </Button>
+          <Button className={css.tallButton} data-test="restart-button" onClick={this.handleReset}>
+            <span><RestartIcon/> Restart</span>
+          </Button>
+        </div>
         <div className={css.seasonSelect}>
           <span className={css.label}>Season:</span>
           <Select
