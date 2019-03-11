@@ -42,7 +42,14 @@ const DEFAULT_CONFIG: any = {
   // Whether model is deterministic or random. Use true if you want your results to be replicable.
   deterministic: false,
   // Each time the landfall happens the model will show a clickable rectangle around it so user can zoom in.
-  markLandfalls: true
+  markLandfalls: true,
+  windArrowsOpacity: 0.5,
+  seaSurfaceTempOpacity: 0.5,
+  // --- UI elements can be shown or hidden using options below ---
+  seasonButton: true,
+  windArrowsSlider: true,
+  seaSurfaceTempSlider: true
+  // --- End of UI widgets ---
 };
 
 const urlConfig: any = {};
