@@ -1,3 +1,5 @@
+@import "common";
+
 .playbackButton {
   min-width: 60px;
   height: 100%;
@@ -13,7 +15,7 @@
     display: block;
     height: 30px;
     width: 30px;
-    margin: 8px auto 0 auto;
+    margin: $bottomBarTopPadding auto 0 auto;
     path {
       fill: #666666;
     }

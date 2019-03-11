@@ -1,5 +1,7 @@
+@import "common";
+
 .opacitySlider {
-  margin-top: 7px;
+  margin-top: $bottomBarTopPadding;
   width: 174px;
 
   .sliderContainer, .label {

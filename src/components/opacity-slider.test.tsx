@@ -5,7 +5,7 @@ import { Provider } from "mobx-react";
 import { OpacitySlider } from "./opacity-slider";
 import Slider from "@material-ui/lab/Slider";
 
-describe("SeasonButton component", () => {
+describe("OpacitySlider component", () => {
   let stores = createStores();
   beforeEach(() => {
     stores = createStores();
@@ -43,6 +43,5 @@ describe("SeasonButton component", () => {
     expect(stores.ui.layerOpacity.seaSurfaceTemp).toEqual(1);
     slider.handleChange(null, 0.25);
     expect(stores.ui.layerOpacity.seaSurfaceTemp).toEqual(0.25);
-
   });
 });

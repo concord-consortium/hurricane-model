@@ -5,6 +5,7 @@ import Button from "@material-ui/core/Button";
 import { SeasonButton } from "./season-button";
 import { PlaybackButtons } from "./playback-buttons";
 import { OpacitySlider } from "./opacity-slider";
+import { HurricaneScale } from "./hurricane-scale";
 import CCLogo from "../assets/cc-logo.svg";
 import CCLogoSmall from "../assets/cc-logo-small.svg";
 
@@ -32,6 +33,9 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         </div>
         <div className={`${css.widgetGroup} ${css.playbackContainer}`}>
           <PlaybackButtons />
+        </div>
+        <div className={css.widgetGroup}>
+          <HurricaneScale />
         </div>
         <div className={css.seasonSelect}>
         {

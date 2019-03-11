@@ -1,10 +1,13 @@
 $bottomBarHeight: 65px;
 $bottomBarBorderWidth: 1px;
 $bottomBarBorderStyle: $bottomBarBorderWidth solid #797979;
+$bottomBarTopPadding: 7px;
 
-$cat0Color: #bbbbbb;
-$cat1Color: #ffd396;
-$cat2Color: #ffb87a;
-$cat3Color: #ff874a;
-$cat4Color: #f63a22;
-$cat5Color: #ff0000;
+$cat0Color: #f2f2f2;
+$cat1Color: #ffffcc;
+$cat2Color: #ffe775;
+$cat3Color: #ffc140;
+$cat4Color: #ff8f20;
+$cat5Color: #ff6060;
+
+$scaleFont: 'Roboto Condensed', Lato, arial, sans-serif;
