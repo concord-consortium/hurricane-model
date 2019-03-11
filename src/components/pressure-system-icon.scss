@@ -1,32 +1,64 @@
+@import "common";
+
 .pressureSystemIcon {
   display: inline-block;
   color: white;
-  font-size: 50px;
-  font-weight: bold;
-  text-shadow: 1px 1px 10px #999;
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
+  border-radius: 60px;
   text-align: center;
-  margin-left: -35px !important;
-  margin-top: -35px !important;
+  margin-left: -60px !important;
+  margin-top: -60px !important;
+  outline: none;
+
+  &:hover {
+    background: rgba(255,255,255,0.25);
+    .dragIcon {
+      visibility: visible;
+    }
+    .thumb {
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.5)
+    }
+  }
+
+  .dragIcon {
+    visibility: hidden;
+    margin-top: 8px;
+    svg {
+      height: 12px;
+      circle {
+        fill: #fff;
+      }
+    }
+  }
+
+  .letter {
+    height: 50px;
+    margin-top: 8px;
+    vertical-align: middle;
+    transform-origin: center center;
+  }
+
+  .label {
+    margin-top: 5px;
+    color: white;
+    font-family: $scaleFont;
+    font-size: 14px;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+  }
+
+  .sliderContainer {
+    display: inline-block;
+    margin-left: 20px;
+    margin-top: 10px;
+    height: 40px;
+    vertical-align: middle;
+
+    .thumb {
+      &:hover {
+        box-shadow: 0 0 0 4px rgba(255,255,255,0.85)
+      }
+    }
+  }
 }
 
-.label {
-  margin-top: -10px;
-  color: white;
-  font-size: 18px;
-}
-
-.highPressure {
-  color: #19c0ea;
-}
-
-.lowPressure {
-  color: #ff2525;
-}
-
-.sliderContainer {
-  display: inline-block;
-  margin-left: 20px;
-  height: 35px;
-}

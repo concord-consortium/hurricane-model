@@ -39,6 +39,14 @@ export default createMuiTheme({
       thumbIconWrapper: {
         width: "20px",
         height: "20px"
+      },
+      thumb: {
+        '&$focused, &:hover': {
+          boxShadow: "0 0 0 4px rgba(255,255,255,0.85)"
+        },
+        '&$activated': {
+          boxShadow: "0 0 0 4px rgba(255,255,255,0.85)"
+        }
       }
     }
   }

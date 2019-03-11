@@ -4,6 +4,9 @@ import { BaseComponent, IBaseProps } from "./base";
 import { PressureSystem } from "../models/pressure-system";
 import Slider from "@material-ui/lab/Slider";
 import VerticalHandle from "../assets/slider-vertical.svg";
+import High from "../assets/high.svg";
+import Low from "../assets/low.svg";
+import DragIcon from "../assets/drag.svg";
 
 import * as css from "./pressure-system-icon.scss";
 
@@ -24,12 +27,20 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public render() {
     const { model, onSliderDragStart, onSliderDragEnd } = this.props;
-
+    const strengthNorm = (model.strength - minStrength) / (maxStrength - minStrength) - 0.5; // [-0.5, 0.5]
+    const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
+    const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
     return (
-      <div className={css.pressureSystemIcon + " " + (model.type === "high" ? css.highPressure : css.lowPressure)}>
-        { model.type === "high" ? "H" : "L" }
+      <div className={css.pressureSystemIcon}>
+        <div className={css.dragIcon}><DragIcon /></div>
+        {
+          model.type === "high" ?
+            <High className={css.letter} style={letterStyle} /> :
+            <Low className={css.letter} style={letterStyle} />
+        }
         <div className={css.sliderContainer}>
           <Slider
+            classes={{thumb: css.thumb}}
             value={model.strength}
             min={minStrength}
             max={maxStrength}

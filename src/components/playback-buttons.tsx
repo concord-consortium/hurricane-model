@@ -23,10 +23,17 @@ export class PlaybackButtons extends BaseComponent<IProps, IState> {
         disabled={!sim.ready}
         className={css.playbackButton}
         data-test="start-button"
+        disableRipple={true}
       >
         { sim.simulationStarted ? <span><PauseIcon/> Stop</span> : <span><StartIcon /> Start</span> }
       </Button>,
-      <Button key="reset" className={css.playbackButton} data-test="restart-button" onClick={this.handleReset}>
+      <Button
+        key="reset"
+        className={css.playbackButton}
+        data-test="restart-button"
+        onClick={this.handleReset}
+        disableRipple={true}
+      >
         <span><RestartIcon/> Restart</span>
       </Button>
     ];
