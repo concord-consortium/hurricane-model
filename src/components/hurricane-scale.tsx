@@ -37,6 +37,7 @@ export class HurricaneScale extends React.PureComponent<IProps, IState> {
             <div className={css.windSpeedLabel}>Wind Speed</div>
           </div>
           { categories.map(cat => renderCategory(cat)) }
+          <div className={css.mph}>mph</div>
         </div>
       </div>
     );

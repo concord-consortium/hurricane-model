@@ -1,8 +1,8 @@
 @import "common";
 
 .hurricaneScale {
-  width: 330px;
-  padding: $bottomBarTopPadding 10px 0 10px;
+  width: 336px;
+  padding: $bottomBarTopPadding 7px 0 7px;
 
   .header {
     text-align: center;
@@ -31,9 +31,17 @@
     }
   }
 
+  .mph {
+    display: inline-block;
+    vertical-align: bottom;
+    font-weight: bold;
+    font-size: 11px;
+    margin-left: -5px;
+  }
+
   .categoryContainer {
     display: inline-block;
-    width: 44px;
+    width: 43px;
     vertical-align: top;
     margin-top: 5px;
     text-align: center;
