@@ -1,9 +1,8 @@
 @import "common.scss";
 
 .authoring {
-
-  form.rjsf {
-    margin: 2rem 0 0 0;
+  form {
+    padding: 2rem 0 0 1rem;
     font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 0.8125rem;
     font-weight: 400;
@@ -14,129 +13,70 @@
     display: block;
     -webkit-font-smoothing: antialiased;
     letter-spacing: 0.1px;
-
-    * {
-      box-sizing: border-box;
-
-      &::before, &::after {
-        box-sizing: border-box;
-      }
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-    }
-
-    .form-group > * {
-      padding-right: 0.5rem;
-    }
-
-    fieldset {
-      min-width: 0;
-      padding: 0;
-      margin: 0 0 0 1em;
-      border: 0;
-    }
-
-    legend {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      padding: 0;
-      margin: 0 1rem 0.5rem -0.6rem;
-      font-size: 1.2rem;
-      line-height: inherit;
-      color: inherit;
-      white-space: normal;
-      border-bottom: 1px solid #e5e5e5;
-    }
-
-    .minor-group legend {
-      border: none;
-      font-size: 1.1rem;
-    }
-
-    label {
-      display: inline-block;
-    }
-
-    input {
-      &[type="radio"], &[type="checkbox"] {
-        box-sizing: border-box;
-        padding: 0;
-        margin-right: 0.5rem;
-      }
-
-      &[type=text] {
-        width: 4rem;
-      }
-    }
-
-    .btn {
-      &:not(:disabled):not(.disabled) {
-        cursor: pointer;
-      }
-
-      text-transform: uppercase;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-      display: inline-block;
-      font-weight: 400;
-      text-align: center;
-      white-space: nowrap;
-      vertical-align: middle;
-      user-select: none;
-      border: 1px solid transparent;
-      padding: 0.8rem 1rem;
-      font-size: 0.8125rem;
-      line-height: 1.5;
-      border-radius: 0.25rem;
-      transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-
-    .btn-info {
-      position: relative;
-      color: #fff;
-      background: #9C27B0 linear-gradient(180deg, #ab47bc, #9C27B0) repeat-x;
-      border-color: #9C27B0;
-    }
-
-    button, html [type="button"], [type="reset"], [type="submit"] {
-      -webkit-appearance: button;
-    }
-
-    select {
-      text-transform: none;
-    }
-
-    button {
-      overflow: visible;
-      border-radius: 0;
-      -webkit-font-smoothing: antialiased;
-      letter-spacing: 0.1px;
-      text-transform: none;
-    }
-
-    input {
-      overflow: visible;
-      margin: 0;
-      font-family: inherit;
-      font-size: inherit;
-      line-height: inherit;
-    }
-
-    button, select, optgroup, textarea {
-      margin: 0;
-      font-family: inherit;
-      font-size: inherit;
-      line-height: inherit;
-    }
-
-    .help-block {
-      margin: 0;
-      color: #9543b6;
-    }
   }
 
+  fieldset {
+    min-width: 0;
+    padding: 0;
+    margin: 0 0 0 1em;
+    border: 0;
+  }
+
+  legend {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0 1rem 0.5rem -0.6rem;
+    font-size: 1.2rem;
+    line-height: inherit;
+    color: inherit;
+    white-space: normal;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  div {
+    font-size: 12px;
+  }
+  select {
+    text-transform: none;
+  }
+  input {
+    overflow: visible;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  input[type=text] {
+    width: 4rem;
+  }
+  input[type=radio], input[type=checkbox]{
+    box-sizing: border-box;
+    padding: 0;
+    margin-right: 0.5rem;
+  }
+  label {
+    display: inline-block;
+  }
+
+  button {
+    -webkit-appearance: button;
+    overflow: visible;
+    border-radius: 0;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: .1px;
+    text-transform: none;
+  }
+
+  div.form-group {
+    margin: 20px;
+    width: 100%;
+  }
+
+  button, select, optgroup, textarea {
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  }
 }
