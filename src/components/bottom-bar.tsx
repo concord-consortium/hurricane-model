@@ -22,27 +22,33 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     return (
       <div className={css.bottomBar}>
-        <CCLogo className={css.logo} />
-        <CCLogoSmall className={css.logoSmall} />
-        <div className={css.widgetGroup}>
-          <SeasonButton />
+        <div className={css.leftContainer}>
+          <CCLogo className={css.logo} />
+          <CCLogoSmall className={css.logoSmall} />
         </div>
-        <div className={css.widgetGroup}>
-          <OpacitySlider property="windArrows" showLabels={true} />
-          <OpacitySlider property="seaSurfaceTemp" />
+        <div className={css.mainContainer}>
+          <div className={css.widgetGroup}>
+            <SeasonButton />
+          </div>
+          <div className={css.widgetGroup}>
+            <OpacitySlider property="windArrows" showLabels={true} />
+            <OpacitySlider property="seaSurfaceTemp" />
+          </div>
+          <div className={`${css.widgetGroup} ${css.playbackContainer}`}>
+            <PlaybackButtons />
+          </div>
+          <div className={css.widgetGroup}>
+            <HurricaneScale />
+          </div>
+          <div className={css.seasonSelect}>
+          {
+            ui.zoomedInView &&
+            <Button onClick={this.stores.ui.setNorthAtlanticView}>Return to full map</Button>
+          }
+          </div>
         </div>
-        <div className={`${css.widgetGroup} ${css.playbackContainer}`}>
-          <PlaybackButtons />
-        </div>
-        <div className={css.widgetGroup}>
-          <HurricaneScale />
-        </div>
-        <div className={css.seasonSelect}>
-        {
-          ui.zoomedInView &&
-          <Button onClick={this.stores.ui.setNorthAtlanticView}>Return to full map</Button>
-        }
-        </div>
+        {/* This empty container is necessary so the spacing works correctly */}
+        <div className={css.rightContainer} />
       </div>
     );
   }

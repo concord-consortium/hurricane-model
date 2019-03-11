@@ -15,11 +15,23 @@ $overflowHeight: 11px;
 
 .bottomBar {
   color: #666;
-  display: flex;
   height: $bottomBarHeight;
-  justify-content: center;
+  display: flex;
+  justify-content: space-between;
   border-top: $bottomBarBorderStyle;
-  position: relative;
+
+  .leftContainer {
+    position: relative;
+    vertical-align: top;
+    padding: 14px 10px 0 10px;
+    .logo, .logoSmall {
+      height: 38px;
+    }
+  }
+
+  .mainContainer {
+    display: flex;
+  }
 
   // Base styles that ensure that given container sticks out from the bottom bar, has a nice, round corners and its border
   // matches rest of the bottom bar correctly.
@@ -54,17 +66,15 @@ $overflowHeight: 11px;
     margin-left: 10px;
     margin-right: 10px;
   }
-
-  .logo, .logoSmall {
-    position: absolute;
-    left: 10px;
-    top: 14px;
-    height: 38px;
-  }
 }
 
 @media (max-width: 927px) {
   .logo {
+    display: none;
+  }
+}
+@media (min-width: 927px) {
+  .logoSmall {
     display: none;
   }
 }
