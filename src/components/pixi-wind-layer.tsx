@@ -9,7 +9,6 @@ import {IVector, IWindPoint} from "../types";
 const vectorWidth = 2;
 const arrowHeadSize = 4;
 const color = 0xffffff;
-const opacity = 0.75;
 
 const lineTexture = (() => {
   const graph = new PIXI.Graphics();
@@ -82,6 +81,11 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
 
   private updateArrows() {
     const stage = this.pixiApp!.stage;
+    const opacity = this.stores.ui.layerOpacity.windArrows;
+    stage.alpha = opacity;
+    if (opacity === 0) {
+      return;
+    }
     const data = this.stores.simulation.windIncHurricane;
     const latLngToContainerPoint = this.stores.ui.latLngToContainerPoint;
     data.forEach((w: IWindPoint, idx: number) => {
@@ -92,7 +96,6 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
       const lineScale = new PIXI.Point(1, length);
       const point = latLngToContainerPoint([w.lat, w.lng]);
       const rotation = Math.atan2(w.u, w.v);
-      arrowContainer.alpha = opacity;
       arrowContainer.x = point.x;
       arrowContainer.y = point.y;
       arrowContainer.rotation = rotation;

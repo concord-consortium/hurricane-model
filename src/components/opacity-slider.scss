@@ -1,0 +1,42 @@
+.opacitySlider {
+  margin-top: 7px;
+  width: 174px;
+
+  .sliderContainer, .label {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .label {
+    width: 50%;
+    font-size: 12px;
+    text-align: right;
+    margin-left: 5px;
+  }
+
+  .sliderContainer {
+    text-align: center;
+    width: 36%;
+    margin-left: 7%;
+    position: relative;
+
+    .slider {
+      width: 70%;
+      margin: 0 auto;
+    }
+
+    .hideLabel, .showLabel {
+      font-size: 9px;
+      position: absolute;
+      top: 10px;
+    }
+
+    .hideLabel {
+      left: 0;
+    }
+
+    .showLabel {
+      right: 0;
+    }
+  }
+}

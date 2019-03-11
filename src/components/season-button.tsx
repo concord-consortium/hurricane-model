@@ -22,10 +22,10 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
         className={css.seasonButton}
         data-test="season-button"
       >
-        <span>
-          <span className={css.seasonValue}>{ sim.season }</span>
-          <span className={css.seasonLabel}>Season</span>
-        </span>
+        <div>
+          <div className={css.seasonValue}>{ sim.season }</div>
+          <div className={css.seasonLabel}>Season</div>
+        </div>
       </Button>
     );
   }

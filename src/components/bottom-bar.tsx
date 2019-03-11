@@ -4,6 +4,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import Button from "@material-ui/core/Button";
 import { SeasonButton } from "./season-button";
 import { PlaybackButtons } from "./playback-buttons";
+import { OpacitySlider } from "./opacity-slider";
 import * as ccLogo from "../assets/cc-logo.png";
 
 import * as css from "./bottom-bar.scss";
@@ -24,6 +25,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <SeasonButton />
         </div>
         <div className={css.widgetGroup}>
+          <OpacitySlider property="windArrows" showLabels={true} />
+          <OpacitySlider property="seaSurfaceTemp" />
+        </div>
+        <div className={`${css.widgetGroup} ${css.playbackContainer}`}>
           <PlaybackButtons />
         </div>
         <div className={css.seasonSelect}>

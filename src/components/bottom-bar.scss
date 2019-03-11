@@ -1,21 +1,22 @@
 @import "common.scss";
 
-$overflowHeight: 14px;
+$overflowHeight: 11px;
 
 // Covers part of the border, just below the rounded corner.
 %borderCover {
   content: '';
   display: block;
   position: absolute;
-  height: $bottomBarHeight;
+  height: $bottomBarHeight + $bottomBarBorderWidth;
   width: $bottomBarBorderWidth;
-  bottom: $bottomBarBorderWidth;
+  bottom: 0;
   background: #fff;
 }
 
 .bottomBar {
   color: #666;
   display: flex;
+  height: $bottomBarHeight;
   justify-content: center;
   border-top: $bottomBarBorderStyle;
   position: relative;
@@ -29,8 +30,8 @@ $overflowHeight: 14px;
     background: #fff;
     border-radius: 0;
     border-top: $bottomBarBorderStyle;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
     position: relative;
     // Left border is necessary so the rounded corner looks good (otherwise, border would end in the middle of curve).
     border-left: $bottomBarBorderStyle;
@@ -57,7 +58,7 @@ $overflowHeight: 14px;
   .logo {
     position: absolute;
     left: 10px;
-    top: 10px;
-    height: 40px;
+    top: 14px;
+    height: 38px;
   }
 }

@@ -2,6 +2,8 @@
 
 .seasonButton {
   width: 92px;
+  height: 100%;
+  overflow: hidden;
 
   .seasonValue {
     color: #fff;
@@ -15,9 +17,11 @@
     align-items: center;
     justify-content: center;
     border: $bottomBarBorderStyle;
+    margin-top: 7px;
   }
 
   .seasonLabel {
     font-size: 12px;
+    margin-bottom: 8px;
   }
 }

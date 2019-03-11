@@ -94,7 +94,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           <AttributionControl position="topright" />
           <PixiWindLayer />
           <ImageOverlay
-            opacity={0.8}
+            opacity={ui.layerOpacity.seaSurfaceTemp}
             url={sim.seaSurfaceTempImgUrl}
             bounds={imageOverlayBounds}
           />

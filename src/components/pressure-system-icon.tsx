@@ -3,6 +3,7 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { PressureSystem } from "../models/pressure-system";
 import Slider from "@material-ui/lab/Slider";
+import VerticalHandle from "../assets/slider-vertical.svg";
 
 import * as css from "./pressure-system-icon.scss";
 
@@ -29,8 +30,6 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
         { model.type === "high" ? "H" : "L" }
         <div className={css.sliderContainer}>
           <Slider
-            classes={{track: css.track, trackAfter: css.trackAfter, thumb: css.thumb}}
-            className={css.slider}
             value={model.strength}
             min={minStrength}
             max={maxStrength}
@@ -38,6 +37,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
             onDragStart={onSliderDragStart}
             onDragEnd={onSliderDragEnd}
             vertical={true}
+            thumb={<VerticalHandle />}
           />
         </div>
         <div className={css.label}>

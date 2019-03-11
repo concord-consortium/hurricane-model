@@ -18,7 +18,24 @@ export default createMuiTheme({
   overrides: {
     MuiButton: {
       text: {
-        color: "#666"
+        color: "#666",
+        padding: 0,
+      }
+    },
+    MuiSlider: {
+      track: {
+        "backgroundColor": "#797979",
+        "height": 1,
+        "&$vertical": {
+          width: 1
+        }
+      },
+      trackAfter: {
+        opacity: 1
+      },
+      thumbIconWrapper: {
+        width: "20px",
+        height: "20px"
       }
     }
   }
