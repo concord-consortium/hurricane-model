@@ -4,6 +4,7 @@ import {
 import config from "../config";
 import { PNG } from "pngjs";
 import {distanceTo} from "geolocation-utils";
+import * as Leaflet from "leaflet";
 const fs = require("fs");
 
 const options: ISimulationOptions = {
@@ -128,6 +129,38 @@ describe("SimulationModel store", () => {
         expect(p.u).toBeGreaterThan(-35);
         expect(p.v).toBeGreaterThan(79);
         expect(p.v).toBeLessThan(80);
+      });
+    });
+
+    describe("windWithinBounds", () => {
+      it("changes depending on bounds", () => {
+        const sim = new SimulationModel(options);
+        let newBounds = {
+          getWest: () => -180,
+          getEast: () => 180, // area width 360
+          getNorth: () => 85,
+          getSouth: () => -85,
+        };
+        sim.updateBounds((newBounds as any) as Leaflet.LatLngBounds);
+        expect(sim.windWithinBounds.length).toEqual(1); // every nth wind vector
+
+        newBounds = {
+          getWest: () => -45,
+          getEast: () => 45, // area width 90
+          getNorth: () => 45,
+          getSouth: () => -45,
+        };
+        sim.updateBounds((newBounds as any) as Leaflet.LatLngBounds);
+        expect(sim.windWithinBounds.length).toEqual(2); // all the vectors
+
+        newBounds = {
+          getWest: () => -20,
+          getEast: () => 20,  // area width < 40
+          getNorth: () => 20,
+          getSouth: () => -20,
+        };
+        sim.updateBounds((newBounds as any) as Leaflet.LatLngBounds);
+        expect(sim.windWithinBounds.length).toEqual(961); // 31 * 31 = 661 -> vectors generated using given range
       });
     });
   });
