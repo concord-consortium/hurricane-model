@@ -5,7 +5,8 @@ import Button from "@material-ui/core/Button";
 import { SeasonButton } from "./season-button";
 import { PlaybackButtons } from "./playback-buttons";
 import { OpacitySlider } from "./opacity-slider";
-import * as ccLogo from "../assets/cc-logo.png";
+import CCLogo from "../assets/cc-logo.svg";
+import CCLogoSmall from "../assets/cc-logo-small.svg";
 
 import * as css from "./bottom-bar.scss";
 
@@ -20,7 +21,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     return (
       <div className={css.bottomBar}>
-        <img className={css.logo} src={ccLogo} />
+        <CCLogo className={css.logo} />
+        <CCLogoSmall className={css.logoSmall} />
         <div className={css.widgetGroup}>
           <SeasonButton />
         </div>

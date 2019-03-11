@@ -55,10 +55,16 @@ $overflowHeight: 11px;
     margin-right: 10px;
   }
 
-  .logo {
+  .logo, .logoSmall {
     position: absolute;
     left: 10px;
     top: 14px;
     height: 38px;
+  }
+}
+
+@media (max-width: 927px) {
+  .logo {
+    display: none;
   }
 }
