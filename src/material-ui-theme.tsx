@@ -23,6 +23,10 @@ export default createMuiTheme({
       root: {
         "&:hover": {
           backgroundColor: "#f2f2f2",
+        },
+        '&$disabled': {
+          color: "inherit",
+          opacity: 0.25
         }
       },
       text: {
