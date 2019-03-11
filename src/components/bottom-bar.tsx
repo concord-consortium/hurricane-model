@@ -38,8 +38,14 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           {
             anySlider &&
             <div className={css.widgetGroup}>
-              { config.windArrowsSlider && <OpacitySlider property="windArrows" showLabels={true} /> }
-              { config.seaSurfaceTempSlider && <OpacitySlider property="seaSurfaceTemp" showLabels={!config.windArrowsSlider} /> }
+              {
+                config.windArrowsSlider &&
+                <OpacitySlider property="windArrows" showLabels={true} />
+              }
+              {
+                config.seaSurfaceTempSlider &&
+                <OpacitySlider property="seaSurfaceTemp" showLabels={!config.windArrowsSlider} />
+              }
             </div>
           }
           <div className={`${css.widgetGroup} ${css.playbackContainer}`}>

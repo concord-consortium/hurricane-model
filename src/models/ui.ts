@@ -12,7 +12,7 @@ export class UIModel {
   @observable public zoomedInView = false;
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
-    windArrows: config.windArrowOpacity,
+    windArrows: config.windArrowsOpacity,
     seaSurfaceTemp: config.seaSurfaceTempOpacity
   };
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
