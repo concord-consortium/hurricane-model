@@ -4,6 +4,8 @@
   width: 92px;
   height: 100%;
   overflow: hidden;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 
   .seasonValue {
     color: #fff;
@@ -18,6 +20,13 @@
     justify-content: center;
     border: $bottomBarBorderStyle;
     margin-top: $bottomBarTopPadding;
+
+    &:hover {
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.5)
+    }
+    &:active {
+      box-shadow: 0 0 0 3px rgba(255,255,255,1)
+    }
   }
 
   .seasonLabel {

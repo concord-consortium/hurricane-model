@@ -30,7 +30,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <div className={css.widgetGroup}>
             <SeasonButton />
           </div>
-          <div className={css.widgetGroup}>
+          <div className={`${css.widgetGroup} hoverable`}>
             <OpacitySlider property="windArrows" showLabels={true} />
             <OpacitySlider property="seaSurfaceTemp" />
           </div>

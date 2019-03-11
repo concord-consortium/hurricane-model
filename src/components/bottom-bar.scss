@@ -42,8 +42,8 @@ $overflowHeight: 11px;
     background: #fff;
     border-radius: 0;
     border-top: $bottomBarBorderStyle;
-    border-top-left-radius: 9px;
-    border-top-right-radius: 9px;
+    border-top-left-radius: $bottomBarBorderRadius;
+    border-top-right-radius: $bottomBarBorderRadius;
     position: relative;
     // Left border is necessary so the rounded corner looks good (otherwise, border would end in the middle of curve).
     border-left: $bottomBarBorderStyle;
@@ -60,6 +60,12 @@ $overflowHeight: 11px;
       right: -$bottomBarBorderWidth;
     }
     margin-left: -$bottomBarBorderWidth;
+  }
+
+  // Why global .hoverable?
+  // It's being used by some child components to turn on initial hover effect.
+  :global(.hoverable):hover {
+    background: $hoverColor;
   }
 
   .playbackContainer {

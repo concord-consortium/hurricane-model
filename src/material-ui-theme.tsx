@@ -6,6 +6,9 @@ export default createMuiTheme({
       main: "#aaa"
     }
   },
+  shape: {
+    borderRadius: 9
+  },
   typography: {
     useNextVariants: true,
     fontFamily: "Lato, Arial, sans-serif",
@@ -17,6 +20,11 @@ export default createMuiTheme({
   },
   overrides: {
     MuiButton: {
+      root: {
+        "&:hover": {
+          backgroundColor: "#f2f2f2",
+        }
+      },
       text: {
         color: "#666",
         padding: 0,
