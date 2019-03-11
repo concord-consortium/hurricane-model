@@ -1,20 +1,80 @@
+@import "common.scss";
+
+$overflowHeight: 11px;
+
+// Covers part of the border, just below the rounded corner.
+%borderCover {
+  content: '';
+  display: block;
+  position: absolute;
+  height: $bottomBarHeight + $bottomBarBorderWidth;
+  width: $bottomBarBorderWidth;
+  bottom: 0;
+  background: #fff;
+}
+
 .bottomBar {
+  color: #666;
+  height: $bottomBarHeight;
   display: flex;
-  justify-content: center;
-  padding-top: 12px;
+  justify-content: space-between;
+  border-top: $bottomBarBorderStyle;
 
-  svg {
-    vertical-align: middle;
+  .leftContainer {
+    position: relative;
+    vertical-align: top;
+    padding: 14px 10px 0 10px;
+    .logo, .logoSmall {
+      height: 38px;
+    }
   }
 
-  .seasonSelect {
-    position: absolute;
-    left: 30px;
-    padding-top: 3px;
+  .mainContainer {
+    display: flex;
   }
 
-  .label {
-    color: #666;
+  // Base styles that ensure that given container sticks out from the bottom bar, has a nice, round corners and its border
+  // matches rest of the bottom bar correctly.
+  .widgetGroup {
+    height: $bottomBarHeight + $overflowHeight;
+    margin-top: -$overflowHeight;
+    z-index: 1000;
+    background: #fff;
+    border-radius: 0;
+    border-top: $bottomBarBorderStyle;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+    position: relative;
+    // Left border is necessary so the rounded corner looks good (otherwise, border would end in the middle of curve).
+    border-left: $bottomBarBorderStyle;
+    // However, it needs to be mostly covered.
+    &:before {
+      @extend %borderCover;
+      left: -$bottomBarBorderWidth;
+    }
+    // Right border is necessary so the rounded corner looks good (otherwise, border would end in the middle of curve).
+    border-right: $bottomBarBorderStyle;
+    // However, it needs to be mostly covered.
+    &:after {
+      @extend %borderCover;
+      right: -$bottomBarBorderWidth;
+    }
+    margin-left: -$bottomBarBorderWidth;
+  }
+
+  .playbackContainer {
+    margin-left: 10px;
     margin-right: 10px;
+  }
+}
+
+@media (max-width: 927px) {
+  .logo {
+    display: none;
+  }
+}
+@media (min-width: 927px) {
+  .logoSmall {
+    display: none;
   }
 }

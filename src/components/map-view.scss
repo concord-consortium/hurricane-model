@@ -2,7 +2,7 @@
 
 .mapView {
   width: 100%;
-  height: calc(100% - #{$bottomBarHeight});
+  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + 1});
 
   .highPressure, .lowPressure {
     color: white;

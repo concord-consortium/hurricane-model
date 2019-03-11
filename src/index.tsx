@@ -5,6 +5,8 @@ import config from "./config";
 import * as seedrandom from "./seedrandom";
 import { AppComponent } from "./components/app";
 import { createStores } from "./models/stores";
+import { MuiThemeProvider } from "@material-ui/core/styles";
+import hurricanesTheme from "./material-ui-theme";
 
 // Setup seedrandom helper.
 seedrandom.initialize(config.deterministic);
@@ -13,7 +15,9 @@ export const stores = createStores();
 
 ReactDOM.render(
   <Provider stores={stores}>
-    <AppComponent />
+    <MuiThemeProvider theme={hurricanesTheme}>
+      <AppComponent />
+    </MuiThemeProvider>
   </Provider>,
   document.getElementById("app")
 );

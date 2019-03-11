@@ -1,0 +1,27 @@
+@import "common.scss";
+
+.seasonButton {
+  width: 92px;
+  height: 100%;
+  overflow: hidden;
+
+  .seasonValue {
+    color: #fff;
+    font-size: 12px;
+    width: 76px;
+    height: 42px;
+    background: #FF8F20;
+    border-radius: 10px;
+    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: $bottomBarBorderStyle;
+    margin-top: $bottomBarTopPadding;
+  }
+
+  .seasonLabel {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+}

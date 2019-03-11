@@ -1,0 +1,87 @@
+@import "common";
+
+.hurricaneScale {
+  width: 336px;
+  padding: $bottomBarTopPadding 7px 0 7px;
+
+  .header {
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .scaleContainer {
+    font-family: $scaleFont;
+  }
+
+  .subheaders {
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: top;
+    margin-top: 5px;
+    .categoryLabel {
+      font-weight: bold;
+    }
+    .windSpeedLabel {
+      margin-top: 19px;
+      font-size: 11px;
+    }
+    .categoryLabel, .windSpeedLabel {
+      width: 52px;
+      text-align: center;
+    }
+  }
+
+  .mph {
+    display: inline-block;
+    vertical-align: bottom;
+    font-weight: bold;
+    font-size: 11px;
+    margin-left: -5px;
+  }
+
+  .categoryContainer {
+    display: inline-block;
+    width: 43px;
+    vertical-align: top;
+    margin-top: 5px;
+    text-align: center;
+    .categoryValue {
+      font-weight: bold;
+    }
+    .dot {
+      line-height: 2px;
+      margin-bottom: 6px;
+    }
+    .bar {
+      margin-top: 1px;
+      width: 100%;
+      height: 8px;
+      border-top: $bottomBarBorderStyle;
+      border-bottom: $bottomBarBorderStyle;
+    }
+    .barCategory0 {
+      background: $cat0Color;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+      border-left: $bottomBarBorderStyle;
+    }
+    .barCategory1 {
+      background: $cat1Color;
+    }
+    .barCategory2 {
+      background: $cat2Color;
+    }
+    .barCategory3 {
+      background: $cat3Color;
+    }
+    .barCategory4 {
+      background: $cat4Color;
+    }
+    .barCategory5 {
+      background: $cat5Color;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      border-right: $bottomBarBorderStyle;
+    }
+  }
+}
