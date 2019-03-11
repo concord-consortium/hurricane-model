@@ -22,6 +22,9 @@ export default createMuiTheme({
         padding: 0,
       }
     },
+    // Ignore TS error in the next line. MuiSlider is part of material-ui/lab, not /core, so TS complains
+    // about it being undefined. Perhaps it'd be possible to augment some interfaces, but it doesn't seem worth it.
+    // @ts-ignore
     MuiSlider: {
       track: {
         "backgroundColor": "#797979",

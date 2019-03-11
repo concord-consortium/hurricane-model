@@ -5,6 +5,7 @@ import { Provider } from "mobx-react";
 import { BottomBar } from "./bottom-bar";
 import { SeasonButton } from "./season-button";
 import { PlaybackButtons } from "./playback-buttons";
+import { OpacitySlider } from "./opacity-slider";
 
 describe("BottomBar component", () => {
   let stores = createStores();
@@ -20,5 +21,6 @@ describe("BottomBar component", () => {
     );
     expect(wrapper.find(PlaybackButtons).length).toEqual(1);
     expect(wrapper.find(SeasonButton).length).toEqual(1);
+    expect(wrapper.find(OpacitySlider).length).toEqual(2);
   });
 });
