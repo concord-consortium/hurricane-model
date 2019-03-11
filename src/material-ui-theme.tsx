@@ -24,7 +24,7 @@ export default createMuiTheme({
         "&:hover": {
           backgroundColor: "#f2f2f2",
         },
-        '&$disabled': {
+        "&$disabled": {
           color: "inherit",
           opacity: 0.25
         }
@@ -53,10 +53,10 @@ export default createMuiTheme({
         height: "20px"
       },
       thumb: {
-        '&$focused, &:hover': {
+        "&$focused, &:hover": {
           boxShadow: "0 0 0 4px rgba(255,255,255,0.85)"
         },
-        '&$activated': {
+        "&$activated": {
           boxShadow: "0 0 0 4px rgba(255,255,255,0.85)"
         }
       }
