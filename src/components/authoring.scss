@@ -34,12 +34,15 @@
     white-space: normal;
     border-bottom: 1px solid #e5e5e5;
   }
+
   div {
     font-size: 12px;
   }
+
   select {
     text-transform: none;
   }
+
   input {
     overflow: visible;
     margin: 0;
@@ -47,14 +50,17 @@
     font-size: inherit;
     line-height: inherit;
   }
+
   input[type=text] {
     width: 4rem;
   }
+
   input[type=radio], input[type=checkbox]{
     box-sizing: border-box;
     padding: 0;
     margin-right: 0.5rem;
   }
+
   label {
     display: inline-block;
   }
@@ -78,5 +84,15 @@
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
+  }
+
+  :global(.form-group) {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+
+  :global(.form-group > * ) {
+    padding-right: 0.5rem;
   }
 }

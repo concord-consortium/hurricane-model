@@ -4,7 +4,6 @@ import Form, { ISubmitEvent } from "react-jsonschema-form";
 import config from "../config";
 import { JSONSchema6 } from "json-schema";
 import * as css from "./authoring.scss";
-import "./authoring-form.css";
 
 interface IProps extends IBaseProps {}
 interface IState { }
