@@ -1,7 +1,6 @@
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import Form, { ISubmitEvent } from "react-jsonschema-form";
-import { QueryParams } from "../utilities/url-params";
 import config from "../config";
 import { JSONSchema6 } from "json-schema";
 import * as css from "./authoring.scss";
@@ -9,6 +8,9 @@ import "./authoring-form.css";
 
 interface IProps extends IBaseProps {}
 interface IState { }
+interface QueryParams {
+  [key: string]: string;
+}
 
 const ignoreConfig = ["season", "authoring"];
 

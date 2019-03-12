@@ -3,12 +3,10 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapView } from "./map-view";
 import { BottomBar } from "./bottom-bar";
-import { Authoring } from "./authoring";
 
-import config from "../config";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import * as css from "./app.scss";
+import * as css from "./index-page.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -19,7 +17,7 @@ export class IndexPage extends BaseComponent<IProps, IState> {
   public render() {
     const loading = this.stores.simulation.loading;
     return (
-      <div className={css.app}>
+      <div className={css.index}>
         {
           loading &&
           <CircularProgress className={css.progress} size={100} thickness={5} color="inherit" />
