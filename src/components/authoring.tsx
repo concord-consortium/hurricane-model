@@ -12,6 +12,16 @@ interface IState { }
 
 const ignoreConfig = ["season", "authoring"];
 
+const keyTitleFormatter = ((key: string) => {
+  let result = key;
+  const upperKey = key.charAt(0).toUpperCase() + key.slice(1);
+  const parts = upperKey.match(/[A-Z][a-z]+|[0-9]+/g);
+  result = parts ? parts.join(" ") : key;
+  result = result.replace("Sys ", "System ");
+  result = result.replace("Sst ", "Sea Surface Temperature ");
+  return result;
+});
+
 const defaultValues = () => {
   const configValues: any = {};
   const settings: any = configSettings();
@@ -26,7 +36,7 @@ const configSettings = () => {
   Object.keys(config).map(key => {
     if (ignoreConfig.indexOf(key) === -1  && typeof(config[key]) !== "object") {
       configurableSettings[key] = {
-        title: key,
+        title: keyTitleFormatter(key),
         type: typeof (config[key]),
         value: config[key]
       };
