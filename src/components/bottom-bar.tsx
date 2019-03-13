@@ -8,6 +8,7 @@ import { OpacitySlider } from "./opacity-slider";
 import { HurricaneScale } from "./hurricane-scale";
 import CCLogo from "../assets/cc-logo.svg";
 import CCLogoSmall from "../assets/cc-logo-small.svg";
+import config from "../config";
 
 import * as css from "./bottom-bar.scss";
 
@@ -20,6 +21,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const ui = this.stores.ui;
+    const anySlider = config.windArrowsSlider || config.seaSurfaceTempSlider;
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -27,13 +29,25 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <CCLogoSmall className={css.logoSmall} />
         </div>
         <div className={css.mainContainer}>
-          <div className={css.widgetGroup}>
-            <SeasonButton />
-          </div>
-          <div className={`${css.widgetGroup} hoverable`}>
-            <OpacitySlider property="windArrows" showLabels={true} />
-            <OpacitySlider property="seaSurfaceTemp" />
-          </div>
+          {
+            config.seasonButton &&
+            <div className={css.widgetGroup}>
+              <SeasonButton />
+            </div>
+          }
+          {
+            anySlider &&
+            <div className={`${css.widgetGroup} hoverable`}>
+              {
+                config.windArrowsSlider &&
+                <OpacitySlider property="windArrows" showLabels={true} />
+              }
+              {
+                config.seaSurfaceTempSlider &&
+                <OpacitySlider property="seaSurfaceTemp" showLabels={!config.windArrowsSlider} />
+              }
+            </div>
+          }
           <div className={`${css.widgetGroup} ${css.playbackContainer}`}>
             <PlaybackButtons />
           </div>
