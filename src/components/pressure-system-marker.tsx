@@ -4,6 +4,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import { PressureSystem } from "../models/pressure-system";
 import { PressureSystemIcon } from "./pressure-system-icon";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
+import config from "../config";
 import * as Leaflet from "leaflet";
 
 interface IProps extends IBaseProps {
@@ -22,13 +23,14 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     const { model } = this.props;
     const { sliderDrag } = this.state;
     const sim = this.stores.simulation;
+    const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
     return (
       <LeafletCustomMarker
         position={model.center}
         onDrag={this.handlePressureSysDrag}
         onDragEnd={this.handlePressureSysDragEnd}
         // Disable dragging when slider is being dragged, so they don't interfere.
-        draggable={!sliderDrag && !sim.simulationStarted && !sim.simulationRunning}
+        draggable={!sliderDrag && !uiDisabled}
       >
         <PressureSystemIcon
           model={model}

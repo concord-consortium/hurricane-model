@@ -3,6 +3,7 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import Button from "@material-ui/core/Button";
 import { Season } from "../types";
+import config from "../config";
 
 import * as css from "./season-button.scss";
 
@@ -16,13 +17,15 @@ const seasons: Season[] = [ "fall", "winter", "spring", "summer" ];
 export class SeasonButton extends BaseComponent<IProps, IState> {
   public render() {
     const sim = this.stores.simulation;
+    // If set to lock the UI while the simulation is running, lock UI once the sim is started until it is reset
+    const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
     return (
       <Button
         onClick={this.handleSeasonChange}
         className={css.seasonButton}
         data-test="season-button"
         disableTouchRipple={true}
-        disabled={sim.simulationStarted && !sim.simulationFinished}
+        disabled={uiDisabled}
       >
         <div>
           <div className={css.seasonValue}>{ sim.season }</div>
