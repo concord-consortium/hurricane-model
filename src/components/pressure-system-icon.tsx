@@ -34,9 +34,10 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
     // If set to lock the UI while the simulation is running, lock UI once the sim is started until it is reset
     const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
+
     return (
       <div className={css.pressureSystemIcon}>
-        <div className={css.dragIcon}><DragIcon /></div>
+        <div className={uiDisabled ? css.dragIconDisabled : css.dragIcon}><DragIcon /></div>
         {
           model.type === "high" ?
             <High className={css.letter} style={letterStyle} /> :
