@@ -10,14 +10,12 @@
   margin-left: -60px !important;
   margin-top: -60px !important;
   outline: none;
+  transition: background-color 350ms;
 
   &:hover {
-    background: rgba(255,255,255,0.25);
+    background-color: rgba(255, 255, 255, 0.25);
     .dragIcon {
       visibility: visible;
-    }
-    .thumb {
-      box-shadow: 0 0 0 4px rgba(255,255,255,0.5)
     }
   }
 
@@ -55,9 +53,14 @@
     vertical-align: middle;
 
     .thumb {
-      &:hover {
-        box-shadow: 0 0 0 4px rgba(255,255,255,0.85)
+      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
+      &:hover, &:active {
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5)
       }
+    }
+
+    .track {
+      background-color: #fff;
     }
   }
 }

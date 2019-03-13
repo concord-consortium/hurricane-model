@@ -40,7 +40,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
         }
         <div className={css.sliderContainer}>
           <Slider
-            classes={{thumb: css.thumb}}
+            classes={{thumb: css.thumb, track: css.track}}
             value={model.strength}
             min={minStrength}
             max={maxStrength}

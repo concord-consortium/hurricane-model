@@ -54,10 +54,10 @@ export default createMuiTheme({
       },
       thumb: {
         "&$focused, &:hover": {
-          boxShadow: "0 0 0 4px rgba(255,255,255,0.85)"
+          boxShadow: "0 0 0 3px rgba(255,255,255,0.85)"
         },
         "&$activated": {
-          boxShadow: "0 0 0 4px rgba(255,255,255,0.85)"
+          boxShadow: "0 0 0 3px rgba(255,255,255,0.85)"
         }
       }
     }

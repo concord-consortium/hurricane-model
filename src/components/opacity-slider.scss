@@ -44,8 +44,8 @@
 }
 
 :global(.hoverable):hover .thumb {
-  box-shadow: 0 0 0 4px rgba(255,255,255,0.25);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.25);
 }
-:global(.hoverable):hover .thumb:hover {
-  box-shadow: 0 0 0 4px rgba(255,255,255,0.85);
+:global(.hoverable):hover .thumb:hover, :global(.hoverable):hover .thumb:active {
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.85);
 }
