@@ -19,13 +19,13 @@ export class PlaybackButtons extends BaseComponent<IProps, IState> {
     return [
       <Button
         key="start-stop"
-        onClick={sim.simulationStarted ? sim.stop : sim.start}
+        onClick={sim.simulationRunning ? sim.stop : sim.start}
         disabled={!sim.ready}
         className={css.playbackButton}
         data-test="start-button"
         disableRipple={true}
       >
-        { sim.simulationStarted ? <span><PauseIcon/> Stop</span> : <span><StartIcon /> Start</span> }
+        { sim.simulationRunning ? <span><PauseIcon/> Stop</span> : <span><StartIcon /> Start</span> }
       </Button>,
       <Button
         key="reset"

@@ -27,6 +27,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public render() {
     const { model, onSliderDragStart, onSliderDragEnd } = this.props;
+    const sim = this.stores.simulation;
     const strengthNorm = (model.strength - minStrength) / (maxStrength - minStrength) - 0.5; // [-0.5, 0.5]
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
     const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
@@ -49,6 +50,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
             onDragEnd={onSliderDragEnd}
             vertical={true}
             thumb={<VerticalHandle />}
+            disabled={sim.simulationStarted && !sim.simulationFinished}
           />
         </div>
         <div className={css.label}>

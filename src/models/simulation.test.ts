@@ -183,6 +183,7 @@ describe("SimulationModel store", () => {
     });
 
     it("reports correct SST value", (done) => {
+      jest.setTimeout(10000);
       global.fetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep.png"));
       const sim = new SimulationModel(options);
       sim._seaSurfaceTempDataParsed = () => {
@@ -273,30 +274,36 @@ describe("SimulationModel store", () => {
       sim.hurricaneTrack = [{category: 1, position: {lat: 33, lng: 123}}];
       sim.landfalls = [{category: 1, position: {lat: 33, lng: 123}}];
       sim.numberOfStepsOverSea = 123;
+      sim.simulationStarted = true;
       sim.reset();
       expect(sim.time).toEqual(0);
       expect(sim.hurricane.reset).toHaveBeenCalled();
       expect(sim.hurricaneTrack.length).toEqual(0);
       expect(sim.landfalls.length).toEqual(0);
       expect(sim.numberOfStepsOverSea).toEqual(0);
+      expect(sim.simulationStarted).toEqual(false);
     });
   });
 
   describe("start", () => {
     it("starts the simulation", () => {
       const sim = new SimulationModel(options);
+      expect(sim.simulationRunning).toEqual(false);
       expect(sim.simulationStarted).toEqual(false);
       sim.start();
+      expect(sim.simulationRunning).toEqual(true);
       expect(sim.simulationStarted).toEqual(true);
     });
   });
 
   describe("stop", () => {
-    it("stops the simulation", () => {
+    it("stops the simulation without resetting it", () => {
       const sim = new SimulationModel(options);
       sim.simulationStarted = true;
+      sim.simulationRunning = true;
       sim.stop();
-      expect(sim.simulationStarted).toEqual(false);
+      expect(sim.simulationRunning).toEqual(false);
+      expect(sim.simulationStarted).toEqual(true);
     });
   });
 

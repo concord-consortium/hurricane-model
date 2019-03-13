@@ -21,13 +21,14 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
   public render() {
     const { model } = this.props;
     const { sliderDrag } = this.state;
+    const sim = this.stores.simulation;
     return (
       <LeafletCustomMarker
         position={model.center}
         onDrag={this.handlePressureSysDrag}
         onDragEnd={this.handlePressureSysDragEnd}
         // Disable dragging when slider is being dragged, so they don't interfere.
-        draggable={!sliderDrag}
+        draggable={!sliderDrag && !sim.simulationStarted && !sim.simulationRunning}
       >
         <PressureSystemIcon
           model={model}
