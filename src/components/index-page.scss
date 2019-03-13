@@ -1,0 +1,11 @@
+.index {
+  height: 100%;
+
+  .progress {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 10000;
+    color: #ffb60f;
+  }
+}
