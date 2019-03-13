@@ -53,4 +53,15 @@
       margin-top: 3px;
     }
   }
+
+  .mapButtonLabel {
+    color: #fff;
+    font-size: 12px;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+    font-family: $scaleFont;
+    line-height: 12px;
+    width: 50px;
+    margin-left: -9px;
+    margin-top: -3px;
+  }
 }

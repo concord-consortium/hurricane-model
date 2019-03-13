@@ -12,6 +12,7 @@ import { LandfallRectangle } from "./landfall-rectangle";
 import config from "../config";
 import { stores } from "../index";
 import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
+import Home from "@material-ui/icons/Home";
 
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
@@ -48,7 +49,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           // Also, apply small padding (3%) as it feels better and otherwise Leaflet is triggering another animations.
           const maxBounds = map.getBounds().pad(0.03);
           const minZoom = map.getZoom();
-          // map.setMinZoom(minZoom);
+          map.setMinZoom(minZoom);
           map.setMaxBounds(maxBounds);
           this._programmaticMapUpdate = false;
         });
@@ -80,17 +81,29 @@ export class MapView extends BaseComponent<IProps, IState> {
              attributionControl={false}
         >
           { navigation && <ZoomControl position="topleft"/> }
+          <Control position="topleft" className="leaflet-bar">
           {
             navigation && ui.mapModifiedByUser &&
-            <Control position="topleft" className="leaflet-bar">
-              <a className={css.resetViewBtn}
-                 onClick={this.resetView}
-                 title="Reset view" role="button" aria-label="Reset view"
-              >
-                <CenterFocusStrong/>
-              </a>
-            </Control>
+            <a className={css.resetViewBtn}
+               onClick={this.resetView}
+               title="Reset view" role="button" aria-label="Reset view"
+            >
+              <CenterFocusStrong/>
+            </a>
           }
+          </Control>
+          <Control position="topleft" className="leaflet-bar">
+          {
+            ui.zoomedInView &&
+            <a className={css.resetViewBtn}
+               onClick={this.stores.ui.setNorthAtlanticView}
+               title="Go to full map view" role="button" aria-label="Go to full map view"
+            >
+              <Home/>
+              <div className={css.mapButtonLabel}>Full Map View</div>
+            </a>
+          }
+          </Control>
           <AttributionControl position="topright" />
           <PixiWindLayer />
           <ImageOverlay

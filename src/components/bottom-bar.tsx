@@ -1,7 +1,6 @@
 import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
-import Button from "@material-ui/core/Button";
 import { SeasonButton } from "./season-button";
 import { PlaybackButtons } from "./playback-buttons";
 import { OpacitySlider } from "./opacity-slider";
@@ -53,12 +52,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           </div>
           <div className={css.widgetGroup}>
             <HurricaneScale />
-          </div>
-          <div className={css.seasonSelect}>
-          {
-            ui.zoomedInView &&
-            <Button onClick={this.stores.ui.setNorthAtlanticView}>Return to full map</Button>
-          }
           </div>
         </div>
         {/* This empty container is necessary so the spacing works correctly */}
