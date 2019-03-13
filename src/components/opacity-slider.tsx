@@ -30,6 +30,7 @@ export class OpacitySlider extends BaseComponent<IProps, IState> {
         <div className={css.sliderContainer}>
           <Slider
             className={css.slider}
+            classes={{thumb: css.thumb}}
             value={value}
             min={0}
             max={1}

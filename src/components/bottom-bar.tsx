@@ -37,7 +37,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           }
           {
             anySlider &&
-            <div className={css.widgetGroup}>
+            <div className={`${css.widgetGroup} hoverable`}>
               {
                 config.windArrowsSlider &&
                 <OpacitySlider property="windArrows" showLabels={true} />

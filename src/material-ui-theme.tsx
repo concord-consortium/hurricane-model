@@ -6,6 +6,9 @@ export default createMuiTheme({
       main: "#aaa"
     }
   },
+  shape: {
+    borderRadius: 9
+  },
   typography: {
     useNextVariants: true,
     fontFamily: "Lato, Arial, sans-serif",
@@ -17,6 +20,15 @@ export default createMuiTheme({
   },
   overrides: {
     MuiButton: {
+      root: {
+        "&:hover": {
+          backgroundColor: "#f2f2f2",
+        },
+        "&$disabled": {
+          color: "inherit",
+          opacity: 0.25
+        }
+      },
       text: {
         color: "#666",
         padding: 0,
@@ -39,6 +51,14 @@ export default createMuiTheme({
       thumbIconWrapper: {
         width: "20px",
         height: "20px"
+      },
+      thumb: {
+        "&$focused, &:hover": {
+          boxShadow: "0 0 0 4px rgba(255,255,255,0.85)"
+        },
+        "&$activated": {
+          boxShadow: "0 0 0 4px rgba(255,255,255,0.85)"
+        }
       }
     }
   }

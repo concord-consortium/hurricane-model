@@ -21,6 +21,7 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
         onClick={this.handleSeasonChange}
         className={css.seasonButton}
         data-test="season-button"
+        disableTouchRipple={true}
       >
         <div>
           <div className={css.seasonValue}>{ sim.season }</div>
