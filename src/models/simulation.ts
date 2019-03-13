@@ -191,8 +191,8 @@ export class SimulationModel {
     // Otherwise, generate custom arrows for given area.
     const result = [];
     const diff = this.areaWidth / 30;
-    for (let lat = this.south; lat < Math.ceil(this.north); lat += diff) {
-      for (let lng = this.west; lng < Math.ceil(this.east); lng += diff) {
+    for (let lat = this.south; lat < this.north; lat += diff) {
+      for (let lng = this.west; lng < this.east; lng += diff) {
         const w = this.windAt({lat, lng});
         const wp = {lat, lng, u: w.u, v: w.v};
         result.push(wp);
