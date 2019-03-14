@@ -7,6 +7,7 @@ import VerticalHandle from "../assets/slider-vertical.svg";
 import High from "../assets/high.svg";
 import Low from "../assets/low.svg";
 import DragIcon from "../assets/drag.svg";
+import config from "../config";
 
 import * as css from "./pressure-system-icon.scss";
 
@@ -27,12 +28,19 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public render() {
     const { model, onSliderDragStart, onSliderDragEnd } = this.props;
+    const sim = this.stores.simulation;
     const strengthNorm = (model.strength - minStrength) / (maxStrength - minStrength) - 0.5; // [-0.5, 0.5]
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
     const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
+    // If set to lock the UI while the simulation is running, lock UI once the sim is started until it is reset
+    const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
+
     return (
-      <div className={css.pressureSystemIcon}>
-        <div className={css.dragIcon}><DragIcon /></div>
+      <div
+        className={`${css.pressureSystemIcon} ${uiDisabled ? css.disabled : ""}`}
+        data-test="pressure-system-icon"
+      >
+        <div className={`${css.dragIcon} ${uiDisabled ? css.disabled : ""}`}><DragIcon /></div>
         {
           model.type === "high" ?
             <High className={css.letter} style={letterStyle} /> :
@@ -40,7 +48,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
         }
         <div className={css.sliderContainer}>
           <Slider
-            classes={{thumb: css.thumb, track: css.track}}
+            classes={{ thumb: css.thumb, track: css.track }}
             value={model.strength}
             min={minStrength}
             max={maxStrength}
@@ -49,6 +57,8 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
             onDragEnd={onSliderDragEnd}
             vertical={true}
             thumb={<VerticalHandle />}
+            disabled={uiDisabled}
+            data-test={"pressure-system-slider"}
           />
         </div>
         <div className={css.label}>

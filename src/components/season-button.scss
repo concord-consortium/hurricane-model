@@ -7,13 +7,17 @@
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
 
+  &.disabled{
+    opacity: 0.5 !important;
+  }
+
   .seasonValue {
     color: #fff;
     font-size: 12px;
     width: 76px;
     height: 42px;
     background: #FF8F20;
-    border-radius: 10px;
+    border-radius: 8px;
     text-transform: capitalize;
     display: flex;
     align-items: center;

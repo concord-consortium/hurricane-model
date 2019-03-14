@@ -49,7 +49,8 @@ const DEFAULT_CONFIG: any = {
   // --- UI elements can be shown or hidden using options below ---
   seasonButton: true,
   windArrowsSlider: true,
-  seaSurfaceTempSlider: true
+  seaSurfaceTempSlider: true,
+  lockSimulationWhileRunning: true
   // --- End of UI widgets ---
 };
 

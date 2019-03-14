@@ -107,6 +107,7 @@ export class SimulationModel {
   });
 
   @observable public simulationStarted = false;
+  @observable public simulationRunning = false;
 
   @observable public landfalls: ILandfall[] = [];
 
@@ -292,23 +293,27 @@ export class SimulationModel {
       this.simulationFinished = true;
     }
 
-    if (this.simulationStarted) {
+    if (this.simulationRunning) {
       requestAnimationFrame(this.tick);
     }
   }
 
   @action.bound public start() {
-    this.simulationStarted = true;
+    this.simulationRunning = true;
+    if (!this.simulationStarted) {
+      this.simulationStarted = true;
+    }
     this.tick();
   }
 
   @action.bound public stop() {
-    this.simulationStarted = false;
+    this.simulationRunning = false;
   }
 
   @action.bound public reset() {
-    this.simulationStarted = false;
+    this.simulationRunning = false;
     this.simulationFinished = false;
+    this.simulationStarted = false;
     this.hurricaneTrack = [];
     this.landfalls = [];
     this.time = 0;
