@@ -26,7 +26,7 @@ export default createMuiTheme({
         },
         "&$disabled": {
           color: "inherit",
-          opacity: 0.25
+          opacity: 0.5
         }
       },
       text: {
@@ -43,14 +43,24 @@ export default createMuiTheme({
         "height": 1,
         "&$vertical": {
           width: 1
+        },
+        "&$disabled": {
+          color: "inherit",
+          opacity: 0.25
         }
       },
       trackAfter: {
         opacity: 1
       },
       thumbIconWrapper: {
-        width: "20px",
-        height: "20px"
+        "width": "20px",
+        "height": "20px",
+
+        "&$disabled": {
+          width: "20px",
+          height: "20px",
+          opacity: 0.25
+        }
       },
       thumb: {
         "&$focused, &:hover": {
@@ -58,6 +68,9 @@ export default createMuiTheme({
         },
         "&$activated": {
           boxShadow: "0 0 0 3px rgba(255,255,255,0.85)"
+        },
+        "&$disabled": {
+          boxShadow: 0
         }
       }
     }

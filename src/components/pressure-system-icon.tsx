@@ -36,8 +36,8 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
 
     return (
-      <div className={css.pressureSystemIcon}>
-        <div className={uiDisabled ? css.dragIconDisabled : css.dragIcon}><DragIcon /></div>
+      <div className={`${css.pressureSystemIcon} ${uiDisabled ? css.disabled : ""}`}>
+        <div className={`${css.dragIcon} ${uiDisabled ? css.disabled : ""}`}><DragIcon /></div>
         {
           model.type === "high" ?
             <High className={css.letter} style={letterStyle} /> :
