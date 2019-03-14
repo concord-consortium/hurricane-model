@@ -11,10 +11,13 @@
   margin-top: -60px !important;
   outline: none;
   transition: background-color 350ms;
+  &.disabled {
+    cursor: default;
+  }
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.25);
-    &.disabled{
+    &.disabled {
       cursor: default;
       background-color: rgba(255, 255, 255, 0.0);
     }

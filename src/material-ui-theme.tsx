@@ -46,7 +46,8 @@ export default createMuiTheme({
         },
         "&$disabled": {
           color: "inherit",
-          opacity: 0.25
+          opacity: 0.25,
+          cursor: "default"
         }
       },
       trackAfter: {
