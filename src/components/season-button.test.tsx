@@ -4,6 +4,7 @@ import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { SeasonButton } from "./season-button";
 import Button from "@material-ui/core/Button";
+import * as css from "./season-button.scss";
 
 describe("SeasonButton component", () => {
   let stores = createStores();
@@ -39,5 +40,16 @@ describe("SeasonButton component", () => {
     wrapper.find(Button).simulate("click");
     expect(stores.simulation.season).toEqual("fall");
     expect(wrapper.text()).toEqual(expect.stringContaining("fall"));
+  });
+
+  it("season button is disabled while model is running", () => {
+    stores.simulation.simulationStarted = true;
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <SeasonButton />
+      </Provider>
+    );
+    const seasonButton = wrapper.find('[data-test="season-button"]').first();
+    expect(seasonButton.hasClass(css.disabled)).toEqual(true);
   });
 });

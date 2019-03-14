@@ -22,7 +22,7 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
     return (
       <Button
         onClick={this.handleSeasonChange}
-        className={css.seasonButton}
+        className={`${css.seasonButton} ${uiDisabled ? css.disabled : ""}`}
         data-test="season-button"
         disableTouchRipple={true}
         disabled={uiDisabled}

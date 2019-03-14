@@ -4,6 +4,7 @@ import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { PressureSystemIcon, minStrength, maxStrength, mbLabelRange } from "./pressure-system-icon";
 import Slider from "@material-ui/lab/Slider";
+import * as css from "./pressure-system-icon.scss";
 
 describe("PressureSystemIcon component", () => {
   let stores = createStores();
@@ -52,5 +53,17 @@ describe("PressureSystemIcon component", () => {
     expect(icon.renderLabel()).toEqual(
       1010 - Math.round((1000000 - minStrength) / (maxStrength - minStrength) * mbLabelRange) + "mb"
     );
+  });
+
+  it("icon and sliders are disabled while model is running", () => {
+    stores.simulation.simulationStarted = true;
+    const model = stores.simulation.pressureSystems[0];
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <PressureSystemIcon model={model}/>
+      </Provider>
+    );
+    const pressureIcon = wrapper.find('[data-test="pressure-system-icon"]').first();
+    expect(pressureIcon.hasClass(css.disabled)).toEqual(true);
   });
 });

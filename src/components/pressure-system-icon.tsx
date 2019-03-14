@@ -36,7 +36,10 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
 
     return (
-      <div className={`${css.pressureSystemIcon} ${uiDisabled ? css.disabled : ""}`}>
+      <div
+        className={`${css.pressureSystemIcon} ${uiDisabled ? css.disabled : ""}`}
+        data-test="pressure-system-icon"
+      >
         <div className={`${css.dragIcon} ${uiDisabled ? css.disabled : ""}`}><DragIcon /></div>
         {
           model.type === "high" ?
@@ -55,6 +58,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
             vertical={true}
             thumb={<VerticalHandle />}
             disabled={uiDisabled}
+            data-test={"pressure-system-slider"}
           />
         </div>
         <div className={css.label}>
