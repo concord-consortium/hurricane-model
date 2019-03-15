@@ -81,29 +81,30 @@ export class MapView extends BaseComponent<IProps, IState> {
              attributionControl={false}
         >
           { navigation && <ZoomControl position="topleft"/> }
-          <Control position="topleft" className="leaflet-bar">
           {
             navigation && ui.mapModifiedByUser &&
-            <a className={css.resetViewBtn}
-               onClick={this.resetView}
-               title="Reset view" role="button" aria-label="Reset view"
-            >
-              <CenterFocusStrong/>
-            </a>
+            <Control position="topleft" className={`${css.resetViewContainer} leaflet-bar`}>
+              <a className={css.resetViewBtn}
+                 onClick={this.resetView}
+                 title="Reset view" role="button" aria-label="Reset view"
+              >
+                <CenterFocusStrong/>
+              </a>
+            </Control>
           }
-          </Control>
-          <Control position="topleft" className="leaflet-bar">
           {
             ui.zoomedInView &&
-            <a className={css.resetViewBtn}
-               onClick={this.stores.ui.setNorthAtlanticView}
-               title="Go to full map view" role="button" aria-label="Go to full map view"
-            >
-              <Home/>
-              <div className={css.mapButtonLabel}>Full Map View</div>
-            </a>
+            <Control position="topleft" className={`${css.fullMapViewContainer} leaflet-bar`}>
+
+              <a className={css.resetViewBtn}
+                 onClick={this.stores.ui.setNorthAtlanticView}
+                 title="Go to full map view" role="button" aria-label="Go to full map view"
+              >
+                <Home/>
+                <div className={css.mapButtonLabel}>Full Map View</div>
+              </a>
+            </Control>
           }
-          </Control>
           <AttributionControl position="topright" />
           <PixiWindLayer />
           <ImageOverlay

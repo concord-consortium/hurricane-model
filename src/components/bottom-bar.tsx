@@ -19,7 +19,6 @@ interface IState {}
 export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
-    const ui = this.stores.ui;
     const anySlider = config.windArrowsSlider || config.seaSurfaceTempSlider;
     return (
       <div className={css.bottomBar}>
