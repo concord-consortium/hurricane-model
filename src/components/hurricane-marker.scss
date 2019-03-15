@@ -10,6 +10,9 @@
     }
   }
 
+  cursor: default;
+  font-family: $scaleFont;
+  font-weight: bold;
   width: 100px;
   height: 100px;
   margin-left: -50px;
@@ -20,20 +23,22 @@
     top: 50%;
     left: 50%;
     transform-origin: top left;
-    animation: rotation 4s infinite linear;
+    animation: rotation 5.5s infinite linear;
 
     svg {
-      width: 70px;
-      height: 70px;
-      margin-left: -35px;
-      margin-top: -35px;
+      width: 45px;
+      height: 72px;
+      margin-left: -22.5px;
+      margin-top: -36px;
     }
   }
 
   .categoryNumber {
-    font-size: 19px;
+    color: #434343;
+    font-size: 16px;
+    text-shadow: 0 0 5px #fff;
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
     width: 50px;
     height: 50px;
@@ -42,25 +47,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    text-shadow: 1px 1px 6px #000;
   }
 
   .temp {
+    color: white;
     font-size: 12px;
-    line-height: 15px;
+    line-height: 13px;
     position: absolute;
     top: 50%;
     left: 50%;
     width: 80px;
-    height: 100px;
+    height: 30px;
     margin-left: -40px;
-    margin-top: -15px;
+    margin-top: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: white;
     text-shadow: 1px 1px 6px #000;
   }
 
@@ -68,30 +71,48 @@
     svg path {
       fill: $cat0Color;
     }
+    .svgContainer {
+      animation-duration: 5.5s;
+    }
   }
   &.category1 {
     svg path {
       fill: $cat1Color;
+    }
+    .svgContainer {
+      animation-duration: 4s;
     }
   }
   &.category2 {
     svg path {
       fill: $cat2Color;
     }
+    .svgContainer {
+      animation-duration: 2.75s;
+    }
   }
   &.category3 {
     svg path {
       fill: $cat3Color;
+    }
+    .svgContainer {
+      animation-duration: 1.75s;
     }
   }
   &.category4 {
     svg path {
       fill: $cat4Color;
     }
+    .svgContainer {
+      animation-duration: 1s;
+    }
   }
   &.category5 {
     svg path {
       fill: $cat5Color;
+    }
+    .svgContainer {
+      animation-duration: 0.5s;
     }
   }
 }
