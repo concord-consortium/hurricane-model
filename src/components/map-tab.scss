@@ -11,6 +11,7 @@
     border-radius: 9px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    position: relative;
     &.geoMaps {
       background-color: $tabGeoLight;
     }
@@ -19,25 +20,45 @@
     }
 
     .mapTabImage {
+      position: absolute;
       width: 49px;
       height: 44px;
+      border-radius: 9px;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      top: 4px;
+      left: 4px;
+      padding-right: 0;
+      background-repeat: no-repeat;
+      background-size: contain;
+
       &:hover {
         opacity: 0.75;
       }
+      &.geoMaps {
+        background-image: url('../assets/geo-map.png');
 
-      .mapTabContent {
-        width: 35px;
-        height: 30px;
-        font-family: Lato;
-        font-size: 14px;
-        font-weight: bold;
-        font-style: normal;
-        font-stretch: normal;
-        line-height: 1;
-        letter-spacing: normal;
-        text-align: center;
-        color: $controlLabel;
       }
+      &.impactMaps {
+        background-image: url('../assets/impact-map.png');
+      }
+    }
+    .mapTabContent {
+      position: relative;
+      top: 4px;
+      left: 4px;
+      height: 30px;
+      font-family: Lato;
+      font-size: 14px;
+      font-weight: bold;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1;
+      letter-spacing: normal;
+      text-align: center;
+      color: $controlLabel;
+      padding-top: 6px;
+      pointer-events: none;
     }
   }
 }

@@ -18,23 +18,26 @@ export class MapTab extends BaseComponent<IProps, IState> {
     const { tabType } = this.props;
     const ui = this.stores.ui;
     let tabStyle = css.geoMaps;
+    let tabText = "Geo Maps";
     switch (tabType) {
       case "geo":
         tabStyle = css.geoMaps;
+        tabText = "Geo Maps";
         break;
       case "impact":
         tabStyle = css.impactMaps;
+        tabText = "Impact Maps";
         break;
       default:
         tabStyle = css.geoMaps;
+        tabText = "Geo Maps";
         break;
     }
     return (
       <div className={`${css.mapTab} ${tabStyle}`} data-test="map-tab">
         <div className={`${css.mapTabBack} ${tabStyle}`}>
-          <div className={css.mapTabContent}>
-            <div className={css.mapTabImage} />
-          </div>
+          <div className={`${css.mapTabImage} ${tabStyle}`} />
+          <div className={css.mapTabContent}>{tabText}</div>
         </div>
       </div>
     );
