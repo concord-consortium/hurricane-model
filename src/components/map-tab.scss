@@ -1,0 +1,50 @@
+@import "common";
+
+.mapTab {
+  display: inline-block;
+  width: $mapTabWidth;
+  height: $mapTabHeight;
+
+  &.geoMaps {
+    top: $mapTabVerticalSpacing;
+  }
+  &.impactMaps {
+    top: calc($mapTabVerticalSpacing + $mapTabHeight + $mapTabVerticalSpacing);
+  }
+
+  .mapTabBack {
+    width: $mapTabWidth;
+    height: $mapTabHeight;
+    border-radius: 9px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    &.geoMaps {
+      background-color: $tabGeoLight;
+    }
+    &.impactMaps {
+      background-color: $tabImpactLight;
+    }
+
+    .mapTabImage {
+      width: 49px;
+      height: 44px;
+      &:hover {
+        opacity: 0.75;
+      }
+
+      .mapTabContent {
+        width: 35px;
+        height: 30px;
+        font-family: Lato;
+        font-size: 14px;
+        font-weight: bold;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1;
+        letter-spacing: normal;
+        text-align: center;
+        color: $controlLabel;
+      }
+    }
+  }
+}
