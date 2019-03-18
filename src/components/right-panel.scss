@@ -20,13 +20,15 @@
     &.open {
       right: 0;
     }
-
-    .rightPanelTab {
+    .rightPanelTabs{
       position: absolute;
       display: inline-block;
-      margin-top: $mapTabVerticalSpacing;
       margin-right: $rightPanelWidth;
       right: 0;
+      list-style-type: none;
+    }
+    .rightPanelTab {
+      margin-top: $mapTabVerticalSpacing;
     }
 
     .tabContentBack{
@@ -41,6 +43,9 @@
       &.geoMaps {
         background-color: $tabGeoLight;
       }
+      &.impactMaps {
+        background-color: $tabImpactLight;
+      }
 
       .tabContent{
         position: relative;
@@ -53,12 +58,6 @@
         margin-right: 0;
         margin-left: auto;
         height: 100%;
-      }
-    }
-
-    .impactMaps {
-      .tabContentBack {
-        background-color: $tabImpactLight;
       }
     }
   }

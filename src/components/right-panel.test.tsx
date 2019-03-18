@@ -17,6 +17,8 @@ describe("Right Panel component", () => {
         <RightPanel />
       </Provider>
     );
-    expect(wrapper.find('[data-test="right-panel"]').length).toEqual(1);
+    const panel = wrapper.find('[data-test="right-panel"]');
+    expect(panel.length).toEqual(1);
+    // expect(panel.hasClass('open')).to.equal(true);
   });
 });

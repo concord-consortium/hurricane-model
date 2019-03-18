@@ -5,13 +5,6 @@
   width: $mapTabWidth;
   height: $mapTabHeight;
 
-  &.geoMaps {
-    top: $mapTabVerticalSpacing;
-  }
-  &.impactMaps {
-    top: calc($mapTabVerticalSpacing + $mapTabHeight + $mapTabVerticalSpacing);
-  }
-
   .mapTabBack {
     width: $mapTabWidth;
     height: $mapTabHeight;
