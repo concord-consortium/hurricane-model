@@ -26,7 +26,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     return (
       <div className={css.rightPanelContainer}>
-        <div className={`${css.rightPanel} ${open ? css.open : ""}`} >
+        <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
           <div className={css.rightPanelTab}
             onClick={this.handleToggleDrawer}><MapTab /></div>
           <div className={`${css.tabContentBack} ${css.geoMaps}`}>

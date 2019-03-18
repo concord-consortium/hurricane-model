@@ -15,7 +15,7 @@ export class MapTab extends BaseComponent<IProps, IState> {
   public render() {
     const ui = this.stores.ui;
     return (
-      <div className={`${css.mapTab} ${css.geoMaps}`}>
+      <div className={`${css.mapTab} ${css.geoMaps}`} data-test="map-tab">
         <div className={`${css.mapTabBack} ${css.geoMaps}`}>
           <div className={css.mapTabContent}>
             <div className={css.mapTabImage} />
