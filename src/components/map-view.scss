@@ -81,7 +81,12 @@
   }
 
   :global(.leaflet-control-attribution) {
-    // margin-right: $mapTabWidth !important;
+    opacity: 0.5 !important;
+
+  }
+  :global(.leaflet-control-attribution:hover) {
+    opacity: 1.0 !important;
+
   }
 
   .resetViewContainer {
