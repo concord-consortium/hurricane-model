@@ -80,8 +80,8 @@
     flex-direction: column;
   }
 
-  :global(.leaflet-control-container) {
-    z-index: 10;
+  :global(.leaflet-control-attribution) {
+    // margin-right: $mapTabWidth !important;
   }
 
   .resetViewContainer {

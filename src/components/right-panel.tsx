@@ -24,7 +24,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      open: true,
+      open: false,
       selectedTab: mapTypes.geo
     };
   }
