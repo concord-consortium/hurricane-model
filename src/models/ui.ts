@@ -9,6 +9,7 @@ export type TranslucentLayer = "windArrows" | "seaSurfaceTemp";
 
 export class UIModel {
   @observable public initialBounds = NorthAtlanticInitialBounds;
+  @observable public mapTiles = "";
   @observable public zoomedInView = false;
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
@@ -45,5 +46,9 @@ export class UIModel {
 
   @action.bound public setOpacity(prop: TranslucentLayer, value: number) {
     this.layerOpacity[prop] = value;
+  }
+
+  @action.bound public setMapTiles(value: string) {
+    this.mapTiles = value;
   }
 }

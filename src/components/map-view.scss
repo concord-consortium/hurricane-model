@@ -80,6 +80,10 @@
     flex-direction: column;
   }
 
+  :global(.leaflet-control-container) {
+    z-index: 10;
+  }
+
   .resetViewContainer {
     order: 1;
   }
