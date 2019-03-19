@@ -18,7 +18,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
   public render() {
     const { label, mapType } = this.props;
     const ui = this.stores.ui;
-    const active = mapType === mapTypes.geo && ui.mapTile.type === label.toLowerCase();
+    const active = mapType === mapTypes.geo && ui.mapTile.mapType === label.toLowerCase();
     let buttonStyle = css.geoMaps;
     switch (mapType) {
       case mapTypes.geo:
@@ -31,7 +31,6 @@ export class MapButton extends BaseComponent<IProps, IState> {
         buttonStyle = css.geoMaps;
         break;
     }
-    const sim = this.stores.simulation;
     const labelText = label ? label : "Satellite";
     return (
       <Button
@@ -47,7 +46,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
     );
   }
 
-  private handleMapSelect = () => {
+  public handleMapSelect = () => {
     if (this.props.mapType === "geo") {
       this.stores.ui.setMapTiles(this.props.label.toLowerCase());
     } else {

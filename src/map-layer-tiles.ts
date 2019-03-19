@@ -1,5 +1,5 @@
 export interface MapTileLayer {
-  type: string;
+  mapType: string;
   name: string;
   url: string;
   attribution: string;
@@ -9,7 +9,7 @@ export interface MapTileLayer {
 
 const layerInfo: MapTileLayer[] = [
   {
-    type: "satellite",
+    mapType: "satellite",
     name: "Satellite",
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     // tslint:disable-next-line:max-line-length
@@ -18,7 +18,7 @@ const layerInfo: MapTileLayer[] = [
     subdomains: []
   },
   {
-    type: "street",
+    mapType: "street",
     name: "Street",
     url: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}@2x.png",
     // tslint:disable-next-line:max-line-length
@@ -27,7 +27,7 @@ const layerInfo: MapTileLayer[] = [
     subdomains: []
   },
   {
-    type: "relief",
+    mapType: "relief",
     name: "Relief",
     // tslint:disable-next-line:max-line-length
     url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/ETOPO1_Global_Relief_Model_Color_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",
@@ -39,6 +39,6 @@ const layerInfo: MapTileLayer[] = [
 ];
 
 export function mapLayer(layerType: string) {
-  const layer: MapTileLayer = layerInfo.find(m => m.type === layerType) || layerInfo[0];
+  const layer: MapTileLayer = layerInfo.find(m => m.mapType === layerType) || layerInfo[0];
   return layer;
 }
