@@ -2,13 +2,13 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import Button from "@material-ui/core/Button";
+import { mapTypes } from "./right-panel";
 
 import * as css from "./map-button.scss";
 
 interface IProps extends IBaseProps {
   label: string;
   mapType: string;
-  active?: boolean;
 }
 interface IState {}
 
@@ -16,14 +16,15 @@ interface IState {}
 @observer
 export class MapButton extends BaseComponent<IProps, IState> {
   public render() {
-    const { label, mapType, active } = this.props;
+    const { label, mapType } = this.props;
     const ui = this.stores.ui;
+    const active = mapType === mapTypes.geo && ui.mapTile.type === label.toLowerCase();
     let buttonStyle = css.geoMaps;
     switch (mapType) {
-      case "geo":
+      case mapTypes.geo:
         buttonStyle = css.geoMaps;
         break;
-      case "impact":
+      case mapTypes.impact:
         buttonStyle = css.impactMaps;
         break;
       default:
@@ -47,6 +48,10 @@ export class MapButton extends BaseComponent<IProps, IState> {
   }
 
   private handleMapSelect = () => {
-    this.stores.ui.setMapTiles(this.props.label);
+    if (this.props.mapType === "geo") {
+      this.stores.ui.setMapTiles(this.props.label.toLowerCase());
+    } else {
+      // do nothing for now
+    }
   }
 }

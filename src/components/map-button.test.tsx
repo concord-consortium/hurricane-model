@@ -15,7 +15,7 @@ describe("MapButton component", () => {
   it("renders basic components", () => {
     const wrapper = mount(
       <Provider stores={stores}>
-        <MapButton mapType={mapTypes.geo} active={false} label={"map label"} />
+        <MapButton mapType={mapTypes.geo} label={"map label"} />
       </Provider>
     );
     expect(wrapper.find('[data-test="map-button"]').length).toBeGreaterThan(0);

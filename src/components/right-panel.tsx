@@ -62,7 +62,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             {selectedTab === mapTypes.geo &&
               <div className={css.tabContent}>
                 <div className={css.drawerTitle}>Geologic Maps</div>
-                <MapButton label="Satellite" mapType={selectedTab} active={true} />
+                <MapButton label="Satellite" mapType={selectedTab} />
                 <MapButton label="Relief" mapType={selectedTab} />
                 <MapButton label="Street" mapType={selectedTab} />
               </div>
@@ -70,7 +70,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             {selectedTab === mapTypes.impact &&
               <div className={css.tabContent}>
                 <div className={css.drawerTitle}>Impact Maps</div>
-                <MapButton label="Population" mapType={selectedTab} active={true} />
+                <MapButton label="Population" mapType={selectedTab} />
                 <MapButton label="Storm Surge" mapType={selectedTab} />
                 <MapButton label="Precipitation" mapType={selectedTab} />
                 <MapButton label="Vulnerability" mapType={selectedTab} />
