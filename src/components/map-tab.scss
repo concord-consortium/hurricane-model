@@ -35,13 +35,6 @@
       &:hover {
         opacity: 0.75;
       }
-      &.geoMaps {
-        background-image: url('../assets/geo-map.png');
-
-      }
-      &.impactMaps {
-        background-image: url('../assets/impact-map.png');
-      }
     }
     .mapTabContent {
       position: relative;
