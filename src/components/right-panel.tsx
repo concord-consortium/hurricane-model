@@ -31,24 +31,6 @@ export class RightPanel extends BaseComponent<IProps, IState> {
 
   public render() {
     const { open, selectedTab } = this.state;
-    const ui = this.stores.ui;
-    let selectedPanelStyle = css.geoMaps;
-    let selectedPanelTitle = "Geologic Maps";
-    switch (selectedTab) {
-      case mapTypes.geo:
-        selectedPanelStyle = css.geoMaps;
-        selectedPanelTitle = "Geologic Maps";
-        break;
-      case mapTypes.impact:
-        selectedPanelStyle = css.impactMaps;
-        selectedPanelTitle = "Impact Maps";
-        break;
-      default:
-        selectedPanelStyle = css.geoMaps;
-        selectedPanelTitle = "Geologic Maps";
-        break;
-    }
-
     return (
       <div className={css.rightPanelContainer}>
         <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
@@ -58,31 +40,33 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             <li><div id={mapTypes.impact} className={css.rightPanelTab}
               onClick={this.handleToggleDrawer}><MapTab tabType={mapTypes.impact} /></div></li>
           </ul>
-          <div className={`${css.tabContentBack} ${selectedPanelStyle}`}>
-            {selectedTab === mapTypes.geo &&
+          {selectedTab === mapTypes.geo &&
+            <div className={`${css.tabContentBack} ${css.geoMaps}`} data-test="geo-panel">
               <div className={css.tabContent}>
                 <div className={css.drawerTitle}>Geologic Maps</div>
                 <MapButton label="Satellite" mapType={selectedTab} />
                 <MapButton label="Relief" mapType={selectedTab} />
                 <MapButton label="Street" mapType={selectedTab} />
               </div>
-            }
-            {selectedTab === mapTypes.impact &&
-              <div className={css.tabContent}>
-                <div className={css.drawerTitle}>Impact Maps</div>
-                <MapButton label="Population" mapType={selectedTab} />
-                <MapButton label="Storm Surge" mapType={selectedTab} />
-                <MapButton label="Precipitation" mapType={selectedTab} />
-                <MapButton label="Vulnerability" mapType={selectedTab} />
-              </div>
-            }
-          </div>
+            </div>
+          }
+          {selectedTab === mapTypes.impact &&
+            <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="impact-panel">
+                <div className={css.tabContent}>
+                  <div className={css.drawerTitle}>Impact Maps</div>
+                  <MapButton label="Population" mapType={selectedTab} />
+                  <MapButton label="Storm Surge" mapType={selectedTab} />
+                  <MapButton label="Precipitation" mapType={selectedTab} />
+                  <MapButton label="Vulnerability" mapType={selectedTab} />
+                </div>
+            </div>
+          }
         </div>
       </div>
     );
   }
 
-  private handleToggleDrawer = (e: React.SyntheticEvent) => {
+  public handleToggleDrawer = (e: React.SyntheticEvent) => {
     const { selectedTab } = this.state;
     if (e.currentTarget.id !== selectedTab) {
       this.setState({ open: true, selectedTab: e.currentTarget.id });

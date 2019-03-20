@@ -4,7 +4,6 @@ import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { MapButton } from "./map-button";
 import { mapTypes } from "./right-panel";
-import * as css from "./map-button.scss";
 
 describe("MapButton component", () => {
   let stores = createStores();

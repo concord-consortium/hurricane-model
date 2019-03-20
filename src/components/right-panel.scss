@@ -19,6 +19,7 @@
     &.open {
       right: 0;
     }
+
     .rightPanelTabs{
       position: absolute;
       display: block;
@@ -26,6 +27,8 @@
       margin-right: $rightPanelWidth;
       right: 0;
       list-style-type: none;
+      padding-top: $mapTabVerticalSpacing;
+
     }
     .rightPanelTab {
       margin-top: $mapTabVerticalSpacing;

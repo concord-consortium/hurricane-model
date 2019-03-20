@@ -2,8 +2,8 @@ import * as React from "react";
 import { mount } from "enzyme";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
-import * as css from "./right-panel.scss";
 import { RightPanel } from "./right-panel";
+import { MapTab } from "./map-tab";
 
 describe("Right Panel component", () => {
   let stores = createStores();
@@ -17,8 +17,72 @@ describe("Right Panel component", () => {
         <RightPanel />
       </Provider>
     );
-    const panel = wrapper.find('[data-test="right-panel"]');
-    expect(panel.length).toEqual(1);
-    // expect(panel.hasClass('open')).to.equal(true);
+    expect(wrapper.find(RightPanel).length).toBe(1);
+    expect(wrapper.find("ul").length).toBe(1);
+    expect(wrapper.find("li").length).toBe(2);
+    // default is the geo panel
+    expect(wrapper.find('[data-test="geo-panel"]').exists());
+    // impact panel is not rendered until the tab is clicked
+    expect(wrapper.find('[data-test="impact-panel"]').length).toEqual(0);
   });
+
+  it("opens when a tab is clicked", () => {
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <RightPanel />
+      </Provider>
+    );
+    const panel = (wrapper.find(RightPanel).instance() as any).wrappedInstance as RightPanel;
+    // right panel hidden by default
+    expect(panel.state.open).toBe(false);
+    wrapper.find("#geo").simulate("click");
+    expect(panel.state.open).toBe(true);
+    // looking at geo panel, no impact panel rendered
+    expect(wrapper.find('[data-test="geo-panel"]').exists());
+    expect(wrapper.find('[data-test="impact-panel"]').length).toEqual(0);
+  });
+
+  it("remains open when a different tab is clicked", () => {
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <RightPanel />
+      </Provider>
+    );
+    const panel = (wrapper.find(RightPanel).instance() as any).wrappedInstance as RightPanel;
+    expect(panel.state.open).toBe(false);
+    wrapper.find("#geo").simulate("click");
+    expect(panel.state.open).toBe(true);
+    wrapper.find("#impact").simulate("click");
+    expect(panel.state.open).toBe(true);
+  });
+
+  it("closes when the same tab is clicked", () => {
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <RightPanel />
+      </Provider>
+    );
+    const panel = (wrapper.find(RightPanel).instance() as any).wrappedInstance as RightPanel;
+    expect(panel.state.open).toBe(false);
+    wrapper.find("#geo").simulate("click");
+    expect(panel.state.open).toBe(true);
+    wrapper.find("#geo").simulate("click");
+    expect(panel.state.open).toBe(false);
+  });
+
+  it("renders the impact panel when the impact tab is clicked", () => {
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <RightPanel />
+      </Provider>
+    );
+    const panel = (wrapper.find(RightPanel).instance() as any).wrappedInstance as RightPanel;
+    expect(panel.state.open).toBe(false);
+    wrapper.find("#impact").simulate("click");
+    expect(panel.state.open).toBe(true);
+    // geo panel now hidden, impact is visible
+    expect(wrapper.find('[data-test="geo-panel"]').length).toEqual(0);
+    expect(wrapper.find('[data-test="impact-panel"]').exists());
+  });
+
 });

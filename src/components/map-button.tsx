@@ -19,19 +19,9 @@ export class MapButton extends BaseComponent<IProps, IState> {
     const { label, mapType } = this.props;
     const ui = this.stores.ui;
     const active = mapType === mapTypes.geo && ui.mapTile.mapType === label.toLowerCase();
-    let buttonStyle = css.geoMaps;
-    switch (mapType) {
-      case mapTypes.geo:
-        buttonStyle = css.geoMaps;
-        break;
-      case mapTypes.impact:
-        buttonStyle = css.impactMaps;
-        break;
-      default:
-        buttonStyle = css.geoMaps;
-        break;
-    }
+    const buttonStyle = mapType === mapTypes.geo ? css.geoMaps : css.impactMaps;
     const labelText = label ? label : "Satellite";
+
     return (
       <Button
         key="map-button"
