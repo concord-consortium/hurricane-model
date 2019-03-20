@@ -7,7 +7,7 @@
     "testURL": "https://hurricane-model.unexisting.url.com",
     "setupTestFrameworkScriptFile": "<rootDir>src/setupTests.js",
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      ".(ts|tsx|js)": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "testPathIgnorePatterns": [
