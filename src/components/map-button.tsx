@@ -21,12 +21,13 @@ export class MapButton extends BaseComponent<IProps, IState> {
     const active = mapType === mapTypes.geo && ui.mapTile.mapType === label.toLowerCase();
     const buttonStyle = mapType === mapTypes.geo ? css.geoMaps : css.impactMaps;
     const labelText = label ? label : "Satellite";
+    const mapButtonStyle = css[label.toLowerCase()];
 
     return (
       <Button
         key="map-button"
         onClick={this.handleMapSelect}
-        className={`${css.mapButton} ${buttonStyle}`}
+        className={`${css.mapButton} ${buttonStyle} ${mapButtonStyle}`}
         data-test="map-button"
         disableRipple={true}
       >

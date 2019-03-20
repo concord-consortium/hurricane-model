@@ -21,6 +21,16 @@
       border: solid 2px $tabImpact !important;
     }
 
+    &.satellite {
+      background-image: url('../assets/satellite-button.png');
+    }
+    &.relief {
+      background-image: url('../assets/relief-button.png');
+    }
+    &.street {
+      background-image: url('../assets/street-button.png');
+    }
+
   .mapLabel {
     position: absolute;
     bottom: 0px;
@@ -44,6 +54,5 @@
         background-color: $tabImpact;
       }
     }
-
   }
 }
