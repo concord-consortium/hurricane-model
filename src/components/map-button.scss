@@ -10,25 +10,14 @@
   border: solid 2px $tabContents !important;
   background-repeat: no-repeat;
   background-size: cover;
+  background-position: center;
   margin-bottom: 10px !important;
 
     &.geoMaps {
-      background-image: url('../assets/geo-map.png');
       border: solid 2px $tabGeo !important;
     }
     &.impactMaps {
-      background-image: url('../assets/impact-map.png');
       border: solid 2px $tabImpact !important;
-    }
-
-    &.satellite {
-      background-image: url('../assets/satellite-button.png');
-    }
-    &.relief {
-      background-image: url('../assets/relief-button.png');
-    }
-    &.street {
-      background-image: url('../assets/street-button.png');
     }
 
   .mapLabel {
