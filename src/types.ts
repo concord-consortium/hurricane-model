@@ -10,6 +10,13 @@ export interface ICoordinates {
 
 export interface IWindPoint extends IVector, ICoordinates {}
 
+export interface IPrecipitationPoint extends Array<number> {
+  [0]: number; // lat
+  [1]: number; // lon
+  [2]: number; // intensity
+  [3]: number; // size
+}
+
 export interface ITrackPoint {
   position: ICoordinates;
   category: number;
