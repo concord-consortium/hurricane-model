@@ -9,6 +9,7 @@ import { PressureSystemMarker } from "./pressure-system-marker";
 import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneTrack } from "./hurricane-track";
 import { LandfallRectangle } from "./landfall-rectangle";
+import { PrecipitationLayer } from "./precipitation-layer";
 import config from "../config";
 import { stores } from "../index";
 import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
@@ -80,42 +81,19 @@ export class MapView extends BaseComponent<IProps, IState> {
              zoomControl={false}
              attributionControl={false}
         >
-          { navigation && <ZoomControl position="topleft"/> }
-          {
-            navigation && ui.mapModifiedByUser &&
-            <Control position="topleft" className={`${css.resetViewContainer} leaflet-bar`}>
-              <a className={css.resetViewBtn}
-                 onClick={this.resetView}
-                 title="Reset view" role="button" aria-label="Reset view"
-              >
-                <CenterFocusStrong/>
-              </a>
-            </Control>
-          }
-          {
-            ui.zoomedInView &&
-            <Control position="topleft" className={`${css.fullMapViewContainer} leaflet-bar`}>
-
-              <a className={css.resetViewBtn}
-                 onClick={this.stores.ui.setNorthAtlanticView}
-                 title="Go to full map view" role="button" aria-label="Go to full map view"
-              >
-                <Home/>
-                <div className={css.mapButtonLabel}>Full Map View</div>
-              </a>
-            </Control>
-          }
-          <AttributionControl position="topright" />
+          <TileLayer
+            attribution={ui.mapTile.attribution}
+            url={ui.mapTile.url}
+          />
           <PixiWindLayer />
           <ImageOverlay
             opacity={ui.layerOpacity.seaSurfaceTemp}
             url={sim.seaSurfaceTempImgUrl}
             bounds={imageOverlayBounds}
           />
-          <TileLayer
-            attribution={ui.mapTile.attribution}
-            url={ui.mapTile.url}
-          />
+          {
+            sim.simulationStarted && <PrecipitationLayer/>
+          }
           <HurricaneTrack />
           {
             sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
@@ -133,6 +111,31 @@ export class MapView extends BaseComponent<IProps, IState> {
           {
             sim.hurricane.active && <HurricaneMarker />
           }
+          { navigation && <ZoomControl position="topleft"/> }
+          <Control position="topleft" className="leaflet-bar">
+            {
+              navigation && ui.mapModifiedByUser &&
+              <a className={css.resetViewBtn}
+                 onClick={this.resetView}
+                 title="Reset view" role="button" aria-label="Reset view"
+              >
+                <CenterFocusStrong/>
+              </a>
+            }
+          </Control>
+          <Control position="topleft" className="leaflet-bar">
+            {
+              ui.zoomedInView &&
+              <a className={css.resetViewBtn}
+                 onClick={this.stores.ui.setNorthAtlanticView}
+                 title="Go to full map view" role="button" aria-label="Go to full map view"
+              >
+                <Home/>
+                <div className={css.mapButtonLabel}>Full Map View</div>
+              </a>
+            }
+          </Control>
+          <AttributionControl position="topright" />
         </Map>
       </div>
     );
