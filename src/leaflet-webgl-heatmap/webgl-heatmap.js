@@ -1032,4 +1032,4 @@ WebGLHeatmap = (function() {
 
 })();
 
-export default  WebGLHeatmap;
+export default WebGLHeatmap;

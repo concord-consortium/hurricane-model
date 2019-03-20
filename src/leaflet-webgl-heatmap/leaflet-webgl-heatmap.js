@@ -127,13 +127,13 @@ const LeafletWebGLHeatmap = L.Renderer.extend({
 
       for (var i = 0; i < dataLen; i++) {
         var dataVal = data[i],
-          latlng = L.latLng(dataVal),
+          latlng = L.latLng(dataVal.slice(0, 2)),
           point = map.latLngToContainerPoint(latlng);
 
         heatmap.addPoint(
           floor(point.x),
           floor(point.y),
-          scaleFn(latlng),
+          scaleFn(latlng, dataVal.length >= 4 ? dataVal[3] : this.size),
           dataVal[2]
         );
       }
@@ -151,11 +151,11 @@ const LeafletWebGLHeatmap = L.Renderer.extend({
 
   // scale methods
 
-  _scalem: function(latlng) {
+  _scalem: function(latlng, size) {
     // necessary to maintain accurately sized circles
     // to change scale to miles (for example), you will need to convert 40075017 (equatorial circumference of the Earth in metres) to miles
     var map = this._map,
-      lngRadius = (this.size / 40075017) *
+      lngRadius = (size / 40075017) *
         360 /
         Math.cos((Math.PI / 180) * latlng.lat),
       latlng2 = new L.LatLng(latlng.lat, latlng.lng - lngRadius),
@@ -165,8 +165,8 @@ const LeafletWebGLHeatmap = L.Renderer.extend({
     return Math.max(Math.round(point.x - point2.x), 1);
   },
 
-  _scalepx: function() {
-    return this.size;
+  _scalepx: function(size) {
+    return size;
   },
 
   // data handling methods
