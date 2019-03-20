@@ -12,6 +12,8 @@
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     position: relative;
+    border: 1px solid $controlIconLine;
+    border-right: 0;
     &.geoMaps {
       background-color: $tabGeoLight;
     }

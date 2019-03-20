@@ -2,16 +2,15 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import Button from "@material-ui/core/Button";
-import { mapTypes } from "./right-panel";
+import { MapType } from "./right-panel";
 import { mapLayer } from "../map-layer-tiles";
 import * as geoMapButton from "../assets/geo-map.png";
 import * as impactMapButton from "../assets/impact-map.png";
-
 import * as css from "./map-button.scss";
 
 interface IProps extends IBaseProps {
   label: string;
-  mapType: string;
+  mapType: MapType;
 }
 interface IState {}
 
@@ -23,14 +22,14 @@ export class MapButton extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     const buttonType = label.toLowerCase();
 
-    const active = mapType === mapTypes.geo && ui.mapTile.mapType === buttonType;
-    const buttonClass = mapType === mapTypes.geo ? css.geoMaps : css.impactMaps;
+    const active = mapType === "geo" && ui.mapTile.mapType === buttonType;
+    const buttonClass = mapType === "geo" ? css.geoMaps : css.impactMaps;
     const labelText = label ? label : "Satellite";
 
     const buttonStyle = {
       backgroundImage: ""
     };
-    if (mapType === mapTypes.geo) {
+    if (mapType === "geo") {
       // for geo maps, get a map preview from the map tile provider to use as a button background
       if (mapLayer(buttonType) && mapLayer(buttonType).url) {
         // get a preview for an area approx the same as the hurricane model data
@@ -45,7 +44,6 @@ export class MapButton extends BaseComponent<IProps, IState> {
 
     return (
       <Button
-        key="map-button"
         onClick={this.handleMapSelect}
         className={`${css.mapButton} ${buttonClass}`}
         data-test="map-button"

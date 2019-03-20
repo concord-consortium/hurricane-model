@@ -7,15 +7,12 @@ import config from "../config";
 import * as css from "./right-panel.scss";
 import { MapButton } from "./map-button";
 
-export const mapTypes = {
-  geo: "geo",
-  impact: "impact"
-};
+export type MapType = "geo" | "impact";
 
 interface IProps extends IBaseProps { }
 interface IState {
   open: boolean;
-  selectedTab: string;
+  selectedTab: MapType;
 }
 
 @inject("stores")
@@ -25,7 +22,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
     super(props);
     this.state = {
       open: false,
-      selectedTab: mapTypes.geo
+      selectedTab: "geo"
     };
   }
 
@@ -35,12 +32,12 @@ export class RightPanel extends BaseComponent<IProps, IState> {
       <div className={css.rightPanelContainer}>
         <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
           <ul className={css.rightPanelTabs}>
-            <li><div id={mapTypes.geo} className={css.rightPanelTab}
-              onClick={this.handleToggleDrawer}><MapTab tabType={mapTypes.geo} /></div></li>
-            <li><div id={mapTypes.impact} className={css.rightPanelTab}
-              onClick={this.handleToggleDrawer}><MapTab tabType={mapTypes.impact} /></div></li>
+            <li><div id={"geo"} className={css.rightPanelTab}
+              onClick={this.handleToggleDrawer}><MapTab tabType={"geo"} /></div></li>
+            <li><div id={"impact"} className={css.rightPanelTab}
+              onClick={this.handleToggleDrawer}><MapTab tabType={"impact"} /></div></li>
           </ul>
-          {selectedTab === mapTypes.geo &&
+          {selectedTab === "geo" &&
             <div className={`${css.tabContentBack} ${css.geoMaps}`} data-test="geo-panel">
               <div className={css.tabContent}>
                 <div className={css.drawerTitle}>Geologic Maps</div>
@@ -50,7 +47,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
               </div>
             </div>
           }
-          {selectedTab === mapTypes.impact &&
+          {selectedTab === "impact" &&
             <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="impact-panel">
                 <div className={css.tabContent}>
                   <div className={css.drawerTitle}>Impact Maps</div>
@@ -69,7 +66,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
   public handleToggleDrawer = (e: React.SyntheticEvent) => {
     const { selectedTab } = this.state;
     if (e.currentTarget.id !== selectedTab) {
-      this.setState({ open: true, selectedTab: e.currentTarget.id });
+      this.setState({ open: true, selectedTab: e.currentTarget.id as MapType});
     } else {
       this.setState({ open: !this.state.open });
     }

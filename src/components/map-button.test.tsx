@@ -3,7 +3,7 @@ import { mount } from "enzyme";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { MapButton } from "./map-button";
-import { mapTypes } from "./right-panel";
+import { MapType } from "./right-panel";
 
 describe("MapButton component", () => {
   let stores = createStores();
@@ -14,7 +14,7 @@ describe("MapButton component", () => {
   it("renders basic components", () => {
     const wrapper = mount(
       <Provider stores={stores}>
-        <MapButton mapType={mapTypes.geo} label={"Street"} />
+        <MapButton mapType={"geo"} label={"Street"} />
       </Provider>
     );
     expect(wrapper.find(MapButton).length).toBe(1);
@@ -25,7 +25,7 @@ describe("MapButton component", () => {
     jest.spyOn(stores.ui, "setMapTiles");
     const wrapper = mount(
       <Provider stores={stores}>
-        <MapButton mapType={mapTypes.geo} label={"Street"} />
+        <MapButton mapType={"geo"} label={"Street"} />
       </Provider>
     );
     const btn = (wrapper.find(MapButton).instance() as any).wrappedInstance as MapButton;

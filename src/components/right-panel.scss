@@ -16,6 +16,7 @@
     width: $rightPanelWidth;
     bottom: $bottomBarHeight !important;
     transition: all 1s;
+    border-left: 1px solid $controlIconLine;
     &.open {
       right: 0;
     }
