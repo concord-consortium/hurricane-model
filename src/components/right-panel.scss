@@ -15,10 +15,11 @@
     top: 0;
     width: $rightPanelWidth;
     bottom: $bottomBarHeight !important;
-    transition: all 1s;
-    border-left: 1px solid $controlIconLine;
+    transition: all 0.8s;
+    border-left: 0;
     &.open {
       right: 0;
+      border-left: 1px solid $controlIconLine;
     }
 
     .rightPanelTabs{
