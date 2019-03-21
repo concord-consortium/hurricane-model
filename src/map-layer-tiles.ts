@@ -37,6 +37,16 @@ const layerInfo: MapTileLayer[] = [
     attribution: "NOAA National Centers for Environmental Information (NCEI), https://noaa.maps.arcgis.com/home/item.html?id=c7cdc62ec1d44297becf264bf67449f9",
     maxZoom: 7,
     subdomains: []
+  },
+  {
+    mapType: "population",
+    name: "Population",
+    // tslint:disable-next-line:max-line-length
+    url: "https://server.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/tile/{z}/{y}/{x}",
+    // tslint:disable-next-line:max-line-length
+    attribution: "NOAA National Centers for Environmental Information (NCEI), https://noaa.maps.arcgis.com/home/item.html?id=c7cdc62ec1d44297becf264bf67449f9",
+    maxZoom: 7,
+    subdomains: []
   }
 ];
 

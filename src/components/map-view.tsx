@@ -85,6 +85,13 @@ export class MapView extends BaseComponent<IProps, IState> {
             attribution={ui.mapTile.attribution}
             url={ui.mapTile.url}
           />
+          {ui.overlay === "population" &&
+            <TileLayer
+              attribution=""
+              url=""
+              opacity={ui.layerOpacity.overlayTiles}
+            />
+          }
           <PixiWindLayer />
           <ImageOverlay
             opacity={ui.layerOpacity.seaSurfaceTemp}

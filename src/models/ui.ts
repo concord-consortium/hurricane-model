@@ -19,7 +19,8 @@ export class UIModel {
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
     windArrows: config.windArrowsOpacity,
-    seaSurfaceTemp: config.seaSurfaceTempOpacity
+    seaSurfaceTemp: config.seaSurfaceTempOpacity,
+    overlayTiles: config.overlayTileOpacity
   };
   @observable public mapTile = mapLayer(config.map);
   @observable public overlay: Overlay = config.overlay;
