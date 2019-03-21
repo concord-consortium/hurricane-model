@@ -1,128 +1,157 @@
 @import "common";
+.temperatureContainer {
+  top: 0;
+  left: 0;
+  width: 100%;
+   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + 1});
 
-.temperatureScale {
-  position: absolute;
-  top: 300px;
-  left: 200px;
-  width: 308px;
-  height: 84px;
-  border-radius: 10px;
-  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
-  border: solid 1px $controlIconLine;
+  .temperatureScale {
+    position: absolute;
+    top: 300px;
+    left: 200px;
+    width: 308px;
+    height: 28px;
+    border-radius: 10px;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
+    border: solid 1px $controlIconLine;
+    background-color: white;
+    z-index: 500;
+    transition: height, 0.3s;
+    &.expanded {
+      height: 94px;
+    }
 
-  padding: 10px;
-  background-color: white;
-  z-index: 500;
+    .header {
+      top: 7px;
+      text-align: center;
+      font-family: Lato;
+      font-size: 12px;
+      font-weight: bold;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: normal;
+      letter-spacing: normal;
+      text-align: center;
+      color: $controlLabel;
+      padding: 7px;
+      .dragIcon{
+        cursor: grab;
+        float: left;
+        width: 12px;
+        svg {
+          height: 12px;
+          circle {
+            fill: $controlLabel;
+          }
+        }
+      }
+      .minMax {
+        float: right;
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        border-radius: 5px;
+        background-color: $minMaxKeyBackground;
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: column;
+        &.expanded {
+          justify-content: flex-end;
+        }
+        .minMaxIcon {
+          width: 10px;
+          height: 1px;
+          margin: 3px;
+          background-color: $controlIconLine;
 
-
-  .header {
-    width: 100%;
-    top: 10px;
-    text-align: center;
-    font-family: Lato;
-    font-size: 12px;
-    font-weight: bold;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: normal;
-    letter-spacing: normal;
-    text-align: center;
-    color: $controlLabel;
-    .dragIcon{
-      cursor: grab;
-      float: left;
-      width: 12px;
-      svg {
-        height: 12px;
-        circle {
-          fill: $controlLabel;
         }
       }
     }
-  }
 
-  .scaleContainer {
-    font-family: $scaleFont;
-  }
+    .scaleContainer {
+      font-family: $scaleFont;
+      padding: 7px;
+    }
 
-  .subheaders {
-    display: inline-block;
-    margin-right: 10px;
-    vertical-align: top;
-    margin-top: 5px;
+    .subheaders {
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: top;
+      margin-top: 5px;
 
-    .temperatureFLabel, .temperatureCLabel {
+      .temperatureFLabel, .temperatureCLabel {
+        font-size: 11px;
+        width: 52px;
+        text-align: center;
+        color: $controlLabel;
+      }
+    }
+
+    .degC {
+      display: inline-block;
+      vertical-align: bottom;
+      font-weight: bold;
       font-size: 11px;
-      width: 52px;
+      margin-left: -5px;
+    }
+
+    .temperatureContainer {
+      display: inline-block;
+      width: 24px;
+      vertical-align: top;
+      margin-top: 5px;
       text-align: center;
-      color: $controlLabel;
-    }
-  }
 
-  .degC {
-    display: inline-block;
-    vertical-align: bottom;
-    font-weight: bold;
-    font-size: 11px;
-    margin-left: -5px;
-  }
-
-  .temperatureContainer {
-    display: inline-block;
-    width: 24px;
-    vertical-align: top;
-    margin-top: 5px;
-    text-align: center;
-
-    .temperatureValue {
-      color: $controlLabel;
-    }
-    .temperatureRange {
-      color: $controlLabel;
-    }
-    .dot {
-      line-height: 2px;
-      margin-bottom: 6px;
-    }
-    .bar {
-      margin-top: 1px;
-      width: 100%;
-      height: 8px;
-      border-top: $bottomBarBorderStyle;
-      border-bottom: $bottomBarBorderStyle;
-    }
-    .barTemperature0 {
-      background: $temperature0Color;
-      border-top-left-radius: 4px;
-      border-bottom-left-radius: 4px;
-      border-left: $bottomBarBorderStyle;
-    }
-    .barTemperature1 {
-      background: $temperature1Color;
-    }
-    .barTemperature2 {
-      background: $temperature2Color;
-    }
-    .barTemperature3 {
-      background: $temperature3Color;
-    }
-    .barTemperature4 {
-      background: $temperature4Color;
-    }
-    .barTemperature5 {
-      background: $temperature5Color;
-    }
-    .barTemperature6 {
-      background: $temperature6Color;
-    }
-    .barTemperature7 {
-      background: $temperature7Color;
-    }
-    .barTemperature8 {
-      background: $temperature8Color;
-      border-top-right-radius: 4px;
-      border-bottom-right-radius: 4px;
-      border-right: $bottomBarBorderStyle;
+      .temperatureValue {
+        color: $controlLabel;
+      }
+      .temperatureRange {
+        color: $controlLabel;
+      }
+      .dot {
+        line-height: 2px;
+        margin-bottom: 6px;
+      }
+      .bar {
+        margin-top: 1px;
+        width: 100%;
+        height: 8px;
+        border-top: $bottomBarBorderStyle;
+        border-bottom: $bottomBarBorderStyle;
+      }
+      .barTemperature0 {
+        background: $temperature0Color;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+        border-left: $bottomBarBorderStyle;
+      }
+      .barTemperature1 {
+        background: $temperature1Color;
+      }
+      .barTemperature2 {
+        background: $temperature2Color;
+      }
+      .barTemperature3 {
+        background: $temperature3Color;
+      }
+      .barTemperature4 {
+        background: $temperature4Color;
+      }
+      .barTemperature5 {
+        background: $temperature5Color;
+      }
+      .barTemperature6 {
+        background: $temperature6Color;
+      }
+      .barTemperature7 {
+        background: $temperature7Color;
+      }
+      .barTemperature8 {
+        background: $temperature8Color;
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+        border-right: $bottomBarBorderStyle;
+      }
     }
   }
 }

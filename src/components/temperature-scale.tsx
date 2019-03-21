@@ -5,7 +5,9 @@ import DragIcon from "../assets/drag.svg";
 import * as css from "./temperature-scale.scss";
 
 interface IProps {}
-interface IState {}
+interface IState {
+  expanded: boolean;
+}
 
 const surfaceTemperature: { [key: number]: number } = {
   0: 0,
@@ -35,30 +37,44 @@ const renderTemperature = (temperature: number) => {
 };
 
 export class TemperatureScale extends React.PureComponent<IProps, IState> {
+  constructor(props: IProps) {
+    super(props);
+    this.state = { expanded: false };
+  }
   public render() {
+    const { expanded } = this.state;
     const temperatures = [0, 1, 2, 3, 4, 5, 6, 7, 8];
     return (
-      <Draggable
-        axis="both"
-        bounds={"body"}
-        handle="strong"
-       >
-        <div className={css.temperatureScale}>
-
-          <div className={css.header}>
-            Key: Sea Surface Temperature
-            <strong className={css.dragIcon}><DragIcon /></strong>
-          </div>
-          <div className={css.scaleContainer}>
-            <div className={css.subheaders}>
-              <div className={css.temperatureFLabel}>Temperature (F)</div>
-              <div className={css.temperatureCLabel}>Temperature (C)</div>
+      <div className={css.temperatureContainer}>
+        <Draggable
+          axis="both"
+          bounds="parent"
+          handle="strong"
+        >
+          <div className={`${css.temperatureScale} ${expanded ? css.expanded : ""}`}>
+            <div className={css.header}>
+              KEY: Sea Surface Temperature
+              <strong className={css.dragIcon}><DragIcon /></strong>
+              <div className={`${css.minMax} ${expanded ? css.expanded : ""}`} onClick={this.toggleExpanded} >
+                <div className={css.minMaxIcon} />
+              </div>
             </div>
-            { temperatures.map(temp => renderTemperature(temp)) }
-            <div className={css.degC}>&deg;C</div>
+            {expanded &&
+              <div className={css.scaleContainer}>
+                <div className={css.subheaders}>
+                  <div className={css.temperatureFLabel}>Temperature (F)</div>
+                  <div className={css.temperatureCLabel}>Temperature (C)</div>
+                </div>
+                {temperatures.map(temp => renderTemperature(temp))}
+                <div className={css.degC}>&deg;C</div>
+              </div>
+            }
           </div>
-        </div>
-      </Draggable>
+        </Draggable>
+      </div>
     );
+  }
+  public toggleExpanded = () => {
+    this.setState({ expanded: !this.state.expanded });
   }
 }
