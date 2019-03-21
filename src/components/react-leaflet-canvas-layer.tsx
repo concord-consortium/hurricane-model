@@ -8,8 +8,8 @@ interface ILeafletCanvasLayer extends Layer {
 
 interface IProps extends MapLayerProps {
   drawMethod: (info: any) => void;
-  onMouseMove: (event: MouseEvent, pos: Point) => void;
-  onMouseClick: (event: MouseEvent, pos: Point) => void;
+  onMouseMove?: (event: MouseEvent, pos: Point) => void;
+  onMouseClick?: (event: MouseEvent, pos: Point) => void;
   data?: any;
 }
 

@@ -1,57 +1,86 @@
-import {MapLayer, MapLayerProps, withLeaflet} from "react-leaflet";
-import LeafletWebGLHeatmap from "../leaflet-webgl-heatmap/leaflet-webgl-heatmap";
-import { IPrecipitationPoint } from "../types";
-import { inject } from "mobx-react";
-import { observe } from "mobx";
-import { IStores } from "../models/stores";
+// @ts-ignore
+import WebGLHeatmap from "../webgl-heatmap/webgl-heatmap";
+import CanvasLayer from "./react-leaflet-canvas-layer";
+import { ICoordinates } from "../types";
+import {inject, observer} from "mobx-react";
+import { autorun } from "mobx";
 import * as PrecipitationScaleSrc from "../assets/precipitation-scale.png";
+import {BaseComponent, IBaseProps} from "./base";
+import * as React from "react";
+import * as L from "leaflet";
 
-interface IProps extends MapLayerProps {
-  stores?: IStores;
-  data?: IPrecipitationPoint[];
-}
+interface IProps extends IBaseProps {}
+interface IState {}
+
+const alphaRange = 0.025;
 
 @inject("stores")
-class PrecipitationLayerBase extends MapLayer<IProps> {
-  public heatmap: any;
+@observer
+export class PrecipitationLayer extends BaseComponent<IProps, IState> {
+  public webglHeatmap: any = null;
+  private autoUpdateDispose: () => void;
 
-  get stores() {
-    return (this.props as IProps).stores as IStores;
-  }
-
-  public createLeafletElement(props: IProps) {
-    // @ts-ignore
-    this.heatmap = new LeafletWebGLHeatmap({
-      opacity: 0.7,
-      alphaRange: 0.025,
-      gradientTexture: PrecipitationScaleSrc
+  public componentDidMount(): void {
+    this.autoUpdateDispose = autorun(() => {
+      // Use MobX autorun to observe all the store properties that are necessary to update wind arrows.
+      this.updateData();
     });
+  }
 
-    // This components supports both regular props or being attached directly to MobX store.
-    // TODO: check performance and pick faster option.
-    if (!props.data) {
-      // Use MobX observer.
-      this.heatmap.setData(this.stores.simulation.precipitationPoints);
-      observe(this.stores.simulation, "precipitationPoints", () => {
-        this.updateData(this.stores.simulation.precipitationPoints);
+  public componentWillUnmount(): void {
+    this.autoUpdateDispose();
+  }
+
+  public render() {
+    return (
+      <CanvasLayer drawMethod={this.drawCanvas}/>
+    );
+  }
+
+  private drawCanvas = (info: any) => {
+    if (!this.webglHeatmap) {
+      // @ts-ignore
+      this.webglHeatmap = new WebGLHeatmap({
+        canvas: info.canvas,
+        gradientTexture: PrecipitationScaleSrc,
+        alphaRange: [0, alphaRange]
       });
-    } else {
-      // Stick to regular props.
-      this.heatmap.setData(props.data);
+      info.canvas.style.opacity = 0.7;
     }
-
-    return this.heatmap;
+    this.webglHeatmap.adjustSize();
+    this.updateData();
   }
 
-  public updateLeafletElement(fromProps: IProps, toProps: IProps) {
-    if (toProps.data) {
-      this.updateData(toProps.data);
-    }
-  }
+  private updateData() {
+    const data = this.stores.simulation.precipitationPoints;
+    const latLngToContainerPoint = this.stores.ui.latLngToContainerPoint;
 
-  public updateData(precipitationPoints: IPrecipitationPoint[]) {
-    this.heatmap.setData(precipitationPoints);
+    const scaleFn = (latlng: ICoordinates, size: number) => {
+      // Necessary to maintain accurately sized circles to change scale to miles (for example), you will need
+      // to convert 40075017 (equatorial circumference of the Earth in metres) to miles.
+      const lngRadius = (size / 40075017) * 360 / Math.cos((Math.PI / 180) * latlng.lat);
+      const latlng2 = new L.LatLng(latlng.lat, latlng.lng - lngRadius);
+      const point = latLngToContainerPoint(latlng);
+      const point2 = latLngToContainerPoint(latlng2);
+
+      return Math.max(Math.round(point.x - point2.x), 1);
+    };
+
+    const heatmap = this.webglHeatmap;
+    heatmap.clear();
+    if (data.length > 0) {
+      for (const dataVal of data) {
+        const latLng = { lat: dataVal[0], lng: dataVal[1] };
+        const point = latLngToContainerPoint(latLng);
+        heatmap.addPoint(
+          Math.floor(point.x),
+          Math.floor(point.y),
+          scaleFn(latLng, dataVal[3]),
+          dataVal[2]
+        );
+      }
+      heatmap.update();
+    }
+    heatmap.display();
   }
 }
-
-export const PrecipitationLayer = withLeaflet(PrecipitationLayerBase);
