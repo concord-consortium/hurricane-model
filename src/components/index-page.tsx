@@ -8,6 +8,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import config from "../config";
 
 import * as css from "./index-page.scss";
+import { TemperatureScale } from "./temperature-scale";
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -32,6 +33,7 @@ export class IndexPage extends BaseComponent<IProps, IState> {
             Steps per second: { this.stores.simulation.stepsPerSecond.toFixed(1) }
           </div>
         }
+        <TemperatureScale />
       </div>
     );
   }
