@@ -2,7 +2,7 @@
 
 .rightPanelContainer {
   overflow-x: hidden;
-  width: $rightPanelWidth + $mapTabWidth;
+  width: $rightPanelContainerWidth + $mapTabWidth;
   height: 100%;
   position: absolute;
   z-index: 1000;
