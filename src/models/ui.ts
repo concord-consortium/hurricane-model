@@ -1,6 +1,7 @@
 import {action, observable} from "mobx";
 import {LatLngExpression, Map, Point, LatLngBoundsLiteral} from "leaflet";
 import config from "../config";
+import { mapLayer } from "../map-layer-tiles";
 
 // North Atlantic.
 export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, -10]];
@@ -15,6 +16,8 @@ export class UIModel {
     windArrows: config.windArrowsOpacity,
     seaSurfaceTemp: config.seaSurfaceTempOpacity
   };
+  @observable public mapTile = mapLayer("satellite");
+
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
   @action.bound public mapUpdated(map: Map, programmaticUpdate: boolean) {
@@ -45,5 +48,9 @@ export class UIModel {
 
   @action.bound public setOpacity(prop: TranslucentLayer, value: number) {
     this.layerOpacity[prop] = value;
+  }
+
+  @action.bound public setMapTiles(value: string) {
+    this.mapTile = mapLayer(value);
   }
 }

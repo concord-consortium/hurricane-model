@@ -80,6 +80,24 @@
     flex-direction: column;
   }
 
+  :global(.leaflet-control-attribution) {
+    background: rgba(255, 255, 255, 0.35) !important;
+    height: 13px;
+    font-family: $scaleFont;
+    font-size: 11px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: condensed;
+    line-height: normal;
+    letter-spacing: normal;
+    color: $controlLabel;
+    transition: 0.1s;
+  }
+  :global(.leaflet-control-attribution:hover) {
+    background: rgba(255, 255, 255, 0.7) !important;
+
+  }
+
   .resetViewContainer {
     order: 1;
   }

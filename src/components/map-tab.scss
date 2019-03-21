@@ -1,0 +1,63 @@
+@import "common";
+
+.mapTab {
+  display: inline-block;
+  width: $mapTabWidth;
+  height: $mapTabHeight;
+
+  .mapTabBack {
+    width: $mapTabWidth;
+    height: $mapTabHeight;
+    border-radius: 9px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    position: relative;
+    border: 1px solid $controlIconLine;
+    border-right: 0;
+    margin-left: -2px;
+    &.geoMaps {
+      background-color: $tabGeoLight;
+    }
+    &.impactMaps {
+      background-color: $tabImpactLight;
+    }
+    &.active {
+      margin-left: -1px;
+    }
+
+    .mapTabImage {
+      position: absolute;
+      width: 49px;
+      height: 44px;
+      border-radius: 9px;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      top: 4px;
+      left: 4px;
+      padding-right: 0;
+      background-repeat: no-repeat;
+      background-size: contain;
+      cursor: pointer;
+      &:hover {
+        opacity: 0.75;
+      }
+    }
+    .mapTabContent {
+      position: relative;
+      top: 4px;
+      left: 4px;
+      height: 30px;
+      font-family: Lato;
+      font-size: 14px;
+      font-weight: bold;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1;
+      letter-spacing: normal;
+      text-align: center;
+      color: $controlLabel;
+      padding-top: 6px;
+      pointer-events: none;
+    }
+  }
+}
