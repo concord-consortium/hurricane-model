@@ -14,11 +14,15 @@
     position: relative;
     border: 1px solid $controlIconLine;
     border-right: 0;
+    margin-left: -2px;
     &.geoMaps {
       background-color: $tabGeoLight;
     }
     &.impactMaps {
       background-color: $tabImpactLight;
+    }
+    &.active {
+      margin-left: -1px;
     }
 
     .mapTabImage {

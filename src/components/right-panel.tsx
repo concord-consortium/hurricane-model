@@ -32,10 +32,10 @@ export class RightPanel extends BaseComponent<IProps, IState> {
       <div className={css.rightPanelContainer}>
         <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
           <ul className={css.rightPanelTabs}>
-            <li><div id={"geo"} className={css.rightPanelTab}
-              onClick={this.handleToggleDrawer}><MapTab tabType={"geo"} /></div></li>
-            <li><div id={"impact"} className={css.rightPanelTab}
-              onClick={this.handleToggleDrawer}><MapTab tabType={"impact"} /></div></li>
+            <li><div id={"geo"} className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
+              <MapTab tabType={"geo"} active={selectedTab === "geo" || !open} /></div></li>
+            <li><div id={"impact"} className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
+              <MapTab tabType={"impact"} active={selectedTab === "impact" || !open} /></div></li>
           </ul>
           {selectedTab === "geo" &&
             <div className={`${css.tabContentBack} ${css.geoMaps}`} data-test="geo-panel">

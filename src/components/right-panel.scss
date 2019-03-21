@@ -30,7 +30,6 @@
       right: 0;
       list-style-type: none;
       padding-top: $mapTabVerticalSpacing;
-
     }
     .rightPanelTab {
       margin-top: $mapTabVerticalSpacing;
@@ -45,7 +44,6 @@
       right: 0;
       min-height: 618px;
       height: 100%;
-
       &.geoMaps {
         background-color: $tabGeoLight;
       }
