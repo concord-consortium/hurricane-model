@@ -95,6 +95,8 @@ const LeafletCanvasLayer = (Layer || Class).extend({
     const size = this._map.getSize();
     canvas.width = size.x;
     canvas.height = size.y;
+    canvas.style.width = size.x + "px";
+    canvas.style.height = size.y + "px";
 
     const animated = this._map.options.zoomAnimation && Browser.any3d;
     DomUtil.addClass(canvas, "leaflet-canvas-layer leaflet-layer leaflet-zoom-" + (animated ? "animated" : "hide"));
@@ -145,9 +147,11 @@ const LeafletCanvasLayer = (Layer || Class).extend({
     const size = this._map.getSize();
     if (this.canvas.width !== size.x) {
       this.canvas.width = size.x;
+      this.canvas.style.width = size.x + "px";
     }
     if (this.canvas.height !== size.y) {
       this.canvas.height = size.y;
+      this.canvas.style.height = size.y + "px";
     }
 
     this._redraw();

@@ -71,7 +71,8 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
         transparent: true,
         antialias: true,
         autoStart: false, // do not start animation, render only when necessary
-        view: info.canvas
+        view: info.canvas,
+        resolution: window.devicePixelRatio
       });
     }
     this.pixiApp.renderer.resize(info.canvas.width, info.canvas.height);
