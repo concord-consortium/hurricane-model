@@ -1,4 +1,4 @@
-import {LatLngExpression, Point, Map, CRS, LatLngBounds} from "leaflet";
+import {LatLngExpression, CRS, LatLngBounds} from "leaflet";
 import { action, observable, computed, autorun } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
@@ -11,12 +11,13 @@ import * as marchSeaTemp from "../../sea-surface-temp-img/mar.png";
 import * as juneSeaTemp from "../../sea-surface-temp-img/jun.png";
 import * as septSeaTemp from "../../sea-surface-temp-img/sep.png";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall } from "../types";
+import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint } from "../types";
 import { vecAverage } from "../math-utils";
 import { headingTo, moveTo, distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
 import config from "../config";
+import { random } from "../seedrandom";
 
 interface IWindDataset {
   winter: IWindPoint[];
@@ -78,6 +79,8 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
 // Landfall is detected when hurricane moves from sea to land. To avoid detecting too many landfalls, assume that
 // hurricane needs to travel over sea for some time before next landfall is detected.
 export const minStepsOverSeaToDetectLandfall = 10;
+const benchmarkInterval = 30;
+const precipitationUpdateInterval = 5;
 
 export class SimulationModel {
   // Region boundaries. Used only for optimization.
@@ -93,6 +96,8 @@ export class SimulationModel {
   @observable public season: Season;
 
   @observable public seaSurfaceTempData: PNG | null = null;
+
+  @observable public precipitationPoints: IPrecipitationPoint[] = [];
 
   // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
   @observable public simulationFinished = false;
@@ -111,12 +116,15 @@ export class SimulationModel {
 
   @observable public landfalls: ILandfall[] = [];
 
+  @observable public stepsPerSecond = 0;
+
   // Callbacks used by tests.
   public _seaSurfaceTempDataParsed: () => void;
 
   public numberOfStepsOverSea = 0;
 
   private initialOptions: ISimulationOptions;
+  private previousTimestamp = 0;
 
   constructor(options?: ISimulationOptions) {
     if (!options) {
@@ -218,6 +226,17 @@ export class SimulationModel {
     return result;
   }
 
+  @computed get precipitationPointsWithinBounds() {
+    // Why do we need margin? Otherwise, precipitation heatmap around screen edges will be disappearing.
+    // We also need to ensure that we never cut area more than size of a single heatmap point. Otherwise, when user
+    // keeps zooming in, some points will get cut off and the final color would change.
+    const margin = Math.max(4, this.areaWidth * 0.1);
+    return this.precipitationPoints.filter((p: IPrecipitationPoint) =>
+      p[0] >= this.south - margin && p[0] <= this.north + margin &&
+      p[1] >= this.west - margin && p[1] <= this.east + margin
+    );
+  }
+
   @computed get seaSurfaceTempImgUrl() {
     return sstImages[this.season];
   }
@@ -241,7 +260,12 @@ export class SimulationModel {
     pressureSystem.checkPressureSystem(this.pressureSystems);
   }
 
-  @action.bound public tick() {
+  @action.bound public tick(timestamp = window.performance.now()) {
+    if (this.time % benchmarkInterval === 0) {
+      this.stepsPerSecond = 1000 / (timestamp - this.previousTimestamp) * benchmarkInterval;
+      this.previousTimestamp = timestamp;
+    }
+
     if (this.time % config.trackSegmentLength === 0) {
       this.hurricaneTrack.push({
         position: Object.assign({}, this.hurricane.center),
@@ -268,6 +292,10 @@ export class SimulationModel {
       this.numberOfStepsOverSea += 1;
     } else {
       this.numberOfStepsOverSea = 0;
+    }
+
+    if (this.time % precipitationUpdateInterval === 0) {
+      this.addPrecipitation();
     }
 
     this.time += config.timestep;
@@ -298,6 +326,30 @@ export class SimulationModel {
     }
   }
 
+  @action.bound public addPrecipitation() {
+    const newPoints: IPrecipitationPoint[] = [];
+    for (let steps = 0; steps < precipitationUpdateInterval; steps++) {
+      const range = 8;
+      // Add a single, large point to represent general, light precipitation.
+      newPoints.push([
+        this.hurricane.center.lat + (random() * range - 0.5 * range),
+        this.hurricane.center.lng + (random() * range - 0.5 * range),
+        0.007,
+        900000
+      ]);
+      // Add a few smaller but more intense points to make precipitation data more interesting.
+      for (let i = 0; i < 3; i++) {
+        newPoints.push([
+          this.hurricane.center.lat + (random() * range - 0.5 * range),
+          this.hurricane.center.lng + (random() * range - 0.5 * range),
+          0.002 * (this.hurricane.category + 8),
+          300000
+        ]);
+      }
+    }
+    this.precipitationPoints.push(...newPoints);
+  }
+
   @action.bound public start() {
     this.simulationRunning = true;
     if (!this.simulationStarted) {
@@ -321,6 +373,7 @@ export class SimulationModel {
     this.pressureSystems =
       (this.initialOptions.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
     this.numberOfStepsOverSea = 0;
+    this.precipitationPoints = [];
   }
 
   @action.bound public removePressureSystem(ps: PressureSystem) {

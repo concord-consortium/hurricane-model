@@ -7,6 +7,8 @@ export interface MapTileLayer {
   subdomains: string[];
 }
 
+export type GeoMap = "satellite" | "street" | "relief";
+
 const layerInfo: MapTileLayer[] = [
   {
     mapType: "satellite",
@@ -38,7 +40,6 @@ const layerInfo: MapTileLayer[] = [
   }
 ];
 
-export function mapLayer(layerType: string) {
-  const layer: MapTileLayer = layerInfo.find(m => m.mapType === layerType) || layerInfo[0];
-  return layer;
+export function mapLayer(layerType: GeoMap): MapTileLayer {
+  return layerInfo.find(m => m.mapType === layerType) || layerInfo[0];
 }

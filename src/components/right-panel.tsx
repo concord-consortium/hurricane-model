@@ -2,7 +2,6 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapTab } from "./map-tab";
-import config from "../config";
 
 import * as css from "./right-panel.scss";
 import { MapButton } from "./map-button";
@@ -37,24 +36,23 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             <li><div id={"impact"} className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
               <MapTab tabType={"impact"} active={selectedTab === "impact" || !open} /></div></li>
           </ul>
-          {selectedTab === "geo" &&
+          {
+            selectedTab === "geo" &&
             <div className={`${css.tabContentBack} ${css.geoMaps}`} data-test="geo-panel">
               <div className={css.tabContent}>
                 <div className={css.drawerTitle}>Geologic Maps</div>
-                <MapButton label="Satellite" mapType={selectedTab} />
-                <MapButton label="Relief" mapType={selectedTab} />
-                <MapButton label="Street" mapType={selectedTab} />
+                <MapButton label="Satellite" value="satellite" mapType={selectedTab} />
+                <MapButton label="Relief" value="relief" mapType={selectedTab} />
+                <MapButton label="Street" value="street"  mapType={selectedTab} />
               </div>
             </div>
           }
-          {selectedTab === "impact" &&
+          {
+            selectedTab === "impact" &&
             <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="impact-panel">
                 <div className={css.tabContent}>
                   <div className={css.drawerTitle}>Impact Maps</div>
-                  <MapButton label="Population" mapType={selectedTab} />
-                  <MapButton label="Storm Surge" mapType={selectedTab} />
-                  <MapButton label="Precipitation" mapType={selectedTab} />
-                  <MapButton label="Vulnerability" mapType={selectedTab} />
+                  <MapButton label="Precipitation" value="precipitation" mapType={"impact"} />
                 </div>
             </div>
           }

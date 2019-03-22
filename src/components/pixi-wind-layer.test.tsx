@@ -1,7 +1,7 @@
 import * as React from "react";
 import {PixiWindLayer} from "./pixi-wind-layer";
 import {mount} from "enzyme";
-import * as CanvasLayer from "react-leaflet-canvas-layer";
+import CanvasLayer from "./react-leaflet-canvas-layer";
 import {createStores} from "../models/stores";
 import {Provider} from "mobx-react";
 import {Map} from "react-leaflet";

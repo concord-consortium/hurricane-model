@@ -7,7 +7,7 @@
     "testURL": "https://hurricane-model.unexisting.url.com",
     "setupTestFrameworkScriptFile": "<rootDir>src/setupTests.js",
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      ".(ts|tsx|js)": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "testPathIgnorePatterns": [
@@ -133,7 +133,6 @@
     "react-dom": "^16.8.4",
     "react-jsonschema-form": "^1.3.0",
     "react-leaflet": "^2.2.1",
-    "react-leaflet-canvas-layer": "^1.0.0",
     "react-leaflet-control": "^2.1.1",
     "seedrandom": "^3.0.1"
   }

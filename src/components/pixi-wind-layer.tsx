@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as CanvasLayer from "react-leaflet-canvas-layer";
+import CanvasLayer from "./react-leaflet-canvas-layer";
 import {inject, observer} from "mobx-react";
 import {BaseComponent, IBaseProps} from "./base";
 import * as PIXI from "pixi.js";
@@ -49,13 +49,17 @@ interface IState {}
 @observer
 export class PixiWindLayer extends BaseComponent<IProps, IState> {
   public pixiApp: PIXI.Application | null = null;
+  private disposeObserver: () => void;
 
   public componentDidMount(): void {
-    autorun(() => {
+    this.disposeObserver = autorun(() => {
       // Use MobX autorun to observe all the store properties that are necessary to update wind arrows.
       this.updateArrows();
-      this.pixiApp!.render();
     });
+  }
+
+  public componentWillUnmount(): void {
+    this.disposeObserver();
   }
 
   public render() {
@@ -71,16 +75,17 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
         transparent: true,
         antialias: true,
         autoStart: false, // do not start animation, render only when necessary
-        view: info.canvas
+        view: info.canvas,
+        resolution: window.devicePixelRatio
       });
     }
     this.pixiApp.renderer.resize(info.canvas.width, info.canvas.height);
-    this.updateArrows();
     this.pixiApp.render();
   }
 
   private updateArrows() {
-    const stage = this.pixiApp!.stage;
+    if (!this.pixiApp) return;
+    const stage = this.pixiApp.stage;
     const opacity = this.stores.ui.layerOpacity.windArrows;
     stage.alpha = opacity;
     if (opacity === 0) {
@@ -113,5 +118,6 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
     if (stage.children.length > data.length) {
       stage.removeChildren(data.length);
     }
+    this.pixiApp.render();
   }
 }

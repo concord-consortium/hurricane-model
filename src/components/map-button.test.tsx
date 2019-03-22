@@ -3,7 +3,6 @@ import { mount } from "enzyme";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { MapButton } from "./map-button";
-import { MapType } from "./right-panel";
 
 describe("MapButton component", () => {
   let stores = createStores();
@@ -14,24 +13,37 @@ describe("MapButton component", () => {
   it("renders basic components", () => {
     const wrapper = mount(
       <Provider stores={stores}>
-        <MapButton mapType={"geo"} label={"Street"} />
+        <MapButton mapType="geo" label="Street" value="street" />
       </Provider>
     );
     expect(wrapper.find(MapButton).length).toBe(1);
   });
 
   it("reacts to click and changes map layer", () => {
-
     jest.spyOn(stores.ui, "setMapTiles");
     const wrapper = mount(
       <Provider stores={stores}>
-        <MapButton mapType={"geo"} label={"Street"} />
+        <MapButton mapType="geo" label="Street" value="street" />
       </Provider>
     );
     const btn = (wrapper.find(MapButton).instance() as any).wrappedInstance as MapButton;
-    expect(stores.ui.mapTile.mapType === "satellite");
+    expect(stores.ui.mapTile.mapType).toEqual("satellite");
     btn.handleMapSelect();
     expect(stores.ui.setMapTiles).toHaveBeenCalled();
-    expect(stores.ui.mapTile.mapType === "street");
+    expect(stores.ui.mapTile.mapType).toEqual("street");
+  });
+
+  it("reacts to click and changes map overlay", () => {
+    jest.spyOn(stores.ui, "setOverlay");
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <MapButton mapType="impact" label="Precipitation" value="precipitation" />
+      </Provider>
+    );
+    const btn = (wrapper.find(MapButton).instance() as any).wrappedInstance as MapButton;
+    expect(stores.ui.overlay).toEqual(null);
+    btn.handleMapSelect();
+    expect(stores.ui.setOverlay).toHaveBeenCalled();
+    expect(stores.ui.overlay).toEqual("precipitation");
   });
 });

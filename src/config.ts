@@ -12,6 +12,10 @@ const DEFAULT_CONFIG: any = {
   authoring: false,
   // Sets base wind data (and sea temperature in the future). "fall", "winter", "spring", or "summer".
   season: "fall",
+  // One of the available maps: "satellite", "relief" or "street".
+  map: "satellite",
+  // Map overlay, for now null (disabled) or "precipitation".
+  overlay: null,
   // If set to false, user won"t be able to drag and zoom map.
   navigation: false,
   timestep: 1,
@@ -46,6 +50,8 @@ const DEFAULT_CONFIG: any = {
   markLandfalls: true,
   windArrowsOpacity: 0.5,
   seaSurfaceTempOpacity: 0.5,
+  // Enables steps per second display.
+  benchmark: false,
   // --- UI elements can be shown or hidden using options below ---
   seasonButton: true,
   windArrowsSlider: true,

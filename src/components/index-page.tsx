@@ -5,6 +5,7 @@ import { MapView } from "./map-view";
 import { BottomBar } from "./bottom-bar";
 import { RightPanel } from "./right-panel";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import config from "../config";
 
 import * as css from "./index-page.scss";
 
@@ -25,6 +26,12 @@ export class IndexPage extends BaseComponent<IProps, IState> {
         <MapView />
         <RightPanel />
         <BottomBar />
+        {
+          config.benchmark &&
+          <div className={css.stepsPerSecond}>
+            Steps per second: { this.stores.simulation.stepsPerSecond.toFixed(1) }
+          </div>
+        }
       </div>
     );
   }

@@ -226,6 +226,7 @@ describe("SimulationModel store", () => {
       sim.seaSurfaceTempAt = jest.fn();
       expect(sim.time).toEqual(0);
       expect(sim.hurricaneTrack.length).toEqual(0);
+      expect(sim.precipitationPoints.length).toEqual(0);
       const oldPos = sim.hurricane.center;
       sim.tick();
       expect(sim.time).toBeGreaterThan(0);
@@ -239,6 +240,7 @@ describe("SimulationModel store", () => {
       expect(sim.hurricaneTrack[0].position).toEqual(oldPos);
       expect(sim.hurricaneTrack[0].position).not.toBe(oldPos); // we expect a copy
       expect(sim.numberOfStepsOverSea).toEqual(1);
+      expect(sim.precipitationPoints.length).toBeGreaterThan(0);
     });
 
     it("handles landfall detection", () => {
