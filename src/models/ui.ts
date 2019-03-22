@@ -1,12 +1,14 @@
 import {action, observable} from "mobx";
 import {LatLngExpression, Map, Point, LatLngBoundsLiteral} from "leaflet";
 import config from "../config";
-import { mapLayer } from "../map-layer-tiles";
+import { mapLayer, GeoMap } from "../map-layer-tiles";
 
 // North Atlantic.
 export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, -10]];
 
 export type TranslucentLayer = "windArrows" | "seaSurfaceTemp";
+
+export type Overlay = "precipitation" | null;
 
 export class UIModel {
   @observable public initialBounds = NorthAtlanticInitialBounds;
@@ -16,7 +18,8 @@ export class UIModel {
     windArrows: config.windArrowsOpacity,
     seaSurfaceTemp: config.seaSurfaceTempOpacity
   };
-  @observable public mapTile = mapLayer("satellite");
+  @observable public mapTile = mapLayer(config.map);
+  @observable public overlay: Overlay = config.overlay;
 
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
@@ -50,7 +53,11 @@ export class UIModel {
     this.layerOpacity[prop] = value;
   }
 
-  @action.bound public setMapTiles(value: string) {
+  @action.bound public setMapTiles(value: GeoMap) {
     this.mapTile = mapLayer(value);
+  }
+
+  @action.bound public setOverlay(value: Overlay) {
+    this.overlay = value;
   }
 }

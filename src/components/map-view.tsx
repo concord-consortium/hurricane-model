@@ -92,7 +92,7 @@ export class MapView extends BaseComponent<IProps, IState> {
             bounds={imageOverlayBounds}
           />
           {
-            sim.simulationStarted && <PrecipitationLayer/>
+            ui.overlay === "precipitation" && <PrecipitationLayer/>
           }
           <HurricaneTrack />
           {
