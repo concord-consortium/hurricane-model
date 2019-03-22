@@ -1,15 +1,19 @@
 @import "common";
+
+$temperatureScaleWidth: 308px;
+$innerEdgePadding: 12px;
+
 .temperatureContainer {
   top: 0;
   left: 0;
   width: 100%;
-   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + 1});
+  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + 1});
 
   .temperatureScale {
     position: absolute;
     top: 300px;
     left: 200px;
-    width: 308px;
+    width: $temperatureScaleWidth;
     height: 28px;
     border-radius: 10px;
     box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
@@ -67,10 +71,21 @@
         }
       }
     }
-
+    $barSegmentWidth: ($temperatureScaleWidth - $innerEdgePadding - $innerEdgePadding) / 10;
     .scaleContainer {
       font-family: $scaleFont;
       padding: 7px;
+
+      .scaleGradient {
+        height: 8px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        border-radius: 4px;
+        width: calc(#{$barSegmentWidth * 9});
+        margin-right: 16px;
+        margin-top: -37px;
+        float: right;
+      }
     }
 
     .subheaders {
@@ -87,8 +102,8 @@
       }
     }
 
-    .degC {
-      display: inline-block;
+    .degC, .degF {
+      float:right;
       vertical-align: bottom;
       font-weight: bold;
       font-size: 11px;
@@ -97,7 +112,7 @@
 
     .temperatureContainer {
       display: inline-block;
-      width: 24px;
+      width: $barSegmentWidth;
       vertical-align: top;
       margin-top: 5px;
       text-align: center;
@@ -119,35 +134,16 @@
         border-top: $bottomBarBorderStyle;
         border-bottom: $bottomBarBorderStyle;
       }
+      .spacer {
+        height: 19px;
+      }
       .barTemperature0 {
-        background: $temperature0Color;
         border-top-left-radius: 4px;
         border-bottom-left-radius: 4px;
         border-left: $bottomBarBorderStyle;
       }
-      .barTemperature1 {
-        background: $temperature1Color;
-      }
-      .barTemperature2 {
-        background: $temperature2Color;
-      }
-      .barTemperature3 {
-        background: $temperature3Color;
-      }
-      .barTemperature4 {
-        background: $temperature4Color;
-      }
-      .barTemperature5 {
-        background: $temperature5Color;
-      }
-      .barTemperature6 {
-        background: $temperature6Color;
-      }
-      .barTemperature7 {
-        background: $temperature7Color;
-      }
+
       .barTemperature8 {
-        background: $temperature8Color;
         border-top-right-radius: 4px;
         border-bottom-right-radius: 4px;
         border-right: $bottomBarBorderStyle;

@@ -1,7 +1,8 @@
 import * as React from "react";
 import Draggable from "react-draggable";
-
 import DragIcon from "../assets/drag.svg";
+import * as tscale from "../temperature-scale";
+import * as scaleKey from "../../sea-surface-temp-img/tempScaleKey.png";
 import * as css from "./temperature-scale.scss";
 
 interface IProps {}
@@ -26,6 +27,8 @@ const getFahrenheit = (celcius: number) => {
 
 const renderTemperature = (temperature: number) => {
   const barClass = `${css.bar} ${css[`barTemperature${temperature}`]}`;
+  const temperatureColor = tscale.temperatureScale(temperature);
+  console.log(temperatureColor);
   return (
     <div key={temperature} className={css.temperatureContainer}>
       <div className={css.temperatureValue}>{ getFahrenheit(surfaceTemperature[temperature]) }</div>
@@ -61,12 +64,13 @@ export class TemperatureScale extends React.PureComponent<IProps, IState> {
             </div>
             {expanded &&
               <div className={css.scaleContainer}>
-                <div className={css.subheaders}>
-                  <div className={css.temperatureFLabel}>Temperature (F)</div>
-                  <div className={css.temperatureCLabel}>Temperature (C)</div>
+              {temperatures.map(temp => renderTemperature(temp))}
+              <div className={css.temperatureContainer}>
+                <div className={css.temperatureValue}>&deg;F</div>
+                <div className={css.spacer} />
+                <div className={css.temperatureRange}>&deg;C</div>
                 </div>
-                {temperatures.map(temp => renderTemperature(temp))}
-                <div className={css.degC}>&deg;C</div>
+              <div className={css.scaleGradient} style={{ backgroundImage: `url(${scaleKey}` }}/>
               </div>
             }
           </div>
