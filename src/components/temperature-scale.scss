@@ -2,13 +2,9 @@
 
 $temperatureScaleWidth: 308px;
 $innerEdgePadding: 12px;
+$animationDuration: 0.3s;
 
 .temperatureContainer {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + 1});
-
   .temperatureScale {
     position: absolute;
     top: 300px;
@@ -20,7 +16,7 @@ $innerEdgePadding: 12px;
     border: solid 1px $controlIconLine;
     background-color: white;
     z-index: 500;
-    transition: height, 0.3s;
+    transition: height, $animationDuration;
     &.expanded {
       height: 94px;
     }
@@ -55,12 +51,14 @@ $innerEdgePadding: 12px;
         width: 16px;
         height: 16px;
         border-radius: 5px;
-        background-color: $minMaxKeyBackground;
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
         &.expanded {
           justify-content: flex-end;
+        }
+        &:hover {
+          background-color: $minMaxKeyBackground;
         }
         .minMaxIcon {
           width: 10px;
@@ -71,7 +69,8 @@ $innerEdgePadding: 12px;
         }
       }
     }
-    $barSegmentWidth: ($temperatureScaleWidth - $innerEdgePadding - $innerEdgePadding) / 9;
+    $barSegmentWidth: ($temperatureScaleWidth) / 9;
+    $barSegmentWidthfix: 32px;
     .scaleContainer {
       font-family: $scaleFont;
       padding: 7px;
@@ -101,22 +100,50 @@ $innerEdgePadding: 12px;
       }
     }
 
-    .temperatureContainer {
+    .temperatureContainer, .temperatureUnitsContainer {
       display: inline-block;
       width: $barSegmentWidth;
       vertical-align: top;
-      margin-top: 5px;
       text-align: center;
+      transition-delay: all $animationDuration;
 
       .temperatureValue {
         color: $controlLabel;
+        font-family: $scaleFont;
+        font-size: 12px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: condensed;
+        line-height: normal;
+        letter-spacing: normal;
+        font-weight: normal;
       }
+
       .temperatureRange {
         color: $controlLabel;
       }
       .dot {
         line-height: 2px;
         margin-bottom: 6px;
+      }
+    }
+    .temperatureUnitsContainer {
+      width: 12px;
+      height: 21px;
+      position: relative;
+      .temperatureUnitsC, .temperatureUnitsF {
+
+        color: $controlLabel;
+        text-align: left;
+        font-weight: bold;
+      }
+      .temperatureUnitsF {
+        position: absolute;
+        bottom: 8px;
+      }
+      .temperatureUnitsC {
+        position: absolute;
+        bottom: 0;
       }
     }
   }

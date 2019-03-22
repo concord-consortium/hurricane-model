@@ -4,34 +4,49 @@ import DragIcon from "../assets/drag.svg";
 import * as scaleKey from "../../sea-surface-temp-img/tempScaleKey.png";
 import * as css from "./temperature-scale.scss";
 
-interface IProps { }
+interface IProps {}
 interface IState {
   expanded: boolean;
 }
 
 const getFahrenheit = (celcius: number) => {
-  return Math.round((celcius * 9 / 5) + 32);
+  return (celcius * 9 / 5) + 32;
 };
 
 const renderTemperatureLabels = (increments: number) => {
   const celciusLabels = [];
   const fahrenheitLabels = [];
   for (let i = 0; i < increments; i++) {
-    celciusLabels.push(
-      <div key={"celcius" + i} className={css.temperatureContainer}>
-        <div className={css.temperatureRange}>{i * 4}</div>
-        <div className={css.dot}>.</div>
-      </div>);
+    const celciusValue = i * 4;
+    const symbol = i === 0 ? <span>&lt;</span> : i === (increments - 1) ? <span>&ge;</span> : "";
+
     fahrenheitLabels.push(
       <div key={"fahrenheit" + i} className={css.temperatureContainer}>
-        <div className={css.temperatureRange}>{getFahrenheit(i * 4)}</div>
+        <div className={css.temperatureRange}>
+          {symbol}
+          {getFahrenheit(celciusValue)}
+        </div>
         <div className={css.dot}>.</div>
       </div>);
+
+    celciusLabels.push(
+      <div key={"celcius" + i} className={css.temperatureContainer}>
+        <div className={css.dot}>.</div>
+        <div className={css.temperatureRange}>
+          {symbol}
+          {celciusValue}{".0"}
+        </div>
+      </div>);
   }
-  celciusLabels.push(<div className={css.temperatureContainer}>
-    <div className={css.temperatureValue}>&deg;C</div></div>);
-  fahrenheitLabels.push(<div className={css.temperatureContainer}>
-                <div className={css.temperatureValue}>&deg;F</div></div>);
+  celciusLabels.push(
+    <div className={css.temperatureUnitsContainer}>
+      <div className={css.temperatureUnitsC}>&deg;C</div>
+    </div>);
+  fahrenheitLabels.push(
+    <div className={css.temperatureUnitsContainer}>
+      <div className={css.temperatureUnitsF}>&deg;F</div>
+    </div>);
+
   return <div className={css.scaleContainer}>
     {fahrenheitLabels}
     <div className={css.scaleGradient} style={{ backgroundImage: `url(${scaleKey}` }} />
@@ -50,7 +65,7 @@ export class TemperatureScale extends React.PureComponent<IProps, IState> {
       <div className={css.temperatureContainer}>
         <Draggable
           axis="both"
-          bounds="parent"
+          bounds="body"
           handle="strong"
         >
           <div className={`${css.temperatureScale} ${expanded ? css.expanded : ""}`}>
