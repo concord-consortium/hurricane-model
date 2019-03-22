@@ -226,6 +226,17 @@ export class SimulationModel {
     return result;
   }
 
+  @computed get precipitationPointsWithinBounds() {
+    // Why do we need margin? Otherwise, precipitation heatmap around screen edges will be disappearing.
+    // We also need to ensure that we never cut area more than size of a single heatmap point. Otherwise, when user
+    // keeps zooming in, some points will get cut off and the final color would change.
+    const margin = Math.max(4, this.areaWidth * 0.1);
+    return this.precipitationPoints.filter((p: IPrecipitationPoint) =>
+      p[0] >= this.south - margin && p[0] <= this.north + margin &&
+      p[1] >= this.west - margin && p[1] <= this.east + margin
+    );
+  }
+
   @computed get seaSurfaceTempImgUrl() {
     return sstImages[this.season];
   }
@@ -319,7 +330,7 @@ export class SimulationModel {
     const newPoints: IPrecipitationPoint[] = [];
     for (let steps = 0; steps < precipitationUpdateInterval; steps++) {
       const range = 8;
-      // Add a single, large point to represent general, light snowfall.
+      // Add a single, large point to represent general, light precipitation.
       newPoints.push([
         this.hurricane.center.lat + (random() * range - 0.5 * range),
         this.hurricane.center.lng + (random() * range - 0.5 * range),

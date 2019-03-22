@@ -51,7 +51,7 @@ export class PrecipitationLayer extends BaseComponent<IProps, IState> {
   }
 
   private updateData() {
-    const data = this.stores.simulation.precipitationPoints;
+    const data = this.stores.simulation.precipitationPointsWithinBounds;
     const latLngToContainerPoint = this.stores.ui.latLngToContainerPoint;
 
     const scaleFn = (latlng: ICoordinates, size: number) => {
