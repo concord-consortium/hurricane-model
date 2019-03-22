@@ -2,10 +2,10 @@
 import WebGLHeatmap from "../webgl-heatmap/webgl-heatmap";
 import CanvasLayer from "./react-leaflet-canvas-layer";
 import { ICoordinates } from "../types";
-import {inject, observer} from "mobx-react";
+import { inject, observer } from "mobx-react";
 import { autorun } from "mobx";
 import * as PrecipitationScaleSrc from "../assets/precipitation-scale.png";
-import {BaseComponent, IBaseProps} from "./base";
+import { BaseComponent, IBaseProps } from "./base";
 import * as React from "react";
 import * as L from "leaflet";
 
@@ -18,17 +18,16 @@ const alphaRange = 0.025;
 @observer
 export class PrecipitationLayer extends BaseComponent<IProps, IState> {
   public webglHeatmap: any = null;
-  private autoUpdateDispose: () => void;
+  private disposeObserver: () => void;
 
   public componentDidMount(): void {
-    this.autoUpdateDispose = autorun(() => {
-      // Use MobX autorun to observe all the store properties that are necessary to update wind arrows.
+    this.disposeObserver = autorun(() => {
       this.updateData();
     });
   }
 
   public componentWillUnmount(): void {
-    this.autoUpdateDispose();
+    this.disposeObserver();
   }
 
   public render() {

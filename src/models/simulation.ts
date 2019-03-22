@@ -79,8 +79,8 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
 // Landfall is detected when hurricane moves from sea to land. To avoid detecting too many landfalls, assume that
 // hurricane needs to travel over sea for some time before next landfall is detected.
 export const minStepsOverSeaToDetectLandfall = 10;
-
 const benchmarkInterval = 30;
+const precipitationUpdateInterval = 5;
 
 export class SimulationModel {
   // Region boundaries. Used only for optimization.
@@ -283,7 +283,9 @@ export class SimulationModel {
       this.numberOfStepsOverSea = 0;
     }
 
-    this.addPrecipitation();
+    if (this.time % precipitationUpdateInterval === 0) {
+      this.addPrecipitation();
+    }
 
     this.time += config.timestep;
 
@@ -314,24 +316,27 @@ export class SimulationModel {
   }
 
   @action.bound public addPrecipitation() {
-    const range = 8;
-    // Add a single, large point to represent general, light snowfall.
-    this.precipitationPoints.push([
-      this.hurricane.center.lat + (random() * range - 0.5 * range),
-      this.hurricane.center.lng + (random() * range - 0.5 * range),
-      0.007,
-      900000
-    ]);
-    // Add a few smaller but more intense points to make precipitation data more interesting.
-    for (let i = 0; i < 3; i++) {
-      this.precipitationPoints.push([
+    const newPoints: IPrecipitationPoint[] = [];
+    for (let steps = 0; steps < precipitationUpdateInterval; steps++) {
+      const range = 8;
+      // Add a single, large point to represent general, light snowfall.
+      newPoints.push([
         this.hurricane.center.lat + (random() * range - 0.5 * range),
         this.hurricane.center.lng + (random() * range - 0.5 * range),
-        0.002 * (this.hurricane.category + 8),
-        300000
+        0.007,
+        900000
       ]);
+      // Add a few smaller but more intense points to make precipitation data more interesting.
+      for (let i = 0; i < 3; i++) {
+        newPoints.push([
+          this.hurricane.center.lat + (random() * range - 0.5 * range),
+          this.hurricane.center.lng + (random() * range - 0.5 * range),
+          0.002 * (this.hurricane.category + 8),
+          300000
+        ]);
+      }
     }
-    this.precipitationPoints = this.precipitationPoints.concat();
+    this.precipitationPoints.push(...newPoints);
   }
 
   @action.bound public start() {
