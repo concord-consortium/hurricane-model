@@ -53,8 +53,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
         disableRipple={true}
         style={buttonStyle}
       >
-        <span className={`${css.mapLabel} ${buttonClass} ${active ? css.active : ""}`}>{labelText}
-        </span>
+        <span className={`${css.mapLabel} ${buttonClass} ${active ? css.active : ""}`}>{labelText}</span>
       </Button>
     );
   }

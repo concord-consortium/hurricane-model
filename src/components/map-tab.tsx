@@ -33,7 +33,7 @@ export class MapTab extends BaseComponent<IProps, IState> {
     return (
       <div className={`${css.mapTab} ${tabStyle}`} data-test="map-tab">
         <div className={`${css.mapTabBack} ${tabStyle} ${activeStyle}`}>
-          <div className={`${css.mapTabImage} ${tabStyle}`} style={tabMap} />
+          <div className={`${css.mapTabImage} ${tabStyle}`} style={tabMap}/>
           <div className={css.mapTabContent}>{tabText}</div>
         </div>
       </div>
