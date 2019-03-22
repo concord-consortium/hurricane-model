@@ -32,4 +32,18 @@ describe("MapButton component", () => {
     expect(stores.ui.setMapTiles).toHaveBeenCalled();
     expect(stores.ui.mapTile.mapType).toEqual("street");
   });
+
+  it("reacts to click and changes map overlay", () => {
+    jest.spyOn(stores.ui, "setOverlay");
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <MapButton mapType="impact" label="Precipitation" value="precipitation" />
+      </Provider>
+    );
+    const btn = (wrapper.find(MapButton).instance() as any).wrappedInstance as MapButton;
+    expect(stores.ui.overlay).toEqual(null);
+    btn.handleMapSelect();
+    expect(stores.ui.setOverlay).toHaveBeenCalled();
+    expect(stores.ui.overlay).toEqual("precipitation");
+  });
 });
