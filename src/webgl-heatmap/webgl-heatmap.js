@@ -914,8 +914,11 @@ WebGLHeatmap = (function() {
       }).bind(0).setSize(2, 2).nearest().clampToEdge();
       if (typeof gradientTexture === 'string') {
         image = new Image();
+        var display = this.display.bind(this);
         image.onload = function() {
-          return textureGradient.bind().upload(image);
+          textureGradient.bind().upload(image);
+          // Refresh display when texture is available.
+          display();
         };
         image.src = gradientTexture;
       } else {
