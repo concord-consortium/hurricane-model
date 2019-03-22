@@ -80,6 +80,8 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
 // hurricane needs to travel over sea for some time before next landfall is detected.
 export const minStepsOverSeaToDetectLandfall = 10;
 
+const benchmarkInterval = 30;
+
 export class SimulationModel {
   // Region boundaries. Used only for optimization.
   @observable public east = 45;
@@ -114,12 +116,15 @@ export class SimulationModel {
 
   @observable public landfalls: ILandfall[] = [];
 
+  @observable public stepsPerSecond = 0;
+
   // Callbacks used by tests.
   public _seaSurfaceTempDataParsed: () => void;
 
   public numberOfStepsOverSea = 0;
 
   private initialOptions: ISimulationOptions;
+  private previousTimestamp = 0;
 
   constructor(options?: ISimulationOptions) {
     if (!options) {
@@ -244,7 +249,12 @@ export class SimulationModel {
     pressureSystem.checkPressureSystem(this.pressureSystems);
   }
 
-  @action.bound public tick() {
+  @action.bound public tick(timestamp = window.performance.now()) {
+    if (this.time % benchmarkInterval === 0) {
+      this.stepsPerSecond = 1000 / (timestamp - this.previousTimestamp) * benchmarkInterval;
+      this.previousTimestamp = timestamp;
+    }
+
     if (this.time % config.trackSegmentLength === 0) {
       this.hurricaneTrack.push({
         position: Object.assign({}, this.hurricane.center),

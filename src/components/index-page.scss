@@ -8,4 +8,16 @@
     z-index: 10000;
     color: #ffb60f;
   }
+
+  .stepsPerSecond {
+    font-size: 12px;
+    background: #eee;
+    padding: 2px;
+    width: 120px;
+    border-radius: 5px;
+    position: absolute;
+    top: 14px;
+    left: 70px;
+    z-index: 10000;
+  }
 }

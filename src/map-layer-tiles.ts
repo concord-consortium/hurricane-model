@@ -38,7 +38,6 @@ const layerInfo: MapTileLayer[] = [
   }
 ];
 
-export function mapLayer(layerType: string) {
-  const layer: MapTileLayer = layerInfo.find(m => m.mapType === layerType) || layerInfo[0];
-  return layer;
+export function mapLayer(layerType: string): MapTileLayer {
+  return layerInfo.find(m => m.mapType === layerType) || layerInfo[0];
 }

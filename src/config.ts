@@ -46,6 +46,8 @@ const DEFAULT_CONFIG: any = {
   markLandfalls: true,
   windArrowsOpacity: 0.5,
   seaSurfaceTempOpacity: 0.5,
+  // Enables steps per second display.
+  benchmark: false,
   // --- UI elements can be shown or hidden using options below ---
   seasonButton: true,
   windArrowsSlider: true,
