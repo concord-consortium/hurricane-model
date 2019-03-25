@@ -10,7 +10,7 @@ export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, 
 const stormSurgeDataBounds: LatLngBoundsLiteral = [[24, -100], [46, -64]];
 
 export type TranslucentLayer = "windArrows" | "seaSurfaceTemp";
-export type Overlay = "precipitation" | "stormSurge" | null;
+export type Overlay = "precipitation" | "stormSurge" | "population" | null;
 export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAvailable: boolean; };
 
 export class UIModel {

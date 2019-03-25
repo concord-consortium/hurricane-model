@@ -14,6 +14,7 @@ import config from "../config";
 import { stores } from "../index";
 import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
 import Home from "@material-ui/icons/Home";
+import { mapLayer } from "../map-layer-tiles";
 
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
@@ -87,8 +88,8 @@ export class MapView extends BaseComponent<IProps, IState> {
           />
           {ui.overlay === "population" &&
             <TileLayer
-              attribution=""
-              url=""
+              attribution={mapLayer("population").attribution}
+              url={mapLayer("population").url}
               opacity={ui.layerOpacity.overlayTiles}
             />
           }

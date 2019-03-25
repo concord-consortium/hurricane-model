@@ -7,7 +7,7 @@ export interface MapTileLayer {
   subdomains: string[];
 }
 
-export type GeoMap = "satellite" | "street" | "relief";
+export type GeoMap = "satellite" | "street" | "relief" | "population";
 
 const layerInfo: MapTileLayer[] = [
   {

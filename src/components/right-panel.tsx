@@ -55,6 +55,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                   <div className={css.drawerTitle}>Impact Maps</div>
                   <MapButton label="Precipitation" value="precipitation" mapType={"impact"} />
                   <MapButton label="Storm Surge" value="stormSurge" mapType={"impact"} disabled={!ui.zoomedInView} />
+                  <MapButton label="Population" value="population" mapType={"impact"} />
                 </div>
             </div>
           }
