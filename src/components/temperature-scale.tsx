@@ -61,11 +61,12 @@ export class TemperatureScale extends React.PureComponent<IProps, IState> {
   }
   public render() {
     const { expanded } = this.state;
+
     return (
       <div className={css.temperatureContainer}>
         <Draggable
           axis="both"
-          bounds="body"
+          bounds="#mapView"
           handle="strong"
         >
           <div className={`${css.temperatureScale} ${expanded ? css.expanded : ""}`}>

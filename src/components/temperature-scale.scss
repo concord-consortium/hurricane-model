@@ -16,7 +16,6 @@ $animationDuration: 0.3s;
     border: solid 1px $controlIconLine;
     background-color: white;
     z-index: 500;
-    transition: height, $animationDuration;
     &.expanded {
       height: 94px;
     }
@@ -105,7 +104,6 @@ $animationDuration: 0.3s;
       width: $barSegmentWidth;
       vertical-align: top;
       text-align: center;
-      transition-delay: all $animationDuration;
 
       .temperatureValue {
         color: $controlLabel;
