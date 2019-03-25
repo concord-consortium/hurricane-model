@@ -1,8 +1,8 @@
 import * as React from "react";
 import Draggable from "react-draggable";
 import DragIcon from "../assets/drag.svg";
-import * as scaleKey from "../../sea-surface-temp-img/tempScaleKey.png";
 import * as css from "./temperature-scale.scss";
+import { temperatureScale } from "../temperature-scale";
 
 interface IProps {}
 interface IState {
@@ -16,9 +16,11 @@ const getFahrenheit = (celcius: number) => {
 const renderTemperatureLabels = (increments: number) => {
   const celciusLabels = [];
   const fahrenheitLabels = [];
+  const keyColorGradientStops = [];
   for (let i = 0; i < increments; i++) {
     const celciusValue = i * 4;
     const symbol = i === 0 ? <span>&lt;</span> : i === (increments - 1) ? <span>&ge;</span> : "";
+    keyColorGradientStops.push(temperatureScale(celciusValue));
 
     fahrenheitLabels.push(
       <div key={"fahrenheit" + i} className={css.temperatureContainer}>
@@ -47,10 +49,13 @@ const renderTemperatureLabels = (increments: number) => {
       <div className={css.temperatureUnitsF}>&deg;F</div>
     </div>);
 
+  // build gradient
+  const gradientStyle = { background: `linear-gradient(90deg, ${keyColorGradientStops.join(", ")})` };
+
   return <div className={css.scaleContainer}>
     {fahrenheitLabels}
     <div data-test="sea-temp-color-gradient"
-      className={css.scaleGradient} style={{ backgroundImage: `url(${scaleKey}` }} />
+      className={css.scaleGradient} style={gradientStyle} />
     {celciusLabels}
   </div>;
 };
