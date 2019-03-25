@@ -39,11 +39,11 @@ const renderTemperatureLabels = (increments: number) => {
       </div>);
   }
   celciusLabels.push(
-    <div className={css.temperatureUnitsContainer}>
+    <div key={"celciusUnits"} className={css.temperatureUnitsContainer}>
       <div className={css.temperatureUnitsC}>&deg;C</div>
     </div>);
   fahrenheitLabels.push(
-    <div className={css.temperatureUnitsContainer}>
+    <div key={"fahrenheitUnits"} className={css.temperatureUnitsContainer}>
       <div className={css.temperatureUnitsF}>&deg;F</div>
     </div>);
 

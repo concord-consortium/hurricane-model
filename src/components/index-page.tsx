@@ -17,6 +17,7 @@ interface IState {}
 @observer
 export class IndexPage extends BaseComponent<IProps, IState> {
   public render() {
+    const ui = this.stores.ui;
     const loading = this.stores.simulation.loading;
     return (
       <div className={css.index}>
@@ -33,7 +34,10 @@ export class IndexPage extends BaseComponent<IProps, IState> {
             Steps per second: { this.stores.simulation.stepsPerSecond.toFixed(1) }
           </div>
         }
-        <TemperatureScale />
+
+        { ui.layerOpacity.seaSurfaceTemp > 0 &&
+          <TemperatureScale />
+        }
       </div>
     );
   }
