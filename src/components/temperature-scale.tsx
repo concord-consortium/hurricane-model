@@ -49,7 +49,8 @@ const renderTemperatureLabels = (increments: number) => {
 
   return <div className={css.scaleContainer}>
     {fahrenheitLabels}
-    <div className={css.scaleGradient} style={{ backgroundImage: `url(${scaleKey}` }} />
+    <div data-test="sea-temp-color-gradient"
+      className={css.scaleGradient} style={{ backgroundImage: `url(${scaleKey}` }} />
     {celciusLabels}
   </div>;
 };
@@ -63,7 +64,7 @@ export class TemperatureScale extends React.PureComponent<IProps, IState> {
     const { expanded } = this.state;
 
     return (
-      <div className={css.temperatureContainer}>
+      <div className={css.temperatureContainer} data-test="temperature-scale-key">
         <Draggable
           axis="both"
           bounds="#mapView"
@@ -73,7 +74,9 @@ export class TemperatureScale extends React.PureComponent<IProps, IState> {
             <div className={css.header}>
               KEY: Sea Surface Temperature
               <strong className={css.dragIcon}><DragIcon /></strong>
-              <div className={`${css.minMax} ${expanded ? css.expanded : ""}`} onClick={this.toggleExpanded} >
+              <div className={`${css.minMax} ${expanded ? css.expanded : ""}`}
+                data-test="key-toggle-visible"
+                onClick={this.toggleExpanded} >
                 <div className={css.minMaxIcon} />
               </div>
             </div>
