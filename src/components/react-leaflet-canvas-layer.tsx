@@ -145,11 +145,11 @@ const LeafletCanvasLayer = (Layer || Class).extend({
     DomUtil.setPosition(this.canvas, topLeft);
 
     const size = this._map.getSize();
-    if (this.canvas.width !== size.x) {
+    if (this.canvas.style.width !== size.x + "px") {
       this.canvas.width = size.x;
       this.canvas.style.width = size.x + "px";
     }
-    if (this.canvas.height !== size.y) {
+    if (this.canvas.style.height !== size.y + "px") {
       this.canvas.height = size.y;
       this.canvas.style.height = size.y + "px";
     }
