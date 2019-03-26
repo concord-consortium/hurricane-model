@@ -79,7 +79,7 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
         resolution: window.devicePixelRatio
       });
     }
-    this.pixiApp.renderer.resize(info.canvas.width, info.canvas.height);
+    this.pixiApp.renderer.resize(parseInt(info.canvas.style.width), parseInt(info.canvas.style.height));
     this.pixiApp.render();
   }
 
