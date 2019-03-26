@@ -58,4 +58,28 @@ describe("MapView component", () => {
     wrapper.update();
     expect(wrapper.find(HurricaneMarker).length).toEqual(0);
   });
+
+  it("renders storm surge overlay in zoomed-in view", () => {
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <MapView />
+      </Provider>
+    );
+    expect(wrapper.find({
+      url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_Category" +
+        "3_CONUS/MapServer/tile/{z}/{y}/{x}"
+    }).length).toEqual(0);
+
+    stores.ui.zoomedInView = {
+      landfallCategory: 3,
+      stormSurgeAvailable: true
+    };
+    stores.ui.overlay = "stormSurge";
+    wrapper.update();
+
+    expect(wrapper.find({
+      url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_Category" +
+           "3_CONUS/MapServer/tile/{z}/{y}/{x}"
+    }).length).toBeGreaterThan(0);
+  });
 });
