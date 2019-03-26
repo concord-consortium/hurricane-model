@@ -67,7 +67,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     const navigation = ui.zoomedInView || config.navigation;
     return (
-      <div className={css.mapView}>
+      <div className={css.mapView} id="mapView">
         <Map ref={this.mapRef}
              dragging={navigation}
              doubleClickZoom={navigation}

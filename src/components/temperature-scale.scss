@@ -1,0 +1,150 @@
+@import "common";
+
+$temperatureScaleWidth: 308px;
+$temperatureScaleWidthMinimized: 280px;
+$temperatureScaleHeightMaximized: 94px;
+$innerEdgePadding: 12px;
+
+.temperatureContainer {
+  .temperatureScale {
+    position: absolute;
+    top: calc(100% - #{$bottomBarHeight + $bottomBarTopPadding + $temperatureScaleHeightMaximized});
+    left: 4px;
+    width: $temperatureScaleWidthMinimized;
+    height: 28px;
+    border-radius: 10px;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
+    border: solid 1px $controlIconLine;
+    background-color: white;
+    z-index: 500;
+    &.expanded {
+      height: $temperatureScaleHeightMaximized;
+      width: $temperatureScaleWidth;
+    }
+
+    .header {
+      top: 7px;
+      text-align: center;
+      font-family: Lato;
+      font-size: 12px;
+      font-weight: bold;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: normal;
+      letter-spacing: normal;
+      text-align: center;
+      color: $controlLabel;
+      padding: 7px;
+      .dragIcon{
+        cursor: grab;
+        float: left;
+        width: 12px;
+        svg {
+          height: 12px;
+          circle {
+            fill: $controlLabel;
+          }
+        }
+      }
+      .minMax {
+        float: right;
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: column;
+        &.expanded {
+          justify-content: flex-end;
+        }
+        &:hover {
+          background-color: $minMaxKeyBackground;
+        }
+        .minMaxIcon {
+          width: 10px;
+          height: 1px;
+          margin: 3px;
+          background-color: $controlIconLine;
+
+        }
+      }
+    }
+    $barSegmentWidth: ($temperatureScaleWidth) / 9;
+    $barSegmentWidthfix: 32px;
+    .scaleContainer {
+      font-family: $scaleFont;
+      padding: 7px;
+
+      .scaleGradient {
+        height: 8px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        border-radius: 0;
+        width: calc(#{$barSegmentWidth * 7});
+        margin-left: 15px;
+        border: $bottomBarBorderStyle;
+      }
+    }
+
+    .subheaders {
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: top;
+      margin-top: 5px;
+
+      .temperatureFLabel, .temperatureCLabel {
+        font-size: 11px;
+        width: 52px;
+        text-align: center;
+        color: $controlLabel;
+      }
+    }
+
+    .temperatureContainer, .temperatureUnitsContainer {
+      display: inline-block;
+      width: $barSegmentWidth;
+      vertical-align: top;
+      text-align: center;
+
+      .temperatureValue {
+        color: $controlLabel;
+        font-family: $scaleFont;
+        font-size: 12px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: condensed;
+        line-height: normal;
+        letter-spacing: normal;
+        font-weight: normal;
+      }
+
+      .temperatureRange {
+        color: $controlLabel;
+      }
+      .dot {
+        line-height: 2px;
+        margin-bottom: 6px;
+      }
+    }
+    .temperatureUnitsContainer {
+      width: 12px;
+      height: 21px;
+      position: relative;
+      .temperatureUnitsC, .temperatureUnitsF {
+
+        color: $controlLabel;
+        text-align: left;
+        font-weight: bold;
+      }
+      .temperatureUnitsF {
+        position: absolute;
+        bottom: 8px;
+      }
+      .temperatureUnitsC {
+        position: absolute;
+        bottom: 0;
+      }
+    }
+  }
+}
