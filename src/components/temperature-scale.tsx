@@ -9,39 +9,39 @@ interface IState {
   expanded: boolean;
 }
 
-const getFahrenheit = (celcius: number) => {
-  return (celcius * 9 / 5) + 32;
+const getFahrenheit = (celsius: number) => {
+  return (celsius * 9 / 5) + 32;
 };
 
 const renderTemperatureLabels = (increments: number) => {
-  const celciusLabels = [];
+  const celsiusLabels = [];
   const fahrenheitLabels = [];
   const keyColorGradientStops = [];
   for (let i = 0; i < increments; i++) {
-    const celciusValue = i * 4;
+    const celsiusValue = i * 4;
     const symbol = i === 0 ? <span>&lt;</span> : i === (increments - 1) ? <span>&ge;</span> : "";
-    keyColorGradientStops.push(temperatureScale(celciusValue));
+    keyColorGradientStops.push(temperatureScale(celsiusValue));
 
     fahrenheitLabels.push(
       <div key={"fahrenheit" + i} className={css.temperatureContainer}>
         <div className={css.temperatureRange}>
           {symbol}
-          {getFahrenheit(celciusValue)}
+          {getFahrenheit(celsiusValue)}
         </div>
         <div className={css.dot}>.</div>
       </div>);
 
-    celciusLabels.push(
-      <div key={"celcius" + i} className={css.temperatureContainer}>
+    celsiusLabels.push(
+      <div key={"celsius" + i} className={css.temperatureContainer}>
         <div className={css.dot}>.</div>
         <div className={css.temperatureRange}>
           {symbol}
-          {celciusValue}{".0"}
+          {celsiusValue}{".0"}
         </div>
       </div>);
   }
-  celciusLabels.push(
-    <div key={"celciusUnits"} className={css.temperatureUnitsContainer}>
+  celsiusLabels.push(
+    <div key={"celsiusUnits"} className={css.temperatureUnitsContainer}>
       <div className={css.temperatureUnitsC}>&deg;C</div>
     </div>);
   fahrenheitLabels.push(
@@ -56,7 +56,7 @@ const renderTemperatureLabels = (increments: number) => {
     {fahrenheitLabels}
     <div data-test="sea-temp-color-gradient"
       className={css.scaleGradient} style={gradientStyle} />
-    {celciusLabels}
+    {celsiusLabels}
   </div>;
 };
 
