@@ -1,18 +1,21 @@
 import {action, observable} from "mobx";
-import {LatLngExpression, Map, Point, LatLngBoundsLiteral} from "leaflet";
+import {LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds} from "leaflet";
 import config from "../config";
 import { mapLayer, GeoMap } from "../map-layer-tiles";
 
 // North Atlantic.
 export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, -10]];
+// Storm surge data bounds is limited to very specify area (Texas to Maine).
+// See: https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
+const stormSurgeDataBounds: LatLngBoundsLiteral = [[24, -100], [46, -64]];
 
 export type TranslucentLayer = "windArrows" | "seaSurfaceTemp";
-
-export type Overlay = "precipitation" | null;
+export type Overlay = "precipitation" | "stormSurge" | null;
+export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAvailable: boolean; };
 
 export class UIModel {
   @observable public initialBounds = NorthAtlanticInitialBounds;
-  @observable public zoomedInView = false;
+  @observable public zoomedInView: ZoomedInViewProps = false;
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
     windArrows: config.windArrowsOpacity,
@@ -39,9 +42,13 @@ export class UIModel {
     this.initialBounds = initialBounds;
   }
 
-  @action.bound public setZoomedInView(bounds: LatLngBoundsLiteral) {
+  @action.bound public setZoomedInView(bounds: LatLngBoundsLiteral, landfallCategory: number) {
     this.initialBounds = bounds;
-    this.zoomedInView = true;
+    const stormSurgeAvailable = landfallCategory > 0 && (new LatLngBounds(stormSurgeDataBounds)).contains(bounds);
+    this.zoomedInView = {
+      landfallCategory,
+      stormSurgeAvailable
+    };
   }
 
   @action.bound public setNorthAtlanticView() {

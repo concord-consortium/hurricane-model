@@ -39,6 +39,7 @@ export class LandfallRectangle extends BaseComponent<IProps, IState> {
   }
 
   public handleClick = () => {
-    this.stores.ui.setZoomedInView(this.getBounds());
+    const { category } = this.props;
+    this.stores.ui.setZoomedInView(this.getBounds(), category);
   }
 }

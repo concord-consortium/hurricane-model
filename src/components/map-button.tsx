@@ -13,6 +13,7 @@ interface IProps extends IBaseProps {
   label: string;
   value: GeoMap | Overlay;
   mapType: MapType;
+  disabled?: boolean;
 }
 interface IState {}
 
@@ -20,7 +21,7 @@ interface IState {}
 @observer
 export class MapButton extends BaseComponent<IProps, IState> {
   public render() {
-    const { label, mapType, value } = this.props;
+    const { label, mapType, value, disabled } = this.props;
     const ui = this.stores.ui;
 
     const active = mapType === "geo" && ui.mapTile.mapType === value ||
@@ -51,6 +52,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
         className={`${css.mapButton} ${buttonClass}`}
         data-test="map-button"
         disableRipple={true}
+        disabled={disabled}
         style={buttonStyle}
       >
         <span className={`${css.mapLabel} ${buttonClass} ${active ? css.active : ""}`}>{labelText}</span>

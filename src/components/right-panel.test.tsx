@@ -3,7 +3,7 @@ import { mount } from "enzyme";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { RightPanel } from "./right-panel";
-import { MapTab } from "./map-tab";
+import { MapButton } from "./map-button";
 
 describe("Right Panel component", () => {
   let stores = createStores();
@@ -83,6 +83,31 @@ describe("Right Panel component", () => {
     // geo panel now hidden, impact is visible
     expect(wrapper.find('[data-test="geo-panel"]').length).toEqual(0);
     expect(wrapper.find('[data-test="impact-panel"]').exists());
+  });
+
+  it("renders disabled storm surge button unless zoomed in view is active", () => {
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <RightPanel />
+      </Provider>
+    );
+    wrapper.find("#impact").simulate("click");
+    expect(wrapper.find({
+      label: "Storm Surge", value: "stormSurge", mapType: "impact", disabled: true
+    }).length).toBeGreaterThan(0); // for some reason length is 2. Impossible looking at the code. Enzyme/Jest issue?
+
+    stores.ui.zoomedInView = {
+      landfallCategory: 3,
+      stormSurgeAvailable: true
+    };
+    wrapper.update();
+
+    expect(wrapper.find({
+      label: "Storm Surge", value: "stormSurge", mapType: "impact", disabled: true
+    }).length).toEqual(0);
+    expect(wrapper.find({
+      label: "Storm Surge", value: "stormSurge", mapType: "impact", disabled: false
+    }).length).toBeGreaterThan(0); // for some reason length is 2. Impossible looking at the code. Enzyme/Jest issue?
   });
 
 });

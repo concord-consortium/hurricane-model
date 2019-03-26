@@ -92,6 +92,16 @@ export class MapView extends BaseComponent<IProps, IState> {
             bounds={imageOverlayBounds}
           />
           {
+            // Source:
+            // https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
+            ui.overlay === "stormSurge" && ui.zoomedInView && ui.zoomedInView.stormSurgeAvailable &&
+            <TileLayer
+              url={`https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_Category` +
+                   `${ui.zoomedInView.landfallCategory}_CONUS/MapServer/tile/{z}/{y}/{x}`}
+              opacity={0.75}
+            />
+          }
+          {
             ui.overlay === "precipitation" && <PrecipitationLayer/>
           }
           <HurricaneTrack />

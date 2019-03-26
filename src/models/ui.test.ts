@@ -46,11 +46,23 @@ describe("UI model", () => {
   });
 
   describe("setZoomedInView", () => {
-    it("updates initialBounds", () => {
+    it("updates initialBounds and zoomedInView props", () => {
       const ui = new UIModel();
-      ui.setZoomedInView([[1, 2], [5, 10]]);
-      expect(ui.initialBounds).toEqual([[1, 2], [5, 10]]);
-      expect(ui.zoomedInView).toEqual(true);
+      ui.setZoomedInView([[30, -85], [35, -80]], 3);
+      expect(ui.initialBounds).toEqual([[30, -85], [35, -80]]);
+      expect(ui.zoomedInView).toEqual({
+        landfallCategory: 3,
+        stormSurgeAvailable: true
+      });
+
+      // Note that boudns are out of bounds of the region that has storm surge data defined.
+      // See: `stormSurgeDataBounds` const in ui.ts.
+      ui.setZoomedInView([[1, -80], [5, -80]], 1);
+      expect(ui.initialBounds).toEqual([[1, -80], [5, -80]]);
+      expect(ui.zoomedInView).toEqual({
+        landfallCategory: 1,
+        stormSurgeAvailable: false
+      });
     });
   });
 
