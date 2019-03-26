@@ -2,13 +2,14 @@
 
 $temperatureScaleWidth: 308px;
 $temperatureScaleWidthMinimized: 280px;
+$temperatureScaleHeightMaximized: 94px;
 $innerEdgePadding: 12px;
 
 .temperatureContainer {
   .temperatureScale {
     position: absolute;
-    top: 80%;
-    left: 200px;
+    top: calc(100% - #{$bottomBarHeight + $bottomBarTopPadding + $temperatureScaleHeightMaximized});
+    left: 4px;
     width: $temperatureScaleWidthMinimized;
     height: 28px;
     border-radius: 10px;
@@ -17,7 +18,7 @@ $innerEdgePadding: 12px;
     background-color: white;
     z-index: 500;
     &.expanded {
-      height: 94px;
+      height: $temperatureScaleHeightMaximized;
       width: $temperatureScaleWidth;
     }
 
