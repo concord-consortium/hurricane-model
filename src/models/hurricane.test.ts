@@ -1,8 +1,8 @@
-import { Hurricane, IHurricaneOptions } from "./hurricane";
+import { Hurricane } from "./hurricane";
 
 describe("Hurricane store", () => {
   const options = {
-    center: {lat: 0, lng: 0}
+    center: {lat: 15, lng: -40}
   };
 
   it("can be created without errors", () => {
@@ -58,6 +58,7 @@ describe("Hurricane store", () => {
   describe("setStrengthChangeFromSST", () => {
     it("should set hurricane strengthChange from SST and update category 3 threshold flag", () => {
       const hurricane = new Hurricane(options);
+      hurricane.speed.u = -20000; // make sure that low speed doesn't cause hurricane to dissipate.
       hurricane.setStrengthChangeFromSST(10);
       expect(hurricane.strengthChange).toBeLessThan(0);
       expect(hurricane.cat3SSTThresholdReached).toEqual(false);
