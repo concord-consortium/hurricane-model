@@ -18,6 +18,7 @@ const cat1SSTThreshold = 26;
 const equatorPushLatThreshold = 10;
 
 const maxHurricaneSpeed = 20000;
+const minHurricaneSpeed = 500;
 
 // Based on: https://www.nhc.noaa.gov/aboutsshws.php, but converted to m/s.
 const hurricaneMaxWindSpeedByCategory = [
@@ -99,6 +100,11 @@ export class Hurricane extends PressureSystem {
       // X*C should cool enough to slowly make hurricane disappear. If this value is lower, it will
       // increase speed of hurricane weakening, if it's higher, it will decrease it.
       sst = -1 * config.hurricaneStrengthDecreaseOverLand; // *C
+    }
+    const speedValue = Math.sqrt(this.speed.u * this.speed.u + this.speed.v * this.speed.v);
+    if (speedValue < minHurricaneSpeed) {
+      // Make sure that if hurricane slows down and get stuck (it rarely happens but it can), it eventually dissipates.
+      sst = -1 * config.hurricaneStrengthDecreaseOverLand;
     }
     // There's a bunch of numbers here. Tweaking them will affect how fast hurricanes are growing or dissipating.
     // It's based on empirical tests, so the model looks realistic (as much as it can).
