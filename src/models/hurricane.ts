@@ -17,6 +17,8 @@ const cat1SSTThreshold = 26;
 // It gets activated when the hurricane crosses equatorPushLatThreshold.
 const equatorPushLatThreshold = 10;
 
+const maxHurricaneSpeed = 20000;
+
 // Based on: https://www.nhc.noaa.gov/aboutsshws.php, but converted to m/s.
 const hurricaneMaxWindSpeedByCategory = [
   33, // category 0, max speed that doesn't classify as hurricane yet
@@ -79,6 +81,12 @@ export class Hurricane extends PressureSystem {
       // to cross equator. See:
       // https://earthscience.stackexchange.com/questions/239/impossible-or-improbable-hurricane-crossing-the-equator
       this.speed.v += Math.pow(revDistance * config.globalWindToAcceleration, 1.1) * timestep;
+    }
+
+    const speedValue = Math.sqrt(this.speed.u * this.speed.u + this.speed.v * this.speed.v);
+    if (speedValue > maxHurricaneSpeed) {
+      this.speed.u *= maxHurricaneSpeed / speedValue;
+      this.speed.v *= maxHurricaneSpeed / speedValue;
     }
 
     const posDiff = {u: this.speed.u * timestep, v: this.speed.v * timestep};
