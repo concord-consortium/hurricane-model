@@ -163,6 +163,11 @@ export class SimulationModel {
   @computed get wind() {
     const result: IWindPoint[] = [];
     this.baseWind.forEach(w => {
+      if (w.lat < 0) {
+        // Don't let pressure systems affect winds below equator.
+        result.push(w);
+        return;
+      }
       const pressureSysWinds: IWindPoint[] = [];
       const pressureSysWeights: number[] = [];
       this.pressureSystems.forEach(ps => {

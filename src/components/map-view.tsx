@@ -166,10 +166,10 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public handleWindowResize = () => {
-    this.resetView();
     if (this.leafletMap) {
       this.leafletMap.invalidateSize(false);
     }
+    this.resetView();
   }
 
   public resetView = () => {

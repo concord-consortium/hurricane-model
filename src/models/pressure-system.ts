@@ -16,7 +16,7 @@ export interface IPressureSystemOptions {
 }
 
 // Limit pressure systems only to the northern hemisphere.
-const minLat = 10;
+const minLat = 15;
 
 const minDistToOtherSystems = (sys: PressureSystem, otherSystems: PressureSystem[]) => {
   const dists = otherSystems.map(ps => distanceTo(ps.center, sys.center));

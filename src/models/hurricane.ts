@@ -11,6 +11,11 @@ import { random } from "../seedrandom";
 // https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2006GL025757
 const cat3SSTThreshold = 28.25;
 const cat1SSTThreshold = 26;
+// Add additional force that pushes hurricane away from equator. It's pretty much impossible for a hurricane
+// to cross equator. See:
+// https://earthscience.stackexchange.com/questions/239/impossible-or-improbable-hurricane-crossing-the-equator
+// It gets activated when the hurricane crosses equatorPushLatThreshold.
+const equatorPushLatThreshold = 10;
 
 // Based on: https://www.nhc.noaa.gov/aboutsshws.php, but converted to m/s.
 const hurricaneMaxWindSpeedByCategory = [
@@ -67,6 +72,15 @@ export class Hurricane extends PressureSystem {
     this.speed.v *= config.pressureSysMomentum;
     this.speed.u += windSpeed.u * config.globalWindToAcceleration * timestep;
     this.speed.v += windSpeed.v * config.globalWindToAcceleration * timestep;
+
+    if (this.center.lat < equatorPushLatThreshold) {
+      const revDistance = equatorPushLatThreshold - this.center.lat;
+      // Add additional force that pushes hurricane away from equator. It's pretty much impossible for a hurricane
+      // to cross equator. See:
+      // https://earthscience.stackexchange.com/questions/239/impossible-or-improbable-hurricane-crossing-the-equator
+      this.speed.v += Math.pow(revDistance * config.globalWindToAcceleration, 1.1) * timestep;
+    }
+
     const posDiff = {u: this.speed.u * timestep, v: this.speed.v * timestep};
     this.center = latLngPlusVector(this.center, posDiff);
   }
