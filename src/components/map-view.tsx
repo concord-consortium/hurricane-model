@@ -14,6 +14,7 @@ import config from "../config";
 import { stores } from "../index";
 import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
 import Home from "@material-ui/icons/Home";
+import { mapLayer } from "../map-layer-tiles";
 
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
@@ -31,7 +32,7 @@ export class MapView extends BaseComponent<IProps, IState> {
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
-    setTimeout(this.handleWindowResize, 1);
+    setTimeout(this.handleWindowResize, 500);
     // Observe some properties manually. React-leaflet implementation is incomplete in some cases. Some properties
     // work only on the initial load, but it's impossible to update them later. That's why we need to access
     // Leaflet API directly.
@@ -92,13 +93,21 @@ export class MapView extends BaseComponent<IProps, IState> {
             bounds={imageOverlayBounds}
           />
           {
+            ui.overlay === "population" &&
+            <TileLayer
+              attribution={mapLayer("population").attribution}
+              url={mapLayer("population").url}
+              opacity={ui.layerOpacity.overlayTiles}
+            />
+          }
+          {
             // Source:
             // https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
             ui.overlay === "stormSurge" && ui.zoomedInView && ui.zoomedInView.stormSurgeAvailable &&
             <TileLayer
-              url={`https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_Category` +
-                   `${ui.zoomedInView.landfallCategory}_CONUS/MapServer/tile/{z}/{y}/{x}`}
-              opacity={0.75}
+              attribution={mapLayer("stormSurge").attribution}
+              url={mapLayer("stormSurge").url.replace("{hurricaneCat}", ui.zoomedInView.landfallCategory.toString())}
+              opacity={ui.layerOpacity.overlayTiles}
             />
           }
           {
@@ -157,10 +166,10 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public handleWindowResize = () => {
+    this.resetView();
     if (this.leafletMap) {
       this.leafletMap.invalidateSize(false);
     }
-    this.resetView();
   }
 
   public resetView = () => {

@@ -1,7 +1,7 @@
 import {action, observable} from "mobx";
 import {LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds} from "leaflet";
 import config from "../config";
-import { mapLayer, GeoMap } from "../map-layer-tiles";
+import { mapLayer, MapTilesName } from "../map-layer-tiles";
 
 // North Atlantic.
 export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, -10]];
@@ -10,7 +10,7 @@ export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, 
 const stormSurgeDataBounds: LatLngBoundsLiteral = [[24, -100], [46, -64]];
 
 export type TranslucentLayer = "windArrows" | "seaSurfaceTemp";
-export type Overlay = "precipitation" | "stormSurge" | null;
+export type Overlay = "precipitation" | "stormSurge" | "population" | null;
 export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAvailable: boolean; };
 
 export class UIModel {
@@ -19,7 +19,8 @@ export class UIModel {
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
     windArrows: config.windArrowsOpacity,
-    seaSurfaceTemp: config.seaSurfaceTempOpacity
+    seaSurfaceTemp: config.seaSurfaceTempOpacity,
+    overlayTiles: config.overlayTileOpacity
   };
   @observable public mapTile = mapLayer(config.map);
   @observable public overlay: Overlay = config.overlay;
@@ -60,7 +61,7 @@ export class UIModel {
     this.layerOpacity[prop] = value;
   }
 
-  @action.bound public setMapTiles(value: GeoMap) {
+  @action.bound public setMapTiles(value: MapTilesName) {
     this.mapTile = mapLayer(value);
   }
 

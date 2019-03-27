@@ -3,7 +3,7 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import Button from "@material-ui/core/Button";
 import { MapType } from "./right-panel";
-import { mapLayer, GeoMap } from "../map-layer-tiles";
+import { mapLayer, MapTilesName } from "../map-layer-tiles";
 import * as geoMapButton from "../assets/geo-map.png";
 import * as impactMapButton from "../assets/impact-map.png";
 import * as css from "./map-button.scss";
@@ -11,7 +11,7 @@ import { Overlay } from "../models/ui";
 
 interface IProps extends IBaseProps {
   label: string;
-  value: GeoMap | Overlay;
+  value: MapTilesName | Overlay;
   mapType: MapType;
   disabled?: boolean;
 }
@@ -33,7 +33,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
       backgroundImage: ""
     };
     if (mapType === "geo") {
-      const geoMap = value as GeoMap;
+      const geoMap = value as MapTilesName;
       // for geo maps, get a map preview from the map tile provider to use as a button background
       if (mapLayer(geoMap) && mapLayer(geoMap).url) {
         // get a preview for an area approx the same as the hurricane model data
@@ -63,7 +63,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
   public handleMapSelect = () => {
     const { value } = this.props;
     if (this.props.mapType === "geo") {
-      this.stores.ui.setMapTiles(value as GeoMap);
+      this.stores.ui.setMapTiles(value as MapTilesName);
     } else {
       // If user clicks the same overlay button again, just turn it off.
       const newOverlay = this.stores.ui.overlay === value ? null : value;
