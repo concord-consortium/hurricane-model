@@ -32,7 +32,7 @@ export class MapView extends BaseComponent<IProps, IState> {
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
-    setTimeout(this.handleWindowResize, 1);
+    setTimeout(this.handleWindowResize, 500);
     // Observe some properties manually. React-leaflet implementation is incomplete in some cases. Some properties
     // work only on the initial load, but it's impossible to update them later. That's why we need to access
     // Leaflet API directly.
@@ -166,10 +166,10 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public handleWindowResize = () => {
+    this.resetView();
     if (this.leafletMap) {
       this.leafletMap.invalidateSize(false);
     }
-    this.resetView();
   }
 
   public resetView = () => {

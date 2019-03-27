@@ -14,11 +14,6 @@ interface IState {}
 @inject("stores")
 @observer
 export class PlaybackButtons extends BaseComponent<IProps, IState> {
-  public componentDidMount() {
-    // Calling reset here early in the launch of the application sets the offsets for the map
-    // so that population tile overlay can display in the correct location and hurricane doesn't get offset
-    setTimeout(this.handleReset, 0.5);
-  }
   public render() {
     const sim = this.stores.simulation;
     return [
