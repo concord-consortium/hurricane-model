@@ -86,13 +86,6 @@ export class MapView extends BaseComponent<IProps, IState> {
             attribution={ui.mapTile.attribution}
             url={ui.mapTile.url}
           />
-          {ui.overlay === "population" &&
-            <TileLayer
-              attribution={mapLayer("population").attribution}
-              url={mapLayer("population").url}
-              opacity={ui.layerOpacity.overlayTiles}
-            />
-          }
           <PixiWindLayer />
           <ImageOverlay
             opacity={ui.layerOpacity.seaSurfaceTemp}
@@ -100,13 +93,21 @@ export class MapView extends BaseComponent<IProps, IState> {
             bounds={imageOverlayBounds}
           />
           {
+            ui.overlay === "population" &&
+            <TileLayer
+              attribution={mapLayer("population").attribution}
+              url={mapLayer("population").url}
+              opacity={ui.layerOpacity.overlayTiles}
+            />
+          }
+          {
             // Source:
             // https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
             ui.overlay === "stormSurge" && ui.zoomedInView && ui.zoomedInView.stormSurgeAvailable &&
             <TileLayer
-              url={`https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_Category` +
-                   `${ui.zoomedInView.landfallCategory}_CONUS/MapServer/tile/{z}/{y}/{x}`}
-              opacity={0.75}
+              attribution={mapLayer("stormSurge").attribution}
+              url={mapLayer("stormSurge").url.replace("{hurricaneCat}", ui.zoomedInView.landfallCategory.toString())}
+              opacity={ui.layerOpacity.overlayTiles}
             />
           }
           {

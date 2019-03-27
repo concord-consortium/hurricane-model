@@ -1,7 +1,7 @@
 import {action, observable} from "mobx";
 import {LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds} from "leaflet";
 import config from "../config";
-import { mapLayer, GeoMap } from "../map-layer-tiles";
+import { mapLayer, MapTilesName } from "../map-layer-tiles";
 
 // North Atlantic.
 export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, -10]];
@@ -61,7 +61,7 @@ export class UIModel {
     this.layerOpacity[prop] = value;
   }
 
-  @action.bound public setMapTiles(value: GeoMap) {
+  @action.bound public setMapTiles(value: MapTilesName) {
     this.mapTile = mapLayer(value);
   }
 

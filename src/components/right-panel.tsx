@@ -53,9 +53,9 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="impact-panel">
                 <div className={css.tabContent}>
                   <div className={css.drawerTitle}>Impact Maps</div>
+                  <MapButton label="Population" value="population" mapType={"impact"} />
                   <MapButton label="Precipitation" value="precipitation" mapType={"impact"} />
                   <MapButton label="Storm Surge" value="stormSurge" mapType={"impact"} disabled={!ui.zoomedInView} />
-                  <MapButton label="Population" value="population" mapType={"impact"} />
                 </div>
             </div>
           }

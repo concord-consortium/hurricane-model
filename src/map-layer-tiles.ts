@@ -7,7 +7,7 @@ export interface MapTileLayer {
   subdomains: string[];
 }
 
-export type GeoMap = "satellite" | "street" | "relief" | "population";
+export type MapTilesName = "satellite" | "street" | "relief" | "population" | "stormSurge";
 
 const layerInfo: MapTileLayer[] = [
   {
@@ -45,11 +45,21 @@ const layerInfo: MapTileLayer[] = [
     url: "https://server.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/tile/{z}/{y}/{x}",
     // tslint:disable-next-line:max-line-length
     attribution: "NOAA National Centers for Environmental Information (NCEI), https://noaa.maps.arcgis.com/home/item.html?id=c7cdc62ec1d44297becf264bf67449f9",
-    maxZoom: 7,
+    maxZoom: 13,
+    subdomains: []
+  },
+  {
+    mapType: "stormSurge",
+    name: "Storm Surge",
+    // tslint:disable-next-line:max-line-length
+    url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_Category{hurricaneCat}_CONUS/MapServer/tile/{z}/{y}/{x}",
+    // tslint:disable-next-line:max-line-length
+    attribution: "NOAA National Centers for Environmental Information (NCEI), https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad",
+    maxZoom: 13,
     subdomains: []
   }
 ];
 
-export function mapLayer(layerType: GeoMap): MapTileLayer {
+export function mapLayer(layerType: MapTilesName): MapTileLayer {
   return layerInfo.find(m => m.mapType === layerType) || layerInfo[0];
 }
