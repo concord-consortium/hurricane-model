@@ -39,6 +39,6 @@ describe("PressureSystemMarker component", () => {
 
     marker.handlePressureSysDrag({latlng: {lat: 0, lng: 30} as LatLng} as LeafletMouseEvent);
     // Limit lat to 10, don't let users drag the pressure system to southern hemisphere.
-    expect(model.center).toEqual({lat: 10, lng: 30});
+    expect(model.center).toEqual({lat: 15, lng: 30});
   });
 });
