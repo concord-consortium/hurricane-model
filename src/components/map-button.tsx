@@ -4,10 +4,12 @@ import { BaseComponent, IBaseProps } from "./base";
 import Button from "@material-ui/core/Button";
 import { MapType } from "./right-panel";
 import { mapLayer, MapTilesName } from "../map-layer-tiles";
+import { Overlay } from "../models/ui";
+import { MapButtonKey } from "./map-button-key";
+
 import * as geoMapButton from "../assets/geo-map.png";
 import * as impactMapButton from "../assets/impact-map.png";
 import * as css from "./map-button.scss";
-import { Overlay } from "../models/ui";
 
 interface IProps extends IBaseProps {
   label: string;
@@ -29,21 +31,19 @@ export class MapButton extends BaseComponent<IProps, IState> {
     const buttonClass = mapType === "geo" ? css.geoMaps : css.impactMaps;
     const labelText = label ? label : "Satellite";
 
-    const buttonStyle = {
-      backgroundImage: ""
-    };
+    let backgroundImage = "";
     if (mapType === "geo") {
       const geoMap = value as MapTilesName;
       // for geo maps, get a map preview from the map tile provider to use as a button background
       if (mapLayer(geoMap) && mapLayer(geoMap).url) {
         // get a preview for an area approx the same as the hurricane model data
         const url = mapLayer(geoMap).url.replace("{z}", "2").replace("{x}", "1").replace("{y}", "1");
-        buttonStyle.backgroundImage = `url(${url})`;
+        backgroundImage = `url(${url})`;
       } else {
-        buttonStyle.backgroundImage = `url(${geoMapButton})`;
+        backgroundImage = `url(${geoMapButton})`;
       }
     } else {
-      buttonStyle.backgroundImage = `url(${impactMapButton})`;
+      backgroundImage = `url(${impactMapButton})`;
     }
 
     return (
@@ -53,9 +53,15 @@ export class MapButton extends BaseComponent<IProps, IState> {
         data-test="map-button"
         disableRipple={true}
         disabled={disabled}
-        style={buttonStyle}
       >
-        <span className={`${css.mapLabel} ${buttonClass} ${active ? css.active : ""}`}>{labelText}</span>
+        <div className={`${css.content} ${buttonClass} ${active ? css.active : ""}`}>
+          <div className={css.mapImage} style={{ backgroundImage }}/>
+          <div className={css.label}>{labelText}</div>
+          {
+            active && <div className={css.key}><MapButtonKey value={value}/></div>
+          }
+        </div>
+
       </Button>
     );
   }

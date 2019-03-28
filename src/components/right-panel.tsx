@@ -2,9 +2,10 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapTab } from "./map-tab";
+import { MapButton } from "./map-button";
 
 import * as css from "./right-panel.scss";
-import { MapButton } from "./map-button";
+
 
 export type MapType = "geo" | "impact";
 
@@ -42,9 +43,9 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             <div className={`${css.tabContentBack} ${css.geoMaps}`} data-test="geo-panel">
               <div className={css.tabContent}>
                 <div className={css.drawerTitle}>Geologic Maps</div>
-                <MapButton label="Satellite" value="satellite" mapType={selectedTab} />
-                <MapButton label="Relief" value="relief" mapType={selectedTab} />
-                <MapButton label="Street" value="street"  mapType={selectedTab} />
+                <MapButton label="Satellite" value="satellite" mapType="geo" />
+                <MapButton label="Relief" value="relief" mapType="geo" />
+                <MapButton label="Street" value="street" mapType="geo" />
               </div>
             </div>
           }
@@ -53,9 +54,9 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="impact-panel">
                 <div className={css.tabContent}>
                   <div className={css.drawerTitle}>Impact Maps</div>
-                  <MapButton label="Population" value="population" mapType={"impact"} />
-                  <MapButton label="Precipitation" value="precipitation" mapType={"impact"} />
-                  <MapButton label="Storm Surge" value="stormSurge" mapType={"impact"} disabled={!ui.zoomedInView} />
+                  <MapButton label="Population" value="population" mapType="impact" />
+                  <MapButton label="Precipitation" value="precipitation" mapType="impact" />
+                  <MapButton label="Storm Surge" value="stormSurge" mapType="impact" disabled={!ui.zoomedInView} />
                 </div>
             </div>
           }

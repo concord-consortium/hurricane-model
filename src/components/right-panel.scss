@@ -1,5 +1,10 @@
 @import "common";
 
+$rightPanelContainerWidth: 159px;
+$rightPanelWidth: 157px;
+$rightPanelInnerWidth: 151px;
+$mapTabVerticalSpacing: 10px;
+
 .rightPanelContainer {
   overflow-x: hidden;
   width: $rightPanelContainerWidth + $mapTabWidth;

@@ -5,13 +5,11 @@
   margin-left: auto !important;
   margin-right: auto !important;
   width: 121px;
-  height: 67px;
+  min-height: 65px;
   border-radius: 10px;
   border: solid 2px $tabContents !important;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
   margin-bottom: 10px !important;
+  background-color: transparent;
 
     &.geoMaps {
       border: solid 2px $tabGeo !important;
@@ -20,26 +18,61 @@
       border: solid 2px $tabImpact !important;
     }
 
-  .mapLabel {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    width: 117px;
-    height: 22px;
+  .content {
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
     color: white;
-    border-bottom-left-radius: 7px;
-    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
     background-color: $tabContents;
 
-    &.geoMaps {
-      background-color: $tabGeoTransparent;
-      &.active {
+    .mapImage {
+      border-radius: 8px;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      height: 65px;
+    }
+
+    .label {
+      margin-top: -22px;
+      height: 22px;
+    }
+
+    .key {
+      color: $controlLabel;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      .keyHeader {
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .keyContent {
+        font-family: $scaleFont;
+        font-size: 10px;
+      }
+    }
+
+    &.geoMaps  {
+      .label {
+        background-color: $tabGeoTransparent;
+      }
+      .key {
+        background-color: #f5faf4;
+      }
+      &.active .label {
         background-color: $tabGeo;
       }
     }
+
     &.impactMaps {
-      background-color: $tabImpactTransparent;
-      &.active {
+      .label {
+        background-color: $tabImpactTransparent;
+      }
+      .key {
+        background-color: #f2faff;
+      }
+      &.active .label {
         background-color: $tabImpact;
       }
     }

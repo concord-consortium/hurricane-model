@@ -1,0 +1,36 @@
+@import "common";
+
+.keyContainer {
+  color: $controlLabel;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+
+  .keyHeader {
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .keyContent {
+    font-family: $scaleFont;
+    font-size: 10px;
+    padding-bottom: 6px;
+    text-align: left;
+
+    .entry {
+      min-width: 45%;
+      margin-left: 5%;
+      display: inline-block;
+      text-align: left;
+
+      .colorBox {
+        display: inline-block;
+        width: 8px;
+        height: 13px;
+        border-radius: 6.5px;
+        border: solid 1px $controlIconLine;
+        vertical-align: middle;
+        margin-right: 5px;
+      }
+    }
+  }
+}
