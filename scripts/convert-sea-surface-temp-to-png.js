@@ -15,10 +15,10 @@ const outputFileName = process.argv[3] || 'sst.png';
 const tempFile = '__sst_temp'
 
 // Limit data to lat/lon range, as our model will be focused on the northern part of the Atlantic ocean.
-const minLat = -10;
+const minLat = -25;
 const maxLat = 80;
-const minLon = -120;
-const maxLon = 0;
+const minLon = -130;
+const maxLon = 30;
 
 // Lakes area, don't treat it as sea.
 const minLonLakes = -96;
