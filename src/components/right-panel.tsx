@@ -6,7 +6,6 @@ import { MapButton } from "./map-button";
 
 import * as css from "./right-panel.scss";
 
-
 export type MapType = "geo" | "impact";
 
 interface IProps extends IBaseProps { }

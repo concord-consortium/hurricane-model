@@ -76,7 +76,7 @@ export class MapButtonKey extends BaseComponent<IProps, IState> {
         <div className={css.keyContent}>
           {
             key.values.map((entry: IMapButtonKeyEntry) =>
-              <div className={css.entry}>
+              <div key={entry.text} className={css.entry}>
                 <div className={css.colorBox} style={{background: entry.background}}/>
                 <span>{entry.text}</span>
               </div>
