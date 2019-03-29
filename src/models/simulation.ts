@@ -56,13 +56,13 @@ export const sstImages: ISSTImages = {
 const defaultPressureSystems: IPressureSystemOptions[] = [
   {
     type: "high",
-    center: {lat: 34, lng: -29},
-    strength: 15
+    center: {lat: 28, lng: -30},
+    strength: 19.5
   },
   {
     type: "high",
-    center: {lat: 34, lng: -53},
-    strength: 10
+    center: {lat: 28.8, lng: -62.4},
+    strength: 13.6
   },
   {
     type: "low",
