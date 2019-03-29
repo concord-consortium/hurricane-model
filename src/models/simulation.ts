@@ -375,8 +375,6 @@ export class SimulationModel {
     this.landfalls = [];
     this.time = 0;
     this.hurricane.reset();
-    this.pressureSystems =
-      (this.initialOptions.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
     this.numberOfStepsOverSea = 0;
     this.precipitationPoints = [];
   }
