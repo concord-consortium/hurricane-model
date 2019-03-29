@@ -154,6 +154,11 @@ export class SimulationModel {
     return this.seaSurfaceTempData === null;
   }
 
+  @computed get windShearPresent() {
+    // Wind shear is present only in winter or spring.
+    return this.season === "winter" || this.season === "spring";
+  }
+
   // Wind data not affected by custom pressure systems.
   @computed get baseWind() {
     return windData[this.season];
@@ -283,6 +288,9 @@ export class SimulationModel {
     const sst = this.seaSurfaceTempAt(this.hurricane.center);
     if (this.time % config.sstCheckInterval === 0) {
       this.hurricane.setStrengthChangeFromSST(sst);
+      if (this.windShearPresent) {
+        this.hurricane.applyWindShear(config.sstCheckInterval);
+      }
     }
     this.hurricane.updateStrength();
 

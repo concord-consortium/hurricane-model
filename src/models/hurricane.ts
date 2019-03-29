@@ -120,6 +120,11 @@ export class Hurricane extends PressureSystem {
     }
   }
 
+  public applyWindShear(timeDiff: number) {
+    // Wind shear simply makes hurricane weaker and weaker.
+    this.strengthChange -= timeDiff * config.windShearStrength;
+  }
+
   public updateStrength() {
     // Note that cat3SSTThresholdReached defines whether hurricane can become a major hurricane (cat >= 3).
     if (
