@@ -42,6 +42,9 @@ describe("HurricaneIcon component", () => {
     );
     const category = wrapper.find('[data-test="hurricane-category"]');
     expect(category.length).toEqual(1);
+    stores.simulation.hurricane.strength = 20;
+    expect(category.text()).toEqual("TS"); // tropical storm
+    stores.simulation.hurricane.strength = 54;
     expect(category.text()).toEqual(stores.simulation.hurricane.category.toString());
     stores.simulation.hurricane.strength = 100;
     expect(category.text()).toEqual("5");

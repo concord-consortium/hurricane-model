@@ -48,7 +48,7 @@ export class HurricaneIcon extends BaseComponent<IProps, IState> {
           <HurricaneSVG />
         </div>
         <div className={css.categoryNumber} data-test="hurricane-category" style={{ opacity }}>
-          { hurricane.category }
+          { hurricane.category === 0 ? "TS" : hurricane.category }
         </div>
         {
           temp !== null &&
