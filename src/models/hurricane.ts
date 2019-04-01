@@ -11,6 +11,14 @@ import { random } from "../seedrandom";
 // https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2006GL025757
 const cat3SSTThreshold = 28.25;
 const cat1SSTThreshold = 26;
+// Add additional force that pushes hurricane away from equator. It's pretty much impossible for a hurricane
+// to cross equator. See:
+// https://earthscience.stackexchange.com/questions/239/impossible-or-improbable-hurricane-crossing-the-equator
+// It gets activated when the hurricane crosses equatorPushLatThreshold.
+const equatorPushLatThreshold = 10;
+
+const maxHurricaneSpeed = 20000;
+const minHurricaneSpeed = 500;
 
 // Based on: https://www.nhc.noaa.gov/aboutsshws.php, but converted to m/s.
 const hurricaneMaxWindSpeedByCategory = [
@@ -67,6 +75,21 @@ export class Hurricane extends PressureSystem {
     this.speed.v *= config.pressureSysMomentum;
     this.speed.u += windSpeed.u * config.globalWindToAcceleration * timestep;
     this.speed.v += windSpeed.v * config.globalWindToAcceleration * timestep;
+
+    if (this.center.lat < equatorPushLatThreshold) {
+      const revDistance = equatorPushLatThreshold - this.center.lat;
+      // Add additional force that pushes hurricane away from equator. It's pretty much impossible for a hurricane
+      // to cross equator. See:
+      // https://earthscience.stackexchange.com/questions/239/impossible-or-improbable-hurricane-crossing-the-equator
+      this.speed.v += Math.pow(revDistance * config.globalWindToAcceleration, 1.1) * timestep;
+    }
+
+    const speedValue = Math.sqrt(this.speed.u * this.speed.u + this.speed.v * this.speed.v);
+    if (speedValue > maxHurricaneSpeed) {
+      this.speed.u *= maxHurricaneSpeed / speedValue;
+      this.speed.v *= maxHurricaneSpeed / speedValue;
+    }
+
     const posDiff = {u: this.speed.u * timestep, v: this.speed.v * timestep};
     this.center = latLngPlusVector(this.center, posDiff);
   }
@@ -76,21 +99,30 @@ export class Hurricane extends PressureSystem {
       // Use X*C as a dummy value when SST is not available -> when hurricane is over land.
       // X*C should cool enough to slowly make hurricane disappear. If this value is lower, it will
       // increase speed of hurricane weakening, if it's higher, it will decrease it.
-      sst = -70; // *C
+      sst = config.landTemperature as number; // *C
+    }
+    const speedValue = Math.sqrt(this.speed.u * this.speed.u + this.speed.v * this.speed.v);
+    if (speedValue < minHurricaneSpeed) {
+      // Make sure that if hurricane slows down and get stuck (it rarely happens but it can), it eventually dissipates.
+      sst = config.landTemperature as number; // *C
     }
     // There's a bunch of numbers here. Tweaking them will affect how fast hurricanes are growing or dissipating.
     // It's based on empirical tests, so the model looks realistic (as much as it can).
     if (sst < cat1SSTThreshold) {
-      const diff = (sst - cat1SSTThreshold) / 300;
-      this.strengthChange = diff - 0.05 * random();
+      this.strengthChange = (sst - cat1SSTThreshold) / 5;
       this.cat3SSTThresholdReached = false;
     } else if (sst > cat1SSTThreshold && sst < cat3SSTThreshold) {
-      this.strengthChange = random() * 0.2 - 0.02;
+      this.strengthChange = random() * 0.25 - 0.05;
       this.cat3SSTThresholdReached = false;
     } else {
-      this.strengthChange = random() * 0.15 - 0.01;
+      this.strengthChange = random() * 0.25 - 0.02;
       this.cat3SSTThresholdReached = true;
     }
+  }
+
+  public applyWindShear(timeDiff: number) {
+    // Wind shear simply makes hurricane weaker and weaker.
+    this.strengthChange -= timeDiff * config.windShearStrength;
   }
 
   public updateStrength() {

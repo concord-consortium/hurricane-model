@@ -23,7 +23,12 @@ const DEFAULT_CONFIG: any = {
   lowPressureSysAngleOffset: 23, // deg
   highPressureSysAngleOffset: 8, // deg
   hurricaneStrength: 24, // max wind speed, m/s
-  initialHurricanePosition: {lat: 20, lng: -20},
+  // Land temperature controls how fast the hurricane dies when it hits the land.
+  // The smaller the number, the quicker it happens.
+  landTemperature: 20,
+  // Wind shear is present in winter and spring and it will cause hurricanes to die pretty fast.
+  windShearStrength: 0,
+  initialHurricanePosition: {lat: 10.5, lng: -20},
   initialHurricaneSpeed: {u: 0, v: 0},
   // When wind is far enough from the center of the pressure system, pressure system effect is lower
   // and we start smoothing it out.

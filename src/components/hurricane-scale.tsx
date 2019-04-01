@@ -17,7 +17,7 @@ const renderCategory = (cat: number) => {
   const barClass = `${css.bar} ${css[`barCategory${cat}`]}`;
   return (
     <div key={cat} className={css.categoryContainer}>
-      <div className={css.categoryValue}>{ cat }</div>
+      <div className={css.categoryValue}>{ cat === 0 ? "TS" : cat }</div>
       <div className={barClass} />
       <div className={css.dot}>.</div>
       <div className={css.windSpeedRange}>{ windSpeeds[cat] }</div>

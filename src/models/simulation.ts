@@ -56,13 +56,13 @@ export const sstImages: ISSTImages = {
 const defaultPressureSystems: IPressureSystemOptions[] = [
   {
     type: "high",
-    center: {lat: 34, lng: -29},
-    strength: 15
+    center: {lat: 28, lng: -30},
+    strength: 19.5
   },
   {
     type: "high",
-    center: {lat: 34, lng: -53},
-    strength: 10
+    center: {lat: 28.8, lng: -62.4},
+    strength: 13.6
   },
   {
     type: "low",
@@ -154,6 +154,11 @@ export class SimulationModel {
     return this.seaSurfaceTempData === null;
   }
 
+  @computed get windShearPresent() {
+    // Wind shear is present only in winter or spring.
+    return this.season === "winter" || this.season === "spring";
+  }
+
   // Wind data not affected by custom pressure systems.
   @computed get baseWind() {
     return windData[this.season];
@@ -163,6 +168,11 @@ export class SimulationModel {
   @computed get wind() {
     const result: IWindPoint[] = [];
     this.baseWind.forEach(w => {
+      if (w.lat < 0) {
+        // Don't let pressure systems affect winds below equator.
+        result.push(w);
+        return;
+      }
       const pressureSysWinds: IWindPoint[] = [];
       const pressureSysWeights: number[] = [];
       this.pressureSystems.forEach(ps => {
@@ -278,6 +288,9 @@ export class SimulationModel {
     const sst = this.seaSurfaceTempAt(this.hurricane.center);
     if (this.time % config.sstCheckInterval === 0) {
       this.hurricane.setStrengthChangeFromSST(sst);
+      if (this.windShearPresent) {
+        this.hurricane.applyWindShear(config.sstCheckInterval);
+      }
     }
     this.hurricane.updateStrength();
 
@@ -370,8 +383,6 @@ export class SimulationModel {
     this.landfalls = [];
     this.time = 0;
     this.hurricane.reset();
-    this.pressureSystems =
-      (this.initialOptions.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
     this.numberOfStepsOverSea = 0;
     this.precipitationPoints = [];
   }

@@ -131,20 +131,20 @@ export class MapView extends BaseComponent<IProps, IState> {
             sim.hurricane.active && <HurricaneMarker />
           }
           { navigation && <ZoomControl position="topleft"/> }
-          <Control position="topleft" className="leaflet-bar">
-            {
-              navigation && ui.mapModifiedByUser &&
+          {
+            navigation && ui.mapModifiedByUser &&
+            <Control position="topleft" className={`${css.resetViewContainer} leaflet-bar`}>
               <a className={css.resetViewBtn}
                  onClick={this.resetView}
                  title="Reset view" role="button" aria-label="Reset view"
               >
                 <CenterFocusStrong/>
               </a>
-            }
-          </Control>
-          <Control position="topleft" className="leaflet-bar">
-            {
-              ui.zoomedInView &&
+            </Control>
+          }
+          {
+            ui.zoomedInView &&
+            <Control position="topleft" className={`${css.fullMapViewContainer} leaflet-bar`}>
               <a className={css.resetViewBtn}
                  onClick={this.stores.ui.setNorthAtlanticView}
                  title="Go to full map view" role="button" aria-label="Go to full map view"
@@ -152,8 +152,8 @@ export class MapView extends BaseComponent<IProps, IState> {
                 <Home/>
                 <div className={css.mapButtonLabel}>Full Map View</div>
               </a>
-            }
-          </Control>
+            </Control>
+          }
           <AttributionControl position="topright" />
         </Map>
       </div>
@@ -166,10 +166,10 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public handleWindowResize = () => {
-    this.resetView();
     if (this.leafletMap) {
       this.leafletMap.invalidateSize(false);
     }
+    this.resetView();
   }
 
   public resetView = () => {
