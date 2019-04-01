@@ -68,7 +68,7 @@ export class MapView extends BaseComponent<IProps, IState> {
   public render() {
     const sim = this.stores.simulation;
     const ui = this.stores.ui;
-    const navigation = ui.zoomedInView || config.navigation;
+    const navigation = !!ui.zoomedInView || config.navigation;
     return (
       <div className={css.mapView} id="mapView">
         <Map ref={this.mapRef}
