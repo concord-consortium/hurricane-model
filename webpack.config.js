@@ -69,7 +69,17 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.svg$/,
-          loader: '@svgr/webpack',
+          oneOf: [
+            {
+              // Do not apply SVGR import in (S)CSS files.
+              issuer: /\.scss$/,
+              use: 'url-loader'
+            },
+            {
+              issuer: /\.tsx?$/,
+              loader: '@svgr/webpack'
+            }
+          ]
         }
       ]
     },

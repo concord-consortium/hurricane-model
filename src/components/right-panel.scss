@@ -3,7 +3,8 @@
 .rightPanelContainer {
   overflow-x: hidden;
   width: $rightPanelContainerWidth + $mapTabWidth;
-  height: 100%;
+  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + 1});
+  min-height: 551px;
   position: absolute;
   z-index: 1000;
   top: 0;
@@ -14,7 +15,7 @@
     right: -$rightPanelWidth;
     top: 0;
     width: $rightPanelWidth;
-    bottom: $bottomBarHeight !important;
+    bottom: 0 !important;
     transition: all 0.8s;
     border-left: 0;
     &.open {

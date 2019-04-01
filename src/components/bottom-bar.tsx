@@ -8,15 +8,51 @@ import { HurricaneScale } from "./hurricane-scale";
 import CCLogo from "../assets/cc-logo.svg";
 import CCLogoSmall from "../assets/cc-logo-small.svg";
 import config from "../config";
+import screenfull from "screenfull";
 
 import * as css from "./bottom-bar.scss";
 
 interface IProps extends IBaseProps {}
-interface IState {}
+interface IState {
+  fullscreen: boolean;
+}
+
+function toggleFullscreen() {
+  if (!screenfull) {
+    return;
+  }
+  if (!screenfull.isFullscreen) {
+    screenfull.request();
+  } else {
+    screenfull.exit();
+  }
+}
 
 @inject("stores")
 @observer
 export class BottomBar extends BaseComponent<IProps, IState> {
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      fullscreen: false
+    };
+  }
+
+  get fullscreenIconStyle() {
+    return css.fullscreenIcon + (this.state.fullscreen ? ` ${css.fullscreen}` : "");
+  }
+
+  public componentDidMount() {
+    if (screenfull && screenfull.enabled) {
+      document.addEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
+    }
+  }
+
+  public componentWillUnmount() {
+    if (screenfull && screenfull.enabled) {
+      document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
+    }
+  }
 
   public render() {
     const anySlider = config.windArrowsSlider || config.seaSurfaceTempSlider;
@@ -54,8 +90,17 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           </div>
         </div>
         {/* This empty container is necessary so the spacing works correctly */}
-        <div className={css.rightContainer} />
+        <div className={css.rightContainer}>
+          {
+            screenfull && screenfull.enabled &&
+            <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" />
+          }
+        </div>
       </div>
     );
+  }
+
+  public fullscreenChange = () => {
+    this.setState({ fullscreen: screenfull && screenfull.isFullscreen });
   }
 }

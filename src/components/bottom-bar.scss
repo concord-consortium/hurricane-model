@@ -71,15 +71,35 @@ $overflowHeight: 11px;
   .playbackContainer {
     margin-left: 10px;
     margin-right: 10px;
+    white-space: nowrap;
+  }
+
+  .fullscreenIcon {
+    margin-right: 5px;
+    margin-top: 5px;
+    height: 50px;
+    width: 50px;
+    background-size: 100%;
+    cursor: pointer;
+    background-image: url("../assets/fullscreen.svg");
+    &:hover {
+      background-image: url("../assets/fullscreen-dark.svg");
+    }
+    &.fullscreen {
+      background-image: url("../assets/fullscreen-exit.svg");
+      &:hover {
+        background-image: url("../assets/fullscreen-exit-dark.svg");
+      }
+    }
   }
 }
 
-@media (max-width: 927px) {
+@media (max-width: 960px) {
   .logo {
     display: none;
   }
 }
-@media (min-width: 927px) {
+@media (min-width: 960px) {
   .logoSmall {
     display: none;
   }

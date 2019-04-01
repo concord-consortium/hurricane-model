@@ -32,6 +32,7 @@ export class MapView extends BaseComponent<IProps, IState> {
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
+    window.addEventListener("fullscreenchange", this.handleWindowResize);
     setTimeout(this.handleWindowResize, 500);
     // Observe some properties manually. React-leaflet implementation is incomplete in some cases. Some properties
     // work only on the initial load, but it's impossible to update them later. That's why we need to access
@@ -61,6 +62,7 @@ export class MapView extends BaseComponent<IProps, IState> {
 
   public componentWillUnmount(): void {
     window.removeEventListener("resize", this.handleWindowResize);
+    window.removeEventListener("fullscreenchange", this.handleWindowResize);
   }
 
   public render() {
