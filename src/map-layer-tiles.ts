@@ -42,9 +42,9 @@ const layerInfo: MapTileLayer[] = [
     mapType: "population",
     name: "Population",
     // tslint:disable-next-line:max-line-length
-    url: "https://server.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/tile/{z}/{y}/{x}",
+    url: "https://services.arcgisonline.com/ArcGIS/rest/services/Demographics/USA_Population_Density/MapServer/tile/{z}/{y}/{x}",
     // tslint:disable-next-line:max-line-length
-    attribution: "NOAA National Centers for Environmental Information (NCEI), https://noaa.maps.arcgis.com/home/item.html?id=c7cdc62ec1d44297becf264bf67449f9",
+    attribution: "Esri, U.S. Census Bureau, https://www.arcgis.com/home/item.html?id=302d4e6025ef41fa8d3525b7fc31963a",
     maxZoom: 13,
     subdomains: []
   },

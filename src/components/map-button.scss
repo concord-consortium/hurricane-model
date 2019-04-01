@@ -1,46 +1,100 @@
 @import "common";
 
 .mapButton {
+  box-sizing: border-box !important;
   display: block !important;
   margin-left: auto !important;
   margin-right: auto !important;
   width: 121px;
-  height: 67px;
+  min-height: 65px;
   border-radius: 10px;
-  border: solid 2px $tabContents !important;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  margin-bottom: 10px !important;
+  // Why box-shadow instead of border? Border was affecting inner size and background position, it didn't look good.
+  box-shadow: 0 0 0 1px $controlIconLine;
+  margin-bottom: 12px !important;
+  background-color: transparent;
 
-    &.geoMaps {
-      border: solid 2px $tabGeo !important;
-    }
-    &.impactMaps {
-      border: solid 2px $tabImpact !important;
-    }
-
-  .mapLabel {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    width: 117px;
-    height: 22px;
+  .content {
+    overflow: hidden;
+    border-radius: 9px;
     color: white;
-    border-bottom-left-radius: 7px;
-    border-bottom-right-radius: 7px;
     background-color: $tabContents;
 
-    &.geoMaps {
-      background-color: $tabGeoTransparent;
-      &.active {
-        background-color: $tabGeo;
+    .mapImage {
+      border-radius: 7px;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      height: 65px;
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: -22px;
+      height: 22px;
+      transition: background-color 350ms;
+    }
+
+    .key {
+      color: $controlLabel;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      .keyHeader {
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .keyContent {
+        font-family: $scaleFont;
+        font-size: 10px;
       }
     }
-    &.impactMaps {
-      background-color: $tabImpactTransparent;
+
+    &.geoMaps  {
+      .label {
+        background-color: $tabGeoTransparent;
+      }
+
+      .key {
+        background-color: #f5faf4;
+      }
+
+      &:hover {
+        box-shadow: 0 0 0 2px $tabGeoLight;
+        .label {
+          background-color: $tabGeoLightTransparent;
+        }
+      }
+
       &.active {
-        background-color: $tabImpact;
+        box-shadow: 0 0 0 2px $tabGeo;
+        .label {
+          background-color: $tabGeo;
+        }
+      }
+    }
+
+    &.impactMaps {
+      .label {
+        background-color: $tabImpactTransparent;
+      }
+
+      .key {
+        background-color: #f2faff;
+      }
+
+      &:hover {
+        box-shadow: 0 0 0 2px $tabImpactLight;
+        .label {
+          background-color: $tabImpactLightTransparent;
+        }
+      }
+
+
+      &.active {
+        box-shadow: 0 0 0 2px $tabImpact;
+        .label {
+          background-color: $tabImpact;
+        }
       }
     }
   }
