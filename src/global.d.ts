@@ -14,3 +14,4 @@ declare module "*.png" {
 }
 declare module "geolocation-utils";
 declare module "react-leaflet-control";
+declare module "shutterbug";
