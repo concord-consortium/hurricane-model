@@ -45,6 +45,9 @@ export class PrecipitationLayer extends BaseComponent<IProps, IState> {
         alphaRange: [0, alphaRange]
       });
       info.canvas.style.opacity = 0.7;
+      // Add shutterbug support. See: shutterbug-support.ts.
+      info.canvas.render = this.webglHeatmap.display.bind(this.webglHeatmap);
+      info.canvas.classList.add("canvas-3d");
     }
     this.webglHeatmap.adjustSize();
     this.updateData();

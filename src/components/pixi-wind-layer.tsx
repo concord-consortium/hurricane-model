@@ -78,6 +78,9 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
         view: info.canvas,
         resolution: window.devicePixelRatio
       });
+      // Add shutterbug support. See: shutterbug-support.ts.
+      info.canvas.render = this.pixiApp.render.bind(this.pixiApp);
+      info.canvas.classList.add("canvas-3d");
     }
     this.pixiApp.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
     this.pixiApp.render();
