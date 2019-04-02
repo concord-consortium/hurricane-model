@@ -5,6 +5,7 @@ import { MapView } from "./map-view";
 import { BottomBar } from "./bottom-bar";
 import { RightPanel } from "./right-panel";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import config from "../config";
 
 import * as css from "./index-page.scss";
@@ -15,7 +16,16 @@ interface IState {}
 
 @inject("stores")
 @observer
+
 export class IndexPage extends BaseComponent<IProps, IState> {
+  public componentDidMount() {
+    enableShutterbug(css.index);
+  }
+
+  public componentWillUnmount() {
+    disableShutterbug();
+  }
+
   public render() {
     const ui = this.stores.ui;
     const loading = this.stores.simulation.loading;
