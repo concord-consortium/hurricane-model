@@ -27,7 +27,7 @@ const DEFAULT_CONFIG: any = {
   // The smaller the number, the quicker it happens.
   landTemperature: 20,
   // Wind shear is present in winter and spring and it will cause hurricanes to die pretty fast.
-  windShearStrength: 0,
+  windShearStrength: 0.004,
   initialHurricanePosition: {lat: 10.5, lng: -20},
   initialHurricaneSpeed: {u: 0, v: 0},
   // When wind is far enough from the center of the pressure system, pressure system effect is lower

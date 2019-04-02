@@ -66,12 +66,12 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
   },
   {
     type: "low",
-    center: {lat: 39, lng: -92},
-    strength: 9
+    center: {lat: 45, lng: -82},
+    strength: 6
   },
   {
     type: "low",
-    center: {lat: 54, lng: -89},
+    center: {lat: 47, lng: -60},
     strength: 7
   }
 ];
