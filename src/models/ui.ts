@@ -4,7 +4,7 @@ import config from "../config";
 import { mapLayer, MapTilesName } from "../map-layer-tiles";
 
 // North Atlantic.
-export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[10, -90], [50, -10]];
+export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[5, -90], [50, -10]];
 // Storm surge data bounds is limited to very specify area (Texas to Maine).
 // See: https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
 const stormSurgeDataBounds: LatLngBoundsLiteral = [[24, -100], [46, -64]];
