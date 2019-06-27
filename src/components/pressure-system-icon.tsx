@@ -17,8 +17,8 @@ export const mbLabelRange = 13;
 
 interface IProps extends IBaseProps {
   model: PressureSystem;
-  onSliderDrag: () => void;
-  onSliderDragEnd: () => void;
+  onSliderDrag?: () => void;
+  onSliderDragEnd?: () => void;
 }
 interface IState {}
 
@@ -79,7 +79,9 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public handleStrengthChange = (e: any, value: number) => {
     const { model, onSliderDrag } = this.props;
-    onSliderDrag();
+    if (onSliderDrag) {
+      onSliderDrag();
+    }
     model.setStrength(value);
   }
 }

@@ -1,7 +1,7 @@
 import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
-import Switch from '@material-ui/core/Switch';
+import Switch from "@material-ui/core/Switch";
 import * as css from "./wind-arrows-toggle.scss";
 
 interface IProps extends IBaseProps {}
