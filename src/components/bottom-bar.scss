@@ -15,7 +15,7 @@ $overflowHeight: 11px;
 
 .bottomBar {
   background: #fff;
-  color: #666;
+  color: $controlLabel;
   height: $bottomBarHeight;
   display: flex;
   justify-content: space-between;

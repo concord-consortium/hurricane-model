@@ -53,15 +53,14 @@ const DEFAULT_CONFIG: any = {
   deterministic: false,
   // Each time the landfall happens the model will show a clickable rectangle around it so user can zoom in.
   markLandfalls: true,
-  windArrowsOpacity: 0.5,
+  windArrows: true,
   seaSurfaceTempOpacity: 0.5,
   // Enables steps per second display.
   benchmark: false,
   overlayTileOpacity: 0.75,
   // --- UI elements can be shown or hidden using options below ---
   seasonButton: true,
-  windArrowsSlider: true,
-  seaSurfaceTempSlider: true,
+  windArrowsToggle: true,
   lockSimulationWhileRunning: true
   // --- End of UI widgets ---
 };
