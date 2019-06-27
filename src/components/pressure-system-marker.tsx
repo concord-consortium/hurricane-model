@@ -34,7 +34,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
       >
         <PressureSystemIcon
           model={model}
-          onSliderDragStart={this.handleDragStart}
+          onSliderDrag={this.handleDrag}
           onSliderDragEnd={this.handleDragEnd}
         />
       </LeafletCustomMarker>
@@ -51,8 +51,10 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     this.stores.simulation.checkPressureSystem(model);
   }
 
-  private handleDragStart = () => {
-    this.setState({ sliderDrag: true });
+  private handleDrag = () => {
+    if (!this.state.sliderDrag) {
+      this.setState({ sliderDrag: true });
+    }
   }
 
   private handleDragEnd = () => {
