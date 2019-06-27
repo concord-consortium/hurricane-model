@@ -5,9 +5,11 @@
   "main": "index.js",
   "jest": {
     "testURL": "https://hurricane-model.unexisting.url.com",
-    "setupTestFrameworkScriptFile": "<rootDir>src/setupTests.js",
+    "setupFilesAfterEnv": [
+      "<rootDir>src/setupTests.js"
+    ],
     "transform": {
-      ".(ts|tsx|js)": "ts-jest"
+      ".(ts|tsx|js)$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "testPathIgnorePatterns": [
@@ -67,7 +69,7 @@
     "@types/enzyme": "^3.9.4",
     "@types/enzyme-adapter-react-16": "^1.0.5",
     "@types/istanbul-lib-coverage": "^2.0.1",
-    "@types/jest": "^23.3.14",
+    "@types/jest": "^24.0.15",
     "@types/leaflet": "^1.4.4",
     "@types/pixi.js": "^4.8.8",
     "@types/pngjs": "^3.3.2",
@@ -91,7 +93,7 @@
     "html-webpack-plugin": "^3.2.0",
     "identity-obj-proxy": "^3.0.0",
     "istanbul-lib-coverage": "^2.0.5",
-    "jest": "^23.6.0",
+    "jest": "^24.8.0",
     "jest-fetch-mock": "^2.1.2",
     "mercator-projection": "0.0.2",
     "mini-css-extract-plugin": "^0.7.0",
@@ -104,7 +106,7 @@
     "sass-loader": "^7.1.0",
     "script-loader": "^0.7.2",
     "style-loader": "^0.23.1",
-    "ts-jest": "^23.10.5",
+    "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
@@ -122,14 +124,14 @@
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "^4.0.0-alpha.18",
     "d3-scale": "^3.0.0",
-    "geolocation-utils": "^1.2.1",
+    "geolocation-utils": "1.1.1",
     "jquery": "^3.4.0",
     "kd-tree-javascript": "^1.0.3",
     "leaflet": "^1.5.1",
     "mobx": "^5.10.1",
     "mobx-react": "^5.4.4",
     "pixi.js": "^4.8.8",
-    "pngjs": "^3.3.3",
+    "pngjs": "3.3.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-draggable": "^3.3.0",
