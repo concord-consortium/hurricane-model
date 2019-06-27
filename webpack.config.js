@@ -43,10 +43,11 @@ module.exports = (env, argv) => {
             {
               loader: 'css-loader',
               options: {
-                modules: true,
+                modules: {
+                  localIdentName: '[name]--[local]--__hurr-v1__'
+                },
                 sourceMap: true,
-                importLoaders: 1,
-                localIdentName: '[name]--[local]--__hurr-v1__'
+                importLoaders: 1
               }
             },
             'postcss-loader',
