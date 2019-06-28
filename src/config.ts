@@ -16,8 +16,8 @@ const DEFAULT_CONFIG: any = {
   map: "satellite",
   // Map overlay, for now null (disabled) or "precipitation".
   overlay: null,
-  // If set to false, user won"t be able to drag and zoom map.
-  navigation: false,
+  // If set to false, user won't be able to drag and zoom map.
+  navigation: true,
   timestep: 1,
   pressureSystemStrength: 15, // max wind speed, m/s
   lowPressureSysAngleOffset: 23, // deg
@@ -52,7 +52,7 @@ const DEFAULT_CONFIG: any = {
   // Whether model is deterministic or random. Use true if you want your results to be replicable.
   deterministic: false,
   // Each time the landfall happens the model will show a clickable rectangle around it so user can zoom in.
-  markLandfalls: true,
+  markLandfalls: false,
   windArrows: true,
   seaSurfaceTempOpacity: 0.5,
   // Enables steps per second display.
