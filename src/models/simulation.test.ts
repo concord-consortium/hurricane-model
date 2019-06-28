@@ -3,7 +3,6 @@ import {
 } from "./simulation";
 import config from "../config";
 import { PNG } from "pngjs";
-import {distanceTo} from "geolocation-utils";
 import * as Leaflet from "leaflet";
 const fs = require("fs");
 
@@ -244,6 +243,9 @@ describe("SimulationModel store", () => {
     });
 
     it("handles landfall detection", () => {
+      const markLandfallsOrigVal = config.markLandfalls;
+      config.markLandfalls = true;
+
       const sim = new SimulationModel(options);
       expect(sim.numberOfStepsOverSea).toEqual(0);
 
@@ -263,6 +265,8 @@ describe("SimulationModel store", () => {
       const landfall = sim.landfalls[0];
       expect(landfall.position).toEqual(sim.hurricane.center);
       expect(landfall.category).toEqual(sim.hurricane.category);
+
+      config.markLandfalls = markLandfallsOrigVal;
     });
   });
 
