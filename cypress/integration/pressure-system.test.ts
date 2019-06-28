@@ -1,6 +1,6 @@
 context("Pressure System", () => {
   beforeEach(() => {
-    cy.visit("");
+    cy.visit("/");
     cy.window().then((win: any) => {
       // Limit number of pressure systems to 1.
       win.stores.simulation.pressureSystems.length = 1;

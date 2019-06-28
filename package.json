@@ -36,7 +36,6 @@
   },
   "scripts": {
     "start": "webpack-dev-server --hot",
-    "start:no-watch": "webpack-dev-server --lazy",
     "build": "npm-run-all lint:build clean build:webpack",
     "build:webpack": "webpack --mode production --devtool false",
     "clean": "rimraf dist",
@@ -86,7 +85,7 @@
     "canvas-prebuilt": "^1.6.11",
     "copy-webpack-plugin": "^5.0.3",
     "css-loader": "^3.0.0",
-    "cypress": "^3.3.1",
+    "cypress": "^3.3.2",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "file-loader": "^4.0.0",
@@ -116,9 +115,9 @@
     "typescript": "^3.5.2",
     "url-loader": "^2.0.1",
     "wait-on": "^3.2.0",
-    "webpack": "^4.35.0",
-    "webpack-cli": "^3.3.5",
-    "webpack-dev-server": "^3.7.2"
+    "webpack": "4.29.6",
+    "webpack-cli": "3.2.3",
+    "webpack-dev-server": "3.2.1"
   },
   "dependencies": {
     "@material-ui/core": "4.1.3",
