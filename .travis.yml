@@ -15,8 +15,17 @@ install:
   - travis_retry cypress install
 script:
   - npm rum test:coverage
-  - npm run start & wait-on http://localhost:8080
+  - npm run start:no-watch & wait-on http://localhost:8080
   - npm run test:cypress
   - npm run build
+after_script:
+  # If there are no errors, these dirs won't be created and Travis will complain about it while uploading artifacts.
+  - mkdir -p ./cypress/screenshots
 after_success:
   - ./s3_deploy.sh
+addons:
+  artifacts:
+    paths:
+      - ./cypress/screenshots
+    target_paths:
+      - /hurricane-model/build-artifacts/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER
