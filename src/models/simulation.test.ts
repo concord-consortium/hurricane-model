@@ -270,10 +270,20 @@ describe("SimulationModel store", () => {
     });
   });
 
-  describe("reset", () => {
-    it("restores initial settings", () => {
-      const sim = new SimulationModel(options);
+  describe("restart", () => {
+    it("restarts hurricane simulation without changing some of the initial conditions", () => {
+      const sim = new SimulationModel({
+        season: "fall",
+        pressureSystems: [
+          {
+            type: "high",
+            center: {lat: 10, lng: 0},
+            strength: 13
+          }
+        ]
+      });
       sim.hurricane.reset = jest.fn();
+      sim.pressureSystems[0].reset = jest.fn();
       sim.time = 123;
       sim.hurricane.center = {lat: 33, lng: 123};
       sim.hurricane.speed = {u: 123, v: 123};
@@ -281,13 +291,39 @@ describe("SimulationModel store", () => {
       sim.landfalls = [{category: 1, position: {lat: 33, lng: 123}}];
       sim.numberOfStepsOverSea = 123;
       sim.simulationStarted = true;
-      sim.reset();
+      sim.season = "winter";
+      sim.restart();
       expect(sim.time).toEqual(0);
-      expect(sim.hurricane.reset).toHaveBeenCalled();
       expect(sim.hurricaneTrack.length).toEqual(0);
       expect(sim.landfalls.length).toEqual(0);
       expect(sim.numberOfStepsOverSea).toEqual(0);
       expect(sim.simulationStarted).toEqual(false);
+      expect(sim.hurricane.reset).toHaveBeenCalled();
+      // These properties shouldn't be reset:
+      expect(sim.pressureSystems[0].reset).not.toHaveBeenCalled();
+      expect(sim.season).toEqual("winter");
+    });
+  });
+
+  describe("reset", () => {
+    it("triggers restart and resets initial conditions", () => {
+      const sim = new SimulationModel({
+        season: "fall",
+        pressureSystems: [
+          {
+            type: "high",
+            center: {lat: 10, lng: 0},
+            strength: 13
+          }
+        ]
+      });
+      jest.spyOn(sim, "restart");
+      sim.pressureSystems[0].reset = jest.fn();
+      sim.season = "winter";
+      sim.reset();
+      expect(sim.restart).toHaveBeenCalled();
+      expect(sim.pressureSystems[0].reset).toHaveBeenCalled();
+      expect(sim.season).toEqual("fall");
     });
   });
 
