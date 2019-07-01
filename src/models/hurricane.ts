@@ -1,6 +1,5 @@
-import { kdTree } from "kd-tree-javascript";
 import { IVector } from "../types";
-import { computed } from "mobx";
+import { computed, action } from "mobx";
 import { latLngPlusVector } from "../math-utils";
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 import config from "../config";
@@ -39,14 +38,14 @@ export class Hurricane extends PressureSystem {
   public speed: IVector = Object.assign({}, config.initialHurricaneSpeed);
   public strengthChange = 0;
   public cat3SSTThresholdReached = false;
-  private initialProps: IHurricaneOptions;
+  protected initialState: Hurricane;
 
   constructor(props: IHurricaneOptions) {
     super(Object.assign({}, props, {type: "low"}));
     if (props.speed !== undefined) {
       this.speed = Object.assign({}, props.speed);
     }
-    this.initialProps = props;
+    this.initialState = JSON.parse(JSON.stringify(this));
   }
 
   @computed public get range() {
@@ -137,11 +136,9 @@ export class Hurricane extends PressureSystem {
     }
   }
 
-  public reset() {
-    const props = this.initialProps;
-    this.strength = props.strength !== undefined ? props.strength : config.hurricaneStrength;
-    this.center = Object.assign({}, props.center || config.initialHurricanePosition);
-    this.speed = Object.assign({}, props.speed || config.initialHurricaneSpeed);
+  @action public reset() {
+    super.reset();
+    this.speed = Object.assign({}, this.initialState.speed);
     this.strengthChange = 0;
   }
 }

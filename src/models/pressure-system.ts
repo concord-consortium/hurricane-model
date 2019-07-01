@@ -1,5 +1,4 @@
 import { action, observable, computed } from "mobx";
-import { kdTree } from "kd-tree-javascript";
 import { ICoordinates, IWindPoint } from "../types";
 import { vecAverage } from "../math-utils";
 import { headingTo, moveTo, distanceTo } from "geolocation-utils";
@@ -33,8 +32,8 @@ export class PressureSystem {
   @observable public type: PressureSystemType;
   @observable public center: ICoordinates;
   @observable public strength = config.pressureSystemStrength;
-
   public lastCorrectCenter: ICoordinates;
+  protected initialState: PressureSystem;
 
   @computed public get range() {
     // Range is proportional to strength.
@@ -47,6 +46,7 @@ export class PressureSystem {
     if (props.strength !== undefined) {
       this.strength = props.strength;
     }
+    this.initialState = JSON.parse(JSON.stringify(this));
   }
 
   public applyToWindPoint = (wind: IWindPoint) => {
@@ -87,5 +87,11 @@ export class PressureSystem {
     if (this.lastCorrectCenter && minDistToOtherSystems(this, pressureSystems) <= config.minPressureSystemDistance) {
       this.center = this.lastCorrectCenter;
     }
+  }
+
+  @action public reset() {
+    this.center = Object.assign({}, this.initialState.center);
+    this.strength = this.initialState.strength;
+    this.type = this.initialState.type;
   }
 }

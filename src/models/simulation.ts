@@ -13,7 +13,7 @@ import * as septSeaTemp from "../../sea-surface-temp-img/sep.png";
 import { kdTree } from "kd-tree-javascript";
 import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint } from "../types";
 import { vecAverage } from "../math-utils";
-import { headingTo, moveTo, distanceTo } from "geolocation-utils";
+import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
 import config from "../config";
@@ -83,63 +83,6 @@ const benchmarkInterval = 30;
 const precipitationUpdateInterval = 5;
 
 export class SimulationModel {
-  // Region boundaries. Used only for optimization.
-  @observable public east = 45;
-  @observable public north = 45;
-  @observable public west = -45;
-  @observable public south = -45;
-
-  @observable public hurricaneTrack: ITrackPoint[] = [];
-  public time = 0;
-
-  // Current season, sets wind and sea temperature (in the future).
-  @observable public season: Season;
-
-  @observable public seaSurfaceTempData: PNG | null = null;
-
-  @observable public precipitationPoints: IPrecipitationPoint[] = [];
-
-  // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
-  @observable public simulationFinished = false;
-
-  // Pressure systems affect winds.
-  @observable public pressureSystems: PressureSystem[] = [];
-
-  @observable public hurricane: Hurricane = new Hurricane({
-    center: config.initialHurricanePosition,
-    strength: config.hurricaneStrength,
-    speed: config.initialHurricaneSpeed
-  });
-
-  @observable public simulationStarted = false;
-  @observable public simulationRunning = false;
-
-  @observable public landfalls: ILandfall[] = [];
-
-  @observable public stepsPerSecond = 0;
-
-  // Callbacks used by tests.
-  public _seaSurfaceTempDataParsed: () => void;
-
-  public numberOfStepsOverSea = 0;
-
-  private initialOptions: ISimulationOptions;
-  private previousTimestamp = 0;
-
-  constructor(options?: ISimulationOptions) {
-    if (!options) {
-      options = {};
-    }
-    this.initialOptions = options;
-    this.season = options.season || config.season;
-    this.pressureSystems = (options.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
-    autorun(() => {
-      // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
-      // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
-      // data is always updated when necessary.
-      this.updateSeaSurfaceTempData();
-    });
-  }
 
   @computed get areaWidth() {
     return this.east - this.west;
@@ -249,6 +192,50 @@ export class SimulationModel {
 
   @computed get seaSurfaceTempImgUrl() {
     return sstImages[this.season];
+  }
+  // Region boundaries. Used only for optimization.
+  @observable public east = 45;
+  @observable public north = 45;
+  @observable public west = -45;
+  @observable public south = -45;
+  @observable public hurricaneTrack: ITrackPoint[] = [];
+  // Current season, sets wind and sea temperature (in the future).
+  @observable public season: Season;
+  @observable public seaSurfaceTempData: PNG | null = null;
+  @observable public precipitationPoints: IPrecipitationPoint[] = [];
+  // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
+  @observable public simulationFinished = false;
+  // Pressure systems affect winds.
+  @observable public pressureSystems: PressureSystem[] = [];
+  @observable public hurricane: Hurricane = new Hurricane({
+    center: config.initialHurricanePosition,
+    strength: config.hurricaneStrength,
+    speed: config.initialHurricaneSpeed
+  });
+  @observable public simulationStarted = false;
+  @observable public simulationRunning = false;
+  @observable public landfalls: ILandfall[] = [];
+  @observable public stepsPerSecond = 0;
+  public time = 0;
+  public numberOfStepsOverSea = 0;
+  // Callback used by tests.
+  public _seaSurfaceTempDataParsed: () => void;
+  protected initialState: SimulationModel;
+  private previousTimestamp = 0;
+
+  constructor(options?: ISimulationOptions) {
+    if (!options) {
+      options = {};
+    }
+    this.season = options.season || config.season;
+    this.pressureSystems = (options.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
+    autorun(() => {
+      // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
+      // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
+      // data is always updated when necessary.
+      this.updateSeaSurfaceTempData();
+    });
+    this.initialState = JSON.parse(JSON.stringify(this));
   }
 
   @action.bound public updateBounds(bounds: LatLngBounds) {
@@ -375,16 +362,24 @@ export class SimulationModel {
     this.simulationRunning = false;
   }
 
-  @action.bound public reset() {
+  // This only restarts simulation without reseting parameters like pressure systems, season, etc.
+  @action.bound public restart() {
     this.simulationRunning = false;
     this.simulationFinished = false;
     this.simulationStarted = false;
     this.hurricaneTrack = [];
     this.landfalls = [];
-    this.time = 0;
-    this.hurricane.reset();
-    this.numberOfStepsOverSea = 0;
     this.precipitationPoints = [];
+    this.time = 0;
+    this.numberOfStepsOverSea = 0;
+    this.hurricane.reset();
+  }
+
+  // That's a complete reset to the initial state.
+  @action.bound public reset() {
+    this.restart();
+    this.pressureSystems.forEach(ps => ps.reset());
+    this.season = this.initialState.season;
   }
 
   @action.bound public removePressureSystem(ps: PressureSystem) {

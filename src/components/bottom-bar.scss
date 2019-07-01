@@ -69,10 +69,13 @@ $overflowHeight: 11px;
     background: $hoverColor;
   }
 
-  .playbackContainer {
+  .reloadRestart {
     margin-left: 10px;
-    margin-right: 10px;
     white-space: nowrap;
+  }
+
+  .startStop {
+    margin-right: 10px;
   }
 
   .fullscreenIcon {
@@ -94,6 +97,41 @@ $overflowHeight: 11px;
     }
   }
 }
+
+.playbackButton {
+  min-width: 60px;
+  height: 100%;
+  color: #434343;
+  font-weight: bold;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+
+  &:hover svg {
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.5);
+  }
+  &:active svg {
+    box-shadow: 0 0 0 4px rgba(255,255,255,1);
+  }
+
+  &:first-child {
+    border-top-left-radius: 10px;
+  }
+  &:last-child {
+    border-top-right-radius: 10px;
+  }
+  svg {
+    background: white;
+    display: block;
+    height: 30px;
+    width: 30px;
+    border-radius: 15px;
+    margin: $bottomBarTopPadding auto 0 auto;
+    path {
+      fill: #797979;
+    }
+  }
+}
+
 
 @media (max-width: 960px) {
   .logo {

@@ -1,4 +1,4 @@
-import {action, observable} from "mobx";
+import { action, observable, toJS } from "mobx";
 import {LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds} from "leaflet";
 import config from "../config";
 import { mapLayer, MapTilesName } from "../map-layer-tiles";
@@ -9,7 +9,6 @@ export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[5, -90], [50, -
 // See: https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
 const stormSurgeDataBounds: LatLngBoundsLiteral = [[24, -100], [46, -64]];
 
-export type TranslucentLayer = "seaSurfaceTemp";
 export type Overlay = "precipitation" | "stormSurge" | "population" | null;
 export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAvailable: boolean; };
 
@@ -24,7 +23,11 @@ export class UIModel {
   @observable public windArrows = config.windArrows;
   @observable public mapTile = mapLayer(config.map);
   @observable public overlay: Overlay = config.overlay;
+  protected initialState: UIModel;
 
+  constructor() {
+    this.initialState = toJS(this);
+  }
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
   @action.bound public mapUpdated(map: Map, programmaticUpdate: boolean) {
@@ -57,10 +60,6 @@ export class UIModel {
     this.zoomedInView = false;
   }
 
-  @action.bound public setOpacity(prop: TranslucentLayer, value: number) {
-    this.layerOpacity[prop] = value;
-  }
-
   @action.bound public setMapTiles(value: MapTilesName) {
     this.mapTile = mapLayer(value);
   }
@@ -71,5 +70,14 @@ export class UIModel {
 
   @action.bound public setWindArrows(enabled: boolean) {
     this.windArrows = enabled;
+  }
+
+  @action.bound public reset() {
+    this.initialBounds = NorthAtlanticInitialBounds;
+    this.zoomedInView = false;
+    this.mapModifiedByUser = false;
+    this.windArrows = this.initialState.windArrows;
+    this.mapTile = this.initialState.mapTile;
+    this.overlay = this.initialState.overlay;
   }
 }
