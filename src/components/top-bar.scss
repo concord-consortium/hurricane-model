@@ -1,0 +1,22 @@
+@import "common.scss";
+
+.topBar {
+  height: $topBarHeight;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 17px;
+  color: #797979;
+
+  .textButton {
+    margin-right: 16px;
+    &:first-child {
+      margin-left: 11px;
+    }
+    cursor: pointer;
+    &:hover {
+      color: $controlLabel;
+    }
+  }
+}
