@@ -3,7 +3,7 @@ import * as React from "react";
 export class Copyright extends React.Component {
   public render() {
     return (
-      <p style={{ fontSize: "0.9em" }}>
+      <p style={{ fontSize: "0.8em" }}>
         <b>Copyright © {(new Date()).getFullYear()}</b> <a href="http://concord.org" target="_blank">The Concord
         Consortium</a>.
         All rights reserved. The software is licensed under
