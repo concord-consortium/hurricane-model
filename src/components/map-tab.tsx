@@ -19,13 +19,13 @@ export class MapTab extends BaseComponent<IProps, IState> {
 
   public render() {
     const { tabType, active } = this.props;
-    const tabStyle = tabType === "geo" ? css.geoMaps : css.impactMaps;
+    const tabStyle = tabType === "base" ? css.geoMaps : css.impactMaps;
     const activeStyle = active ? css.active : "";
-    const tabText = tabType === "geo" ? "Geo Maps" : "Impact Maps";
+    const tabText = tabType === "base" ? "Base Maps" : "Maps Overlays";
     const tabMap = {
       backgroundImage: ""
     };
-    if (tabType === "geo") {
+    if (tabType === "base") {
       tabMap.backgroundImage = `url(${geoMapTab})`;
     } else {
       tabMap.backgroundImage = `url(${impactMapTab})`;

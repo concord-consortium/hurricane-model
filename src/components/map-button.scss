@@ -13,6 +13,13 @@
   margin-bottom: 12px !important;
   background-color: transparent;
 
+  svg {
+    position: absolute;
+    left: -10px;
+    top: 7px;
+    width: 26px;
+  }
+
   .content {
     overflow: hidden;
     border-radius: 9px;
@@ -54,6 +61,10 @@
         background-color: $tabGeoTransparent;
       }
 
+      svg {
+        fill: $tabGeo;
+      }
+
       .key {
         background-color: #f5faf4;
       }
@@ -76,6 +87,10 @@
     &.impactMaps {
       .label {
         background-color: $tabImpactTransparent;
+      }
+
+      svg {
+        fill: $tabImpact;
       }
 
       .key {

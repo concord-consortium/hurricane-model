@@ -6,6 +6,7 @@ import { MapType } from "./right-panel";
 import { mapLayer, MapTilesName } from "../map-layer-tiles";
 import { Overlay } from "../models/ui";
 import { MapButtonKey } from "./map-button-key";
+import ViewIcon from "../assets/view-icon.svg";
 
 import * as geoMapButton from "../assets/geo-map.png";
 import * as impactMapButton from "../assets/impact-map.png";
@@ -26,13 +27,13 @@ export class MapButton extends BaseComponent<IProps, IState> {
     const { label, mapType, value, disabled } = this.props;
     const ui = this.stores.ui;
 
-    const active = mapType === "geo" && ui.mapTile.mapType === value ||
-                   mapType !== "geo" && ui.overlay === value;
-    const buttonClass = mapType === "geo" ? css.geoMaps : css.impactMaps;
+    const active = mapType === "base" && ui.mapTile.mapType === value ||
+                   mapType !== "base" && ui.overlay === value;
+    const buttonClass = mapType === "base" ? css.geoMaps : css.impactMaps;
     const labelText = label ? label : "Satellite";
 
     let backgroundImage = "";
-    if (mapType === "geo") {
+    if (mapType === "base") {
       const geoMap = value as MapTilesName;
       // for geo maps, get a map preview from the map tile provider to use as a button background
       if (mapLayer(geoMap) && mapLayer(geoMap).url) {
@@ -58,17 +59,19 @@ export class MapButton extends BaseComponent<IProps, IState> {
           <div className={css.mapImage} style={{ backgroundImage }}/>
           <div className={css.label}>{labelText}</div>
           {
+            active && <ViewIcon />
+          }
+          {
             active && <div className={css.key}><MapButtonKey value={value}/></div>
           }
         </div>
-
       </Button>
     );
   }
 
   public handleMapSelect = () => {
     const { value } = this.props;
-    if (this.props.mapType === "geo") {
+    if (this.props.mapType === "base") {
       this.stores.ui.setMapTiles(value as MapTilesName);
     } else {
       // If user clicks the same overlay button again, just turn it off.
