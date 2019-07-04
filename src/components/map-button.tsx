@@ -7,9 +7,9 @@ import { mapLayer, MapTilesName } from "../map-layer-tiles";
 import { Overlay } from "../models/ui";
 import { MapButtonKey } from "./map-button-key";
 import ViewIcon from "../assets/view-icon.svg";
-
 import * as baseMapTabImg from "../assets/base-map-tab.png";
 import * as overlayTabImg from "../assets/overlay-tab.png";
+
 import * as css from "./map-button.scss";
 
 interface IProps extends IBaseProps {
@@ -19,6 +19,13 @@ interface IProps extends IBaseProps {
   disabled?: boolean;
 }
 interface IState {}
+
+const overlayImage: { [key: string]: string } = {
+  sst: overlayTabImg,
+  population: overlayTabImg,
+  precipitation: overlayTabImg,
+  stormSurge: overlayTabImg
+};
 
 @inject("stores")
 @observer
@@ -34,17 +41,17 @@ export class MapButton extends BaseComponent<IProps, IState> {
 
     let backgroundImage = "";
     if (mapType === "base") {
-      const geoMap = value as MapTilesName;
+      const baseMap = value as MapTilesName;
       // for geo maps, get a map preview from the map tile provider to use as a button background
-      if (mapLayer(geoMap) && mapLayer(geoMap).url) {
+      if (mapLayer(baseMap) && mapLayer(baseMap).url) {
         // get a preview for an area approx the same as the hurricane model data
-        const url = mapLayer(geoMap).url.replace("{z}", "2").replace("{x}", "1").replace("{y}", "1");
+        const url = mapLayer(baseMap).url.replace("{z}", "2").replace("{x}", "1").replace("{y}", "1");
         backgroundImage = `url(${url})`;
       } else {
         backgroundImage = `url(${baseMapTabImg})`;
       }
     } else {
-      backgroundImage = `url(${overlayTabImg})`;
+      backgroundImage = `url(${overlayImage[value] || overlayTabImg})`;
     }
 
     return (
