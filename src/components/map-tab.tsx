@@ -4,7 +4,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import { MapType } from "./right-panel";
 import * as css from "./map-tab.scss";
 import * as baseMapTabImg from "../assets/base-map-tab.png";
-import * as overlaysTabImg from "../assets/overlays-tab.png";
+import * as overlayTabImg from "../assets/overlay-tab.png";
 
 interface IProps extends IBaseProps {
   tabType: MapType;
@@ -27,7 +27,7 @@ export class MapTab extends BaseComponent<IProps, IState> {
     if (tabType === "base") {
       tabMap.backgroundImage = `url(${baseMapTabImg})`;
     } else {
-      tabMap.backgroundImage = `url(${overlaysTabImg})`;
+      tabMap.backgroundImage = `url(${overlayTabImg})`;
     }
     return (
       <div className={`${css.mapTab} ${tabStyle}`} data-test="map-tab">

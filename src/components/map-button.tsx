@@ -9,7 +9,7 @@ import { MapButtonKey } from "./map-button-key";
 import ViewIcon from "../assets/view-icon.svg";
 
 import * as baseMapTabImg from "../assets/base-map-tab.png";
-import * as overlaysTabImg from "../assets/overlays-tab.png";
+import * as overlayTabImg from "../assets/overlay-tab.png";
 import * as css from "./map-button.scss";
 
 interface IProps extends IBaseProps {
@@ -44,7 +44,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
         backgroundImage = `url(${baseMapTabImg})`;
       }
     } else {
-      backgroundImage = `url(${overlaysTabImg})`;
+      backgroundImage = `url(${overlayTabImg})`;
     }
 
     return (

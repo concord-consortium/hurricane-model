@@ -107,7 +107,7 @@ describe("UI model", () => {
         maxZoom: 13,
         subdomains: []
       });
-      expect(ui.overlay).toEqual(null);
+      expect(ui.overlay).toEqual("sst");
     });
   });
 });
