@@ -25,7 +25,7 @@ $tabPadding: 4px;
       background-color: $tabImpactLight;
     }
     &.active {
-      margin-left: -1px;
+      width: $mapTabWidth + 1px; // to cover border on the right side
     }
 
     .mapTabImage {
