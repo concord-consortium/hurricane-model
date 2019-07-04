@@ -1,0 +1,36 @@
+@import "common";
+
+
+.units {
+  display: flex;
+  justify-content: space-between;
+  width: 65%;
+  margin: 0 auto;
+}
+
+.scaleContainer {
+  text-align: center;
+
+  .column {
+    font-size: 11px;
+    text-align: right;
+    height: 173px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-around;
+    vertical-align: middle;
+  }
+
+  .scaleGradient {
+    margin-left: 12px;
+    margin-right: 7px;
+    height: 88%;
+    width: 24px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 0;
+    border: $bottomBarBorderStyle;
+  }
+}
+
+
