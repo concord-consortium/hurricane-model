@@ -1,7 +1,7 @@
 import * as React from "react";
+import {temperatureScale} from "../temperature-scale";
 import * as genericKeyCss from "./map-button-key.scss";
 import * as css from "./sst-key.scss";
-import {temperatureScale} from "../temperature-scale";
 
 const getFahrenheit = (celsius: number) => {
   return (celsius * 9 / 5) + 32;

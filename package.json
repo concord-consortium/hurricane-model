@@ -134,7 +134,6 @@
     "pngjs": "3.3.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-draggable": "^3.3.0",
     "react-jsonschema-form": "^1.6.1",
     "react-leaflet": "^2.4.0",
     "react-leaflet-control": "^2.1.1",
