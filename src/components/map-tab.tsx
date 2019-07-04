@@ -3,9 +3,8 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapType } from "./right-panel";
 import * as css from "./map-tab.scss";
-
-import * as geoMapTab from "../assets/geo-map.png";
-import * as impactMapTab from "../assets/impact-map.png";
+import * as baseMapTabImg from "../assets/base-map-tab.png";
+import * as overlaysTabImg from "../assets/overlays-tab.png";
 
 interface IProps extends IBaseProps {
   tabType: MapType;
@@ -26,9 +25,9 @@ export class MapTab extends BaseComponent<IProps, IState> {
       backgroundImage: ""
     };
     if (tabType === "base") {
-      tabMap.backgroundImage = `url(${geoMapTab})`;
+      tabMap.backgroundImage = `url(${baseMapTabImg})`;
     } else {
-      tabMap.backgroundImage = `url(${impactMapTab})`;
+      tabMap.backgroundImage = `url(${overlaysTabImg})`;
     }
     return (
       <div className={`${css.mapTab} ${tabStyle}`} data-test="map-tab">

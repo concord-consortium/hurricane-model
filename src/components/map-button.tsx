@@ -8,8 +8,8 @@ import { Overlay } from "../models/ui";
 import { MapButtonKey } from "./map-button-key";
 import ViewIcon from "../assets/view-icon.svg";
 
-import * as geoMapButton from "../assets/geo-map.png";
-import * as impactMapButton from "../assets/impact-map.png";
+import * as baseMapTabImg from "../assets/base-map-tab.png";
+import * as overlaysTabImg from "../assets/overlays-tab.png";
 import * as css from "./map-button.scss";
 
 interface IProps extends IBaseProps {
@@ -41,10 +41,10 @@ export class MapButton extends BaseComponent<IProps, IState> {
         const url = mapLayer(geoMap).url.replace("{z}", "2").replace("{x}", "1").replace("{y}", "1");
         backgroundImage = `url(${url})`;
       } else {
-        backgroundImage = `url(${geoMapButton})`;
+        backgroundImage = `url(${baseMapTabImg})`;
       }
     } else {
-      backgroundImage = `url(${impactMapButton})`;
+      backgroundImage = `url(${overlaysTabImg})`;
     }
 
     return (
