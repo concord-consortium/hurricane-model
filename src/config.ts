@@ -14,8 +14,8 @@ const DEFAULT_CONFIG: any = {
   season: "fall",
   // One of the available maps: "satellite", "relief" or "street".
   map: "satellite",
-  // Map overlay, for now null (disabled) or "precipitation".
-  overlay: null,
+  // Map overlay: "sst", "population", "precipitation" or "stormSurge".
+  overlay: "sst",
   // If set to false, user won't be able to drag and zoom map.
   navigation: true,
   timestep: 1,

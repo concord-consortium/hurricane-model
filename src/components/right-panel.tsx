@@ -53,6 +53,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="impact-panel">
                 <div className={css.tabContent}>
                   <div className={css.drawerTitle}>Map Overlays</div>
+                  <MapButton label="Sea Surface Temp" value="sst" mapType="overlays" />
                   <MapButton label="Population" value="population" mapType="overlays" />
                   <MapButton label="Precipitation" value="precipitation" mapType="overlays" />
                   <MapButton label="Storm Surge" value="stormSurge" mapType="overlays" disabled={!ui.zoomedInView} />
