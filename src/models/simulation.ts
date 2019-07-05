@@ -218,6 +218,7 @@ export class SimulationModel {
   @observable public stepsPerSecond = 0;
   public time = 0;
   public numberOfStepsOverSea = 0;
+  public numberOfStepsOverLand = 0;
   // Callback used by tests.
   public _seaSurfaceTempDataParsed: () => void;
   protected initialState: SimulationModel;
@@ -273,7 +274,13 @@ export class SimulationModel {
     this.hurricane.move(windSpeed, config.timestep);
 
     const sst = this.seaSurfaceTempAt(this.hurricane.center);
-    if (this.time % config.sstCheckInterval === 0) {
+    const enteredLand = sst === null && this.numberOfStepsOverSea >= minStepsOverSeaToDetectLandfall;
+    const enteredWater = sst !== null && this.numberOfStepsOverLand >= 0;
+
+    // Increase SST check interval around boundaries between land and water, so hurricane strength is updated
+    // immediately after making landfall (or going back to the ocean). Otherwise, the hurricane could
+    // stay too strong over land.
+    if (this.time % config.sstCheckInterval === 0 || enteredLand || enteredWater) {
       this.hurricane.setStrengthChangeFromSST(sst);
       if (this.windShearPresent) {
         this.hurricane.applyWindShear(config.sstCheckInterval);
@@ -281,7 +288,7 @@ export class SimulationModel {
     }
     this.hurricane.updateStrength();
 
-    if (config.markLandfalls && sst === null && this.numberOfStepsOverSea >= minStepsOverSeaToDetectLandfall) {
+    if (config.markLandfalls && enteredLand) {
       this.landfalls.push({
         position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category
@@ -290,8 +297,10 @@ export class SimulationModel {
 
     if (sst !== null) {
       this.numberOfStepsOverSea += 1;
+      this.numberOfStepsOverLand = 0;
     } else {
       this.numberOfStepsOverSea = 0;
+      this.numberOfStepsOverLand += 1;
     }
 
     if (this.time % precipitationUpdateInterval === 0) {
@@ -372,6 +381,7 @@ export class SimulationModel {
     this.precipitationPoints = [];
     this.time = 0;
     this.numberOfStepsOverSea = 0;
+    this.numberOfStepsOverLand = 0;
     this.hurricane.reset();
   }
 

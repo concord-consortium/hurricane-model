@@ -25,7 +25,7 @@ const DEFAULT_CONFIG: any = {
   hurricaneStrength: 24, // max wind speed, m/s
   // Land temperature controls how fast the hurricane dies when it hits the land.
   // The smaller the number, the quicker it happens.
-  landTemperature: 20,
+  landTemperature: 22,
   // Wind shear is present in winter and spring and it will cause hurricanes to die pretty fast.
   windShearStrength: 0.004,
   initialHurricanePosition: {lat: 10.5, lng: -20},

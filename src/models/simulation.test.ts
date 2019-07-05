@@ -239,6 +239,7 @@ describe("SimulationModel store", () => {
       expect(sim.hurricaneTrack[0].position).toEqual(oldPos);
       expect(sim.hurricaneTrack[0].position).not.toBe(oldPos); // we expect a copy
       expect(sim.numberOfStepsOverSea).toEqual(1);
+      expect(sim.numberOfStepsOverLand).toEqual(0);
       expect(sim.precipitationPoints.length).toBeGreaterThan(0);
     });
 
@@ -248,10 +249,12 @@ describe("SimulationModel store", () => {
 
       const sim = new SimulationModel(options);
       expect(sim.numberOfStepsOverSea).toEqual(0);
+      expect(sim.numberOfStepsOverLand).toEqual(0);
 
       sim.seaSurfaceTempAt = jest.fn().mockImplementation(() => null); // null => land
       sim.tick();
       expect(sim.numberOfStepsOverSea).toEqual(0);
+      expect(sim.numberOfStepsOverLand).toEqual(1);
 
       sim.seaSurfaceTempAt = jest.fn().mockImplementation(() => 28); // temperature value => sea
       for (let i = 0; i < minStepsOverSeaToDetectLandfall; i++) sim.tick();
@@ -261,6 +264,7 @@ describe("SimulationModel store", () => {
       sim.seaSurfaceTempAt = jest.fn().mockImplementation(() => null); // null => land
       sim.tick();
       expect(sim.numberOfStepsOverSea).toEqual(0); // counter is reset now
+      expect(sim.numberOfStepsOverLand).toEqual(1);
       expect(sim.landfalls.length).toEqual(1); // but landfall has been detected
       const landfall = sim.landfalls[0];
       expect(landfall.position).toEqual(sim.hurricane.center);
@@ -290,6 +294,7 @@ describe("SimulationModel store", () => {
       sim.hurricaneTrack = [{category: 1, position: {lat: 33, lng: 123}}];
       sim.landfalls = [{category: 1, position: {lat: 33, lng: 123}}];
       sim.numberOfStepsOverSea = 123;
+      sim.numberOfStepsOverLand = 321;
       sim.simulationStarted = true;
       sim.season = "winter";
       sim.restart();
@@ -297,6 +302,7 @@ describe("SimulationModel store", () => {
       expect(sim.hurricaneTrack.length).toEqual(0);
       expect(sim.landfalls.length).toEqual(0);
       expect(sim.numberOfStepsOverSea).toEqual(0);
+      expect(sim.numberOfStepsOverLand).toEqual(0);
       expect(sim.simulationStarted).toEqual(false);
       expect(sim.hurricane.reset).toHaveBeenCalled();
       // These properties shouldn't be reset:
