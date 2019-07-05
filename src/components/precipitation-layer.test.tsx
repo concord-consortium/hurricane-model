@@ -7,7 +7,7 @@ import {Provider} from "mobx-react";
 import {Map} from "react-leaflet";
 
 // Mock webgl-heatmap as it won't work in JSDOM env (no webgl support).
-jest.mock("../webgl-heatmap/webgl-heatmap");
+jest.mock("../libs/webgl-heatmap");
 
 describe("PrecipitationLayer component", () => {
   let stores = createStores();

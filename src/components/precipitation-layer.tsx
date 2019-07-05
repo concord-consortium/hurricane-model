@@ -1,5 +1,5 @@
 // @ts-ignore
-import WebGLHeatmap from "../webgl-heatmap/webgl-heatmap";
+import WebGLHeatmap from "../libs/webgl-heatmap";
 import CanvasLayer from "./react-leaflet-canvas-layer";
 import { ICoordinates } from "../types";
 import { inject, observer } from "mobx-react";
