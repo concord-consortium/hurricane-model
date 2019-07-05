@@ -1,3 +1,7 @@
+// Taken from https://github.com/frogcat/leaflet-tilelayer-mask as it's an old library and it isn't published to NPM.
+// Also, there are some customizations:
+// - unavailable tiles are hidden, so browser doesn't display broken image icon
+
 import * as L from 'leaflet'
 
 var defaultMaskUrl = [
@@ -112,6 +116,9 @@ export default L.TileLayer.extend({
     tile.setAttribute('x', tilePos.x)
     tile.setAttribute('y', tilePos.y)
     tile.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url)
+
+    // customization: hide unavailable tiles, so browser doesn't show broken image icon.
+    tile.onerror = () => tile.style.display = 'none';
 
     this._tiles[key] = {
       el: tile,
