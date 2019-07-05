@@ -9,6 +9,9 @@ import { MapButtonKey } from "./map-button-key";
 import ViewIcon from "../assets/view-icon.svg";
 import * as baseMapTabImg from "../assets/base-map-tab.png";
 import * as overlayTabImg from "../assets/overlay-tab.png";
+import * as sstThumbImg from "../assets/sst-thumb.png";
+import * as precipitationThumbImg from "../assets/precipitation-thumb.png";
+import * as stormSurgeThumbImg from "../assets/storm-surge-thumb.png";
 
 import * as css from "./map-button.scss";
 
@@ -21,10 +24,10 @@ interface IProps extends IBaseProps {
 interface IState {}
 
 const overlayImage: { [key: string]: string } = {
-  sst: overlayTabImg,
+  sst: sstThumbImg,
   population: overlayTabImg,
-  precipitation: overlayTabImg,
-  stormSurge: overlayTabImg
+  precipitation: precipitationThumbImg,
+  stormSurge: stormSurgeThumbImg
 };
 
 @inject("stores")
