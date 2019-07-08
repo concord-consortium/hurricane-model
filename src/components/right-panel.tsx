@@ -27,7 +27,6 @@ export class RightPanel extends BaseComponent<IProps, IState> {
 
   public render() {
     const { open, selectedTab } = this.state;
-    const { ui } = this.stores;
     return (
       <div className={css.rightPanelContainer}>
         <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
