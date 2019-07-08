@@ -3,6 +3,7 @@
 // - unavailable tiles are hidden, so browser doesn't display broken image icon
 
 import * as L from "leaflet";
+import { Browser } from 'leaflet'
 
 var defaultMaskUrl = [
   "data:image/png;base64,",
@@ -37,34 +38,41 @@ var defaultMaskUrl = [
 export default L.TileLayer.extend({
   options: {
     maskUrl: defaultMaskUrl,
-    maskSize: 512,
-    center: [0, 0]
+    maskSize: 1000, // in kilometers
+    maskCenter: [0, 0] // lat, lng
   },
   getMaskSize: function() {
     const size = this.options.maskSize;
+    const center = L.latLng(this.options.maskCenter);
 
-    return new L.Point(size, size);
-
-    const center = L.latLng(this.options.center);
-
-    const lngRadius = (size / 40075017) * 360 / Math.cos((Math.PI / 180) * center.lat);
+    const lngRadius = (size / 40075.017) * 360 / Math.cos((Math.PI / 180) * center.lat);
     const center2 = new L.LatLng(center.lat, center.lng - lngRadius);
     const point = this._map.latLngToContainerPoint(center);
     const point2 = this._map.latLngToContainerPoint(center2);
 
     const sizeInPx = Math.max(Math.round(point.x - point2.x), 1);
-    console.log(sizeInPx);
 
     return new L.Point(sizeInPx, sizeInPx);
   },
   _updateCenter: function() {
     if (this._map) {
-      const containerPoint = this._map.latLngToContainerPoint(this.options.center);
+      const containerPoint = this._map.latLngToContainerPoint(this.options.maskCenter);
       let p = this._map.containerPointToLayerPoint(containerPoint);
       p = p.subtract(this.getMaskSize().divideBy(2));
       this._image.setAttribute("x", p.x);
       this._image.setAttribute("y", p.y);
     }
+  },
+  _updateMaskSize: function() {
+    if (this._map) {
+      var size = this.getMaskSize();
+      this._image.setAttribute("width", size.x);
+      this._image.setAttribute("height", size.y);
+    }
+  },
+  _handleViewChange: function() {
+    this._updateCenter();
+    this._updateMaskSize();
   },
   _initContainer: function() {
     if (this._container) return;
@@ -77,8 +85,8 @@ export default L.TileLayer.extend({
     mask.setAttribute("id", "leaflet-tilelayer-mask-" + L.stamp(this));
     mask.setAttribute("x", "-100%");
     mask.setAttribute("y", "-100%");
-    mask.setAttribute("width", "300%");
-    mask.setAttribute("height", "300%");
+    mask.setAttribute("width", "200%");
+    mask.setAttribute("height", "200%");
     image.setAttribute("width", size.x);
     image.setAttribute("height", size.y);
     image.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", this.options.maskUrl);
@@ -86,6 +94,13 @@ export default L.TileLayer.extend({
     this._container = container;
     this._image = image;
     this._updateCenter();
+
+    this._map.on("viewreset", this._handleViewChange, this);
+    this._map.on("moveend", this._handleViewChange, this);
+    if (this._map.options.zoomAnimation && Browser.any3d) {
+      this._map.on("zoom", this._handleViewChange, this);
+      this._map.on("zoomanim", this._handleViewChange, this);
+    }
   },
   _updateLevels: function() {
     var zoom = this._tileZoom;
