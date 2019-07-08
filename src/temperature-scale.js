@@ -49,4 +49,4 @@ exports.temperatureScale = (temperature) => {
 
 exports.invertedTemperatureScale = (color) => {
   return invertedScale[color] ? invertedScale[color] : null;
-}
+};

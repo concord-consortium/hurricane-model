@@ -1,4 +1,4 @@
-import {LatLngExpression, CRS, LatLngBounds} from "leaflet";
+import {LatLngExpression, CRS, LatLngBounds, latLngBounds} from "leaflet";
 import { action, observable, computed, autorun } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
@@ -288,7 +288,7 @@ export class SimulationModel {
     }
     this.hurricane.updateStrength();
 
-    if (config.markLandfalls && enteredLand) {
+    if (enteredLand) {
       this.landfalls.push({
         position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category
