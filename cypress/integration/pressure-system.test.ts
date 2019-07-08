@@ -1,6 +1,6 @@
 context("Pressure System", () => {
   beforeEach(() => {
-    cy.visit("");
+    cy.visit("/");
     cy.window().then((win: any) => {
       // Limit number of pressure systems to 1.
       win.stores.simulation.pressureSystems.length = 1;
@@ -10,7 +10,7 @@ context("Pressure System", () => {
   it("can have strength adjusted by slider", () => {
     cy.window().then((win: any) => {
       const oldStrength = win.stores.simulation.pressureSystems[0].strength;
-      cy.get("div[role='slider'] button").first()
+      cy.get("[data-test='pressure-system-slider'] svg").first()
         .trigger('mousedown', { which: 1 });
       cy.get(".leaflet-container")
         // move slider up

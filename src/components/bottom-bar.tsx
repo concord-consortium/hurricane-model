@@ -3,7 +3,7 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { SeasonButton } from "./season-button";
 import { PlaybackButtons } from "./playback-buttons";
-import { OpacitySlider } from "./opacity-slider";
+import { WindArrowsToggle } from "./wind-arrows-toggle";
 import { HurricaneScale } from "./hurricane-scale";
 import CCLogo from "../assets/cc-logo.svg";
 import CCLogoSmall from "../assets/cc-logo-small.svg";
@@ -55,7 +55,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public render() {
-    const anySlider = config.windArrowsSlider || config.seaSurfaceTempSlider;
+    const anySlider = config.windArrowsToggle || config.seaSurfaceTempSlider;
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -73,12 +73,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             anySlider &&
             <div className={`${css.widgetGroup} hoverable`}>
               {
-                config.windArrowsSlider &&
-                <OpacitySlider property="windArrows" showLabels={true} />
-              }
-              {
-                config.seaSurfaceTempSlider &&
-                <OpacitySlider property="seaSurfaceTemp" showLabels={!config.windArrowsSlider} />
+                config.windArrowsToggle &&
+                <WindArrowsToggle />
               }
             </div>
           }

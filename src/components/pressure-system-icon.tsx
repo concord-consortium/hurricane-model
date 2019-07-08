@@ -17,7 +17,7 @@ export const mbLabelRange = 13;
 
 interface IProps extends IBaseProps {
   model: PressureSystem;
-  onSliderDragStart?: () => void;
+  onSliderDrag?: () => void;
   onSliderDragEnd?: () => void;
 }
 interface IState {}
@@ -27,7 +27,7 @@ interface IState {}
 export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public render() {
-    const { model, onSliderDragStart, onSliderDragEnd } = this.props;
+    const { model, onSliderDragEnd } = this.props;
     const sim = this.stores.simulation;
     const strengthNorm = (model.strength - minStrength) / (maxStrength - minStrength) - 0.5; // [-0.5, 0.5]
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
@@ -48,17 +48,16 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
         }
         <div className={css.sliderContainer}>
           <Slider
-            classes={{ thumb: css.thumb, track: css.track }}
+            classes={{ thumb: css.thumb, track: css.track, rail: css.rail, disabled: css.disabled }}
             value={model.strength}
             min={minStrength}
             max={maxStrength}
             onChange={this.handleStrengthChange}
-            onDragStart={onSliderDragStart}
-            onDragEnd={onSliderDragEnd}
-            vertical={true}
-            thumb={<VerticalHandle />}
+            onChangeCommitted={onSliderDragEnd}
+            orientation="vertical"
+            ThumbComponent={VerticalHandle}
             disabled={uiDisabled}
-            data-test={"pressure-system-slider"}
+            data-test="pressure-system-slider"
           />
         </div>
         <div className={css.label}>
@@ -79,7 +78,10 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
   }
 
   public handleStrengthChange = (e: any, value: number) => {
-    const { model } = this.props;
+    const { model, onSliderDrag } = this.props;
+    if (onSliderDrag) {
+      onSliderDrag();
+    }
     model.setStrength(value);
   }
 }

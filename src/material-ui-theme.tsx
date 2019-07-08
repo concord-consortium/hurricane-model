@@ -4,13 +4,15 @@ export default createMuiTheme({
   palette: {
     primary: {
       main: "#aaa"
+    },
+    secondary: {
+      main: "#ff9900"
     }
   },
   shape: {
     borderRadius: 9
   },
   typography: {
-    useNextVariants: true,
     fontFamily: "Lato, Arial, sans-serif",
     button: {
       textTransform: "none",
@@ -22,7 +24,7 @@ export default createMuiTheme({
     MuiButton: {
       root: {
         "&:hover": {
-          backgroundColor: "#f2f2f2",
+          backgroundColor: "#dfdfdf",
         },
         "&$disabled": {
           color: "inherit",
@@ -30,48 +32,34 @@ export default createMuiTheme({
         }
       },
       text: {
-        color: "#666",
+        color: "#434343",
         padding: 0,
       }
     },
-    // Ignore TS error in the next line. MuiSlider is part of material-ui/lab, not /core, so TS complains
-    // about it being undefined. Perhaps it'd be possible to augment some interfaces, but it doesn't seem worth it.
-    // @ts-ignore
-    MuiSlider: {
-      track: {
-        "backgroundColor": "#797979",
-        "height": 1,
-        "&$vertical": {
-          width: 1
-        },
-        "&$disabled": {
-          color: "inherit",
-          opacity: 0.25,
-          cursor: "default"
-        }
-      },
-      trackAfter: {
-        opacity: 1
-      },
-      thumbIconWrapper: {
-        "width": "20px",
-        "height": "20px",
-
-        "&$disabled": {
-          width: "20px",
-          height: "20px",
-          opacity: 0.25
-        }
+    MuiSwitch: {
+      root: {
+        padding: 14
       },
       thumb: {
-        "&$focused, &:hover": {
-          boxShadow: "0 0 0 3px rgba(255,255,255,0.85)"
+        "width": 18,
+        "height": 18,
+        "boxShadow": "0 1px 5px 0 rgba(0, 0, 0, 0.35)",
+        "border": "1px solid #797979",
+        "$switchBase:hover &": {
+          boxShadow: "0 0 0 3px rgba(255, 255, 255, 0.5)",
         },
-        "&$activated": {
-          boxShadow: "0 0 0 3px rgba(255,255,255,0.85)"
-        },
-        "&$disabled": {
-          boxShadow: 0
+        "$switchBase:active &": {
+          boxShadow: "0 0 0 3px rgba(255, 255, 255, 1)",
+        }
+      },
+      switchBase: {
+        backgroundColor: "transparent !important" // disable default hover state
+      },
+      track: {
+        "backgroundColor": "#797979",
+        "opacity": 1,
+        "$switchBase$checked + &": {
+          opacity: 1
         }
       }
     }

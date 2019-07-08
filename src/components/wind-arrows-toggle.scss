@@ -1,0 +1,16 @@
+@import "common";
+
+.windArrowsToggle {
+  margin-top: $bottomBarTopPadding;
+  width: 97px;
+
+  .label {
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .toggleContainer {
+    text-align: center;
+  }
+}
+

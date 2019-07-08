@@ -57,19 +57,34 @@
 
   .sliderContainer {
     display: inline-block;
-    margin-left: 20px;
+    margin-left: 8px;
     margin-top: 10px;
-    height: 40px;
+    height: 45px;
     vertical-align: middle;
 
+    .disabled {
+      opacity: 0.25;
+
+      .thumb {
+        margin-left: -8.5px;
+        margin-bottom: -8.5px;
+      }
+    }
+
     .thumb {
+      width: 20px;
+      height: 20px;
+      margin-left: -8.5px;
+      margin-bottom: -8.5px;
       box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
       &:hover, &:active {
         box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5)
       }
     }
 
-    .track {
+    .track, .rail {
+      width: 1px;
+      opacity: 1;
       background-color: #fff;
     }
   }

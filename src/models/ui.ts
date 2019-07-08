@@ -9,7 +9,7 @@ export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[5, -90], [50, -
 // See: https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
 const stormSurgeDataBounds: LatLngBoundsLiteral = [[24, -100], [46, -64]];
 
-export type TranslucentLayer = "windArrows" | "seaSurfaceTemp";
+export type TranslucentLayer = "seaSurfaceTemp";
 export type Overlay = "precipitation" | "stormSurge" | "population" | null;
 export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAvailable: boolean; };
 
@@ -18,10 +18,10 @@ export class UIModel {
   @observable public zoomedInView: ZoomedInViewProps = false;
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
-    windArrows: config.windArrowsOpacity,
     seaSurfaceTemp: config.seaSurfaceTempOpacity,
     overlayTiles: config.overlayTileOpacity
   };
+  @observable public windArrows = config.windArrows;
   @observable public mapTile = mapLayer(config.map);
   @observable public overlay: Overlay = config.overlay;
 
@@ -67,5 +67,9 @@ export class UIModel {
 
   @action.bound public setOverlay(value: Overlay) {
     this.overlay = value;
+  }
+
+  @action.bound public setWindArrows(enabled: boolean) {
+    this.windArrows = enabled;
   }
 }
