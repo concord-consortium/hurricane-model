@@ -35,6 +35,13 @@ var defaultMaskUrl = [
   "zI6ZgxlZuIRlVbW11eXFeFhxZHAmZlY2dlYWlPwPAD6nKPWk11d/AAAAAElFTkSuQmCC"
 ].join("");
 
+const remove = (el) => {
+  var parent = el.parentNode;
+  if (parent) {
+    parent.removeChild(el);
+  }
+};
+
 export default L.TileLayer.extend({
   options: {
     maskUrl: defaultMaskUrl,
@@ -92,6 +99,7 @@ export default L.TileLayer.extend({
     image.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", this.options.maskUrl);
     container.setAttribute("mask", "url(#" + mask.getAttribute("id") + ")");
     this._container = container;
+    this._defs = defs;
     this._image = image;
     this._updateCenter();
 
@@ -101,6 +109,14 @@ export default L.TileLayer.extend({
       this._map.on("zoom", this._handleViewChange, this);
       this._map.on("zoomanim", this._handleViewChange, this);
     }
+  },
+  onRemove: function(map) {
+    this._removeAllTiles();
+    remove(this._container);
+    remove(this._defs);
+    map._removeZoomLimit(this);
+    this._container = null;
+    this._tileZoom = undefined;
   },
   _updateLevels: function() {
     var zoom = this._tileZoom;
