@@ -1,7 +1,7 @@
 import { action, observable, computed } from "mobx";
 import {LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds} from "leaflet";
 import config from "../config";
-import { mapLayer, MapTilesName } from "../map-layer-tiles";
+import { mapLayer, MapTilesName, mapTilesNames } from "../map-layer-tiles";
 
 // North Atlantic.
 export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[5, -90], [50, -10]];
@@ -39,6 +39,15 @@ export class UIModel {
     return mapLayer(this.baseMap).attribution;
   }
 
+  @computed public get maxZoom() {
+    const baseMap = mapLayer(this.baseMap);
+    // Overlay might not be defined using tiles.
+    const overlay = this.overlay &&
+                    mapTilesNames.indexOf(this.overlay) !== -1 &&
+                    mapLayer(this.overlay as MapTilesName);
+    return Math.min(baseMap.maxZoom, overlay && overlay.maxZoom || Infinity);
+  }
+
   @action.bound public mapUpdated(map: Map, programmaticUpdate: boolean) {
     this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
     this.mapModifiedByUser = !programmaticUpdate;
@@ -73,7 +82,7 @@ export class UIModel {
     this.baseMap = value;
   }
 
-  @action.bound public setOverlay(value: Overlay) {
+  @action.bound public setOverlay(value: Overlay | null) {
     this.overlay = value;
   }
 

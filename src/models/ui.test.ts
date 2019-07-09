@@ -10,6 +10,18 @@ describe("UI model", () => {
     expect(ui.latLngToContainerPoint).toBeDefined();
   });
 
+  describe("maxZoom", () => {
+    it("should consider both base map and overlay tiles (when tiles are used as overlay)", () => {
+      const ui = new UIModel();
+      ui.setMapTiles("street");
+      ui.setOverlay(null);
+      expect(ui.maxZoom).toEqual(19);
+      ui.setMapTiles("street");
+      ui.setOverlay("stormSurge");
+      expect(ui.maxZoom).toEqual(13);
+    });
+  });
+
   describe("mapUpdated", () => {
     it("updates latLngToContainerPoint and mapModifiedByUser", () => {
       const ui = new UIModel();
