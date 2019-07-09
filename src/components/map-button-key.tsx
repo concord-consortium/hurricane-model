@@ -3,6 +3,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import { MapTilesName } from "../map-layer-tiles";
 import { Overlay } from "../models/ui";
 import * as leveedAreaKey from "../assets/leveed-area-key.png";
+import { SSTKey } from "./sst-key";
 
 import * as css from "./map-button-key.scss";
 
@@ -63,26 +64,37 @@ const keyData: { [name: string]: IMapButtonKeyDef } = {
   }
 };
 
+const keyElement: { [name: string]: JSX.Element } = {
+  sst: <SSTKey />
+};
+
 export class MapButtonKey extends BaseComponent<IProps, IState> {
   public render() {
     const { value } = this.props;
-    const key = value && keyData[value];
-    if (!key) {
+    const keyDef = value && keyData[value];
+    const KeyElement = value && keyElement[value];
+    if (!keyDef && !KeyElement) {
       return null;
     }
     return (
       <div className={css.keyContainer}>
-        <div className={css.keyHeader}>{ key.header || "Key"}</div>
-        <div className={css.keyContent}>
-          {
-            key.values.map((entry: IMapButtonKeyEntry) =>
-              <div key={entry.text} className={css.entry}>
-                <div className={css.colorBox} style={{background: entry.background}}/>
-                <span>{entry.text}</span>
-              </div>
-            )
-          }
-        </div>
+        <div className={css.keyHeader}>Key</div>
+        { KeyElement && KeyElement }
+        { keyDef &&
+          <div>
+            { keyDef.header && <div className={css.keySubheader}>{ keyDef.header }</div> }
+            <div className={css.keyContent}>
+              {
+                keyDef.values.map((entry: IMapButtonKeyEntry) =>
+                  <div key={entry.text} className={css.entry}>
+                    <div className={css.colorBox} style={{background: entry.background}}/>
+                    <span>{entry.text}</span>
+                  </div>
+                )
+              }
+            </div>
+          </div>
+        }
       </div>
     );
   }

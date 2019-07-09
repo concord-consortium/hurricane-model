@@ -1,0 +1,32 @@
+@import "common.scss";
+
+.dialogBody {
+  margin: 1em;
+}
+
+.title {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.closeButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #797979;
+  cursor: pointer;
+  &:hover {
+    color: $controlLabel;
+  }
+}
+
+.content {
+  color: $controlLabel;
+  margin-top: 1em;
+  p:first-child {
+    margin-top: 0;
+  }
+  p:last-child {
+    margin-bottom: 0;
+  }
+}

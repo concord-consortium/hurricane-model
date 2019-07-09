@@ -89,11 +89,14 @@ export class MapView extends BaseComponent<IProps, IState> {
             url={ui.mapTile.url}
           />
           <PixiWindLayer />
-          <ImageOverlay
-            opacity={ui.layerOpacity.seaSurfaceTemp}
-            url={sim.seaSurfaceTempImgUrl}
-            bounds={imageOverlayBounds}
-          />
+          {
+            ui.overlay === "sst" &&
+            <ImageOverlay
+              opacity={ui.layerOpacity.seaSurfaceTemp}
+              url={sim.seaSurfaceTempImgUrl}
+              bounds={imageOverlayBounds}
+            />
+          }
           {
             ui.overlay === "population" &&
             <TileLayer

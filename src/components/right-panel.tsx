@@ -6,7 +6,7 @@ import { MapButton } from "./map-button";
 
 import * as css from "./right-panel.scss";
 
-export type MapType = "geo" | "impact";
+export type MapType = "base" | "overlay";
 
 interface IProps extends IBaseProps { }
 interface IState {
@@ -21,7 +21,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
     super(props);
     this.state = {
       open: false,
-      selectedTab: "geo"
+      selectedTab: "base"
     };
   }
 
@@ -32,30 +32,31 @@ export class RightPanel extends BaseComponent<IProps, IState> {
       <div className={css.rightPanelContainer}>
         <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
           <ul className={css.rightPanelTabs}>
-            <li><div id={"geo"} className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
-              <MapTab tabType={"geo"} active={selectedTab === "geo" || !open} /></div></li>
-            <li><div id={"impact"} className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
-              <MapTab tabType={"impact"} active={selectedTab === "impact" || !open} /></div></li>
+            <li><div id="base" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
+              <MapTab tabType="base" active={selectedTab === "base" || !open} /></div></li>
+            <li><div id="overlay" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
+              <MapTab tabType="overlay" active={selectedTab === "overlay" || !open} /></div></li>
           </ul>
           {
-            selectedTab === "geo" &&
-            <div className={`${css.tabContentBack} ${css.geoMaps}`} data-test="geo-panel">
+            selectedTab === "base" &&
+            <div className={`${css.tabContentBack} ${css.geoMaps}`} data-test="base-panel">
               <div className={css.tabContent}>
-                <div className={css.drawerTitle}>Geologic Maps</div>
-                <MapButton label="Satellite" value="satellite" mapType="geo" />
-                <MapButton label="Relief" value="relief" mapType="geo" />
-                <MapButton label="Street" value="street" mapType="geo" />
+                <div className={css.drawerTitle}>Base Maps</div>
+                <MapButton label="Satellite" value="satellite" mapType="base" />
+                <MapButton label="Relief" value="relief" mapType="base" />
+                <MapButton label="Street" value="street" mapType="base" />
               </div>
             </div>
           }
           {
-            selectedTab === "impact" &&
-            <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="impact-panel">
+            selectedTab === "overlay" &&
+            <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="overlay-panel">
                 <div className={css.tabContent}>
-                  <div className={css.drawerTitle}>Impact Maps</div>
-                  <MapButton label="Population" value="population" mapType="impact" />
-                  <MapButton label="Precipitation" value="precipitation" mapType="impact" />
-                  <MapButton label="Storm Surge" value="stormSurge" mapType="impact" disabled={!ui.zoomedInView} />
+                  <div className={css.drawerTitle}>Map Overlays</div>
+                  <MapButton label="Sea Surface Temp" value="sst" mapType="overlay" />
+                  <MapButton label="Population" value="population" mapType="overlay" />
+                  <MapButton label="Precipitation" value="precipitation" mapType="overlay" />
+                  <MapButton label="Storm Surge" value="stormSurge" mapType="overlay" disabled={!ui.zoomedInView} />
                 </div>
             </div>
           }

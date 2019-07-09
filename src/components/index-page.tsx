@@ -3,13 +3,13 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapView } from "./map-view";
 import { BottomBar } from "./bottom-bar";
+import { TopBar } from "./top-bar";
 import { RightPanel } from "./right-panel";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import config from "../config";
 
 import * as css from "./index-page.scss";
-import { TemperatureScale } from "./temperature-scale";
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -27,10 +27,10 @@ export class IndexPage extends BaseComponent<IProps, IState> {
   }
 
   public render() {
-    const ui = this.stores.ui;
     const loading = this.stores.simulation.loading;
     return (
       <div className={css.index}>
+        <TopBar />
         {
           loading &&
           <CircularProgress className={css.progress} size={100} thickness={5} color="inherit" />
@@ -43,10 +43,6 @@ export class IndexPage extends BaseComponent<IProps, IState> {
           <div className={css.stepsPerSecond}>
             Steps per second: { this.stores.simulation.stepsPerSecond.toFixed(1) }
           </div>
-        }
-
-        { ui.layerOpacity.seaSurfaceTemp > 0 &&
-          <TemperatureScale />
         }
       </div>
     );

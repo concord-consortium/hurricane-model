@@ -13,6 +13,19 @@
   margin-bottom: 12px !important;
   background-color: transparent;
 
+  &:hover {
+    .mapImage {
+      opacity: 0.75;
+    }
+  }
+
+  svg {
+    position: absolute;
+    left: -10px;
+    top: 7px;
+    width: 26px;
+  }
+
   .content {
     overflow: hidden;
     border-radius: 9px;
@@ -33,6 +46,7 @@
       margin-top: -22px;
       height: 22px;
       transition: background-color 350ms;
+      opacity: 0.999;
     }
 
     .key {
@@ -52,6 +66,10 @@
     &.geoMaps  {
       .label {
         background-color: $tabGeoTransparent;
+      }
+
+      svg {
+        fill: $tabGeo;
       }
 
       .key {
@@ -76,6 +94,10 @@
     &.impactMaps {
       .label {
         background-color: $tabImpactTransparent;
+      }
+
+      svg {
+        fill: $tabImpact;
       }
 
       .key {

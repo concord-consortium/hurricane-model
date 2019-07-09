@@ -1,6 +1,7 @@
 @import "common";
 
 $mapTabHeight: 52px;
+$tabPadding: 4px;
 
 .mapTab {
   display: inline-block;
@@ -24,18 +25,18 @@ $mapTabHeight: 52px;
       background-color: $tabImpactLight;
     }
     &.active {
-      margin-left: -1px;
+      width: $mapTabWidth + 1px; // to cover border on the right side
     }
 
     .mapTabImage {
       position: absolute;
-      width: 49px;
+      width: 64px;
       height: 44px;
       border-radius: 6px;
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
-      top: 4px;
-      left: 4px;
+      top: $tabPadding;
+      left: $tabPadding;
       padding-right: 0;
       background-repeat: no-repeat;
       background-size: contain;
@@ -46,9 +47,9 @@ $mapTabHeight: 52px;
     }
     .mapTabContent {
       position: relative;
-      width: 49px;
+      width: 64px;
       top: 5px;
-      left: 4px;
+      left: $tabPadding;
       height: 30px;
       font-size: 14px;
       font-weight: bold;

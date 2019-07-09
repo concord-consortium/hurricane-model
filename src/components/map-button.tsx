@@ -6,9 +6,13 @@ import { MapType } from "./right-panel";
 import { mapLayer, MapTilesName } from "../map-layer-tiles";
 import { Overlay } from "../models/ui";
 import { MapButtonKey } from "./map-button-key";
+import ViewIcon from "../assets/view-icon.svg";
+import * as baseMapTabImg from "../assets/base-map-tab.png";
+import * as overlayTabImg from "../assets/overlay-tab.png";
+import * as sstThumbImg from "../assets/sst-thumb.png";
+import * as precipitationThumbImg from "../assets/precipitation-thumb.png";
+import * as stormSurgeThumbImg from "../assets/storm-surge-thumb.png";
 
-import * as geoMapButton from "../assets/geo-map.png";
-import * as impactMapButton from "../assets/impact-map.png";
 import * as css from "./map-button.scss";
 
 interface IProps extends IBaseProps {
@@ -19,6 +23,13 @@ interface IProps extends IBaseProps {
 }
 interface IState {}
 
+const overlayImage: { [key: string]: string } = {
+  sst: sstThumbImg,
+  population: overlayTabImg,
+  precipitation: precipitationThumbImg,
+  stormSurge: stormSurgeThumbImg
+};
+
 @inject("stores")
 @observer
 export class MapButton extends BaseComponent<IProps, IState> {
@@ -26,24 +37,24 @@ export class MapButton extends BaseComponent<IProps, IState> {
     const { label, mapType, value, disabled } = this.props;
     const ui = this.stores.ui;
 
-    const active = mapType === "geo" && ui.mapTile.mapType === value ||
-                   mapType !== "geo" && ui.overlay === value;
-    const buttonClass = mapType === "geo" ? css.geoMaps : css.impactMaps;
+    const active = mapType === "base" && ui.mapTile.mapType === value ||
+                   mapType !== "base" && ui.overlay === value;
+    const buttonClass = mapType === "base" ? css.geoMaps : css.impactMaps;
     const labelText = label ? label : "Satellite";
 
     let backgroundImage = "";
-    if (mapType === "geo") {
-      const geoMap = value as MapTilesName;
+    if (mapType === "base") {
+      const baseMap = value as MapTilesName;
       // for geo maps, get a map preview from the map tile provider to use as a button background
-      if (mapLayer(geoMap) && mapLayer(geoMap).url) {
+      if (mapLayer(baseMap) && mapLayer(baseMap).url) {
         // get a preview for an area approx the same as the hurricane model data
-        const url = mapLayer(geoMap).url.replace("{z}", "2").replace("{x}", "1").replace("{y}", "1");
+        const url = mapLayer(baseMap).url.replace("{z}", "2").replace("{x}", "1").replace("{y}", "1");
         backgroundImage = `url(${url})`;
       } else {
-        backgroundImage = `url(${geoMapButton})`;
+        backgroundImage = `url(${baseMapTabImg})`;
       }
     } else {
-      backgroundImage = `url(${impactMapButton})`;
+      backgroundImage = `url(${overlayImage[value] || overlayTabImg})`;
     }
 
     return (
@@ -58,17 +69,19 @@ export class MapButton extends BaseComponent<IProps, IState> {
           <div className={css.mapImage} style={{ backgroundImage }}/>
           <div className={css.label}>{labelText}</div>
           {
+            active && <ViewIcon />
+          }
+          {
             active && <div className={css.key}><MapButtonKey value={value}/></div>
           }
         </div>
-
       </Button>
     );
   }
 
   public handleMapSelect = () => {
     const { value } = this.props;
-    if (this.props.mapType === "geo") {
+    if (this.props.mapType === "base") {
       this.stores.ui.setMapTiles(value as MapTilesName);
     } else {
       // If user clicks the same overlay button again, just turn it off.

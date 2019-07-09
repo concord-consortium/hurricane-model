@@ -74,4 +74,40 @@ describe("UI model", () => {
       expect(ui.zoomedInView).toEqual(false);
     });
   });
+
+  describe("reset", () => {
+    it("resets most of the UI related params", () => {
+      const ui = new UIModel();
+      ui.initialBounds = [[1, 2], [3, 4]];
+      ui.setZoomedInView([[30, -85], [35, -80]], 3);
+      ui.mapModifiedByUser = true;
+      ui.windArrows = false;
+      ui.mapTile = {
+        mapType: "123",
+        name: "123",
+        url: "123",
+        attribution: "123",
+        maxZoom: 123,
+        subdomains: []
+      };
+      ui.overlay = "stormSurge";
+
+      ui.reset();
+
+      expect(ui.initialBounds).toEqual(NorthAtlanticInitialBounds);
+      expect(ui.zoomedInView).toEqual(false);
+      expect(ui.mapModifiedByUser).toEqual(false);
+      expect(ui.windArrows).toEqual(true);
+      expect(ui.mapTile).toEqual({
+        mapType: "satellite",
+        name: "Satellite",
+        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        // tslint:disable-next-line:max-line-length
+        attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+        maxZoom: 13,
+        subdomains: []
+      });
+      expect(ui.overlay).toEqual("sst");
+    });
+  });
 });

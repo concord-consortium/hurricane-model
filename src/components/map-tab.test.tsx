@@ -15,7 +15,7 @@ describe("MapTab component", () => {
   it("renders basic components", () => {
     const wrapper = mount(
       <Provider stores={stores}>
-        <MapTab tabType={"geo"} active={true} />
+        <MapTab tabType="base" active={true} />
       </Provider>
     );
     expect(wrapper.find('[data-test="map-tab"]').length).toEqual(1);

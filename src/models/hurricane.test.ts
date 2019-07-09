@@ -112,7 +112,6 @@ describe("Hurricane store", () => {
         center: {lat: 10, lng: 10},
         speed: {u: 1, v: 2},
         strength: 45,
-
       };
       const hurricane = new Hurricane(params);
       hurricane.center.lat = 50;
