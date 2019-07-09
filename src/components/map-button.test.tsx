@@ -28,10 +28,10 @@ describe("MapButton component", () => {
       </Provider>
     );
     const btn = (wrapper.find(MapButton).instance() as any).wrappedInstance as MapButton;
-    expect(stores.ui.mapTile.mapType).toEqual("satellite");
+    expect(stores.ui.baseMap).toEqual("satellite");
     btn.handleMapSelect();
     expect(stores.ui.setMapTiles).toHaveBeenCalled();
-    expect(stores.ui.mapTile.mapType).toEqual("street");
+    expect(stores.ui.baseMap).toEqual("street");
   });
 
   it("reacts to click and changes map overlay", () => {

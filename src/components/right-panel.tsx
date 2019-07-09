@@ -44,6 +44,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                 <MapButton label="Satellite" value="satellite" mapType="base" />
                 <MapButton label="Relief" value="relief" mapType="base" />
                 <MapButton label="Street" value="street" mapType="base" />
+                <MapButton label="Population" value="population" mapType="base" />
               </div>
             </div>
           }
@@ -53,7 +54,6 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                 <div className={css.tabContent}>
                   <div className={css.drawerTitle}>Map Overlays</div>
                   <MapButton label="Sea Surface Temp" value="sst" mapType="overlay" />
-                  <MapButton label="Population" value="population" mapType="overlay" />
                   <MapButton label="Precipitation" value="precipitation" mapType="overlay" />
                   <MapButton label="Storm Surge" value="stormSurge" mapType="overlay" />
                 </div>

@@ -37,7 +37,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
     const { label, mapType, value, disabled } = this.props;
     const ui = this.stores.ui;
 
-    const active = mapType === "base" && ui.mapTile.mapType === value ||
+    const active = mapType === "base" && ui.baseMap === value ||
                    mapType !== "base" && ui.overlay === value;
     const buttonClass = mapType === "base" ? css.geoMaps : css.impactMaps;
     const labelText = label ? label : "Satellite";

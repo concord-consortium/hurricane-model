@@ -86,9 +86,19 @@ export class MapView extends BaseComponent<IProps, IState> {
              attributionControl={false}
         >
           <TileLayer
-            attribution={ui.mapTile.attribution}
-            url={ui.mapTile.url}
+            url={ui.baseMapTileUrl}
+            attribution={ui.baseMapTileAttribution}
           />
+          {
+            // Special case - "population" base map is actually combination of "street" base map and "population"
+            // overlay tiles.
+            ui.baseMap === "population" &&
+            <TileLayer
+              attribution={mapLayer("population").attribution}
+              url={mapLayer("population").url}
+              opacity={0.6}
+            />
+          }
           <PixiWindLayer />
           {
             ui.overlay === "stormSurge" &&
@@ -103,21 +113,13 @@ export class MapView extends BaseComponent<IProps, IState> {
             />
           }
           {
-            ui.overlay === "population" &&
-            <TileLayer
-              attribution={mapLayer("population").attribution}
-              url={mapLayer("population").url}
-              opacity={ui.layerOpacity.overlayTiles}
-            />
-          }
-          {
             // Source:
             // https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
             ui.overlay === "stormSurge" && ui.zoomedInView && ui.zoomedInView.stormSurgeAvailable &&
             <TileLayer
               attribution={mapLayer("stormSurge").attribution}
               url={mapLayer("stormSurge").url.replace("{hurricaneCat}", ui.zoomedInView.landfallCategory.toString())}
-              opacity={ui.layerOpacity.overlayTiles}
+              opacity={0.75}
             />
           }
           {

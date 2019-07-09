@@ -57,7 +57,6 @@ const DEFAULT_CONFIG: any = {
   seaSurfaceTempOpacity: 0.5,
   // Enables steps per second display.
   benchmark: false,
-  overlayTileOpacity: 0.75,
   // --- UI elements can be shown or hidden using options below ---
   seasonButton: true,
   windArrowsToggle: true,

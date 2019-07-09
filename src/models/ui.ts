@@ -1,4 +1,4 @@
-import { action, observable, toJS } from "mobx";
+import { action, observable, computed } from "mobx";
 import {LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds} from "leaflet";
 import config from "../config";
 import { mapLayer, MapTilesName } from "../map-layer-tiles";
@@ -9,7 +9,7 @@ export const NorthAtlanticInitialBounds: LatLngBoundsLiteral = [[5, -90], [50, -
 // See: https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
 const stormSurgeDataBounds: LatLngBoundsLiteral = [[24, -100], [46, -64]];
 
-export type Overlay = "sst" | "precipitation" | "stormSurge" | "population";
+export type Overlay = "sst" | "precipitation" | "stormSurge";
 export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAvailable: boolean; };
 
 export class UIModel {
@@ -18,17 +18,26 @@ export class UIModel {
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
     seaSurfaceTemp: config.seaSurfaceTempOpacity,
-    overlayTiles: config.overlayTileOpacity
   };
   @observable public windArrows = config.windArrows;
-  @observable public mapTile = mapLayer(config.map);
+  @observable public baseMap: MapTilesName = config.map;
   @observable public overlay: Overlay | null = config.overlay;
   protected initialState: UIModel;
 
   constructor() {
-    this.initialState = toJS(this);
+    this.initialState = JSON.parse(JSON.stringify(this));
   }
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
+
+  @computed public get baseMapTileUrl() {
+    // Special case for "population". Actually, population isn't a base map but overlay.
+    // So, when it's selected, we need to use "street" map as a base.
+    return mapLayer(this.baseMap === "population" ? "street" : this.baseMap).url;
+  }
+
+  @computed public get baseMapTileAttribution() {
+    return mapLayer(this.baseMap).attribution;
+  }
 
   @action.bound public mapUpdated(map: Map, programmaticUpdate: boolean) {
     this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
@@ -61,7 +70,7 @@ export class UIModel {
   }
 
   @action.bound public setMapTiles(value: MapTilesName) {
-    this.mapTile = mapLayer(value);
+    this.baseMap = value;
   }
 
   @action.bound public setOverlay(value: Overlay) {
@@ -77,7 +86,7 @@ export class UIModel {
     this.zoomedInView = false;
     this.mapModifiedByUser = false;
     this.windArrows = this.initialState.windArrows;
-    this.mapTile = this.initialState.mapTile;
+    this.baseMap = this.initialState.baseMap;
     this.overlay = this.initialState.overlay;
   }
 }
