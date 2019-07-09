@@ -1,5 +1,5 @@
 import {
-  SimulationModel, ISimulationOptions, windData, sstImages, minStepsOverSeaToDetectLandfall
+  SimulationModel, ISimulationOptions, windData, sstImages, minStepsOverSeaToDetectLandfall, extendedLandfallBounds
 } from "./simulation";
 import config from "../config";
 import { PNG } from "pngjs";
@@ -223,6 +223,7 @@ describe("SimulationModel store", () => {
       sim.hurricane.setStrengthChangeFromSST = jest.fn();
       sim.hurricane.updateStrength = jest.fn();
       sim.seaSurfaceTempAt = jest.fn();
+      sim.hurricaneWithinExtendedLandfallArea = jest.fn();
       expect(sim.time).toEqual(0);
       expect(sim.hurricaneTrack.length).toEqual(0);
       expect(sim.precipitationPoints.length).toEqual(0);
@@ -232,6 +233,7 @@ describe("SimulationModel store", () => {
       expect(sim.hurricaneTrack[0].position).toEqual(oldPos);
       expect(sim.hurricane.move).toHaveBeenCalled();
       expect(sim.seaSurfaceTempAt).toHaveBeenCalled();
+      expect(sim.hurricaneWithinExtendedLandfallArea).toHaveBeenCalled();
       expect(sim.hurricane.setStrengthChangeFromSST).toHaveBeenCalled();
       expect(sim.hurricane.updateStrength).toHaveBeenCalled();
       expect(sim.hurricaneTrack.length).toBeGreaterThan(0);
@@ -244,9 +246,6 @@ describe("SimulationModel store", () => {
     });
 
     it("handles landfall detection", () => {
-      const markLandfallsOrigVal = config.markLandfalls;
-      config.markLandfalls = true;
-
       const sim = new SimulationModel(options);
       expect(sim.numberOfStepsOverSea).toEqual(0);
       expect(sim.numberOfStepsOverLand).toEqual(0);
@@ -269,8 +268,29 @@ describe("SimulationModel store", () => {
       const landfall = sim.landfalls[0];
       expect(landfall.position).toEqual(sim.hurricane.center);
       expect(landfall.category).toEqual(sim.hurricane.category);
+    });
+  });
 
-      config.markLandfalls = markLandfallsOrigVal;
+  describe("hurricaneWithinExtendedLandfallArea", () => {
+    it("shouldn't modify extendedLandfallAreas property if hurricane is outside all of them", () => {
+      const sim = new SimulationModel(options);
+      const bounds = Object.values(extendedLandfallBounds);
+      expect(sim.extendedLandfallAreas).toEqual(bounds);
+      sim.hurricaneWithinExtendedLandfallArea();
+      expect(sim.extendedLandfallAreas).toEqual(bounds);
+    });
+
+    it("should modify extendedLandfallAreas property if hurricane is inside one of them", () => {
+      const sim = new SimulationModel(options);
+      const PuertoRicoBounds = extendedLandfallBounds.PuertoRico;
+      const bounds = Object.values(extendedLandfallBounds);
+      expect(sim.extendedLandfallAreas).toEqual(bounds);
+      sim.hurricane.center.lat = PuertoRicoBounds.getSouthWest().lat + 0.01;
+      sim.hurricane.center.lng = PuertoRicoBounds.getSouthWest().lng + 0.01;
+      sim.hurricaneWithinExtendedLandfallArea();
+      expect(sim.extendedLandfallAreas.length).toEqual(Object.values(extendedLandfallBounds).length - 1);
+      bounds.splice(bounds.indexOf(PuertoRicoBounds), 1);
+      expect(sim.extendedLandfallAreas).toEqual(bounds);
     });
   });
 
@@ -296,6 +316,7 @@ describe("SimulationModel store", () => {
       sim.numberOfStepsOverSea = 123;
       sim.numberOfStepsOverLand = 321;
       sim.simulationStarted = true;
+      sim.extendedLandfallAreas.length = 1;
       sim.season = "winter";
       sim.restart();
       expect(sim.time).toEqual(0);
@@ -303,6 +324,7 @@ describe("SimulationModel store", () => {
       expect(sim.landfalls.length).toEqual(0);
       expect(sim.numberOfStepsOverSea).toEqual(0);
       expect(sim.numberOfStepsOverLand).toEqual(0);
+      expect(sim.extendedLandfallAreas).toEqual(Object.values(extendedLandfallBounds));
       expect(sim.simulationStarted).toEqual(false);
       expect(sim.hurricane.reset).toHaveBeenCalled();
       // These properties shouldn't be reset:

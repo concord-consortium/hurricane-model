@@ -362,7 +362,7 @@ export class SimulationModel {
     }
   }
 
-  @action.bound public hurricaneWithinExtendedLandfallArea() {
+  @action public hurricaneWithinExtendedLandfallArea() {
     for (let i = 0; i < this.extendedLandfallAreas.length; i += 1) {
       const area = this.extendedLandfallAreas[i];
       if (area.contains(this.hurricane.center)) {
@@ -374,7 +374,7 @@ export class SimulationModel {
     return false;
   }
 
-  @action.bound public addPrecipitation() {
+  @action public addPrecipitation() {
     const newPoints: IPrecipitationPoint[] = [];
     for (let steps = 0; steps < precipitationUpdateInterval; steps++) {
       const range = 8;
