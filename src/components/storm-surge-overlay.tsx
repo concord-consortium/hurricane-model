@@ -4,38 +4,35 @@ import { BaseComponent, IBaseProps } from "./base";
 import { stores } from "../index";
 import TilelayerMask from "./react-leaflet-tilelayer-mask";
 import { ICoordinates } from "../types";
-import { latLngBounds } from "leaflet";
 import * as TopRightMaskUrl from "../assets/storm-surge-mask-top-right.png";
+import { extendedLandfallBounds } from "../models/simulation";
 
 interface IProps extends IBaseProps {}
 interface IState {}
 
 const stormSurgeAreaSize = 800; // km
 
-const BaseUrlUSA = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_" +
+const baseUrlUSA = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_" +
                    "Category{category}_CONUS/MapServer/tile/{z}/{y}/{x}";
-const BaseUrlPuertoRico = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/data5_PR_USVI_SLOSH_" +
+const baseUrlPuertoRico = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/data5_PR_USVI_SLOSH_" +
                           "MOMs_cat{category}/MapServer/tile/{z}/{y}/{x}";
 
-const Bounds = {
-  PuertoRico: latLngBounds([
-    {lat: 18.77828658944489, lng: -67.45515346527101},
-    {lat: 17.54128117656407, lng: -63.972487449646}
-  ])
-};
+const PuertoRicoBounds = extendedLandfallBounds.PuertoRico;
 
 const getTilesUrl = (position: ICoordinates, category: number) => {
-  let url = BaseUrlUSA;
-  if (Bounds.PuertoRico.contains(position)) {
-    url = BaseUrlPuertoRico;
+  let url = baseUrlUSA;
+  if (PuertoRicoBounds.contains(position)) {
+    url = baseUrlPuertoRico;
   }
   return url.replace("{category}", category.toString());
 };
 
 const getMaskUrl = (position: ICoordinates) => {
-  if (Bounds.PuertoRico.contains(position)) {
-    return undefined; // use default, round mask for small islands
+  if (PuertoRicoBounds.contains(position)) {
+    // Use default, round mask for small islands
+    return undefined;
   }
+  // Otherwise, show storm surge area north-east of the hurricane track.
   return TopRightMaskUrl;
 };
 
