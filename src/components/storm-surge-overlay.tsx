@@ -12,14 +12,14 @@ interface IState {}
 
 const stormSurgeAreaSize = 800; // km
 
-const baseUrlUSA = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_" +
-                   "Category{category}_CONUS/MapServer/tile/{z}/{y}/{x}";
-const baseUrlPuertoRico = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/data5_PR_USVI_SLOSH_" +
-                          "MOMs_cat{category}/MapServer/tile/{z}/{y}/{x}";
+export const baseUrlUSA = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_" +
+                          "Category{category}_CONUS/MapServer/tile/{z}/{y}/{x}";
+export const baseUrlPuertoRico = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/data5_PR_" +
+                                 "USVI_SLOSH_MOMs_cat{category}/MapServer/tile/{z}/{y}/{x}";
 
-const PuertoRicoBounds = extendedLandfallBounds.PuertoRico;
+export const PuertoRicoBounds = extendedLandfallBounds.PuertoRico;
 
-const getTilesUrl = (position: ICoordinates, category: number) => {
+export const getTilesUrl = (position: ICoordinates, category: number) => {
   let url = baseUrlUSA;
   if (PuertoRicoBounds.contains(position)) {
     url = baseUrlPuertoRico;
@@ -27,7 +27,7 @@ const getTilesUrl = (position: ICoordinates, category: number) => {
   return url.replace("{category}", category.toString());
 };
 
-const getMaskUrl = (position: ICoordinates) => {
+export const getMaskUrl = (position: ICoordinates) => {
   if (PuertoRicoBounds.contains(position)) {
     // Use default, round mask for small islands
     return undefined;
