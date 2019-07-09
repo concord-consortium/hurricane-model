@@ -1,11 +1,14 @@
 // Taken from https://github.com/frogcat/leaflet-tilelayer-mask as it's an old library and it isn't published to NPM.
-// Also, there are some customizations:
+// There are some customizations:
 // - unavailable tiles are hidden, so browser doesn't display broken image icon
+// - center can be specified as an option, using lat/lng coordinates
+// - maskSize is in kilometers, not pixels
+// - source is converted to TypeScript
 
 import * as L from "leaflet";
-import { Browser } from 'leaflet'
+import { Browser } from "leaflet";
 
-var defaultMaskUrl = [
+const defaultMaskUrl = [
   "data:image/png;base64,",
   "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAC7lBMVEUAAAABAQECAgIDAwMEBAQF",
   "BQUGBgYHBwcICAgJCQkKCgoLCwsMDAwNDQ0ODg4PDw8QEBARERESEhITExMUFBQVFRUWFhYXFxcY",
@@ -35,8 +38,8 @@ var defaultMaskUrl = [
   "zI6ZgxlZuIRlVbW11eXFeFhxZHAmZlY2dlYWlPwPAD6nKPWk11d/AAAAAElFTkSuQmCC"
 ].join("");
 
-const remove = (el) => {
-  var parent = el.parentNode;
+const remove = (el: Element) => {
+  const parent = el.parentNode;
   if (parent) {
     parent.removeChild(el);
   }
@@ -48,7 +51,7 @@ export default L.TileLayer.extend({
     maskSize: 1000, // in kilometers
     maskCenter: [0, 0] // lat, lng
   },
-  getMaskSize: function() {
+  getMaskSize() {
     const size = this.options.maskSize;
     const center = L.latLng(this.options.maskCenter);
 
@@ -61,7 +64,7 @@ export default L.TileLayer.extend({
 
     return new L.Point(sizeInPx, sizeInPx);
   },
-  _updateCenter: function() {
+  _updateCenter() {
     if (this._map) {
       const containerPoint = this._map.latLngToContainerPoint(this.options.maskCenter);
       let p = this._map.containerPointToLayerPoint(containerPoint);
@@ -70,26 +73,26 @@ export default L.TileLayer.extend({
       this._image.setAttribute("y", p.y);
     }
   },
-  _updateMaskSize: function() {
+  _updateMaskSize() {
     if (this._map) {
-      var size = this.getMaskSize();
+      const size = this.getMaskSize();
       this._image.setAttribute("width", size.x);
       this._image.setAttribute("height", size.y);
     }
   },
-  _handleViewChange: function() {
+  _handleViewChange() {
     this._updateCenter();
     this._updateMaskSize();
   },
-  _initContainer: function() {
+  _initContainer() {
     if (this._container) return;
-    var rootGroup = this._map.getRenderer(this)._rootGroup;
-    var defs = rootGroup.appendChild(L.SVG.create("defs"));
-    var container = rootGroup.appendChild(L.SVG.create("g"));
-    var mask = defs.appendChild(L.SVG.create("mask"));
-    var image = mask.appendChild(L.SVG.create("image"));
-    var size = this.getMaskSize();
-    mask.setAttribute("id", "leaflet-tilelayer-mask-" + L.stamp(this));
+    const rootGroup = this._map.getRenderer(this)._rootGroup;
+    const defs = rootGroup.appendChild(L.SVG.create("defs"));
+    const container = rootGroup.appendChild(L.SVG.create("g"));
+    const mask = defs.appendChild(L.SVG.create("mask"));
+    const image = mask.appendChild(L.SVG.create("image"));
+    const size = this.getMaskSize();
+    mask.setAttribute("id", "leaflet-tilelayer-mask-" + L.Util.stamp(this));
     mask.setAttribute("x", "-100%");
     mask.setAttribute("y", "-100%");
     mask.setAttribute("width", "200%");
@@ -110,21 +113,22 @@ export default L.TileLayer.extend({
       this._map.on("zoomanim", this._handleViewChange, this);
     }
   },
-  onRemove: function(map) {
+  onRemove(map: L.Map) {
     this._removeAllTiles();
     remove(this._container);
     remove(this._defs);
+    // @ts-ignore
     map._removeZoomLimit(this);
     this._container = null;
     this._tileZoom = undefined;
   },
-  _updateLevels: function() {
-    var zoom = this._tileZoom;
+  _updateLevels() {
+    const zoom = this._tileZoom;
     if (zoom === undefined) {
       return undefined;
     }
 
-    for (var z in this._levels) {
+    for (const z in this._levels) {
       if (!this._levels[z].el.firstChild && z !== zoom) {
         L.DomUtil.remove(this._levels[z].el);
         this._removeTilesAtZoom(z);
@@ -132,28 +136,27 @@ export default L.TileLayer.extend({
       }
     }
 
-    var level = this._levels[zoom];
+    let level = this._levels[zoom];
     if (!level) {
-      var map = this._map;
+      const map = this._map;
       level = {
         el: this._container.appendChild(L.SVG.create("g")),
         origin: map.project(map.unproject(map.getPixelOrigin()), zoom).round(),
-        zoom: zoom
+        zoom
       };
       this._setZoomTransform(level, map.getCenter(), map.getZoom());
-      L.Util.falseFn(level.el.offsetWidth);
       this._levels[zoom] = level;
     }
     this._level = level;
     return level;
   },
-  _addTile: function(coords, container) {
-    var tilePos = this._getTilePos(coords);
-    var tileSize = this.getTileSize();
-    var key = this._tileCoordsToKey(coords);
-    var url = this.getTileUrl(this._wrapCoords(coords));
+  _addTile(coords: L.LatLngExpression, container: Element) {
+    const tilePos = this._getTilePos(coords);
+    const tileSize = this.getTileSize();
+    const key = this._tileCoordsToKey(coords);
+    const url = this.getTileUrl(this._wrapCoords(coords));
 
-    var tile = container.appendChild(L.SVG.create("image"));
+    const tile = container.appendChild(L.SVG.create("image"));
     tile.setAttribute("width", tileSize.x);
     tile.setAttribute("height", tileSize.y);
     tile.setAttribute("x", tilePos.x);
@@ -165,7 +168,7 @@ export default L.TileLayer.extend({
 
     this._tiles[key] = {
       el: tile,
-      coords: coords,
+      coords,
       current: true
     };
   }
