@@ -112,7 +112,6 @@ describe("Right Panel component", () => {
     expect(wrapper.exists({mapType: "overlay", value: "precipitation"})).toEqual(false);
     expect(wrapper.exists({mapType: "overlay", value: "stormSurge"})).toEqual(true);
 
-
     config.availableOverlays = ["sst"];
     wrapper = mount(
       <Provider stores={stores}>
@@ -124,7 +123,6 @@ describe("Right Panel component", () => {
     expect(wrapper.exists({mapType: "overlay", value: "sst"})).toEqual(true);
     expect(wrapper.exists({mapType: "overlay", value: "precipitation"})).toEqual(false);
     expect(wrapper.exists({mapType: "overlay", value: "stormSurge"})).toEqual(false);
-
 
     config.availableOverlays = [];
     wrapper = mount(
