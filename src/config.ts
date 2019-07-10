@@ -12,10 +12,15 @@ const DEFAULT_CONFIG: any = {
   authoring: false,
   // Sets base wind data (and sea temperature in the future). "fall", "winter", "spring", or "summer".
   season: "fall",
-  // One of the available maps: "satellite", "relief" or "street".
+  // One of the available maps: "satellite", "relief", "street" or "population".
   map: "satellite",
-  // Map overlay: "sst", "population", "precipitation" or "stormSurge".
+  // Enabled map overlay. One of the values listed in "availableOverlays".
   overlay: "sst",
+  availableOverlays: [
+    "sst",
+    "precipitation",
+    "stormSurge"
+  ],
   // If set to false, user won't be able to drag and zoom map.
   navigation: true,
   timestep: 1,

@@ -3,6 +3,7 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapTab } from "./map-tab";
 import { MapButton } from "./map-button";
+import config from "../config";
 
 import * as css from "./right-panel.scss";
 
@@ -13,6 +14,17 @@ interface IState {
   open: boolean;
   selectedTab: MapType;
 }
+
+const overlayTabVisible = () => {
+  return config.availableOverlays && config.availableOverlays.length > 0;
+};
+
+const getAvailableOverlays = (): {[key: string]: boolean} => {
+  return (config.availableOverlays || []).reduce((res: { [key: string]: boolean }, o: string) => {
+    res[o] = true;
+    return res;
+  }, {});
+};
 
 @inject("stores")
 @observer
@@ -27,14 +39,25 @@ export class RightPanel extends BaseComponent<IProps, IState> {
 
   public render() {
     const { open, selectedTab } = this.state;
+    const availableOverlays = getAvailableOverlays();
     return (
       <div className={css.rightPanelContainer}>
         <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
           <ul className={css.rightPanelTabs}>
-            <li><div id="base" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
-              <MapTab tabType="base" active={selectedTab === "base" || !open} /></div></li>
-            <li><div id="overlay" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
-              <MapTab tabType="overlay" active={selectedTab === "overlay" || !open} /></div></li>
+            <li>
+              <div id="base" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
+                <MapTab tabType="base" active={selectedTab === "base" || !open} />
+              </div>
+            </li>
+            {
+              overlayTabVisible() &&
+              <li>
+                <div id="overlay" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
+                  <MapTab tabType="overlay" active={selectedTab === "overlay" || !open} />
+                </div>
+              </li>
+            }
+
           </ul>
           {
             selectedTab === "base" &&
@@ -53,9 +76,18 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="overlay-panel">
                 <div className={css.tabContent}>
                   <div className={css.drawerTitle}>Map Overlays</div>
-                  <MapButton label="Sea Surface Temp" value="sst" mapType="overlay" />
-                  <MapButton label="Precipitation" value="precipitation" mapType="overlay" />
-                  <MapButton label="Storm Surge" value="stormSurge" mapType="overlay" />
+                  {
+                    availableOverlays.sst &&
+                    <MapButton label="Sea Surface Temp" value="sst" mapType="overlay" />
+                  }
+                  {
+                    availableOverlays.precipitation &&
+                    <MapButton label="Precipitation" value="precipitation" mapType="overlay" />
+                  }
+                  {
+                    availableOverlays.stormSurge &&
+                    <MapButton label="Storm Surge" value="stormSurge" mapType="overlay" />
+                  }
                 </div>
             </div>
           }
