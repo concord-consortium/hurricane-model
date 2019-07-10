@@ -15,6 +15,7 @@ import { stores } from "../index";
 import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
 import Home from "@material-ui/icons/Home";
 import { mapLayer } from "../map-layer-tiles";
+import { StormSurgeOverlay } from "./storm-surge-overlay";
 
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
@@ -90,6 +91,10 @@ export class MapView extends BaseComponent<IProps, IState> {
           />
           <PixiWindLayer />
           {
+            ui.overlay === "stormSurge" &&
+            <StormSurgeOverlay />
+          }
+          {
             ui.overlay === "sst" &&
             <ImageOverlay
               opacity={ui.layerOpacity.seaSurfaceTemp}
@@ -120,7 +125,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           <HurricaneTrack />
           {
-            sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
+            config.markLandfalls && sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
               <LandfallRectangle key={idx} position={lf.position} category={lf.category} />
             )
           }

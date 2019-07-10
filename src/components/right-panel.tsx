@@ -27,7 +27,6 @@ export class RightPanel extends BaseComponent<IProps, IState> {
 
   public render() {
     const { open, selectedTab } = this.state;
-    const { ui } = this.stores;
     return (
       <div className={css.rightPanelContainer}>
         <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
@@ -56,7 +55,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                   <MapButton label="Sea Surface Temp" value="sst" mapType="overlay" />
                   <MapButton label="Population" value="population" mapType="overlay" />
                   <MapButton label="Precipitation" value="precipitation" mapType="overlay" />
-                  <MapButton label="Storm Surge" value="stormSurge" mapType="overlay" disabled={!ui.zoomedInView} />
+                  <MapButton label="Storm Surge" value="stormSurge" mapType="overlay" />
                 </div>
             </div>
           }

@@ -10,6 +10,7 @@ import { HurricaneTrack } from "./hurricane-track";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
+import config from "../config";
 
 describe("MapView component", () => {
   let stores = createStores();
@@ -33,6 +34,8 @@ describe("MapView component", () => {
   });
 
   it("handles landfall rectangles correctly", () => {
+    const oldMarkLandfalls = config.markLandfalls;
+    config.markLandfalls = true;
     stores.simulation.simulationFinished = false;
     stores.simulation.landfalls = [{ position: {lat: 10, lng: 10}, category: 3 }];
     const wrapper = mount(
@@ -45,6 +48,7 @@ describe("MapView component", () => {
     stores.simulation.simulationFinished = true;
     wrapper.update();
     expect(wrapper.find(LandfallRectangle).length).toEqual(1);
+    config.markLandfalls = oldMarkLandfalls;
   });
 
   it("doesn't render hurricane if it's not active", () => {

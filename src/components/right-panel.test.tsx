@@ -83,30 +83,4 @@ describe("Right Panel component", () => {
     expect(wrapper.find('[data-test="base-panel"]').length).toEqual(0);
     expect(wrapper.find('[data-test="overlay-panel"]').exists());
   });
-
-  it("renders disabled storm surge button unless zoomed in view is active", () => {
-    const wrapper = mount(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
-    wrapper.find("#overlay").simulate("click");
-    expect(wrapper.find({
-      label: "Storm Surge", value: "stormSurge", mapType: "overlay", disabled: true
-    }).length).toBeGreaterThan(0); // for some reason length is 2. Impossible looking at the code. Enzyme/Jest issue?
-
-    stores.ui.zoomedInView = {
-      landfallCategory: 3,
-      stormSurgeAvailable: true
-    };
-    wrapper.update();
-
-    expect(wrapper.find({
-      label: "Storm Surge", value: "stormSurge", mapType: "overlay", disabled: true
-    }).length).toEqual(0);
-    expect(wrapper.find({
-      label: "Storm Surge", value: "stormSurge", mapType: "overlay", disabled: false
-    }).length).toBeGreaterThan(0); // for some reason length is 2. Impossible looking at the code. Enzyme/Jest issue?
-  });
-
 });

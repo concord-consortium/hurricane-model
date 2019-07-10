@@ -1,4 +1,4 @@
-import {LatLngExpression, CRS, LatLngBounds} from "leaflet";
+import {LatLngExpression, CRS, LatLngBounds, latLngBounds} from "leaflet";
 import { action, observable, computed, autorun } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
@@ -75,6 +75,32 @@ const defaultPressureSystems: IPressureSystemOptions[] = [
     strength: 7
   }
 ];
+
+// When hurricane passes through some areas, we should consider that a landfall even if it doesn't hit the land.
+// E.g. hurricane can be passing close to an island or Florida and storm surge data should be shown there.
+// Current areas marked on the map: https://i.imgur.com/txuXfqt.png
+export const extendedLandfallBounds: {[key: string]: LatLngBounds} = {
+  PuertoRico: latLngBounds([
+    {lat: 19.5, lng: -68},
+    {lat: 17, lng: -65}
+  ]),
+  FloridaEast1: latLngBounds([
+    {lat: 30, lng: -81.5},
+    {lat: 28, lng: -79}
+  ]),
+  FloridaEast2: latLngBounds([
+    {lat: 28, lng: -80.5},
+    {lat: 26, lng: -78},
+  ]),
+  FloridaWest1: latLngBounds([
+    {lat: 30, lng: -85},
+    {lat: 28, lng: -82.5}
+  ]),
+  FloridaWest2: latLngBounds([
+    {lat: 28, lng: -84},
+    {lat: 26, lng: -81.5}
+  ]),
+};
 
 // Landfall is detected when hurricane moves from sea to land. To avoid detecting too many landfalls, assume that
 // hurricane needs to travel over sea for some time before next landfall is detected.
@@ -218,6 +244,8 @@ export class SimulationModel {
   @observable public stepsPerSecond = 0;
   public time = 0;
   public numberOfStepsOverSea = 0;
+  public numberOfStepsOverLand = 0;
+  public extendedLandfallAreas: LatLngBounds[] = Object.values(extendedLandfallBounds);
   // Callback used by tests.
   public _seaSurfaceTempDataParsed: () => void;
   protected initialState: SimulationModel;
@@ -273,7 +301,13 @@ export class SimulationModel {
     this.hurricane.move(windSpeed, config.timestep);
 
     const sst = this.seaSurfaceTempAt(this.hurricane.center);
-    if (this.time % config.sstCheckInterval === 0) {
+    const enteredLand = sst === null && this.numberOfStepsOverSea >= minStepsOverSeaToDetectLandfall;
+    const enteredWater = sst !== null && this.numberOfStepsOverLand >= 0;
+
+    // Increase SST check interval around boundaries between land and water, so hurricane strength is updated
+    // immediately after making landfall (or going back to the ocean). Otherwise, the hurricane could
+    // stay too strong over land.
+    if (this.time % config.sstCheckInterval === 0 || enteredLand || enteredWater) {
       this.hurricane.setStrengthChangeFromSST(sst);
       if (this.windShearPresent) {
         this.hurricane.applyWindShear(config.sstCheckInterval);
@@ -281,7 +315,7 @@ export class SimulationModel {
     }
     this.hurricane.updateStrength();
 
-    if (config.markLandfalls && sst === null && this.numberOfStepsOverSea >= minStepsOverSeaToDetectLandfall) {
+    if (enteredLand || this.hurricaneWithinExtendedLandfallArea()) {
       this.landfalls.push({
         position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category
@@ -290,8 +324,10 @@ export class SimulationModel {
 
     if (sst !== null) {
       this.numberOfStepsOverSea += 1;
+      this.numberOfStepsOverLand = 0;
     } else {
       this.numberOfStepsOverSea = 0;
+      this.numberOfStepsOverLand += 1;
     }
 
     if (this.time % precipitationUpdateInterval === 0) {
@@ -326,7 +362,19 @@ export class SimulationModel {
     }
   }
 
-  @action.bound public addPrecipitation() {
+  @action public hurricaneWithinExtendedLandfallArea() {
+    for (let i = 0; i < this.extendedLandfallAreas.length; i += 1) {
+      const area = this.extendedLandfallAreas[i];
+      if (area.contains(this.hurricane.center)) {
+        // Remove this area, so it doesn't get detected again.
+        this.extendedLandfallAreas.splice(i, 1);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @action public addPrecipitation() {
     const newPoints: IPrecipitationPoint[] = [];
     for (let steps = 0; steps < precipitationUpdateInterval; steps++) {
       const range = 8;
@@ -372,6 +420,8 @@ export class SimulationModel {
     this.precipitationPoints = [];
     this.time = 0;
     this.numberOfStepsOverSea = 0;
+    this.numberOfStepsOverLand = 0;
+    this.extendedLandfallAreas = Object.values(extendedLandfallBounds);
     this.hurricane.reset();
   }
 
