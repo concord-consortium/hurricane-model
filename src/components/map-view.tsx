@@ -59,6 +59,14 @@ export class MapView extends BaseComponent<IProps, IState> {
         });
       }
     });
+    // This maxZoom option is not handled by react-leaftlet as a dynamic react property (it doesn't update after
+    // Map component is created), so we need to use raw Leaflet API to dynamically change it.
+    observe(this.stores.ui, "maxZoom", () => {
+      const map = this.leafletMap;
+      if (map) {
+        map.setMaxZoom(this.stores.ui.maxZoom);
+      }
+    });
   }
 
   public componentWillUnmount(): void {
@@ -81,14 +89,25 @@ export class MapView extends BaseComponent<IProps, IState> {
              style={{width: "100%", height: "100%"}}
              onViewportChanged={this.handleViewportChanged}
              zoom={4}
+             maxZoom={ui.maxZoom}
              center={[30, -45]}
              zoomControl={false}
              attributionControl={false}
         >
           <TileLayer
-            attribution={ui.mapTile.attribution}
-            url={ui.mapTile.url}
+            url={ui.baseMapTileUrl}
+            attribution={ui.baseMapTileAttribution}
           />
+          {
+            // Special case - "population" base map is actually combination of "street" base map and "population"
+            // overlay tiles.
+            ui.baseMap === "population" &&
+            <TileLayer
+              attribution={mapLayer("population").attribution}
+              url={mapLayer("population").url}
+              opacity={0.6}
+            />
+          }
           <PixiWindLayer />
           {
             ui.overlay === "stormSurge" &&
@@ -103,21 +122,13 @@ export class MapView extends BaseComponent<IProps, IState> {
             />
           }
           {
-            ui.overlay === "population" &&
-            <TileLayer
-              attribution={mapLayer("population").attribution}
-              url={mapLayer("population").url}
-              opacity={ui.layerOpacity.overlayTiles}
-            />
-          }
-          {
             // Source:
             // https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
             ui.overlay === "stormSurge" && ui.zoomedInView && ui.zoomedInView.stormSurgeAvailable &&
             <TileLayer
               attribution={mapLayer("stormSurge").attribution}
               url={mapLayer("stormSurge").url.replace("{hurricaneCat}", ui.zoomedInView.landfallCategory.toString())}
-              opacity={ui.layerOpacity.overlayTiles}
+              opacity={0.75}
             />
           }
           {

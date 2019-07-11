@@ -60,6 +60,8 @@ const layerInfo: MapTileLayer[] = [
   }
 ];
 
+export const mapTilesNames = layerInfo.map(li => li.mapType);
+
 export function mapLayer(layerType: MapTilesName): MapTileLayer {
   return layerInfo.find(m => m.mapType === layerType) || layerInfo[0];
 }
