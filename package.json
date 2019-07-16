@@ -1,6 +1,6 @@
 {
   "name": "hurricane-model",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Concord Consortium Hurricane Model",
   "main": "index.js",
   "jest": {
@@ -85,7 +85,7 @@
     "canvas-prebuilt": "^1.6.11",
     "copy-webpack-plugin": "^5.0.3",
     "css-loader": "^3.0.0",
-    "cypress": "^3.3.2",
+    "cypress": "^3.4.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "file-loader": "^4.0.0",
