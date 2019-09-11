@@ -53,29 +53,6 @@ export const sstImages: ISSTImages = {
   fall: septSeaTemp
 };
 
-const defaultPressureSystems: IPressureSystemOptions[] = [
-  {
-    type: "high",
-    center: {lat: 28, lng: -30},
-    strength: 19.5
-  },
-  {
-    type: "high",
-    center: {lat: 28.8, lng: -62.4},
-    strength: 13.6
-  },
-  {
-    type: "low",
-    center: {lat: 45, lng: -82},
-    strength: 6
-  },
-  {
-    type: "low",
-    center: {lat: 47, lng: -60},
-    strength: 7
-  }
-];
-
 // When hurricane passes through some areas, we should consider that a landfall even if it doesn't hit the land.
 // E.g. hurricane can be passing close to an island or Florida and storm surge data should be shown there.
 // Current areas marked on the map: https://i.imgur.com/txuXfqt.png
@@ -256,7 +233,9 @@ export class SimulationModel {
       options = {};
     }
     this.season = options.season || config.season;
-    this.pressureSystems = (options.pressureSystems || defaultPressureSystems).map(o => new PressureSystem(o));
+    this.pressureSystems = (options.pressureSystems || config.pressureSystems).map(
+      (o: IPressureSystemOptions) => new PressureSystem(o)
+    );
     autorun(() => {
       // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
       // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature

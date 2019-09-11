@@ -71,6 +71,17 @@ export class PressureSystem {
     return wind;
   }
 
+  public serialize() {
+    return {
+      type: this.type,
+      center: {
+        lat: this.center.lat,
+        lng: this.center.lng
+      },
+      strength: this.strength
+    };
+  }
+
   @action.bound public setCenter(center: ICoordinates, pressureSystems: PressureSystem[]) {
     center.lat = Math.max(minLat, center.lat);
     if (minDistToOtherSystems(this, pressureSystems) >= config.minPressureSystemDistance) {
