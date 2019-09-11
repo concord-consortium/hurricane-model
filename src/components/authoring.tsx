@@ -43,6 +43,10 @@ const customProperties: any = {
       "population"
     ]
   },
+  initialBounds: {
+    title: "Initial map bounds ([[lat1, lng2], [lat2, lng2]])",
+    type: "string"
+  },
   overlay: {
     title: "Overlay",
     type: "string",
@@ -90,6 +94,8 @@ export const defaultAuthoring = {
   ...config
 };
 
+defaultAuthoring.initialBounds = JSON.stringify(config.initialBounds);
+
 const uiSchema = {
   availableOverlays: {
     "ui:widget": "checkboxes"
@@ -110,19 +116,21 @@ export class Authoring extends BaseComponent<IProps, IState> {
   }
 
   public onSubmit = (e: ISubmitEvent<QueryParams>) => {
+    const formValues: any = {};
     Object.keys(e.formData).forEach(key => {
       const newValue = e.formData[key];
+      formValues[key] = e.formData[key];
       if (newValue.constructor === Array) {
-        e.formData[key] = `[${newValue.toString()}]`;
+        formValues[key] = JSON.stringify(newValue);
       }
     });
     const params = Object.keys(e.formData)
       .filter(key => {
         let defValue = config[key];
         if (defValue.constructor === Array) {
-          defValue = `[${defValue.toString()}]`;
+          defValue = JSON.stringify(defValue);
         }
-        return e.formData[key] !== defValue;
+        return formValues[key] !== defValue;
       })
       .map(key => {
         return encodeURIComponent(key) + "=" + encodeURIComponent(e.formData[key]);

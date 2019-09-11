@@ -1,3 +1,5 @@
+import {LatLngBoundsLiteral} from "leaflet";
+
 function getURLParam(name: string) {
   const url = (self || window).location.href;
   name = name.replace(/[[]]/g, "\\$&");
@@ -16,6 +18,8 @@ const DEFAULT_CONFIG: any = {
   map: "satellite",
   // Enabled map overlay. One of the values listed in "availableOverlays".
   overlay: "sst",
+  // LatLngBoundsLiteral: [[lat, lng], [lat, lng]]. Defaults to North Atlantic.
+  initialBounds: [[5, -90], [50, -10]],
   pressureSystems: [
     {
       type: "high",

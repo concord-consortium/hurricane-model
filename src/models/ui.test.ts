@@ -1,10 +1,11 @@
-import { UIModel, NorthAtlanticInitialBounds } from "./ui";
+import { UIModel } from "./ui";
 import { Map } from "leaflet";
+import config from "../config";
 
 describe("UI model", () => {
   it("can be created without errors", () => {
     const ui = new UIModel();
-    expect(ui.initialBounds).toEqual(NorthAtlanticInitialBounds);
+    expect(ui.initialBounds).toEqual(config.initialBounds);
     expect(ui.zoomedInView).toEqual(false);
     expect(ui.mapModifiedByUser).toEqual(false);
     expect(ui.latLngToContainerPoint).toBeDefined();
@@ -82,7 +83,7 @@ describe("UI model", () => {
     it("updates initialBounds", () => {
       const ui = new UIModel();
       ui.setNorthAtlanticView();
-      expect(ui.initialBounds).toEqual(NorthAtlanticInitialBounds);
+      expect(ui.initialBounds).toEqual(config.initialBounds);
       expect(ui.zoomedInView).toEqual(false);
     });
   });
@@ -99,7 +100,7 @@ describe("UI model", () => {
 
       ui.reset();
 
-      expect(ui.initialBounds).toEqual(NorthAtlanticInitialBounds);
+      expect(ui.initialBounds).toEqual(config.initialBounds);
       expect(ui.zoomedInView).toEqual(false);
       expect(ui.mapModifiedByUser).toEqual(false);
       expect(ui.windArrows).toEqual(true);
