@@ -1,3 +1,5 @@
+import {LatLngBoundsLiteral} from "leaflet";
+
 function getURLParam(name: string) {
   const url = (self || window).location.href;
   name = name.replace(/[[]]/g, "\\$&");
@@ -16,6 +18,30 @@ const DEFAULT_CONFIG: any = {
   map: "satellite",
   // Enabled map overlay. One of the values listed in "availableOverlays".
   overlay: "sst",
+  // LatLngBoundsLiteral: [[lat, lng], [lat, lng]]. Defaults to North Atlantic.
+  initialBounds: [[5, -90], [50, -10]],
+  pressureSystems: [
+    {
+      type: "high",
+      center: {lat: 28, lng: -30},
+      strength: 19.5
+    },
+    {
+      type: "high",
+      center: {lat: 28.8, lng: -62.4},
+      strength: 13.6
+    },
+    {
+      type: "low",
+      center: {lat: 45, lng: -82},
+      strength: 6
+    },
+    {
+      type: "low",
+      center: {lat: 47, lng: -60},
+      strength: 7
+    }
+  ],
   availableOverlays: [
     "sst",
     "precipitation",
@@ -75,12 +101,26 @@ function isArray(value: any) {
   return typeof value === "string" && value.match(/^\[.*\]$/);
 }
 
+function isJSON(value: any) {
+  if (typeof value !== "string") {
+    return false;
+  }
+  try {
+    JSON.parse(value);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 Object.keys(DEFAULT_CONFIG).forEach((key) => {
   const urlValue: any = getURLParam(key);
   if (urlValue === true || urlValue === "true") {
     urlConfig[key] = true;
   } else if (urlValue === "false") {
     urlConfig[key] = false;
+  } else if (isJSON(urlValue)) {
+    urlConfig[key] = JSON.parse(urlValue);
   } else if (isArray(urlValue)) {
     // Array can be provided in URL using following format:
     // &parameter=[value1,value2,value3]

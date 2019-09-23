@@ -11,6 +11,5 @@ export function createStores(): IStores {
     ui: new UIModel(),
     simulation: new SimulationModel()
   };
-  (window as any).stores = stores;
   return stores;
 }

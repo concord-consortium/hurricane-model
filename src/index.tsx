@@ -21,3 +21,12 @@ ReactDOM.render(
   </Provider>,
   document.getElementById("app")
 );
+
+// A few helpers to make authoring and development easier.
+// Make stores accessible through window object.
+(window as any).stores = stores;
+// Provide a function that serialize current pressure systems settings to an URL parameter that can be used later.
+(window as any).serializePressureSystems = () => {
+  const sim = stores.simulation;
+  return "pressureSystems=" + encodeURIComponent(JSON.stringify(sim.pressureSystems.map(ps => ps.serialize())));
+};

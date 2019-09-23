@@ -11,6 +11,16 @@ describe("PressureSystem store", () => {
     expect(pressureSystem).toBeDefined();
   });
 
+  it("can be serialized", () => {
+    const options: IPressureSystemOptions = {
+      center: {lat: 12, lng: -13},
+      type: "high",
+      strength: 5.5
+    };
+    const pressureSystem = new PressureSystem(options);
+    expect(pressureSystem.serialize()).toEqual(options);
+  });
+
   describe("reset", () => {
     it("should basic params of the pressure system back to the initial options", () => {
       const options: IPressureSystemOptions = {
