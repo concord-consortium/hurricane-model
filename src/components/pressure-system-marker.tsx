@@ -23,7 +23,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     const { model } = this.props;
     const { sliderDrag } = this.state;
     const sim = this.stores.simulation;
-    const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
+    const uiDisabled = config.pressureSystemsLocked || (config.lockSimulationWhileRunning && sim.simulationStarted);
     return (
       <LeafletCustomMarker
         position={model.center}

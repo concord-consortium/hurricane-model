@@ -88,10 +88,12 @@ const DEFAULT_CONFIG: any = {
   seaSurfaceTempOpacity: 0.5,
   // Enables steps per second display.
   benchmark: false,
+  // If set to true, users won't be able to change pressure systems.
+  pressureSystemsLocked: false,
+  lockSimulationWhileRunning: true,
   // --- UI elements can be shown or hidden using options below ---
   seasonButton: true,
-  windArrowsToggle: true,
-  lockSimulationWhileRunning: true
+  windArrowsToggle: true
   // --- End of UI widgets ---
 };
 

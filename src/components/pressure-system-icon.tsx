@@ -33,7 +33,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
     const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
     // If set to lock the UI while the simulation is running, lock UI once the sim is started until it is reset
-    const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
+    const uiDisabled = config.pressureSystemsLocked || (config.lockSimulationWhileRunning && sim.simulationStarted);
 
     return (
       <div
@@ -46,20 +46,23 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
             <High className={css.letter} style={letterStyle} /> :
             <Low className={css.letter} style={letterStyle} />
         }
-        <div className={css.sliderContainer}>
-          <Slider
-            classes={{ thumb: css.thumb, track: css.track, rail: css.rail, disabled: css.disabled }}
-            value={model.strength}
-            min={minStrength}
-            max={maxStrength}
-            onChange={this.handleStrengthChange}
-            onChangeCommitted={onSliderDragEnd}
-            orientation="vertical"
-            ThumbComponent={VerticalHandle}
-            disabled={uiDisabled}
-            data-test="pressure-system-slider"
-          />
-        </div>
+        {
+          !config.pressureSystemsLocked &&
+          <div className={css.sliderContainer}>
+            <Slider
+              classes={{ thumb: css.thumb, track: css.track, rail: css.rail, disabled: css.disabled }}
+              value={model.strength}
+              min={minStrength}
+              max={maxStrength}
+              onChange={this.handleStrengthChange}
+              onChangeCommitted={onSliderDragEnd}
+              orientation="vertical"
+              ThumbComponent={VerticalHandle}
+              disabled={uiDisabled}
+              data-test="pressure-system-slider"
+            />
+          </div>
+        }
         <div className={css.label}>
           { this.renderLabel() }
         </div>
