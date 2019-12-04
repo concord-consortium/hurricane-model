@@ -17,22 +17,23 @@ export interface IPressureSystemOptions {
 // Limit pressure systems only to the northern hemisphere.
 const minLat = 15;
 
-const minDistToOtherSystems = (sys: PressureSystem, otherSystems: PressureSystem[]) => {
-  const dists = otherSystems.map(ps => distanceTo(ps.center, sys.center));
+const minDistToOtherSystems = (center: ICoordinates, otherSystems: PressureSystem[]) => {
+  const dists = otherSystems.map(ps => distanceTo(ps.center, center));
   let minDist = Infinity;
+  let heading = null;
   for (let i = 0; i < dists.length; i += 1) {
-    if (otherSystems[i] !== sys && dists[i] < minDist) {
+    if (dists[i] < minDist) {
       minDist = dists[i];
+      heading = headingTo(center, otherSystems[i].center);
     }
   }
-  return minDist;
+  return { minDist, heading };
 };
 
 export class PressureSystem {
   @observable public type: PressureSystemType;
   @observable public center: ICoordinates;
   @observable public strength = config.pressureSystemStrength;
-  public lastCorrectCenter: ICoordinates;
   protected initialState: PressureSystem;
 
   @computed public get range() {
@@ -82,22 +83,25 @@ export class PressureSystem {
     };
   }
 
-  @action.bound public setCenter(center: ICoordinates, pressureSystems: PressureSystem[]) {
+  @action.bound public setCenter(center: ICoordinates, otherPressureSystems: PressureSystem[]) {
     center.lat = Math.max(minLat, center.lat);
-    if (minDistToOtherSystems(this, pressureSystems) >= config.minPressureSystemDistance) {
-      this.lastCorrectCenter = center;
+    const step = config.minPressureSystemDistance / 100;
+    const minDistRes = minDistToOtherSystems(center, otherPressureSystems);
+    const heading = minDistRes.heading;
+    let minDist = minDistRes.minDist;
+    // Why is an iterative approach used instead of a single calculation based on the minPressureSystemDistance
+    // and heading? Note this single calculation could result in new center being to close to another pressure system.
+    // Iterative calculations ensure that we'll always end up away from *all* the pressure systems. Initial heading
+    // is used, so the interaction feels a bit more natural for user.
+    while (minDist < config.minPressureSystemDistance) {
+      center = moveTo(center, { distance: step, heading: heading + 180 });
+      minDist = minDistToOtherSystems(center, otherPressureSystems).minDist;
     }
     this.center = center;
   }
 
   @action.bound public setStrength(value: number) {
     this.strength = value;
-  }
-
-  @action.bound public checkPressureSystem(pressureSystems: PressureSystem[]) {
-    if (this.lastCorrectCenter && minDistToOtherSystems(this, pressureSystems) <= config.minPressureSystemDistance) {
-      this.center = this.lastCorrectCenter;
-    }
   }
 
   @action public reset() {

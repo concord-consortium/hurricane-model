@@ -28,7 +28,6 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
       <LeafletCustomMarker
         position={model.center}
         onDrag={this.handlePressureSysDrag}
-        onDragEnd={this.handlePressureSysDragEnd}
         // Disable dragging when slider is being dragged, so they don't interfere.
         draggable={!sliderDrag && !uiDisabled}
       >
@@ -44,11 +43,6 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
   public handlePressureSysDrag = (e: Leaflet.LeafletMouseEvent) => {
     const { model } = this.props;
     this.stores.simulation.setPressureSysCenter(model, e.latlng);
-  }
-
-  private handlePressureSysDragEnd = () => {
-    const { model } = this.props;
-    this.stores.simulation.checkPressureSystem(model);
   }
 
   private handleDrag = () => {

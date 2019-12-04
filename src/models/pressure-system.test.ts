@@ -1,4 +1,5 @@
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
+import config from "../config";
 
 describe("PressureSystem store", () => {
   const defOptions: IPressureSystemOptions = {
@@ -39,6 +40,23 @@ describe("PressureSystem store", () => {
       expect(pressureSystem.center).not.toBe(options.center);
       expect(pressureSystem.strength).toEqual(options.strength);
       expect(pressureSystem.type).toEqual(options.type);
+    });
+  });
+
+  describe("setCenter", () => {
+    it("should ensure that a new center is not too close to other pressure systems", () => {
+      const oldMinDist = config.minPressureSystemDistance;
+      config.minPressureSystemDistance = 800000;
+      const ps1 = new PressureSystem({ center: { lat: 20, lng: 20 } });
+      const otherPs = [
+        new PressureSystem({ center: { lat: 20, lng: 30 } }),
+        new PressureSystem({ center: { lat: 20, lng: 40 } })
+      ];
+      ps1.setCenter({ lat: 20, lng: 25 }, otherPs);
+      expect(ps1.center.lng).toBeCloseTo(22.32);
+      ps1.setCenter({ lat: 20, lng: 35 }, otherPs);
+      expect(ps1.center.lng).toBeCloseTo(47.69);
+      config.minPressureSystemDistance = oldMinDist;
     });
   });
 });

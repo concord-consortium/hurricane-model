@@ -257,11 +257,7 @@ export class SimulationModel {
   }
 
   @action.bound public setPressureSysCenter(pressureSystem: PressureSystem, center: ICoordinates) {
-    pressureSystem.setCenter(center, this.pressureSystems);
-  }
-
-  @action.bound public checkPressureSystem(pressureSystem: PressureSystem) {
-    pressureSystem.checkPressureSystem(this.pressureSystems);
+    pressureSystem.setCenter(center, this.pressureSystems.filter(ps => ps !== pressureSystem));
   }
 
   @action.bound public tick(timestamp = window.performance.now()) {
