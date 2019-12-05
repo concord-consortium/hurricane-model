@@ -51,7 +51,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
           <div className={css.sliderContainer}>
             <Slider
               classes={{ thumb: css.thumb, track: css.track, rail: css.rail, disabled: css.disabled }}
-              value={model.strength}
+              value={model.type === "high" ? model.strength : maxStrength + minStrength - model.strength}
               min={minStrength}
               max={maxStrength}
               onChange={this.handleStrengthChange}
@@ -85,6 +85,10 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     if (onSliderDrag) {
       onSliderDrag();
     }
-    model.setStrength(value);
+    if (model.type === "low") {
+      model.setStrength(maxStrength + minStrength - value);
+    } else {
+      model.setStrength(value);
+    }
   }
 }
