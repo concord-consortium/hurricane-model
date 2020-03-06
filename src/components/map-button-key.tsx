@@ -26,10 +26,10 @@ const keyData: { [name: string]: IMapButtonKeyDef } = {
     header: "",
     values: [
       {background: "#f2f2f2", text: "No population"},
-      {background: "#fecda8", text: "100 or less people"},
+      {background: "#fecda8", text: "100 or fewer people"},
       {background: "#f9a65d", text: "100 to 1k people"},
       {background: "#f78926", text: "1k to 10k people"},
-      {background: "#be681c", text: "10k to 25l people"},
+      {background: "#be681c", text: "10k to 25k people"},
       {background: "#95510b", text: "25k to 100k people"},
       {background: "#642e00", text: "100k or more people"}
     ]
