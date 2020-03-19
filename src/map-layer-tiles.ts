@@ -22,9 +22,13 @@ const layerInfo: MapTileLayer[] = [
   {
     mapType: "street",
     name: "Street",
-    url: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}@2x.png",
+    // Switch from wikimedia to arcgisonline for street map tiles due to new terms of use
+    // url: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}@2x.png",
+    url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
     // tslint:disable-next-line:max-line-length
-    attribution: 'Street map images are hosted by <a href="https://foundation.wikimedia.org/w/index.php?title=Maps_Terms_of_Use#Where_does_the_map_data_come_from.3F" target="_blank">The Wikimedia Foundation</a>, serving map data from <a href="https://openstreetmap.org" target="_blank">&#169;OpenStreetMap</a>',
+    // attribution: 'Street map images are hosted by <a href="https://foundation.wikimedia.org/w/index.php?title=Maps_Terms_of_Use#Where_does_the_map_data_come_from.3F" target="_blank">The Wikimedia Foundation</a>, serving map data from <a href="https://openstreetmap.org" target="_blank">&#169;OpenStreetMap</a>',
+     // tslint:disable-next-line:max-line-length
+    attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
     maxZoom: 19,
     subdomains: []
   },
