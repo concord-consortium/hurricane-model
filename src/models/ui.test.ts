@@ -16,7 +16,7 @@ describe("UI model", () => {
       const ui = new UIModel();
       ui.setMapTiles("street");
       ui.setOverlay(null);
-      expect(ui.maxZoom).toEqual(19);
+      expect(ui.maxZoom).toEqual(13);
       ui.setMapTiles("street");
       ui.setOverlay("stormSurge");
       expect(ui.maxZoom).toEqual(13);
