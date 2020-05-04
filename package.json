@@ -140,6 +140,6 @@
     "react-leaflet-control": "^2.1.1",
     "screenfull": "^4.2.0",
     "seedrandom": "^3.0.1",
-    "shutterbug": "^1.1.0"
+    "shutterbug": "1.3.0-pre.1"
   }
 }
