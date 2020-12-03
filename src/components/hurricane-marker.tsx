@@ -3,10 +3,15 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import HurricaneSVG from "../assets/hurricane.svg";
+import CategoryMarkerSVG from "../assets/category-marker.svg";
 import * as css from "./hurricane-marker.scss";
 import config from "../config";
+import { ITrackPoint } from "../types";
 
-interface IProps extends IBaseProps {}
+interface IProps extends IBaseProps { }
+interface ICategoryMarkerProps extends IProps {
+  point: ITrackPoint;
+}
 interface IState {}
 
 @inject("stores")
@@ -57,6 +62,24 @@ export class HurricaneIcon extends BaseComponent<IProps, IState> {
           </div>
         }
       </div>
+    );
+  }
+}
+export class HurricaneCategoryMarker extends BaseComponent<ICategoryMarkerProps, IState> {
+  public render() {
+    const categoryChangePoint = this.props.point;
+    const categoryCssClass = css["category" + categoryChangePoint.category];
+    return (
+      <LeafletCustomMarker position={categoryChangePoint.position} draggable={false}>
+        <div className={`${css.hurricaneIcon} ${categoryCssClass}`}>
+          <div className={css.svgContainer}>
+            <CategoryMarkerSVG />
+          </div>
+          <div className={css.categoryNumber} data-test="hurricane-category">
+            { categoryChangePoint.category === 0 ? "TS" : categoryChangePoint.category }
+          </div>
+        </div>
+      </LeafletCustomMarker>
     );
   }
 }

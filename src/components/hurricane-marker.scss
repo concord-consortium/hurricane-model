@@ -68,7 +68,7 @@
   }
 
   &.category0 {
-    svg path {
+    svg path, circle {
       fill: $cat0Color;
     }
     .svgContainer {
@@ -76,7 +76,7 @@
     }
   }
   &.category1 {
-    svg path {
+    svg path, circle {
       fill: $cat1Color;
     }
     .svgContainer {
@@ -84,7 +84,7 @@
     }
   }
   &.category2 {
-    svg path {
+    svg path, circle {
       fill: $cat2Color;
     }
     .svgContainer {
@@ -92,7 +92,7 @@
     }
   }
   &.category3 {
-    svg path {
+    svg path, circle {
       fill: $cat3Color;
     }
     .svgContainer {
@@ -100,7 +100,7 @@
     }
   }
   &.category4 {
-    svg path {
+    svg path, circle {
       fill: $cat4Color;
     }
     .svgContainer {
@@ -108,7 +108,7 @@
     }
   }
   &.category5 {
-    svg path {
+    svg path, circle {
       fill: $cat5Color;
     }
     .svgContainer {

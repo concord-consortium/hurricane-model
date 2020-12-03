@@ -217,6 +217,7 @@ export class SimulationModel {
   });
   @observable public simulationStarted = false;
   @observable public simulationRunning = false;
+  @observable public strengthChangePositions: ITrackPoint[] = [];
   @observable public landfalls: ILandfall[] = [];
   @observable public stepsPerSecond = 0;
   public time = 0;
@@ -288,7 +289,14 @@ export class SimulationModel {
         this.hurricane.applyWindShear(config.sstCheckInterval);
       }
     }
+    const currentCategory = this.hurricane.category;
     this.hurricane.updateStrength();
+    if (this.strengthChangePositions.length === 0 || currentCategory !== this.hurricane.category) {
+      this.strengthChangePositions.push({
+        position: Object.assign({}, this.hurricane.center),
+        category: this.hurricane.category
+      });
+    }
 
     if (enteredLand || this.hurricaneWithinExtendedLandfallArea()) {
       this.landfalls.push({
@@ -392,6 +400,7 @@ export class SimulationModel {
     this.simulationStarted = false;
     this.hurricaneTrack = [];
     this.landfalls = [];
+    this.strengthChangePositions = [];
     this.precipitationPoints = [];
     this.time = 0;
     this.numberOfStepsOverSea = 0;

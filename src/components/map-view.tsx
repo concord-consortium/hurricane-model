@@ -6,7 +6,7 @@ import { Map, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "r
 import Control from "react-leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
-import { HurricaneMarker } from "./hurricane-marker";
+import { HurricaneMarker, HurricaneCategoryMarker } from "./hurricane-marker";
 import { HurricaneTrack } from "./hurricane-track";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
@@ -150,6 +150,14 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             sim.hurricane.active && <HurricaneMarker />
+          }
+          { ui.categoryChangeMarkers &&
+            sim.strengthChangePositions.map((ps, idx) =>
+              <HurricaneCategoryMarker
+                point={ps}
+                key={idx}
+              />
+            )
           }
           { navigation && <ZoomControl position="topleft"/> }
           {

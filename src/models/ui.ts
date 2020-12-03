@@ -20,6 +20,7 @@ export class UIModel {
   @observable public windArrows = config.windArrows;
   @observable public baseMap: MapTilesName = config.map;
   @observable public overlay: Overlay | null = config.overlay;
+  @observable public categoryChangeMarkers = config.categoryChangeMarkers;
   protected initialState: UIModel;
 
   constructor() {
