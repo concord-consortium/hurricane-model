@@ -223,7 +223,6 @@ export class SimulationModel {
   public time = 0;
   public numberOfStepsOverSea = 0;
   public numberOfStepsOverLand = 0;
-  public trackSegmentLength = config.categoryChangeMarkers ? 2 : config.trackSegmentLength;
   public extendedLandfallAreas: LatLngBounds[] = Object.values(extendedLandfallBounds);
   // Callback used by tests.
   public _seaSurfaceTempDataParsed: () => void;
@@ -267,8 +266,8 @@ export class SimulationModel {
       this.stepsPerSecond = 1000 / (timestamp - this.previousTimestamp) * benchmarkInterval;
       this.previousTimestamp = timestamp;
     }
-
-    if (this.time % this.trackSegmentLength === 0) {
+    const trackSegmentThisTick = this.time % config.trackSegmentLength === 0;
+    if (trackSegmentThisTick) {
       this.hurricaneTrack.push({
         position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category
@@ -297,6 +296,13 @@ export class SimulationModel {
         position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category
       });
+      // Also add an extra point to the hurricane track if the track did not get an extra point this tick
+      if (!trackSegmentThisTick) {
+        this.hurricaneTrack.push({
+          position: Object.assign({}, this.hurricane.center),
+          category: this.hurricane.category
+        });
+      }
     }
 
     if (enteredLand || this.hurricaneWithinExtendedLandfallArea()) {
