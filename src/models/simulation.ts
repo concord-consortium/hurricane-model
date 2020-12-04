@@ -223,6 +223,7 @@ export class SimulationModel {
   public time = 0;
   public numberOfStepsOverSea = 0;
   public numberOfStepsOverLand = 0;
+  public trackSegmentLength = config.categoryChangeMarkers ? 2 : config.trackSegmentLength;
   public extendedLandfallAreas: LatLngBounds[] = Object.values(extendedLandfallBounds);
   // Callback used by tests.
   public _seaSurfaceTempDataParsed: () => void;
@@ -267,7 +268,7 @@ export class SimulationModel {
       this.previousTimestamp = timestamp;
     }
 
-    if (this.time % config.trackSegmentLength === 0) {
+    if (this.time % this.trackSegmentLength === 0) {
       this.hurricaneTrack.push({
         position: Object.assign({}, this.hurricane.center),
         category: this.hurricane.category
