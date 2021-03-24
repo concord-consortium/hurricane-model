@@ -86,7 +86,6 @@ const benchmarkInterval = 30;
 const precipitationUpdateInterval = 5;
 
 export class SimulationModel {
-
   @computed get areaWidth() {
     return this.east - this.west;
   }
@@ -136,11 +135,6 @@ export class SimulationModel {
       }
     });
     return result;
-  }
-
-  // Helper structure.
-  @computed get windKdTree() {
-    return new kdTree(this.wind, distanceTo, ["lat", "lng"]);
   }
 
   // Wind data affected by custom pressure systems and limited to current bounds.
@@ -224,6 +218,7 @@ export class SimulationModel {
   public numberOfStepsOverSea = 0;
   public numberOfStepsOverLand = 0;
   public extendedLandfallAreas: LatLngBounds[] = Object.values(extendedLandfallBounds);
+  public windKdTreeCache: any;
   // Callback used by tests.
   public _seaSurfaceTempDataParsed: () => void;
   protected initialState: SimulationModel;
@@ -392,6 +387,8 @@ export class SimulationModel {
     this.simulationRunning = true;
     if (!this.simulationStarted) {
       this.simulationStarted = true;
+      // Remove wind data kd tree cache, as pressure system could have been moved by the user.
+      this.windKdTreeCache = null;
     }
     this.tick();
   }
@@ -430,8 +427,16 @@ export class SimulationModel {
     }
   }
 
+  public getWindKdTree() {
+    return new kdTree(this.wind, distanceTo, ["lat", "lng"]);
+  }
+
   public windAt(point: ICoordinates): IVector {
-    const wind = this.windKdTree;
+    if (!this.windKdTreeCache) {
+      // This is relatively expensive, so cache KD Tree.
+      this.windKdTreeCache = this.getWindKdTree();
+    }
+    const wind = this.windKdTreeCache;
     const nearestPoints = wind.nearest(point, 4);
     const perfectHit = nearestPoints.filter((sr: any) => sr[1] === 0);
     // There's some point with distance equal to 0. Simply return it.
