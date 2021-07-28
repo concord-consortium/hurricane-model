@@ -8,7 +8,7 @@ import High from "../assets/high.svg";
 import Low from "../assets/low.svg";
 import DragIcon from "../assets/drag.svg";
 import config from "../config";
-
+import { log } from "@concord-consortium/lara-interactive-api";
 import * as css from "./pressure-system-icon.scss";
 
 export const minStrength = 3;
@@ -21,6 +21,15 @@ interface IProps extends IBaseProps {
   onSliderDragEnd?: () => void;
 }
 interface IState {}
+
+const getPressureLabel = (model: PressureSystem) => {
+  const normalizedStrength = (model.strength - minStrength) / (maxStrength - minStrength);
+  if (model.type === "high") {
+    return Math.round(1015 + normalizedStrength * mbLabelRange) + "mb";
+  } else {
+    return Math.round(1010 - normalizedStrength * mbLabelRange) + "mb";
+  }
+};
 
 @inject("stores")
 @observer
@@ -55,7 +64,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
               min={minStrength}
               max={maxStrength}
               onChange={this.handleStrengthChange}
-              onChangeCommitted={onSliderDragEnd}
+              onChangeCommitted={this.handleSliderDragEnd}
               orientation="vertical"
               ThumbComponent={VerticalHandle}
               disabled={uiDisabled}
@@ -72,12 +81,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public renderLabel() {
     const { model } = this.props;
-    const normalizedStrength = (model.strength - minStrength) / (maxStrength - minStrength);
-    if (model.type === "high") {
-      return Math.round(1015 + normalizedStrength * mbLabelRange) + "mb";
-    } else {
-      return Math.round(1010 - normalizedStrength * mbLabelRange) + "mb";
-    }
+    return getPressureLabel(model);
   }
 
   public handleStrengthChange = (e: any, value: number) => {
@@ -90,5 +94,13 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     } else {
       model.setStrength(value);
     }
+  }
+
+  public handleSliderDragEnd = () => {
+    const { onSliderDragEnd, model } = this.props;
+    if (onSliderDragEnd) {
+      onSliderDragEnd();
+    }
+    log("PressureSystemStrengthUpdated", { value: getPressureLabel(model) });
   }
 }

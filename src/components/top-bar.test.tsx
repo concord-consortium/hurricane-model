@@ -10,14 +10,17 @@ describe("TopBar component", () => {
   });
 
   describe("Reload button", () => {
-    it("reloads the model using window.location.reload", () => {
+    it("reloads the model using window.location.reload", (done) => {
       const wrapper = shallow(
         <TopBar />
       );
       const topBar = wrapper.instance() as TopBar;
       window.location.reload = jest.fn();
       topBar.handleReload();
-      expect(window.location.reload).toHaveBeenCalled();
+      setTimeout(() => {
+        expect(window.location.reload).toHaveBeenCalled();
+        done();
+      }, 150);
     });
   });
 

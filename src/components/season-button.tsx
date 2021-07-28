@@ -6,6 +6,7 @@ import { Season } from "../types";
 import config from "../config";
 
 import * as css from "./season-button.scss";
+import { log } from "@concord-consortium/lara-interactive-api";
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -38,6 +39,8 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
   public handleSeasonChange = () => {
     const currentSeason = this.stores.simulation.season;
     const currentIdx = seasons.indexOf(currentSeason);
-    this.stores.simulation.setSeason(seasons[(currentIdx + 1) % seasons.length]);
+    const season = seasons[(currentIdx + 1) % seasons.length];
+    this.stores.simulation.setSeason(season);
+    log("SeasonChanged", { season })
   }
 }

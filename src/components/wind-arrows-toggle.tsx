@@ -2,6 +2,7 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import Switch from "@material-ui/core/Switch";
+import { log } from "@concord-consortium/lara-interactive-api";
 import * as css from "./wind-arrows-toggle.scss";
 
 interface IProps extends IBaseProps {}
@@ -24,5 +25,10 @@ export class WindArrowsToggle extends BaseComponent<IProps, IState> {
 
   public handleChange = (e: any, checked: boolean) => {
     this.stores.ui.setWindArrows(checked);
+    if (checked) {
+      log("WindArrowsShown");
+    } else {
+      log("WindArrowsHidden")
+    }
   }
 }
