@@ -214,7 +214,7 @@ export class MapView extends BaseComponent<IProps, IState> {
       this.stores.ui.mapUpdated(this.leafletMap, this._programmaticMapUpdate);
 
       if (!this._programmaticMapUpdate) {
-        console.log("ViewportUpdated", {
+        log("ViewportUpdated", {
           zoom: this.leafletMap.getZoom(),
           east: bounds.getEast(),
           west: bounds.getWest(),
