@@ -21,7 +21,6 @@ import { log } from "@concord-consortium/lara-interactive-api";
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
 
-
 interface IProps extends IBaseProps {}
 interface IState {}
 

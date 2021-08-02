@@ -28,7 +28,7 @@ export class WindArrowsToggle extends BaseComponent<IProps, IState> {
     if (checked) {
       log("WindArrowsShown");
     } else {
-      log("WindArrowsHidden")
+      log("WindArrowsHidden");
     }
   }
 }

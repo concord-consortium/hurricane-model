@@ -85,13 +85,13 @@ export class MapButton extends BaseComponent<IProps, IState> {
     if (this.props.mapType === "base") {
       const type = value as MapTilesName;
       this.stores.ui.setMapTiles(type);
-      log("BaseMapSet", { type })
+      log("BaseMapSet", { type });
     } else {
       // If user clicks the same overlay button again, just turn it off.
       const newOverlay = this.stores.ui.overlay === value ? null : value;
       this.stores.ui.setOverlay(newOverlay as Overlay);
       if (newOverlay !== null) {
-        log("MapOverlaySet", { type: newOverlay })
+        log("MapOverlaySet", { type: newOverlay });
       } else {
         log("MapOverlayDisabled");
       }

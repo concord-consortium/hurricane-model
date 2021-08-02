@@ -41,6 +41,6 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
     const currentIdx = seasons.indexOf(currentSeason);
     const season = seasons[(currentIdx + 1) % seasons.length];
     this.stores.simulation.setSeason(season);
-    log("SeasonChanged", { season })
+    log("SeasonChanged", { season });
   }
 }
