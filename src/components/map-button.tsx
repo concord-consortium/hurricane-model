@@ -14,6 +14,7 @@ import * as precipitationThumbImg from "../assets/precipitation-thumb.png";
 import * as stormSurgeThumbImg from "../assets/storm-surge-thumb.png";
 
 import * as css from "./map-button.scss";
+import { log } from "@concord-consortium/lara-interactive-api";
 
 interface IProps extends IBaseProps {
   label: string;
@@ -82,11 +83,18 @@ export class MapButton extends BaseComponent<IProps, IState> {
   public handleMapSelect = () => {
     const { value } = this.props;
     if (this.props.mapType === "base") {
-      this.stores.ui.setMapTiles(value as MapTilesName);
+      const type = value as MapTilesName;
+      this.stores.ui.setMapTiles(type);
+      log("BaseMapSet", { type });
     } else {
       // If user clicks the same overlay button again, just turn it off.
       const newOverlay = this.stores.ui.overlay === value ? null : value;
       this.stores.ui.setOverlay(newOverlay as Overlay);
+      if (newOverlay !== null) {
+        log("MapOverlaySet", { type: newOverlay });
+      } else {
+        log("MapOverlayDisabled");
+      }
     }
   }
 }

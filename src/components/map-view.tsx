@@ -16,6 +16,7 @@ import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
 import Home from "@material-ui/icons/Home";
 import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
+import { log } from "@concord-consortium/lara-interactive-api";
 
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
@@ -203,12 +204,24 @@ export class MapView extends BaseComponent<IProps, IState> {
 
   public resetView = () => {
     this.stores.ui.resetMapView();
+    log("ResetMapViewClicked");
   }
 
   private handleViewportChanged = () => {
     if (this.leafletMap) {
-      this.stores.simulation.updateBounds(this.leafletMap.getBounds());
+      const bounds = this.leafletMap.getBounds();
+      this.stores.simulation.updateBounds(bounds);
       this.stores.ui.mapUpdated(this.leafletMap, this._programmaticMapUpdate);
+
+      if (!this._programmaticMapUpdate) {
+        log("ViewportUpdated", {
+          zoom: this.leafletMap.getZoom(),
+          east: bounds.getEast(),
+          west: bounds.getWest(),
+          north: bounds.getNorth(),
+          south: bounds.getSouth()
+        });
+      }
     }
   }
 }

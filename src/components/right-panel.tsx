@@ -6,6 +6,7 @@ import { MapButton } from "./map-button";
 import config from "../config";
 
 import * as css from "./right-panel.scss";
+import { log } from "@concord-consortium/lara-interactive-api";
 
 export type MapType = "base" | "overlay";
 
@@ -98,10 +99,18 @@ export class RightPanel extends BaseComponent<IProps, IState> {
 
   public handleToggleDrawer = (e: React.SyntheticEvent) => {
     const { selectedTab } = this.state;
-    if (e.currentTarget.id !== selectedTab) {
-      this.setState({ open: true, selectedTab: e.currentTarget.id as MapType});
+    const mapType = e.currentTarget.id as MapType;
+    if (mapType !== selectedTab) {
+      this.setState({ open: true, selectedTab: mapType });
+      log("MapTabOpened", { type: mapType });
     } else {
-      this.setState({ open: !this.state.open });
+      const newState = !this.state.open;
+      this.setState({ open: newState });
+      if (newState) {
+        log("MapTabOpened", { type: mapType });
+      } else {
+        log("MapTabClosed", { type: mapType });
+      }
     }
   }
 }

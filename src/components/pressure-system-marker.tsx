@@ -5,6 +5,7 @@ import { PressureSystem } from "../models/pressure-system";
 import { PressureSystemIcon } from "./pressure-system-icon";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import config from "../config";
+import { log } from "@concord-consortium/lara-interactive-api";
 import * as Leaflet from "leaflet";
 
 interface IProps extends IBaseProps {
@@ -28,6 +29,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
       <LeafletCustomMarker
         position={model.center}
         onDrag={this.handlePressureSysDrag}
+        onDragEnd={this.handlePressureSysDragEnd}
         // Disable dragging when slider is being dragged, so they don't interfere.
         draggable={!sliderDrag && !uiDisabled}
       >
@@ -43,6 +45,11 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
   public handlePressureSysDrag = (e: Leaflet.LeafletMouseEvent) => {
     const { model } = this.props;
     this.stores.simulation.setPressureSysCenter(model, e.latlng);
+  }
+
+  public handlePressureSysDragEnd = () => {
+    const { model } = this.props;
+    log("PressureSystemMoved", { type: model.type, lat: model.center.lat, lng: model.center.lng });
   }
 
   private handleDrag = () => {

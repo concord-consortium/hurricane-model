@@ -4,6 +4,7 @@ import RefreshIcon from "@material-ui/icons/Refresh";
 import { Dialog } from "./dialog";
 import { AboutDialogContent } from "./about-dialog-content";
 import { ShareDialogContent } from "./share-dialog-content";
+import { log } from "@concord-consortium/lara-interactive-api";
 import * as css from "./top-bar.scss";
 
 interface IProps extends IBaseProps {}
@@ -48,15 +49,20 @@ export class TopBar extends BaseComponent<IProps, IState> {
   }
 
   public handleReload = () => {
-    window.location.reload();
+    log("TopBarReloadButtonClicked");
+    // Give some time for the log message to be delivered. Note it goes only to the parent window using postMessage,
+    // so we don't have to wait for network request.
+    setTimeout(() => window.location.reload(), 100);
   }
 
   public handleShareOpen = () => {
     this.setState({ shareOpen: true });
+    log("ShareDialogOpened");
   }
 
   public handleAboutOpen = () => {
     this.setState({ aboutOpen: true });
+    log("AboutDialogOpened");
   }
 
   public handleShareClose = () => {

@@ -13,6 +13,7 @@ import PauseIcon from "../assets/pause.svg";
 import StartIcon from "../assets/start.svg";
 import ReloadIcon from "../assets/reload.svg";
 import RestartIcon from "../assets/restart.svg";
+import { log } from "@concord-consortium/lara-interactive-api";
 
 import * as css from "./bottom-bar.scss";
 
@@ -27,8 +28,10 @@ function toggleFullscreen() {
   }
   if (!screenfull.isFullscreen) {
     screenfull.request();
+    log("FullscreenEnabled");
   } else {
     screenfull.exit();
+    log("FullscreenDisabled");
   }
 }
 
@@ -99,7 +102,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           </div>
           <div className={`${css.widgetGroup} ${css.stopStart}`}>
             <Button
-              onClick={sim.simulationRunning ? sim.stop : sim.start}
+              onClick={this.handleStartStop}
               disabled={!sim.ready}
               className={css.playbackButton}
               data-test="start-button"
@@ -127,13 +130,25 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     this.setState({ fullscreen: screenfull && screenfull.isFullscreen });
   }
 
+  public handleStartStop = () => {
+    if (this.stores.simulation.simulationRunning) {
+      this.stores.simulation.stop();
+      log("SimulationStopped");
+    } else {
+      this.stores.simulation.start();
+      log("SimulationStarted");
+    }
+  }
+
   public handleRestart = () => {
     this.stores.simulation.restart();
     this.stores.ui.setNorthAtlanticView();
+    log("SimulationRestarted");
   }
 
   public handleReload = () => {
     this.stores.simulation.reset();
     this.stores.ui.reset();
+    log("SimulationReloaded");
   }
 }
