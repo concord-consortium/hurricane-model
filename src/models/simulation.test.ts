@@ -4,6 +4,7 @@ import {
 import config from "../config";
 import { PNG } from "pngjs";
 import * as Leaflet from "leaflet";
+const mockFetch = require("jest-fetch-mock");
 const fs = require("fs");
 
 const options: ISimulationOptions = {
@@ -25,9 +26,9 @@ windData.fall = fallWind;
 
 describe("SimulationModel store", () => {
   beforeEach(() => {
-    global.fetch.resetMocks();
+    mockFetch.resetMocks();
     // SST Image data.
-    global.fetch.mockResponse("123");
+    mockFetch.mockResponse("123");
   });
 
   it("can be created without errors", () => {
@@ -169,21 +170,21 @@ describe("SimulationModel store", () => {
       const sim = new SimulationModel(options);
       expect(sim.seaSurfaceTempImgUrl).toEqual("fall.png");
       expect(sim.seaSurfaceTempData).toEqual(null); // no time to parse it
-      expect(global.fetch.mock.calls.length).toEqual(1);
-      expect(global.fetch.mock.calls[0][0]).toEqual(sim.seaSurfaceTempImgUrl);
+      expect(mockFetch.mock.calls.length).toEqual(1);
+      expect(mockFetch.mock.calls[0][0]).toEqual(sim.seaSurfaceTempImgUrl);
 
       sim.season = "summer";
       expect(sim.seaSurfaceTempImgUrl).toEqual("summer.png");
       expect(sim.seaSurfaceTempData).toEqual(null); // no time to parse it
-      expect(global.fetch.mock.calls.length).toEqual(2);
-      expect(global.fetch.mock.calls[1][0]).toEqual(sim.seaSurfaceTempImgUrl);
+      expect(mockFetch.mock.calls.length).toEqual(2);
+      expect(mockFetch.mock.calls[1][0]).toEqual(sim.seaSurfaceTempImgUrl);
       // No valid data parsed yet, so expect null.
       expect(sim.seaSurfaceTempAt(config.initialHurricanePosition)).toEqual(null);
     });
 
     it("reports correct SST value", (done) => {
       jest.setTimeout(10000);
-      global.fetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep.png"));
+      mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep.png"));
       const sim = new SimulationModel(options);
       sim._seaSurfaceTempDataParsed = () => {
         expect(sim.seaSurfaceTempData).not.toEqual(null); // real data, should be already parsed
@@ -197,7 +198,7 @@ describe("SimulationModel store", () => {
         expect(sim.seaSurfaceTempAt({lat: 20, lng: -90})).toEqual(null); // land
 
         // Change season and test again.
-        global.fetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/jun.png"));
+        mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/jun.png"));
         sim.season = "summer";
         sim._seaSurfaceTempDataParsed = () => {
           expect(sim.seaSurfaceTempData).not.toEqual(null); // real data, should be already parsed

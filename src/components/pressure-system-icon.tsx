@@ -2,7 +2,7 @@ import * as React from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { PressureSystem } from "../models/pressure-system";
-import Slider from "@material-ui/lab/Slider";
+import Slider from "@material-ui/core/Slider";
 import VerticalHandle from "../assets/slider-vertical.svg";
 import High from "../assets/high.svg";
 import Low from "../assets/low.svg";
