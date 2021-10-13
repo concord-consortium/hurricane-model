@@ -15,7 +15,9 @@ describe("TopBar component", () => {
         <TopBar />
       );
       const topBar = wrapper.instance() as TopBar;
-      window.location.reload = jest.fn();
+      // https://remarkablemark.org/blog/2018/11/17/mock-window-location/#update-for-jsdom-14
+      delete (window as any).location;
+      window.location = { reload: jest.fn() } as any;
       topBar.handleReload();
       setTimeout(() => {
         expect(window.location.reload).toHaveBeenCalled();

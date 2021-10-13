@@ -3,7 +3,7 @@ import { mount } from "enzyme";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { PressureSystemIcon, minStrength, maxStrength, mbLabelRange } from "./pressure-system-icon";
-import Slider from "@material-ui/lab/Slider";
+import Slider from "@material-ui/core/Slider";
 import * as css from "./pressure-system-icon.scss";
 import config from "../config";
 
