@@ -493,7 +493,7 @@ export class SimulationModel {
     return invertedTemperatureScale(color);
   }
 
-  public get categoryMarkerPositions() {
+  @computed public get categoryMarkerPositions() {
     const markerPositions: ITrackPoint[] = [];
     let prevTrackIndex = 0;
     this.strengthChangePositions.map(thisTrackIndex => {
