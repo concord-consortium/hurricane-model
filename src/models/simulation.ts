@@ -211,7 +211,7 @@ export class SimulationModel {
   });
   @observable public simulationStarted = false;
   @observable public simulationRunning = false;
-  @observable public strengthChangePositions: ITrackPoint[] = [];
+  @observable public strengthChangePositions: number[] = [];
   @observable public landfalls: ILandfall[] = [];
   @observable public stepsPerSecond = 0;
   public time = 0;
@@ -287,17 +287,15 @@ export class SimulationModel {
     const currentCategory = this.hurricane.category;
     this.hurricane.updateStrength();
     if (this.strengthChangePositions.length === 0 || currentCategory !== this.hurricane.category) {
-      this.strengthChangePositions.push({
-        position: Object.assign({}, this.hurricane.center),
-        category: this.hurricane.category
-      });
-      // Also add an extra point to the hurricane track if the track did not get an extra point this tick
+      // add an extra point to the hurricane track if the track did not get an extra point this tick
       if (!trackSegmentThisTick) {
         this.hurricaneTrack.push({
           position: Object.assign({}, this.hurricane.center),
           category: this.hurricane.category
         });
       }
+      // position changes are indexed references into the hurricaneTrack
+      this.strengthChangePositions.push(this.hurricaneTrack.length - 1);
     }
 
     if (enteredLand || this.hurricaneWithinExtendedLandfallArea()) {
@@ -340,6 +338,13 @@ export class SimulationModel {
       // Stop the model when hurricane gets too weak.
       this.stop();
       this.simulationFinished = true;
+      // add change for end-of-track so last segment gets a category marker
+      const lastChangeIndex = this.strengthChangePositions.length
+                                ? this.strengthChangePositions[this.strengthChangePositions.length - 1]
+                                : 0;
+      if (this.hurricaneTrack.length - 1 > lastChangeIndex) {
+        this.strengthChangePositions.push(this.hurricaneTrack.length - 1);
+      }
     }
 
     if (this.simulationRunning) {
@@ -486,6 +491,35 @@ export class SimulationModel {
     // It needs to match invertedTemperatureScale domain.
     const color = `rgb(${r}, ${g}, ${b})`;
     return invertedTemperatureScale(color);
+  }
+
+  @computed public get categoryMarkerPositions() {
+    const markerPositions: ITrackPoint[] = [];
+    let prevTrackIndex = 0;
+    this.strengthChangePositions.map(thisTrackIndex => {
+      if (thisTrackIndex > 0) {
+        const segmentCount = thisTrackIndex - prevTrackIndex;
+        // even number of segments; put marker on middle join
+        if (segmentCount % 2 === 0) {
+          markerPositions.push(this.hurricaneTrack[prevTrackIndex + (segmentCount / 2)]);
+        }
+        // odd number of segments; put marker in middle of center segment
+        else {
+          const startIndex = prevTrackIndex + Math.floor(segmentCount / 2);
+          const startPos = this.hurricaneTrack[startIndex];
+          const endPos = this.hurricaneTrack[startIndex + 1];
+          markerPositions.push({
+            position: {
+              lat: (startPos.position.lat + endPos.position.lat) / 2,
+              lng: (startPos.position.lng + endPos.position.lng) / 2
+            },
+            category: startPos.category
+          });
+        }
+      }
+      prevTrackIndex = thisTrackIndex;
+    });
+    return markerPositions;
   }
 
   private updateSeaSurfaceTempData() {

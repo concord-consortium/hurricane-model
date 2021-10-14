@@ -36,7 +36,10 @@
   .categoryNumber {
     color: #434343;
     font-size: 16px;
-    text-shadow: 0 0 5px #fff;
+    text-shadow: 1px  1px 0 #fff,
+                -1px -1px 0 #fff,
+                 1px -1px 0 #fff,
+                -1px  1px 0 #fff;
     position: absolute;
     top: 60%;
     left: 50%;

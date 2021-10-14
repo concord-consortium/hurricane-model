@@ -217,6 +217,38 @@ describe("SimulationModel store", () => {
     });
   });
 
+  describe("categoryMarkerPositions", () => {
+    it("should show no markers with no hurricane track", () => {
+      const sim = new SimulationModel(options);
+      expect(sim.categoryMarkerPositions).toEqual([]);
+    });
+    it("should show no markers with insufficient hurricane track", () => {
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [{ position: { lat: 1, lng: -1}, category: 0 }];
+      sim.strengthChangePositions = [0];
+      expect(sim.categoryMarkerPositions).toEqual([]);
+    });
+    it("should show marker in middle of middle segment for odd number of segments", () => {
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [
+        { position: { lat: 1, lng: -1}, category: 0 },
+        { position: { lat: 3, lng: -3}, category: 1 }
+      ];
+      sim.strengthChangePositions = [0, 1];
+      expect(sim.categoryMarkerPositions).toEqual([{ position: { lat: 2, lng: -2}, category: 0 }]);
+    });
+    it("should show marker at join of middle segments for even number of segments", () => {
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [
+        { position: { lat: 1, lng: -1}, category: 0 },
+        { position: { lat: 2, lng: -2}, category: 0 },
+        { position: { lat: 3, lng: -3}, category: 1 }
+      ];
+      sim.strengthChangePositions = [0, 2];
+      expect(sim.categoryMarkerPositions).toEqual([{ position: { lat: 2, lng: -2}, category: 0 }]);
+    });
+  });
+
   describe("tick", () => {
     it("increases simulation time, moves hurricane and saves it track", () => {
       const sim = new SimulationModel(options);
