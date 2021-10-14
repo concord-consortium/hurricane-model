@@ -8,15 +8,28 @@ context("Test the Hurricane Model app", () => {
   });
 
   it("lets user change season", () => {
-    cy.contains(".season-button--seasonValue--__hurr-v1__", "fall");
-    cy.get('[data-test="season-button"]').click();
-    cy.contains(".season-button--seasonValue--__hurr-v1__", "winter");
-    cy.get('[data-test="season-button"]').click();
-    cy.contains(".season-button--seasonValue--__hurr-v1__", "spring");
-    cy.get('[data-test="season-button"]').click();
-    cy.contains(".season-button--seasonValue--__hurr-v1__", "summer");
-    cy.get('[data-test="season-button"]').click();
-    cy.contains(".season-button--seasonValue--__hurr-v1__", "fall");
+    // defaults to Fall
+    cy.contains(".season-button--seasonSelect--__hurr-v1__", "Fall");
+    // can change to Winter
+    cy.get('[data-test="season-button"]')
+      .click()
+      .then(() => {
+        cy.get('[data-test="season-item-winter"]')
+          .click()
+          .then(() => {
+            cy.contains(".season-button--seasonSelect--__hurr-v1__", "Winter");
+          });
+      });
+    // can change to Spring
+    cy.get('[data-test="season-button"]')
+      .click()
+      .then(() => {
+        cy.get('[data-test="season-item-spring"]')
+          .click()
+          .then(() => {
+            cy.contains(".season-button--seasonSelect--__hurr-v1__", "Spring");
+          });
+      });
   });
 
   it("lets user start and stop the model", () => {

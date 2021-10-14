@@ -1,40 +1,56 @@
 @import "common.scss";
 
 .seasonButton {
-  width: 92px;
-  height: 100%;
-  overflow: hidden;
-  border-bottom-left-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
+  margin-top: $bottomBarTopPadding;
+  width: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   &.disabled{
     opacity: 0.5 !important;
   }
 
-  .seasonValue {
-    color: #fff;
-    font-size: 12px;
-    width: 76px;
-    height: 42px;
-    background: #FF8F20;
-    border-radius: 8px;
-    text-transform: capitalize;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: $bottomBarBorderStyle;
-    margin-top: $bottomBarTopPadding;
-
-    &:hover {
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.5)
-    }
-    &:active {
-      box-shadow: 0 0 0 3px rgba(255,255,255,1)
-    }
-  }
-
   .seasonLabel {
     font-size: 12px;
-    margin-bottom: 8px;
+    text-align: center;
   }
+
+  .selectContainer {
+    margin-top: 8px;
+    width: 82px;
+    height: 26px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0);
+    &:hover {
+      background: rgba(255,255,255,0.5);
+    }
+
+    .seasonSelect {
+      left: 3px;
+      top: 3px;
+      width: 76px;
+      height: 20px;
+      font-size: 11px;
+      border: 1px solid black;
+      border-radius: 5px;
+      background: white;
+
+      &:hover {
+        background: $hoverColor;
+      }
+    }
+  }
+}
+
+.seasonItem {
+  padding: 0 8px !important;
+  width: 74px !important;
+  font-size: 11px !important;
+  display: flex;
+  justify-content: space-between !important;
+}
+
+:global(.MuiSelect-select:focus) {
+  background: none !important;
 }

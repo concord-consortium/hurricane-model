@@ -23,7 +23,7 @@ describe("BottomBar component", () => {
     expect(wrapper.find(SeasonButton).length).toEqual(1);
     expect(wrapper.find(WindArrowsToggle).length).toEqual(1);
     expect(wrapper.find(HurricaneImageToggle).length).toEqual(1);
-    expect(wrapper.find(Button).length).toEqual(4);
+    expect(wrapper.find(Button).length).toEqual(3);
   });
 
   it("start button is disabled until model is ready", () => {
