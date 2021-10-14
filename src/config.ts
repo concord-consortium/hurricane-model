@@ -87,6 +87,7 @@ const DEFAULT_CONFIG: any = {
   // Show the hurricane strength category changes along the path
   categoryChangeMarkers: false,
   windArrows: true,
+  hurricaneImage: false,
   seaSurfaceTempOpacity: 0.5,
   // Enables steps per second display.
   benchmark: false,
@@ -95,7 +96,8 @@ const DEFAULT_CONFIG: any = {
   lockSimulationWhileRunning: true,
   // --- UI elements can be shown or hidden using options below ---
   seasonButton: true,
-  windArrowsToggle: true
+  windArrowsToggle: true,
+  hurricaneImageToggle: true
   // --- End of UI widgets ---
 };
 

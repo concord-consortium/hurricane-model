@@ -1,0 +1,18 @@
+@import "common";
+
+.hurricaneImageToggle {
+  margin-top: $bottomBarTopPadding;
+  width: 97px;
+
+  .label {
+    width: 80px;
+    margin: 0 auto;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .toggleContainer {
+    text-align: center;
+  }
+}
+

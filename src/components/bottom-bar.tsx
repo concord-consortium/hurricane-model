@@ -3,6 +3,7 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { SeasonButton } from "./season-button";
 import { WindArrowsToggle } from "./wind-arrows-toggle";
+import { HurricaneImageToggle } from "./hurricane-image-toggle";
 import { HurricaneScale } from "./hurricane-scale";
 import CCLogo from "../assets/cc-logo.svg";
 import CCLogoSmall from "../assets/cc-logo-small.svg";
@@ -80,6 +81,12 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             {
               config.windArrowsToggle &&
               <WindArrowsToggle />
+            }
+          </div>
+          <div className={`${css.widgetGroup} hoverable`}>
+            {
+              config.hurricaneImageToggle &&
+              <HurricaneImageToggle />
             }
           </div>
           <div className={`${css.widgetGroup} ${css.reloadRestart}`}>

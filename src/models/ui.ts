@@ -18,9 +18,12 @@ export class UIModel {
     seaSurfaceTemp: config.seaSurfaceTempOpacity,
   };
   @observable public windArrows = config.windArrows;
+  @observable public hurricaneImage = config.hurricaneImage;
+  @observable public mapZoom = 1;
   @observable public baseMap: MapTilesName = config.map;
   @observable public overlay: Overlay | null = config.overlay;
   @observable public categoryChangeMarkers = config.categoryChangeMarkers;
+
   protected initialState: UIModel;
 
   constructor() {
@@ -49,6 +52,7 @@ export class UIModel {
 
   @action.bound public mapUpdated(map: Map, programmaticUpdate: boolean) {
     this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
+    this.mapZoom = map.getZoom();
     this.mapModifiedByUser = !programmaticUpdate;
   }
 
@@ -87,6 +91,10 @@ export class UIModel {
 
   @action.bound public setWindArrows(enabled: boolean) {
     this.windArrows = enabled;
+  }
+
+  @action.bound public setHurricaneImage(enabled: boolean) {
+    this.hurricaneImage = enabled;
   }
 
   @action.bound public reset() {

@@ -5,6 +5,7 @@ import { Provider } from "mobx-react";
 import { BottomBar } from "./bottom-bar";
 import { SeasonButton } from "./season-button";
 import { WindArrowsToggle } from "./wind-arrows-toggle";
+import { HurricaneImageToggle } from "./hurricane-image-toggle";
 import Button from "@material-ui/core/Button";
 
 describe("BottomBar component", () => {
@@ -21,6 +22,7 @@ describe("BottomBar component", () => {
     );
     expect(wrapper.find(SeasonButton).length).toEqual(1);
     expect(wrapper.find(WindArrowsToggle).length).toEqual(1);
+    expect(wrapper.find(HurricaneImageToggle).length).toEqual(1);
     expect(wrapper.find(Button).length).toEqual(4);
   });
 

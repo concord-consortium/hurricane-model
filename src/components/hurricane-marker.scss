@@ -31,12 +31,20 @@
       margin-left: -22.5px;
       margin-top: -36px;
     }
+
+    img {
+      width: 200px;
+      height: 200px;
+      margin-left: -100px;
+      margin-top: -100px;
+    }
   }
 
+
   .categoryNumber {
-    color: #434343;
-    font-size: 16px;
-    text-shadow: 0 0 5px #fff;
+    color: #000;
+    font-size: 18px;
+    font-weight: bold;
     position: absolute;
     top: 60%;
     left: 50%;
@@ -47,6 +55,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    // Text outline
+    text-shadow: 1px 1px 0 #fff,
+      -1px -1px 0 #fff,
+      1px -1px 0 #fff,
+      -1px 1px 0 #fff,
+      1px 1px 0 #fff;
   }
 
   .temp {
