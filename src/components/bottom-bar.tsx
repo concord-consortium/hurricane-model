@@ -21,6 +21,7 @@ import * as css from "./bottom-bar.scss";
 interface IProps extends IBaseProps {}
 interface IState {
   fullscreen: boolean;
+  isSeasonMenuOpen: boolean;
 }
 
 function toggleFullscreen() {
@@ -42,7 +43,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      fullscreen: false
+      fullscreen: false,
+      isSeasonMenuOpen: false
     };
   }
 
@@ -64,6 +66,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const sim = this.stores.simulation;
+    const { isSeasonMenuOpen } = this.state;
+    const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -73,8 +77,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         <div className={css.mainContainer}>
           {
             config.seasonButton &&
-            <div className={css.widgetGroup}>
-              <SeasonButton />
+            <div className={`${css.widgetGroup} hoverable ${seasonButtonHoveredClass}`}>
+              <SeasonButton
+                onMenuOpen={() => this.setState({ isSeasonMenuOpen: true })}
+                onMenuClose={() => {
+                  // delay to avoid flash between closing menu and :hover taking over
+                  setTimeout(() => this.setState({ isSeasonMenuOpen: false }), 500);
+                }} />
             </div>
           }
           <div className={`${css.widgetGroup} hoverable`}>

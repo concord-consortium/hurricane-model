@@ -69,6 +69,11 @@ $overflowHeight: 11px;
     background: $hoverColor;
   }
 
+  // for programmatic control of hover state
+  .hovered {
+    background: $hoverColor;
+  }
+
   .reloadRestart {
     margin-left: 10px;
     white-space: nowrap;

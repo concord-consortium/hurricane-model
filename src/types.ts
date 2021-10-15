@@ -28,3 +28,9 @@ export interface ILandfall {
 }
 
 export type Season = "winter" | "spring" | "summer" | "fall";
+export const seasonLabels: Record<Season, string> = {
+  winter: "Winter",
+  spring: "Spring",
+  summer: "Summer",
+  fall: "Fall"
+};
