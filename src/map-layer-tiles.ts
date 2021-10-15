@@ -46,7 +46,7 @@ const layerInfo: MapTileLayer[] = [
     mapType: "population",
     name: "Population",
     // tslint:disable-next-line:max-line-length
-    url: "https://services.arcgisonline.com/ArcGIS/rest/services/Demographics/USA_Population_Density/MapServer/tile/{z}/{y}/{x}",
+    url: "https://tiles.arcgis.com/tiles/4yjifSiIG17X0gW4/arcgis/rest/services/World_Population_Footprint/MapServer/tile/{z}/{y}/{x}",
     // tslint:disable-next-line:max-line-length
     attribution: "Esri, U.S. Census Bureau, https://www.arcgis.com/home/item.html?id=302d4e6025ef41fa8d3525b7fc31963a",
     maxZoom: 13,

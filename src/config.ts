@@ -85,7 +85,7 @@ const DEFAULT_CONFIG: any = {
   // Each time the landfall happens the model will show a clickable rectangle around it so user can zoom in.
   markLandfalls: false,
   // Show the hurricane strength category changes along the path
-  categoryChangeMarkers: false,
+  categoryChangeMarkers: true,
   windArrows: true,
   hurricaneImage: false,
   seaSurfaceTempOpacity: 0.5,
