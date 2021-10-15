@@ -24,14 +24,16 @@ describe("UI model", () => {
   });
 
   describe("mapUpdated", () => {
-    it("updates latLngToContainerPoint and mapModifiedByUser", () => {
+    it("updates latLngToContainerPoint, mapModifiedByUser, and mapZoom", () => {
       const ui = new UIModel();
       const map = new Map(document.createElement("div"));
+      map.getZoom = () => 123; // mock zoom
       const oldLatLngToContainerPoint = ui.latLngToContainerPoint;
 
       ui.mapUpdated(map, true);
       expect(ui.latLngToContainerPoint).not.toEqual(oldLatLngToContainerPoint);
       expect(ui.mapModifiedByUser).toEqual(false);
+      expect(ui.mapZoom).toEqual(123);
 
       ui.mapUpdated(map, false);
       expect(ui.mapModifiedByUser).toEqual(true);
