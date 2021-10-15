@@ -38,8 +38,5 @@ export class HurricaneTrack extends BaseComponent<IProps, IState> {
         }
       </>
     );
-
-
-
   }
 }

@@ -184,7 +184,7 @@ describe("SimulationModel store", () => {
 
     it("reports correct SST value", (done) => {
       jest.setTimeout(10000);
-      mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep.png"));
+      mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep-default.png"));
       const sim = new SimulationModel(options);
       sim._seaSurfaceTempDataParsed = () => {
         expect(sim.seaSurfaceTempData).not.toEqual(null); // real data, should be already parsed
@@ -198,7 +198,7 @@ describe("SimulationModel store", () => {
         expect(sim.seaSurfaceTempAt({lat: 20, lng: -90})).toEqual(null); // land
 
         // Change season and test again.
-        mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/jun.png"));
+        mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/jun-default.png"));
         sim.season = "summer";
         sim._seaSurfaceTempDataParsed = () => {
           expect(sim.seaSurfaceTempData).not.toEqual(null); // real data, should be already parsed
