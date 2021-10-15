@@ -68,7 +68,8 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                 <MapButton label="Satellite" value="satellite" mapType="base" />
                 <MapButton label="Relief" value="relief" mapType="base" />
                 <MapButton label="Street" value="street" mapType="base" />
-                <MapButton label="Population" value="population" mapType="base" />
+                {config.enablePopulationMap &&
+                  <MapButton label="Population" value="population" mapType="base" />}
               </div>
             </div>
           }

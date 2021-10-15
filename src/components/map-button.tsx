@@ -62,7 +62,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
       <Button
         onClick={this.handleMapSelect}
         className={`${css.mapButton} ${buttonClass}`}
-        data-test="map-button"
+        data-test={`map-button-${value}`}
         disableRipple={true}
         disabled={disabled}
       >

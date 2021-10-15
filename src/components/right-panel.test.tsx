@@ -20,9 +20,9 @@ describe("Right Panel component", () => {
     expect(wrapper.find(RightPanel).length).toBe(1);
     expect(wrapper.find("ul").length).toBe(1);
     expect(wrapper.find("li").length).toBe(2);
-    // default is the geo panel
+    // default is the base maps panel
     expect(wrapper.find('[data-test="base-panel"]').exists()).toEqual(true);
-    // impact panel is not rendered until the tab is clicked
+    // overlay panel is not rendered until the tab is clicked
     expect(wrapper.find('[data-test="overlay-panel"]').length).toEqual(0);
   });
 
@@ -37,7 +37,7 @@ describe("Right Panel component", () => {
     expect(panel.state.open).toBe(false);
     wrapper.find("#base").simulate("click");
     expect(panel.state.open).toBe(true);
-    // looking at geo panel, no impact panel rendered
+    // looking at base maps panel, no overlay panel rendered
     expect(wrapper.find('[data-test="base-panel"]').exists()).toEqual(true);
     expect(wrapper.find('[data-test="overlay-panel"]').length).toEqual(0);
   });
@@ -70,7 +70,33 @@ describe("Right Panel component", () => {
     expect(panel.state.open).toBe(false);
   });
 
-  it("renders the impact panel when the impact tab is clicked", () => {
+  it("provides the population base map option when configured to do so", () => {
+    const defaultValue = config.enablePopulationMap;
+
+    config.enablePopulationMap = true;
+    let wrapper = mount(
+      <Provider stores={stores}>
+        <RightPanel />
+      </Provider>
+    );
+    wrapper.find("#base").simulate("click");
+    expect(wrapper.find('[data-test="base-panel"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test="map-button-population"]').exists()).toBe(true);
+
+    config.enablePopulationMap = false;
+    wrapper = mount(
+      <Provider stores={stores}>
+        <RightPanel />
+      </Provider>
+    );
+    wrapper.find("#base").simulate("click");
+    expect(wrapper.find('[data-test="base-panel"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test="map-button-population"]').exists()).toBe(false);
+
+    config.enablePopulationMap = defaultValue;
+  });
+
+  it("renders the overlay panel when the overlay tab is clicked", () => {
     const wrapper = mount(
       <Provider stores={stores}>
         <RightPanel />
@@ -80,7 +106,7 @@ describe("Right Panel component", () => {
     expect(panel.state.open).toBe(false);
     wrapper.find("#overlay").simulate("click");
     expect(panel.state.open).toBe(true);
-    // geo panel now hidden, impact is visible
+    // base maps panel now hidden, overlay is visible
     expect(wrapper.find('[data-test="base-panel"]').length).toEqual(0);
     expect(wrapper.find('[data-test="overlay-panel"]').exists()).toEqual(true);
   });
