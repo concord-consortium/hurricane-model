@@ -20,7 +20,7 @@ export class MapTab extends BaseComponent<IProps, IState> {
     const { tabType, active } = this.props;
     const tabStyle = tabType === "base" ? css.geoMaps : css.impactMaps;
     const activeStyle = active ? css.active : "";
-    const tabText = tabType === "base" ? "Base Maps" : "Maps Overlays";
+    const tabText = tabType === "base" ? "Base Maps" : "Map Overlays";
     const tabMap = {
       backgroundImage: ""
     };

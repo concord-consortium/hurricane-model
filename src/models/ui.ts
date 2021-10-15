@@ -11,7 +11,7 @@ export type Overlay = "sst" | "precipitation" | "stormSurge";
 export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAvailable: boolean; };
 
 export class UIModel {
-    @observable public initialBounds = config.initialBounds;
+  @observable public initialBounds = config.initialBounds;
   @observable public zoomedInView: ZoomedInViewProps = false;
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
@@ -28,6 +28,9 @@ export class UIModel {
 
   constructor() {
     this.initialState = JSON.parse(JSON.stringify(this));
+    if ((this.initialState.baseMap === "population") && !config.enablePopulationMap) {
+      this.initialState.baseMap = "street";
+    }
   }
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
