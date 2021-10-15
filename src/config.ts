@@ -94,6 +94,10 @@ const DEFAULT_CONFIG: any = {
   // If set to true, users won't be able to change pressure systems.
   pressureSystemsLocked: false,
   lockSimulationWhileRunning: true,
+  // Default sea surface temperature image, available values are: "default", "rainbowCC"
+  defaultSSTScale: "default",
+  // Color blind accessible sea surface temperature image, available values are: "purple3", "purpleCC"
+  colorBlindSSTScale: "purple3",
   // --- UI elements can be shown or hidden using options below ---
   seasonButton: true,
   windArrowsToggle: true,

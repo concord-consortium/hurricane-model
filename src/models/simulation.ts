@@ -6,12 +6,12 @@ import * as decWind from "../../wind-data-json/dec-simple.json";
 import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
 import * as septWind from "../../wind-data-json/sep-simple.json";
-import * as decSeaTemp from "../../sea-surface-temp-img/dec.png";
-import * as marchSeaTemp from "../../sea-surface-temp-img/mar.png";
-import * as juneSeaTemp from "../../sea-surface-temp-img/jun.png";
-import * as septSeaTemp from "../../sea-surface-temp-img/sep.png";
+import * as decSeaTemp from "../../sea-surface-temp-img/dec-default.png";
+import * as marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
+import * as juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
+import * as septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint } from "../types";
+import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages } from "../types";
 import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
@@ -24,13 +24,6 @@ interface IWindDataset {
   spring: IWindPoint[];
   summer: IWindPoint[];
   fall: IWindPoint[];
-}
-
-interface ISSTImages {
-  winter: string;
-  spring: string;
-  summer: string;
-  fall: string;
 }
 
 export interface ISimulationOptions {
@@ -187,7 +180,7 @@ export class SimulationModel {
     );
   }
 
-  @computed get seaSurfaceTempImgUrl() {
+  @computed get dataSeaSurfaceTempImgUrl() {
     return sstImages[this.season];
   }
   // Region boundaries. Used only for optimization.
@@ -525,7 +518,7 @@ export class SimulationModel {
   private updateSeaSurfaceTempData() {
     // Set data to null so the model know that it's not available while the new one is being downloaded.
     this.seaSurfaceTempData = null;
-    fetch(this.seaSurfaceTempImgUrl).then(response => {
+    fetch(this.dataSeaSurfaceTempImgUrl).then(response => {
       if (response.ok) {
         response.arrayBuffer().then(buffer => {
           const png = new PNG();

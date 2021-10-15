@@ -34,3 +34,10 @@ export const seasonLabels: Record<Season, string> = {
   summer: "Summer",
   fall: "Fall"
 };
+
+export interface ISSTImages {
+  winter: string;
+  spring: string;
+  summer: string;
+  fall: string;
+}

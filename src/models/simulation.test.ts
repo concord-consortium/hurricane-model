@@ -168,16 +168,16 @@ describe("SimulationModel store", () => {
   describe("sea surface temperature data", () => {
     it("downloads sea surface temperature data on init or change of the season", () => {
       const sim = new SimulationModel(options);
-      expect(sim.seaSurfaceTempImgUrl).toEqual("fall.png");
+      expect(sim.dataSeaSurfaceTempImgUrl).toEqual("fall.png");
       expect(sim.seaSurfaceTempData).toEqual(null); // no time to parse it
       expect(mockFetch.mock.calls.length).toEqual(1);
-      expect(mockFetch.mock.calls[0][0]).toEqual(sim.seaSurfaceTempImgUrl);
+      expect(mockFetch.mock.calls[0][0]).toEqual(sim.dataSeaSurfaceTempImgUrl);
 
       sim.season = "summer";
-      expect(sim.seaSurfaceTempImgUrl).toEqual("summer.png");
+      expect(sim.dataSeaSurfaceTempImgUrl).toEqual("summer.png");
       expect(sim.seaSurfaceTempData).toEqual(null); // no time to parse it
       expect(mockFetch.mock.calls.length).toEqual(2);
-      expect(mockFetch.mock.calls[1][0]).toEqual(sim.seaSurfaceTempImgUrl);
+      expect(mockFetch.mock.calls[1][0]).toEqual(sim.dataSeaSurfaceTempImgUrl);
       // No valid data parsed yet, so expect null.
       expect(sim.seaSurfaceTempAt(config.initialHurricanePosition)).toEqual(null);
     });

@@ -117,8 +117,9 @@ export class MapView extends BaseComponent<IProps, IState> {
           {
             ui.overlay === "sst" &&
             <ImageOverlay
-              opacity={ui.layerOpacity.seaSurfaceTemp}
-              url={sim.seaSurfaceTempImgUrl}
+              // color blind version of sea surface temperature should always use 100% opacity
+              opacity={ui.colorBlindSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
+              url={ui.getVisibleSeaSurfaceTempImgUrl(sim.season)}
               bounds={imageOverlayBounds}
             />
           }
