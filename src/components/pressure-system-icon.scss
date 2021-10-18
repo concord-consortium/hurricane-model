@@ -52,7 +52,7 @@
     color: white;
     font-family: $scaleFont;
     font-size: 14px;
-    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+    text-shadow: 0 1px 5px #000;
   }
 
   .sliderContainer {
@@ -76,16 +76,17 @@
       height: 20px;
       margin-left: -8.5px;
       margin-bottom: -8.5px;
-      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
+      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.65);
       &:hover, &:active {
         box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5)
       }
     }
 
     .track, .rail {
-      width: 1px;
+      width: 2px;
       opacity: 1;
       background-color: #fff;
+      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.65);
     }
   }
 }
