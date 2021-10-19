@@ -36,7 +36,7 @@ const getPressureLabel = (model: PressureSystem) => {
 export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public render() {
-    const { model, onSliderDragEnd } = this.props;
+    const { model } = this.props;
     const sim = this.stores.simulation;
     const strengthNorm = (model.strength - minStrength) / (maxStrength - minStrength) - 0.5; // [-0.5, 0.5]
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling

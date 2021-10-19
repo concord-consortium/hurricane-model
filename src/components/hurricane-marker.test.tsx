@@ -6,6 +6,7 @@ import { Provider } from "mobx-react";
 import { Map } from "react-leaflet";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import { HurricaneMarker, HurricaneIcon } from "./hurricane-marker";
+import { CategoryNumber } from "./category-number";
 
 describe("HurricaneMarker component", () => {
   let stores = createStores();
@@ -40,13 +41,19 @@ describe("HurricaneIcon component", () => {
         </Map>
       </Provider>
     );
-    const category = wrapper.find('[data-test="hurricane-category"]');
+    let category = wrapper.find(CategoryNumber);
     expect(category.length).toEqual(1);
     stores.simulation.hurricane.strength = 20;
-    expect(category.text()).toEqual("TS"); // tropical storm
+    wrapper.update();
+    category = wrapper.find(CategoryNumber);
+    expect(category.prop("value")).toEqual(0); // tropical storm
     stores.simulation.hurricane.strength = 54;
-    expect(category.text()).toEqual(stores.simulation.hurricane.category.toString());
+    wrapper.update();
+    category = wrapper.find(CategoryNumber);
+    expect(category.prop("value")).toEqual(stores.simulation.hurricane.category);
     stores.simulation.hurricane.strength = 100;
-    expect(category.text()).toEqual("5");
+    wrapper.update();
+    category = wrapper.find(CategoryNumber);
+    expect(category.prop("value")).toEqual(5);
   });
 });

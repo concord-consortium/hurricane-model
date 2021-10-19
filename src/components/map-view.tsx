@@ -6,7 +6,8 @@ import { Map, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "r
 import Control from "react-leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
-import { HurricaneMarker, HurricaneCategoryMarker } from "./hurricane-marker";
+import { HurricaneMarker } from "./hurricane-marker";
+import { HurricaneCategoryMarker } from "./hurricane-category-marker";
 import { HurricaneTrack } from "./hurricane-track";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";

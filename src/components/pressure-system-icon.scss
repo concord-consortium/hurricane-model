@@ -41,8 +41,8 @@
   }
 
   .letter {
-    height: 50px;
-    margin-top: 8px;
+    height: 72px;
+    margin: -3px -10px -10px -8px; // new asset has padding
     vertical-align: middle;
     transform-origin: center center;
   }
@@ -83,7 +83,7 @@
     }
 
     .track, .rail {
-      width: 2px;
+      width: 3px;
       opacity: 1;
       background-color: #fff;
       box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.65);

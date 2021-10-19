@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="21px" height="16px" viewBox="0 0 21 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>4</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons-and-Artwork-v2" transform="translate(-270.000000, -492.000000)">
+            <g id="4" transform="translate(270.000000, 492.000000)">
+                <rect id="Rectangle" x="0" y="0" width="21" height="16"></rect>
+                <polygon id="Path" fill="#FFFFFF" fill-rule="nonzero" points="12.8214177 0.31 15.0328552 0.31 15.0324177 7.388 16.0016052 7.388125 16.0016052 13.2240625 15.0324177 13.224 15.0328552 15.685 8.82191769 15.685 8.82141769 13.224 5.19332911 13.2240625 4.92 9.37642963 9.59517353 0.31 11.4194177 0.31"></polygon>
+                <path d="M13.0328552,13.685 L13.0328552,11.2240625 L14.0016052,11.2240625 L14.0016052,9.388125 L13.0328552,9.388125 L13.0328552,2.31 L10.8141052,2.31 L6.95473019,9.794375 L7.05629269,11.2240625 L10.8219177,11.2240625 L10.8219177,13.685 L13.0328552,13.685 Z M10.8219177,9.388125 L9.10316769,9.388125 L10.7750427,5.669375 L10.8219177,5.5834375 L10.8219177,9.388125 Z" fill="#434343" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>
