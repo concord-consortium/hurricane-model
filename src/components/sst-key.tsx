@@ -76,7 +76,7 @@ export class SSTKey extends BaseComponent<IBaseProps, {}> {
             checked={ui.colorBlindSSTScale}
             onChange={this.toggleColorBlindKey}
             onClick={this.preventClickPropagation}
-          /> Color blind key
+          /> Accessible Key
         </div>
       </div>
     );
