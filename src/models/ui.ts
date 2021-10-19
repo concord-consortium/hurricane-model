@@ -143,6 +143,9 @@ export class UIModel {
 
   @action.bound public setOverlay(value: Overlay | null) {
     this.overlay = value;
+    if (value !== "sst") {
+      this.disableThermometer();
+    }
   }
 
   @action.bound public setWindArrows(enabled: boolean) {

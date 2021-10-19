@@ -4,6 +4,8 @@
   min-width: 60px;
   width: 100%;
   height: 100%;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 
   svg {
     position: absolute;
@@ -14,12 +16,20 @@
     margin: $bottomBarTopPadding/2 auto 0 auto;
   }
 
-  .iconButtonHighlightSvg {
-    opacity: 1;
+  .iconButtonHighlightSvg, .iconButtonActiveSvg {
+    transition: opacity 0.125s;
+    opacity: 0;
   }
 
   &:hover {
     .iconButtonHighlightSvg {
+      transition: opacity 0s;
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    .iconButtonActiveSvg {
       opacity: 1;
     }
   }
@@ -34,5 +44,9 @@
   &.disabled {
     opacity: 0.5 !important;
     filter: grayscale(1);
+  }
+
+  &.active {
+    background-color: #cfcfcf;
   }
 }

@@ -3,7 +3,7 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import { LatLngExpression } from "leaflet";
-import * as css from "./temperature-marker.scss";
+import * as css from "./thermometer-marker.scss";
 
 interface IProps extends IBaseProps {
   position: LatLngExpression | null;
@@ -13,7 +13,7 @@ interface IState {}
 
 @inject("stores")
 @observer
-export class TemperatureMarker extends BaseComponent<IProps, IState> {
+export class ThermometerMarker extends BaseComponent<IProps, IState> {
   public render() {
     const { position, saved } = this.props;
     if (!position) {
@@ -25,8 +25,8 @@ export class TemperatureMarker extends BaseComponent<IProps, IState> {
     }
     return (
       <LeafletCustomMarker position={position} draggable={false}>
-        <div className={css.temperatureContainer}>
-          <div className={css.temperatureReadout}>
+        <div className={css.thermometerContainer}>
+          <div className={css.thermometerReadout}>
             { temp.toFixed(1) } °C
           </div>
           { saved && <div className={css.arrowUp} /> }

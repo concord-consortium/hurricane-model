@@ -20,7 +20,7 @@ import { log } from "@concord-consortium/lara-interactive-api";
 import { LeafletMouseEvent } from "leaflet";
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
-import { TemperatureMarker } from "./temperature-marker";
+import { ThermometerMarker } from "./thermometer-marker";
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -82,7 +82,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     const navigation = !!ui.zoomedInView || config.navigation;
     return (
-      <div className={`${css.mapView} ${ui.thermometerActive ? css.thermometerActive : ""}`} id="mapView">
+      <div className={css.mapView} id="mapView">
         <Map ref={this.mapRef}
              dragging={navigation}
              doubleClickZoom={navigation}
@@ -191,10 +191,10 @@ export class MapView extends BaseComponent<IProps, IState> {
             </Control>
           }
           {
-            ui.thermometerActive && <TemperatureMarker position={ui.thermometerPositionSaved} saved={true} />
+            ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionSaved} saved={true} />
           }
           {
-            ui.thermometerActive && <TemperatureMarker position={ui.thermometerPositionHover} saved={false} />
+            ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
           }
           <AttributionControl position="topright" />
         </Map>

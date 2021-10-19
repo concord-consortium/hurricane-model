@@ -69,6 +69,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const sim = this.stores.simulation;
+    const ui = this.stores.ui;
     const { isSeasonMenuOpen } = this.state;
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     return (
@@ -101,10 +102,14 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               <HurricaneImageToggle />
             }
           </div>
-          <div className={`${css.widgetGroup} `}>
+          <div className={`${css.widgetGroup} hoverable`}>
               <IconButton
+                disabled={sim.simulationStarted || ui.overlay !== "sst"}
+                active={ui.thermometerActive}
+                buttonText="Temp"
+                dataTest="temp-button"
                 icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
-                disabled={false} buttonText="Temp" dataTest="temp-button" onClick={this.handleThermometerToggle}
+                onClick={this.handleThermometerToggle}
               />
           </div>
           <div className={`${css.widgetGroup} ${css.reloadRestart}`}>

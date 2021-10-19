@@ -65,4 +65,34 @@ describe("BottomBar component", () => {
       expect(stores.ui.reset).toHaveBeenCalled();
     });
   });
+
+  describe("thermometer button", () => {
+    it("is disabled when overlay is different from SST", () => {
+      const wrapper = mount(
+        <Provider stores={stores}>
+          <BottomBar />
+        </Provider>
+      );
+      let start = wrapper.find('[data-test="temp-button"]').first();
+      expect(start.prop("disabled")).toEqual(false);
+      stores.ui.setOverlay("stormSurge");
+      wrapper.update();
+      start = wrapper.find('[data-test="temp-button"]').first();
+      expect(start.prop("disabled")).toEqual(true);
+    });
+
+    it("is disabled when simulation is started", () => {
+      const wrapper = mount(
+        <Provider stores={stores}>
+          <BottomBar />
+        </Provider>
+      );
+      let start = wrapper.find('[data-test="temp-button"]').first();
+      expect(start.prop("disabled")).toEqual(false);
+      stores.simulation.start();
+      wrapper.update();
+      start = wrapper.find('[data-test="temp-button"]').first();
+      expect(start.prop("disabled")).toEqual(true);
+    });
+  });
 });
