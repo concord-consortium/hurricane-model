@@ -19,6 +19,7 @@ export class UIModel {
   };
   @observable public windArrows = config.windArrows;
   @observable public hurricaneImage = config.hurricaneImage;
+  @observable public mapBounds: LatLngBounds;
   @observable public mapZoom = 1;
   @observable public baseMap: MapTilesName = config.map;
   @observable public overlay: Overlay | null = config.overlay;
@@ -55,6 +56,7 @@ export class UIModel {
 
   @action.bound public mapUpdated(map: Map, programmaticUpdate: boolean) {
     this.latLngToContainerPoint = map.latLngToContainerPoint.bind(map);
+    this.mapBounds = map.getBounds();
     this.mapZoom = map.getZoom();
     this.mapModifiedByUser = !programmaticUpdate;
   }
