@@ -493,6 +493,12 @@ export class SimulationModel {
     return invertedTemperatureScale(color);
   }
 
+  // Note that the visibility testing here is based on testing hurricane track segment end points.
+  // It is possible for the user to zoom in far enough that only a single track segment is visible
+  // and both of its ends are off screen. In that case, no category label will be displayed. This
+  // seems like an edge case that is not worth additional effort, but if it were deemed necessary
+  // it would require detecting this case and calculating the intersection between the track
+  // segment and the map boundaries.
   public getCategoryMarkerPositions(bounds: LatLngBounds) {
     const markerPositions: ITrackPoint[] = [];
     let prevTrackIndex = 0;
