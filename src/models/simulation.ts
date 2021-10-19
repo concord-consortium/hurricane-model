@@ -493,33 +493,73 @@ export class SimulationModel {
     return invertedTemperatureScale(color);
   }
 
-  @computed public get categoryMarkerPositions() {
+  // Note that the visibility testing here is based on testing hurricane track segment end points.
+  // It is possible for the user to zoom in far enough that only a single track segment is visible
+  // and both of its ends are off screen. In that case, no category label will be displayed. This
+  // seems like an edge case that is not worth additional effort, but if it were deemed necessary
+  // it would require detecting this case and calculating the intersection between the track
+  // segment and the map boundaries.
+  public getCategoryMarkerPositions(bounds: LatLngBounds) {
     const markerPositions: ITrackPoint[] = [];
     let prevTrackIndex = 0;
-    this.strengthChangePositions.map(thisTrackIndex => {
+    this.strengthChangePositions.forEach(thisTrackIndex => {
       if (thisTrackIndex > 0) {
-        const segmentCount = thisTrackIndex - prevTrackIndex;
-        // even number of segments; put marker on middle join
-        if (segmentCount % 2 === 0) {
-          markerPositions.push(this.hurricaneTrack[prevTrackIndex + (segmentCount / 2)]);
-        }
-        // odd number of segments; put marker in middle of center segment
-        else {
-          const startIndex = prevTrackIndex + Math.floor(segmentCount / 2);
-          const startPos = this.hurricaneTrack[startIndex];
-          const endPos = this.hurricaneTrack[startIndex + 1];
-          markerPositions.push({
-            position: {
-              lat: (startPos.position.lat + endPos.position.lat) / 2,
-              lng: (startPos.position.lng + endPos.position.lng) / 2
-            },
-            category: startPos.category
-          });
+        // center the marker in the visible part of the segment
+        const [visStart, visEnd] = this.getVisibleTrackSegments(prevTrackIndex, thisTrackIndex, bounds) || [];
+        if ((visStart != null) && (visEnd != null)) {
+          const segmentCount = visEnd - visStart;
+          // even number of segments; put marker on middle join
+          if (segmentCount % 2 === 0) {
+            markerPositions.push(this.hurricaneTrack[visStart + (segmentCount / 2)]);
+          }
+          // odd number of segments; put marker in middle of center segment
+          else {
+            const startIndex = visStart + Math.floor(segmentCount / 2);
+            const startPos = this.hurricaneTrack[startIndex];
+            const endPos = this.hurricaneTrack[startIndex + 1];
+            markerPositions.push({
+              position: {
+                lat: (startPos.position.lat + endPos.position.lat) / 2,
+                lng: (startPos.position.lng + endPos.position.lng) / 2
+              },
+              category: startPos.category
+            });
+          }
         }
       }
       prevTrackIndex = thisTrackIndex;
     });
     return markerPositions;
+  }
+
+  private isTrackPointVisible(index: number, bounds: LatLngBounds) {
+    return (index >= 0) && (index < this.hurricaneTrack.length) &&
+            bounds.contains(this.hurricaneTrack[index].position);
+  }
+
+  private isTrackSegmentVisible(start: number, end: number, bounds: LatLngBounds) {
+    const startPos = this.hurricaneTrack[start].position;
+    const endPos = this.hurricaneTrack[end].position;
+    const segmentBounds = new LatLngBounds(
+                                { lat: Math.min(startPos.lat, endPos.lat), lng: Math.min(startPos.lng, endPos.lng) },
+                                { lat: Math.max(startPos.lat, endPos.lat), lng: Math.max(startPos.lng, endPos.lng) });
+    return bounds.intersects(segmentBounds);
+  }
+
+  private getVisibleTrackSegments(start: number, end: number, bounds: LatLngBounds): [number, number] | undefined {
+    if (!this.isTrackSegmentVisible(start, end, bounds)) return;
+    // if we get here, some part of the segment is visible
+    if (!this.isTrackPointVisible(start, bounds)) {
+      while ((start < end) && !this.isTrackPointVisible(start + 1, bounds)) {
+        ++start;
+      }
+    }
+    if (!this.isTrackPointVisible(end, bounds)) {
+      while ((start < end) && !this.isTrackPointVisible(end - 1, bounds)) {
+        --end;
+      }
+    }
+    return [start, end];
   }
 
   private updateSeaSurfaceTempData() {

@@ -153,7 +153,7 @@ export class MapView extends BaseComponent<IProps, IState> {
             sim.hurricane.active && <HurricaneMarker />
           }
           { ui.categoryChangeMarkers &&
-            sim.categoryMarkerPositions.map((ps, idx) =>
+            sim.getCategoryMarkerPositions(ui.mapBounds).map((ps, idx) =>
               <HurricaneCategoryMarker
                 point={ps}
                 key={idx}

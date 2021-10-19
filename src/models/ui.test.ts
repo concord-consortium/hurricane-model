@@ -1,5 +1,5 @@
 import { UIModel } from "./ui";
-import { Map } from "leaflet";
+import { LatLngBounds, Map } from "leaflet";
 import config from "../config";
 
 describe("UI model", () => {
@@ -27,6 +27,8 @@ describe("UI model", () => {
     it("updates latLngToContainerPoint, mapModifiedByUser, and mapZoom", () => {
       const ui = new UIModel();
       const map = new Map(document.createElement("div"));
+      // mock bounds
+      map.getBounds = () => new LatLngBounds({ lat: -10, lng: -10 }, { lat: 10, lng: 10 });
       map.getZoom = () => 123; // mock zoom
       const oldLatLngToContainerPoint = ui.latLngToContainerPoint;
 
