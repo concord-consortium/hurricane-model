@@ -14,9 +14,12 @@ import PauseIcon from "../assets/pause.svg";
 import StartIcon from "../assets/start.svg";
 import ReloadIcon from "../assets/reload.svg";
 import RestartIcon from "../assets/restart.svg";
+import ThermometerIcon from "../assets/thermometer.svg";
+import ThermometerHoverIcon from "../assets/thermometer-hover.svg";
 import { log } from "@concord-consortium/lara-interactive-api";
 
 import * as css from "./bottom-bar.scss";
+import { IconButton } from "./icon-button";
 
 interface IProps extends IBaseProps {}
 interface IState {
@@ -98,6 +101,12 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               <HurricaneImageToggle />
             }
           </div>
+          <div className={`${css.widgetGroup} `}>
+              <IconButton
+                icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
+                disabled={false} buttonText="Temp" dataTest="temp-button" onClick={this.handleThermometerToggle}
+              />
+          </div>
           <div className={`${css.widgetGroup} ${css.reloadRestart}`}>
             <Button
               className={css.playbackButton}
@@ -154,11 +163,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       this.stores.simulation.start();
       log("SimulationStarted");
     }
+    this.stores.ui.disableThermometer();
   }
 
   public handleRestart = () => {
     this.stores.simulation.restart();
     this.stores.ui.setNorthAtlanticView();
+    this.stores.ui.disableThermometer();
     log("SimulationRestarted");
   }
 
@@ -166,5 +177,15 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     this.stores.simulation.reset();
     this.stores.ui.reset();
     log("SimulationReloaded");
+  }
+
+  public handleThermometerToggle = () => {
+    const newValue = !this.stores.ui.thermometerActive;
+    this.stores.ui.setThermometerActive(newValue);
+    if (newValue) {
+      log("ThermometerEnabled");
+    } else {
+      log("ThermometerDisabled");
+    }
   }
 }

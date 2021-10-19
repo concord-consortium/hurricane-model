@@ -12,15 +12,15 @@ import { HurricaneTrack } from "./hurricane-track";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
 import config from "../config";
-import { stores } from "../index";
 import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
 import Home from "@material-ui/icons/Home";
 import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "@concord-consortium/lara-interactive-api";
-
+import { LeafletMouseEvent } from "leaflet";
 import * as css from "./map-view.scss";
 import "leaflet/dist/leaflet.css";
+import { TemperatureMarker } from "./temperature-marker";
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -32,6 +32,7 @@ const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [
 export class MapView extends BaseComponent<IProps, IState> {
   private mapRef = React.createRef<Map>();
   private _programmaticMapUpdate = false;
+  private _lastThermometerUpdateTime = 0;
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
@@ -81,7 +82,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     const navigation = !!ui.zoomedInView || config.navigation;
     return (
-      <div className={css.mapView} id="mapView">
+      <div className={`${css.mapView} ${ui.thermometerActive ? css.thermometerActive : ""}`} id="mapView">
         <Map ref={this.mapRef}
              dragging={navigation}
              doubleClickZoom={navigation}
@@ -90,6 +91,8 @@ export class MapView extends BaseComponent<IProps, IState> {
              keyboard={navigation}
              style={{width: "100%", height: "100%"}}
              onViewportChanged={this.handleViewportChanged}
+             onclick={this.handleMouseClick}
+             onmousemove={this.handleMouseMove}
              zoom={4}
              maxZoom={ui.maxZoom}
              center={[30, -45]}
@@ -154,7 +157,8 @@ export class MapView extends BaseComponent<IProps, IState> {
           {
             sim.hurricane.active && <HurricaneMarker />
           }
-          { ui.categoryChangeMarkers &&
+          {
+            ui.categoryChangeMarkers &&
             sim.categoryMarkerPositions.map((ps, idx) =>
               <HurricaneCategoryMarker
                 point={ps}
@@ -185,6 +189,12 @@ export class MapView extends BaseComponent<IProps, IState> {
                 <div className={css.mapButtonLabel}>Full Map View</div>
               </a>
             </Control>
+          }
+          {
+            ui.thermometerActive && <TemperatureMarker position={ui.thermometerPositionSaved} saved={true} />
+          }
+          {
+            ui.thermometerActive && <TemperatureMarker position={ui.thermometerPositionHover} saved={false} />
           }
           <AttributionControl position="topright" />
         </Map>
@@ -224,6 +234,19 @@ export class MapView extends BaseComponent<IProps, IState> {
           south: bounds.getSouth()
         });
       }
+    }
+  }
+
+  private handleMouseClick = (e: LeafletMouseEvent) => {
+    this.stores.ui.setThermometerPositionSaved(e.latlng);
+  }
+
+  private handleMouseMove = (e: LeafletMouseEvent) => {
+    const time = window.performance.now();
+    const targetFPS = 60; // limit updates to 60 FPS
+    if (time - this._lastThermometerUpdateTime >= (1000 / targetFPS)) {
+      this.stores.ui.setThermometerPositionHover(e.latlng);
+      this._lastThermometerUpdateTime = time;
     }
   }
 }

@@ -38,11 +38,13 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
   public render() {
     const { model } = this.props;
     const sim = this.stores.simulation;
+    const ui = this.stores.ui;
     const strengthNorm = (model.strength - minStrength) / (maxStrength - minStrength) - 0.5; // [-0.5, 0.5]
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
     const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
     // If set to lock the UI while the simulation is running, lock UI once the sim is started until it is reset
-    const uiDisabled = config.pressureSystemsLocked || (config.lockSimulationWhileRunning && sim.simulationStarted);
+    const uiDisabled = config.pressureSystemsLocked || ui.thermometerActive ||
+      (config.lockSimulationWhileRunning && sim.simulationStarted);
 
     return (
       <div
