@@ -32,4 +32,16 @@
   }
 }
 
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
 
+  input {
+    margin-right: 5px;
+    width: 18px;
+    height: 18px;
+  }
+}

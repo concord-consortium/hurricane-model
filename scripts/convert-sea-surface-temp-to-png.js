@@ -11,6 +11,7 @@ const { PNG } = require("pngjs");
 
 const fileName = process.argv[2];
 const outputFileName = process.argv[3] || 'sst.png';
+const colorScaleName = process.argv[4] || 'default';
 
 const tempFile = '__sst_temp'
 
@@ -112,7 +113,7 @@ result.forEach(p => {
   imgData[x][y] = true;
 
   const idx = (imgSize * y + x) << 2;
-  const cssColor = temperatureScale(p.sst);
+  const cssColor = temperatureScale(p.sst, colorScaleName);
   const match = cssColor.match(/rgb\((\d+), (\d+), (\d+)\)/);
   png.data[idx] = Number(match[1]);
   png.data[idx + 1] = Number(match[2]);

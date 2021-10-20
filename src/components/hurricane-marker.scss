@@ -26,10 +26,10 @@
     animation: rotation 5.5s infinite linear;
 
     svg {
-      width: 45px;
-      height: 72px;
-      margin-left: -22.5px;
-      margin-top: -36px;
+      width: 124px;
+      height: 92px;
+      margin-left: -62px;
+      margin-top: -46px;
     }
 
     img {
@@ -38,27 +38,6 @@
       margin-left: -100px;
       margin-top: -100px;
     }
-  }
-
-
-  .categoryNumber {
-    font-weight: bold;
-    color: #434343;
-    font-size: 16px;
-    text-shadow: 1px  1px 0 #fff,
-                -1px -1px 0 #fff,
-                 1px -1px 0 #fff,
-                -1px  1px 0 #fff;
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    width: 50px;
-    height: 50px;
-    margin-left: -25px;
-    margin-top: -25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .temp {
@@ -76,55 +55,60 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    text-shadow: 1px 1px 6px #000;
+    text-shadow: 0 1px 5px #000;
   }
+}
 
-  &.category0 {
-    svg path, circle {
-      fill: $cat0Color;
-    }
-    .svgContainer {
-      animation-duration: 5.5s;
-    }
+.category0 {
+  svg path, circle {
+    fill: $cat0Color;
   }
-  &.category1 {
-    svg path, circle {
-      fill: $cat1Color;
-    }
-    .svgContainer {
-      animation-duration: 4s;
-    }
+  .svgContainer {
+    animation-duration: 5.5s;
   }
-  &.category2 {
-    svg path, circle {
-      fill: $cat2Color;
-    }
-    .svgContainer {
-      animation-duration: 2.75s;
-    }
+}
+
+.category1 {
+  svg path, circle {
+    fill: $cat1Color;
   }
-  &.category3 {
-    svg path, circle {
-      fill: $cat3Color;
-    }
-    .svgContainer {
-      animation-duration: 1.75s;
-    }
+  .svgContainer {
+    animation-duration: 4s;
   }
-  &.category4 {
-    svg path, circle {
-      fill: $cat4Color;
-    }
-    .svgContainer {
-      animation-duration: 1s;
-    }
+}
+
+.category2 {
+  svg path, circle {
+    fill: $cat2Color;
   }
-  &.category5 {
-    svg path, circle {
-      fill: $cat5Color;
-    }
-    .svgContainer {
-      animation-duration: 0.5s;
-    }
+  .svgContainer {
+    animation-duration: 2.75s;
+  }
+}
+
+.category3 {
+  svg path, circle {
+    fill: $cat3Color;
+  }
+  .svgContainer {
+    animation-duration: 1.75s;
+  }
+}
+
+.category4 {
+  svg path, circle {
+    fill: $cat4Color;
+  }
+  .svgContainer {
+    animation-duration: 1s;
+  }
+}
+
+.category5 {
+  svg path, circle {
+    fill: $cat5Color;
+  }
+  .svgContainer {
+    animation-duration: 0.5s;
   }
 }

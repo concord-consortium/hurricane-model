@@ -1,0 +1,24 @@
+@import "common.scss";
+
+.categoryMarker {
+  cursor: default;
+  font-family: $scaleFont;
+  font-weight: bold;
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  margin-top: -50px;
+
+  .svgContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    svg {
+      width: 56px;
+      height: 56px;
+      margin-left: -28px;
+      margin-top: -28px;
+    }
+  }
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="21px" height="16px" viewBox="0 0 21 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>1</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons-and-Artwork-v2" transform="translate(-192.000000, -492.000000)">
+            <g id="1" transform="translate(192.000000, 492.000000)">
+                <rect id="Rectangle" x="0" y="0" width="21" height="16"></rect>
+                <polygon fill="#FFFFFF" fill-rule="nonzero" points="14.0628125 0.3 11.4355453 0.3 5.68 2.65207785 5.68 8.75565316 7.8433125 7.919625 7.8440625 15.690625 14.0628125 15.690625"></polygon>
+                <polygon id="Path" fill="#434343" fill-rule="nonzero" points="12.0628125 2.3 12.0628125 13.690625 9.8440625 13.690625 9.8440625 5.003125 7.68 5.8390625 7.68 3.9953125 11.8284375 2.3"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

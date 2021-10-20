@@ -89,12 +89,17 @@ const DEFAULT_CONFIG: any = {
   categoryChangeMarkers: true,
   windArrows: true,
   hurricaneImage: false,
-  seaSurfaceTempOpacity: 0.5,
+  // The regular version of sea surface temperature overlay (not color blind friendly that always has opacity=1).
+  seaSurfaceTempOpacity: 0.8,
   // Enables steps per second display.
   benchmark: false,
   // If set to true, users won't be able to change pressure systems.
   pressureSystemsLocked: false,
   lockSimulationWhileRunning: true,
+  // Default sea surface temperature image, available values are: "default", "rainbowCC"
+  defaultSSTScale: "default",
+  // Color blind accessible sea surface temperature image, available values are: "purple3", "purpleCC"
+  colorBlindSSTScale: "purple3",
   // --- UI elements can be shown or hidden using options below ---
   seasonButton: true,
   windArrowsToggle: true,

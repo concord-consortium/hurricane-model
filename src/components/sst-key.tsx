@@ -1,5 +1,8 @@
 import * as React from "react";
-import {temperatureScale} from "../temperature-scale";
+import { inject, observer } from "mobx-react";
+import { BaseComponent, IBaseProps } from "./base";
+import { temperatureScale } from "../temperature-scale";
+import { log } from "@concord-consortium/lara-interactive-api";
 import * as genericKeyCss from "./map-button-key.scss";
 import * as css from "./sst-key.scss";
 
@@ -7,14 +10,14 @@ const getFahrenheit = (celsius: number) => {
   return (celsius * 9 / 5) + 32;
 };
 
-const renderTemperatureLabels = (increments: number) => {
+const renderTemperatureLabels = (increments: number, tempScaleName: string) => {
   const celsiusLabels = [];
   const fahrenheitLabels = [];
   const keyColorGradientStops = [];
   for (let i = increments - 1; i >= 0; i--) {
     const celsiusValue = i * 4;
     const symbol = i === 0 ? <span>&lt;</span> : i === (increments - 1) ? <span>&ge;</span> : "";
-    keyColorGradientStops.push(temperatureScale(celsiusValue));
+    keyColorGradientStops.push(temperatureScale(celsiusValue, tempScaleName));
     fahrenheitLabels.push(
       <div key={"fahrenheit" + i} className={css.temperatureContainer}>
         <div className={css.temperatureRange}>
@@ -41,13 +44,39 @@ const renderTemperatureLabels = (increments: number) => {
   </div>;
 };
 
-export class SSTKey extends React.Component {
+@inject("stores")
+@observer
+export class SSTKey extends BaseComponent<IBaseProps, {}> {
+  public toggleColorBlindKey = () => {
+    const newValue = !this.stores.ui.colorBlindSSTScale;
+    this.stores.ui.setColorBlindSSTScale(newValue);
+    if (newValue) {
+      log("ColorBlindSSTScaleEnabled");
+    } else {
+      log("ColorBlindSSTScaleDisabled");
+    }
+  }
+
+  public preventClickPropagation = (e: React.MouseEvent<HTMLInputElement>) => {
+    // This prevents closing the whole map button that also reacts to click event.
+    e.stopPropagation();
+  }
+
   public render() {
+    const ui = this.stores.ui;
     return (
       <div>
         <div className={`${genericKeyCss.keySubheader} ${css.units}`}><span>°C</span><span>°F</span></div>
         <div className={genericKeyCss.keyContent}>
-          { renderTemperatureLabels(9) }
+          { renderTemperatureLabels(9, ui.sstScaleName) }
+        </div>
+        <div className={css.checkbox}>
+          <input
+            type="checkbox"
+            checked={ui.colorBlindSSTScale}
+            onChange={this.toggleColorBlindKey}
+            onClick={this.preventClickPropagation}
+          /> Color blind key
         </div>
       </div>
     );

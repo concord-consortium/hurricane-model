@@ -9,10 +9,15 @@ import {IVector, IWindPoint} from "../types";
 const vectorWidth = 2;
 const arrowHeadSize = 4;
 const color = 0xffffff;
-const opacity = 0.75;
+const shadow = 0x000000;
+const opacity = 1;
 
 const lineTexture = (() => {
   const graph = new PIXI.Graphics();
+  const shadowOffset = 1;
+  graph.beginFill(shadow);
+  graph.drawRect(0, 0, vectorWidth + shadowOffset, 1);
+  graph.endFill();
   graph.beginFill(color);
   graph.drawRect(0, 0, vectorWidth, 1);
   graph.endFill();
@@ -24,11 +29,18 @@ const lineTexture = (() => {
 
 const arrowTexture = (() => {
   const graph = new PIXI.Graphics();
+  const shadowOffset = 1;
+  graph.beginFill(shadow);
+  graph.drawPolygon([
+    0, 0,
+    arrowHeadSize * 0.5 * vectorWidth + shadowOffset, -arrowHeadSize * vectorWidth - shadowOffset,
+    arrowHeadSize * vectorWidth + shadowOffset, 0
+  ]);
+  graph.endFill();
   graph.beginFill(color);
   graph.drawPolygon([
     0, 0,
-    arrowHeadSize * 0.5 * vectorWidth,
-    -arrowHeadSize * vectorWidth,
+    arrowHeadSize * 0.5 * vectorWidth, -arrowHeadSize * vectorWidth,
     arrowHeadSize * vectorWidth, 0
   ]);
   graph.endFill();

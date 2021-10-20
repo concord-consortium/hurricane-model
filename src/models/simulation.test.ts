@@ -168,23 +168,23 @@ describe("SimulationModel store", () => {
   describe("sea surface temperature data", () => {
     it("downloads sea surface temperature data on init or change of the season", () => {
       const sim = new SimulationModel(options);
-      expect(sim.seaSurfaceTempImgUrl).toEqual("fall.png");
+      expect(sim.dataSeaSurfaceTempImgUrl).toEqual("fall.png");
       expect(sim.seaSurfaceTempData).toEqual(null); // no time to parse it
       expect(mockFetch.mock.calls.length).toEqual(1);
-      expect(mockFetch.mock.calls[0][0]).toEqual(sim.seaSurfaceTempImgUrl);
+      expect(mockFetch.mock.calls[0][0]).toEqual(sim.dataSeaSurfaceTempImgUrl);
 
       sim.season = "summer";
-      expect(sim.seaSurfaceTempImgUrl).toEqual("summer.png");
+      expect(sim.dataSeaSurfaceTempImgUrl).toEqual("summer.png");
       expect(sim.seaSurfaceTempData).toEqual(null); // no time to parse it
       expect(mockFetch.mock.calls.length).toEqual(2);
-      expect(mockFetch.mock.calls[1][0]).toEqual(sim.seaSurfaceTempImgUrl);
+      expect(mockFetch.mock.calls[1][0]).toEqual(sim.dataSeaSurfaceTempImgUrl);
       // No valid data parsed yet, so expect null.
       expect(sim.seaSurfaceTempAt(config.initialHurricanePosition)).toEqual(null);
     });
 
     it("reports correct SST value", (done) => {
       jest.setTimeout(10000);
-      mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep.png"));
+      mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep-default.png"));
       const sim = new SimulationModel(options);
       sim._seaSurfaceTempDataParsed = () => {
         expect(sim.seaSurfaceTempData).not.toEqual(null); // real data, should be already parsed
@@ -198,7 +198,7 @@ describe("SimulationModel store", () => {
         expect(sim.seaSurfaceTempAt({lat: 20, lng: -90})).toEqual(null); // land
 
         // Change season and test again.
-        mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/jun.png"));
+        mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/jun-default.png"));
         sim.season = "summer";
         sim._seaSurfaceTempDataParsed = () => {
           expect(sim.seaSurfaceTempData).not.toEqual(null); // real data, should be already parsed

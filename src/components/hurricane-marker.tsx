@@ -3,17 +3,13 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import HurricaneIconSVG from "../assets/hurricane.svg";
-import * as HurricaneImageSrc from "../assets/hurricane-image.png";
-import CategoryMarkerSVG from "../assets/category-marker.svg";
 import config from "../config";
-import { ITrackPoint } from "../types";
+import { CategoryNumber } from "./category-number";
 
+import * as HurricaneImageSrc from "../assets/hurricane-image.png";
 import * as css from "./hurricane-marker.scss";
 
 interface IProps extends IBaseProps { }
-interface ICategoryMarkerProps extends IProps {
-  point: ITrackPoint;
-}
 interface IState {}
 
 // Realistic hurricane image size can be adjusted here or in CSS. Really small values in CSS
@@ -61,17 +57,15 @@ export class HurricaneIcon extends BaseComponent<IProps, IState> {
     // anyway, I don't think we want distract users with hurricane changing its size only because it moved on the map.
     const hurricaneImageScale = Math.pow(2, mapZoom) * HURRICANE_IMG_SCALE_FACTOR;
     return (
-      <div className={`${css.hurricaneIcon} ${categoryCssClass}`}>
-        <div className={css.svgContainer} style={{ opacity }}>
+      <div className={`${css.hurricaneIcon}`}>
+        <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
           {
             hurricaneImage ?
               <img src={HurricaneImageSrc} style={{ transform: `scale(${hurricaneImageScale})` }} /> :
               <HurricaneIconSVG />
           }
         </div>
-        <div className={css.categoryNumber} data-test="hurricane-category" style={{ opacity }}>
-          { hurricane.category === 0 ? "TS" : hurricane.category }
-        </div>
+        <CategoryNumber value={hurricane.category} />
         {
           temp !== null &&
           <div className={css.temp}>
@@ -79,25 +73,6 @@ export class HurricaneIcon extends BaseComponent<IProps, IState> {
           </div>
         }
       </div>
-    );
-  }
-}
-
-export class HurricaneCategoryMarker extends BaseComponent<ICategoryMarkerProps, IState> {
-  public render() {
-    const categoryChangePoint = this.props.point;
-    const categoryCssClass = css["category" + categoryChangePoint.category];
-    return (
-      <LeafletCustomMarker position={categoryChangePoint.position} draggable={false}>
-        <div className={`${css.hurricaneIcon} ${categoryCssClass}`}>
-          <div className={css.svgContainer}>
-            <CategoryMarkerSVG />
-          </div>
-          <div className={css.categoryNumber} data-test="hurricane-category">
-            { categoryChangePoint.category === 0 ? "TS" : categoryChangePoint.category }
-          </div>
-        </div>
-      </LeafletCustomMarker>
     );
   }
 }
