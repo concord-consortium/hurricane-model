@@ -23,7 +23,7 @@ describe("BottomBar component", () => {
     expect(wrapper.find(SeasonButton).length).toEqual(1);
     expect(wrapper.find(WindArrowsToggle).length).toEqual(1);
     expect(wrapper.find(HurricaneImageToggle).length).toEqual(1);
-    expect(wrapper.find(Button).length).toEqual(3);
+    expect(wrapper.find(Button).length).toEqual(4);
   });
 
   it("start button is disabled until model is ready", () => {
@@ -63,6 +63,36 @@ describe("BottomBar component", () => {
       wrapper.find('[data-test="reload-button"]').first().simulate("click");
       expect(stores.simulation.reset).toHaveBeenCalled();
       expect(stores.ui.reset).toHaveBeenCalled();
+    });
+  });
+
+  describe("thermometer button", () => {
+    it("is disabled when overlay is different from SST", () => {
+      const wrapper = mount(
+        <Provider stores={stores}>
+          <BottomBar />
+        </Provider>
+      );
+      let start = wrapper.find('[data-test="temp-button"]').first();
+      expect(start.prop("disabled")).toEqual(false);
+      stores.ui.setOverlay("stormSurge");
+      wrapper.update();
+      start = wrapper.find('[data-test="temp-button"]').first();
+      expect(start.prop("disabled")).toEqual(true);
+    });
+
+    it("is disabled when simulation is started", () => {
+      const wrapper = mount(
+        <Provider stores={stores}>
+          <BottomBar />
+        </Provider>
+      );
+      let start = wrapper.find('[data-test="temp-button"]').first();
+      expect(start.prop("disabled")).toEqual(false);
+      stores.simulation.start();
+      wrapper.update();
+      start = wrapper.find('[data-test="temp-button"]').first();
+      expect(start.prop("disabled")).toEqual(true);
     });
   });
 });

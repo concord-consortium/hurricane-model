@@ -1,5 +1,5 @@
 import { action, observable, computed } from "mobx";
-import { LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds } from "leaflet";
+import { LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds, LatLngTuple } from "leaflet";
 import config from "../config";
 import { mapLayer, MapTilesName, mapTilesNames } from "../map-layer-tiles";
 import { Season, ISSTImages } from "../types";
@@ -69,6 +69,9 @@ export class UIModel {
   @observable public overlay: Overlay | null = config.overlay;
   @observable public colorBlindSSTScale = false;
   @observable public categoryChangeMarkers = config.categoryChangeMarkers;
+  @observable public thermometerActive = false;
+  @observable public thermometerPositionSaved: LatLngExpression | null = null;
+  @observable public thermometerPositionHover: LatLngExpression | null = null;
 
   protected initialState: UIModel;
 
@@ -145,6 +148,9 @@ export class UIModel {
 
   @action.bound public setOverlay(value: Overlay | null) {
     this.overlay = value;
+    if (value !== "sst") {
+      this.disableThermometer();
+    }
   }
 
   @action.bound public setWindArrows(enabled: boolean) {
@@ -153,6 +159,24 @@ export class UIModel {
 
   @action.bound public setHurricaneImage(enabled: boolean) {
     this.hurricaneImage = enabled;
+  }
+
+  @action.bound public setThermometerActive(enabled: boolean) {
+    this.thermometerActive = enabled;
+  }
+
+  @action.bound public setThermometerPositionSaved(position: LatLngExpression) {
+    this.thermometerPositionSaved = position;
+  }
+
+  @action.bound public setThermometerPositionHover(position: LatLngExpression) {
+    this.thermometerPositionHover = position;
+  }
+
+  @action.bound public disableThermometer = () => {
+    this.thermometerActive = false;
+    this.thermometerPositionHover = null;
+    this.thermometerPositionSaved = null;
   }
 
   @action.bound public setColorBlindSSTScale(enabled: boolean) {
@@ -166,5 +190,6 @@ export class UIModel {
     this.windArrows = this.initialState.windArrows;
     this.baseMap = this.initialState.baseMap;
     this.overlay = this.initialState.overlay;
+    this.disableThermometer();
   }
 }

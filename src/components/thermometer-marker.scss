@@ -1,0 +1,44 @@
+$background: rgba(255, 255, 255, 0.85);
+
+.thermometerContainer {
+  // Why is it 400x400px? This large box follows the cursor and provides the custom cursor CSS rule. It's that big,
+  // as even if the marker lags behind the cursor a bit, the mouse pointer should still be within the box and custom
+  // cursor CSS rule will be applied. If it was smaller, the user would constantly see the cursor switching back and
+  // forth between the custom and the default one.
+  width: 400px;
+  height: 400px;
+  margin-left: -195px;
+  margin-top: -200px;
+  padding-top: 220px;
+  cursor: url("../assets/temp-cursor.png") 8 8, crosshair;
+  &:active {
+    cursor: url("../assets/temp-cursor-2.png") 8 8, crosshair;
+  }
+  // ---
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+}
+
+.thermometerReadout {
+  font-size: 14px;
+  font-family: Lato, 'Roboto Condensed', Helvetica, Arial, sans-serif;
+  width: 60px;
+  height: 25px;
+  border-radius: 12.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $background;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+}
+
+.arrowUp {
+  margin-top: -31px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid $background;
+}

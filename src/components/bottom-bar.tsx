@@ -14,8 +14,10 @@ import PauseIcon from "../assets/pause.svg";
 import StartIcon from "../assets/start.svg";
 import ReloadIcon from "../assets/reload.svg";
 import RestartIcon from "../assets/restart.svg";
+import ThermometerIcon from "../assets/thermometer.svg";
+import ThermometerHoverIcon from "../assets/thermometer-hover.svg";
 import { log } from "@concord-consortium/lara-interactive-api";
-
+import { IconButton } from "./icon-button";
 import * as css from "./bottom-bar.scss";
 
 interface IProps extends IBaseProps {}
@@ -66,6 +68,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const sim = this.stores.simulation;
+    const ui = this.stores.ui;
     const { isSeasonMenuOpen } = this.state;
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     return (
@@ -97,6 +100,16 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               config.hurricaneImageToggle &&
               <HurricaneImageToggle />
             }
+          </div>
+          <div className={`${css.widgetGroup} hoverable`}>
+              <IconButton
+                disabled={sim.simulationStarted || ui.overlay !== "sst"}
+                active={ui.thermometerActive}
+                buttonText="Temp"
+                dataTest="temp-button"
+                icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
+                onClick={this.handleThermometerToggle}
+              />
           </div>
           <div className={`${css.widgetGroup} ${css.reloadRestart}`}>
             <Button
@@ -154,11 +167,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       this.stores.simulation.start();
       log("SimulationStarted");
     }
+    this.stores.ui.disableThermometer();
   }
 
   public handleRestart = () => {
     this.stores.simulation.restart();
     this.stores.ui.setNorthAtlanticView();
+    this.stores.ui.disableThermometer();
     log("SimulationRestarted");
   }
 
@@ -166,5 +181,15 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     this.stores.simulation.reset();
     this.stores.ui.reset();
     log("SimulationReloaded");
+  }
+
+  public handleThermometerToggle = () => {
+    const newValue = !this.stores.ui.thermometerActive;
+    this.stores.ui.setThermometerActive(newValue);
+    if (newValue) {
+      log("ThermometerEnabled");
+    } else {
+      log("ThermometerDisabled");
+    }
   }
 }
