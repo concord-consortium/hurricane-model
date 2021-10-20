@@ -17,9 +17,8 @@ import RestartIcon from "../assets/restart.svg";
 import ThermometerIcon from "../assets/thermometer.svg";
 import ThermometerHoverIcon from "../assets/thermometer-hover.svg";
 import { log } from "@concord-consortium/lara-interactive-api";
-
-import * as css from "./bottom-bar.scss";
 import { IconButton } from "./icon-button";
+import * as css from "./bottom-bar.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {

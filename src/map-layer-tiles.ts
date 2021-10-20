@@ -43,6 +43,8 @@ const layerInfo: MapTileLayer[] = [
     subdomains: []
   },
   {
+    // Note: As of 2021-Oct, this url is no longer in service. We have configured the model not to display
+    // the population map option (config.enablePopulationMap: false) until a replacement is found.
     mapType: "population",
     name: "Population",
     // tslint:disable-next-line:max-line-length

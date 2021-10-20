@@ -16,6 +16,7 @@ const DEFAULT_CONFIG: any = {
   season: "fall",
   // One of the available maps: "satellite", "relief", "street" or "population".
   map: "satellite",
+  enablePopulationMap: false,
   // Enabled map overlay. One of the values listed in "availableOverlays".
   overlay: "sst",
   // LatLngBoundsLiteral: [[lat, lng], [lat, lng]]. Defaults to North Atlantic.

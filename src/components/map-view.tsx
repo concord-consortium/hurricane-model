@@ -19,8 +19,8 @@ import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "@concord-consortium/lara-interactive-api";
 import { LeafletMouseEvent } from "leaflet";
 import * as css from "./map-view.scss";
-import "leaflet/dist/leaflet.css";
 import { ThermometerMarker } from "./thermometer-marker";
+import "leaflet/dist/leaflet.css";
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -159,7 +159,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             ui.categoryChangeMarkers &&
-            sim.categoryMarkerPositions.map((ps, idx) =>
+            sim.getCategoryMarkerPositions(ui.mapBounds).map((ps, idx) =>
               <HurricaneCategoryMarker
                 point={ps}
                 key={idx}

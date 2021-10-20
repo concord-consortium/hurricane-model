@@ -218,34 +218,48 @@ describe("SimulationModel store", () => {
   });
 
   describe("categoryMarkerPositions", () => {
+    const mapBounds = new Leaflet.LatLngBounds({ lat: -5, lng: -5 }, { lat: 5, lng: 5 });
     it("should show no markers with no hurricane track", () => {
       const sim = new SimulationModel(options);
-      expect(sim.categoryMarkerPositions).toEqual([]);
+      expect(sim.getCategoryMarkerPositions(mapBounds)).toEqual([]);
     });
     it("should show no markers with insufficient hurricane track", () => {
       const sim = new SimulationModel(options);
-      sim.hurricaneTrack = [{ position: { lat: 1, lng: -1}, category: 0 }];
+      sim.hurricaneTrack = [{ position: { lat: 1, lng: -1 }, category: 0 }];
       sim.strengthChangePositions = [0];
-      expect(sim.categoryMarkerPositions).toEqual([]);
+      expect(sim.getCategoryMarkerPositions(mapBounds)).toEqual([]);
     });
     it("should show marker in middle of middle segment for odd number of segments", () => {
       const sim = new SimulationModel(options);
       sim.hurricaneTrack = [
-        { position: { lat: 1, lng: -1}, category: 0 },
-        { position: { lat: 3, lng: -3}, category: 1 }
+        { position: { lat: 1, lng: -1 }, category: 0 },
+        { position: { lat: 3, lng: -3 }, category: 1 }
       ];
       sim.strengthChangePositions = [0, 1];
-      expect(sim.categoryMarkerPositions).toEqual([{ position: { lat: 2, lng: -2}, category: 0 }]);
+      expect(sim.getCategoryMarkerPositions(mapBounds)).toEqual([{ position: { lat: 2, lng: -2 }, category: 0 }]);
     });
     it("should show marker at join of middle segments for even number of segments", () => {
       const sim = new SimulationModel(options);
       sim.hurricaneTrack = [
-        { position: { lat: 1, lng: -1}, category: 0 },
-        { position: { lat: 2, lng: -2}, category: 0 },
-        { position: { lat: 3, lng: -3}, category: 1 }
+        { position: { lat: 1, lng: -1 }, category: 0 },
+        { position: { lat: 2, lng: -2 }, category: 0 },
+        { position: { lat: 3, lng: -3 }, category: 1 }
       ];
       sim.strengthChangePositions = [0, 2];
-      expect(sim.categoryMarkerPositions).toEqual([{ position: { lat: 2, lng: -2}, category: 0 }]);
+      expect(sim.getCategoryMarkerPositions(mapBounds)).toEqual([{ position: { lat: 2, lng: -2 }, category: 0 }]);
+    });
+    it("should show markers in visible parts of segments", () => {
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [
+        { position: { lat: 1, lng: -1 }, category: 0 },
+        { position: { lat: 3, lng: -3 }, category: 1 },
+        { position: { lat: 4, lng: -4 }, category: 1 },
+        { position: { lat: 6, lng: -6 }, category: 1 },
+        { position: { lat: 8, lng: -8 }, category: 0 }
+      ];
+      sim.strengthChangePositions = [0, 1, 4];
+      expect(sim.getCategoryMarkerPositions(mapBounds))
+        .toEqual([{ position: { lat: 2, lng: -2 }, category: 0 }, { position: { lat: 4, lng: -4 }, category: 1 }]);
     });
   });
 
