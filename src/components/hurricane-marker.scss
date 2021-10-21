@@ -60,10 +60,10 @@
 }
 
 .category0 {
-  // This is based on the structure of the hurricane.svg file. Note that it's optimized by SVGR loader, so we
-  // cannot use class names. If we disable SVGR optimization, these global class names will be conflicting,
-  // so it's not  an option.
-  svg path:first-of-type {
+  // This is based on the structure of the hurricane.svg and category-marker.svg files. Note that they're optimized
+  // by SVGR loader, so we cannot use class names. If we disable SVGR optimization, these global class names will
+  // clash with eaach other, so it's not  an option.
+  svg path:first-of-type, circle {
     fill: $cat0Color;
   }
   .svgContainer {
@@ -72,7 +72,7 @@
 }
 
 .category1 {
-  svg path:first-of-type {
+  svg path:first-of-type, circle {
     fill: $cat1Color;
   }
   .svgContainer {
@@ -81,7 +81,7 @@
 }
 
 .category2 {
-  svg path:first-of-type {
+  svg path:first-of-type, circle {
     fill: $cat2Color;
   }
   .svgContainer {
@@ -90,7 +90,7 @@
 }
 
 .category3 {
-  svg path:first-of-type {
+  svg path:first-of-type, circle {
     fill: $cat3Color;
   }
   .svgContainer {
@@ -99,7 +99,7 @@
 }
 
 .category4 {
-  svg path:first-of-type {
+  svg path:first-of-type, circle {
     fill: $cat4Color;
   }
   .svgContainer {
@@ -108,7 +108,7 @@
 }
 
 .category5 {
-  svg path:first-of-type {
+  svg path:first-of-type, circle {
     fill: $cat5Color;
   }
   .svgContainer {
