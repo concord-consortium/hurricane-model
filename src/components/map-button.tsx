@@ -70,7 +70,7 @@ export class MapButton extends BaseComponent<IProps, IState> {
           <div className={css.mapImage} style={{ backgroundImage }}/>
           <div className={css.label}>{labelText}</div>
           {
-            active && <ViewIcon />
+            active && <ViewIcon className={css.viewIcon} />
           }
           {
             active && <div className={css.key}><MapButtonKey value={value}/></div>

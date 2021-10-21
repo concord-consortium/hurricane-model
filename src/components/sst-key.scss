@@ -38,10 +38,18 @@
   justify-content: center;
   font-size: 12px;
   font-weight: bold;
+  margin-top: -6px;
 
   input {
     margin-right: 5px;
     width: 18px;
     height: 18px;
+  }
+
+  .checkboxElement {
+    padding: 6px 5px 6px 0px;
+    svg {
+      fill: $tabImpact;
+    }
   }
 }
