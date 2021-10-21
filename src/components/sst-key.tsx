@@ -3,6 +3,7 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { temperatureScale } from "../temperature-scale";
 import { log } from "@concord-consortium/lara-interactive-api";
+import Checkbox from "@material-ui/core/Checkbox";
 import * as genericKeyCss from "./map-button-key.scss";
 import * as css from "./sst-key.scss";
 
@@ -47,17 +48,14 @@ const renderTemperatureLabels = (increments: number, tempScaleName: string) => {
 @inject("stores")
 @observer
 export class SSTKey extends BaseComponent<IBaseProps, {}> {
-  public toggleColorBlindKey = () => {
-    const newValue = !this.stores.ui.colorBlindSSTScale;
-    this.stores.ui.setColorBlindSSTScale(newValue);
+  public toggleAccessibleKey = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const newValue = !this.stores.ui.accessibleSSTScale;
+    this.stores.ui.setAccessibleSSTScale(newValue);
     if (newValue) {
-      log("ColorBlindSSTScaleEnabled");
+      log("AccessibleSSTScaleEnabled");
     } else {
-      log("ColorBlindSSTScaleDisabled");
+      log("AccessibleSSTScaleDisabled");
     }
-  }
-
-  public preventClickPropagation = (e: React.MouseEvent<HTMLInputElement>) => {
     // This prevents closing the whole map button that also reacts to click event.
     e.stopPropagation();
   }
@@ -71,11 +69,10 @@ export class SSTKey extends BaseComponent<IBaseProps, {}> {
           { renderTemperatureLabels(9, ui.sstScaleName) }
         </div>
         <div className={css.checkbox}>
-          <input
-            type="checkbox"
-            checked={ui.colorBlindSSTScale}
-            onChange={this.toggleColorBlindKey}
-            onClick={this.preventClickPropagation}
+          <Checkbox
+            className={css.checkboxElement}
+            checked={ui.accessibleSSTScale}
+            onClick={this.toggleAccessibleKey}
           /> Accessible Key
         </div>
       </div>

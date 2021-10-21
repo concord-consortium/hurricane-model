@@ -7,8 +7,15 @@
   flex-direction: column;
   align-items: center;
 
-  &.disabled{
-    opacity: 0.5 !important;
+  &.disabled {
+    opacity: 0.7 !important;
+
+    .selectContainer:hover {
+      background: white;
+    }
+    .selectContainer .seasonSelect:hover {
+      background: white;
+    }
   }
 
   .seasonLabel {

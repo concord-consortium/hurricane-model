@@ -19,7 +19,7 @@
     }
   }
 
-  svg {
+  .viewIcon {
     position: absolute;
     left: -10px;
     top: 7px;
@@ -68,7 +68,7 @@
         background-color: $tabGeoTransparent;
       }
 
-      svg {
+      .viewIcon {
         fill: $tabGeo;
       }
 
@@ -96,7 +96,7 @@
         background-color: $tabImpactTransparent;
       }
 
-      svg {
+      .viewIcon {
         fill: $tabImpact;
       }
 

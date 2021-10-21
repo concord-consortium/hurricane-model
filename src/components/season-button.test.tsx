@@ -29,6 +29,6 @@ describe("SeasonButton component", () => {
       </Provider>
     );
     const seasonButton = wrapper.find('[data-test="season-button"]').first();
-    expect(seasonButton.hasClass(css.disabled)).toEqual(true);
+    expect(seasonButton.prop("disabled")).toEqual(true);
   });
 });
