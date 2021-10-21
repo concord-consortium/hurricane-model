@@ -48,7 +48,7 @@ const renderTemperatureLabels = (increments: number, tempScaleName: string) => {
 @inject("stores")
 @observer
 export class SSTKey extends BaseComponent<IBaseProps, {}> {
-  public preventClickPropagation = (e: React.MouseEvent<HTMLButtonElement>) => {
+  public toggleAccessibleKey = (e: React.MouseEvent<HTMLButtonElement>) => {
     const newValue = !this.stores.ui.accessibleSSTScale;
     this.stores.ui.setAccessibleSSTScale(newValue);
     if (newValue) {
@@ -72,7 +72,7 @@ export class SSTKey extends BaseComponent<IBaseProps, {}> {
           <Checkbox
             className={css.checkboxElement}
             checked={ui.accessibleSSTScale}
-            onClick={this.preventClickPropagation}
+            onClick={this.toggleAccessibleKey}
           /> Accessible Key
         </div>
       </div>
