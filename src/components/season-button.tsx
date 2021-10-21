@@ -26,13 +26,13 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
     // If set to lock the UI while the simulation is running, lock UI once the sim is started until it is reset
     const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
     return (
-      <div className={css.seasonButton}>
+      <div className={`${css.seasonButton} ${uiDisabled ? css.disabled : ""}`}>
         <div className={css.seasonLabel}>Season</div>
         <div className={css.selectContainer}>
           <Select
             value={sim.season}
             onChange={this.handleSeasonChange}
-            className={`${css.seasonSelect} ${uiDisabled ? css.disabled : ""}`}
+            className={css.seasonSelect}
             data-test="season-button"
             disabled={uiDisabled}
             disableUnderline={true}

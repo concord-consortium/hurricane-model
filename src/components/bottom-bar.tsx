@@ -71,6 +71,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     const { isSeasonMenuOpen } = this.state;
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
+    const tempButtonDisabled = sim.simulationStarted || ui.overlay !== "sst";
+    const seasonButtonDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -80,7 +82,9 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         <div className={css.mainContainer}>
           {
             config.seasonButton &&
-            <div className={`${css.widgetGroup} hoverable ${seasonButtonHoveredClass}`}>
+            <div
+              className={`${css.widgetGroup} ${seasonButtonDisabled ? "" : "hoverable"} ${seasonButtonHoveredClass}`}
+            >
               <SeasonButton
                 onMenuOpen={() => this.setState({ isSeasonMenuOpen: true })}
                 onMenuClose={() => {
@@ -101,9 +105,9 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               <HurricaneImageToggle />
             }
           </div>
-          <div className={`${css.widgetGroup} hoverable`}>
+          <div className={`${css.widgetGroup} ${tempButtonDisabled ? "" : "hoverable"}`}>
               <IconButton
-                disabled={sim.simulationStarted || ui.overlay !== "sst"}
+                disabled={tempButtonDisabled}
                 active={ui.thermometerActive}
                 buttonText="Temp"
                 dataTest="temp-button"
