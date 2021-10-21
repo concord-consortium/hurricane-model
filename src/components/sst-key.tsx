@@ -49,12 +49,12 @@ const renderTemperatureLabels = (increments: number, tempScaleName: string) => {
 @observer
 export class SSTKey extends BaseComponent<IBaseProps, {}> {
   public preventClickPropagation = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const newValue = !this.stores.ui.colorBlindSSTScale;
-    this.stores.ui.setColorBlindSSTScale(newValue);
+    const newValue = !this.stores.ui.accessibleSSTScale;
+    this.stores.ui.setAccessibleSSTScale(newValue);
     if (newValue) {
-      log("ColorBlindSSTScaleEnabled");
+      log("AccessibleSSTScaleEnabled");
     } else {
-      log("ColorBlindSSTScaleDisabled");
+      log("AccessibleSSTScaleDisabled");
     }
     // This prevents closing the whole map button that also reacts to click event.
     e.stopPropagation();
@@ -71,7 +71,7 @@ export class SSTKey extends BaseComponent<IBaseProps, {}> {
         <div className={css.checkbox}>
           <Checkbox
             className={css.checkboxElement}
-            checked={ui.colorBlindSSTScale}
+            checked={ui.accessibleSSTScale}
             onClick={this.preventClickPropagation}
           /> Accessible Key
         </div>

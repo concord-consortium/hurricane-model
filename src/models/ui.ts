@@ -67,7 +67,7 @@ export class UIModel {
   @observable public mapZoom = 1;
   @observable public baseMap: MapTilesName = config.map;
   @observable public overlay: Overlay | null = config.overlay;
-  @observable public colorBlindSSTScale = false;
+  @observable public accessibleSSTScale = false;
   @observable public categoryChangeMarkers = config.categoryChangeMarkers;
   @observable public thermometerActive = false;
   @observable public thermometerPositionSaved: LatLngExpression | null = null;
@@ -103,7 +103,7 @@ export class UIModel {
   }
 
   @computed public get sstScaleName() {
-    return this.colorBlindSSTScale ? config.colorBlindSSTScale : config.defaultSSTScale;
+    return this.accessibleSSTScale ? config.accessibleSSTScale : config.defaultSSTScale;
   }
 
   public getVisibleSeaSurfaceTempImgUrl(season: Season) {
@@ -179,8 +179,8 @@ export class UIModel {
     this.thermometerPositionSaved = null;
   }
 
-  @action.bound public setColorBlindSSTScale(enabled: boolean) {
-    this.colorBlindSSTScale = enabled;
+  @action.bound public setAccessibleSSTScale(enabled: boolean) {
+    this.accessibleSSTScale = enabled;
   }
 
   @action.bound public reset() {
