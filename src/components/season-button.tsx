@@ -70,11 +70,14 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
   }
 }
 
+// Original spec had a check mark; updated spec does not.
+// We leave the implementation in place in case the check mark comes back.
 const OptionalCheck: React.FC<{ show: boolean }> = ({ show }) => {
-  const checkMark = "\u2713"; // ✓
-  return (
-    <div className={show ? "checked" : ""}>
-      {show ? checkMark : ""}
-    </div>
-  );
+  return null;
+  // const checkMark = "\u2713"; // ✓
+  // return (
+  //   <div className={show ? "checked" : ""}>
+  //     {show ? checkMark : ""}
+  //   </div>
+  // );
 };

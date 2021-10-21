@@ -32,7 +32,7 @@
       width: 76px;
       height: 20px;
       font-size: 11px;
-      border: 1px solid black;
+      border: 1px solid $controlIconLine;
       border-radius: 5px;
       background: white;
 
@@ -43,13 +43,16 @@
   }
 }
 
-.seasonItem {
-  padding: 0 8px !important;
-  width: 74px !important;
-  font-size: 11px !important;
-  display: flex;
-  justify-content: space-between !important;
-}
+// Original spec had custom menu styling; updated spec uses MUI default menu styling.
+// We leave the styling in place (but commented out) in case it comes back.
+// Flex container is for styling of optional check mark.
+// .seasonItem {
+//   padding: 0 8px !important;
+//   width: 74px !important;
+//   font-size: 11px !important;
+//   display: flex;
+//   justify-content: space-between !important;
+// }
 
 :global(.MuiSelect-select:focus) {
   background: none !important;
