@@ -25,7 +25,7 @@ export class ThermometerMarker extends BaseComponent<IProps, IState> {
     }
     return (
       <LeafletCustomMarker position={position} draggable={false}>
-        <div className={css.thermometerContainer}>
+        <div className={`${css.thermometerContainer} ${saved ? css.saved : ""}`}>
           <div className={css.thermometerReadout}>
             { temp.toFixed(1) } °C
           </div>

@@ -19,6 +19,11 @@ $background: rgba(255, 255, 255, 0.85);
   align-items: center;
   flex-direction: column;
 
+  &.saved {
+    // Marker which is saved and locked in one place shouldn't change cursor to a custom one anymore.
+    // See the second bullet here: https://www.pivotaltracker.com/story/show/179739638/comments/227553974
+    pointer-events: none;
+  }
 }
 
 .thermometerReadout {
