@@ -71,7 +71,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     const { isSeasonMenuOpen } = this.state;
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
-    const tempButtonDisabled = sim.simulationStarted || ui.overlay !== "sst";
+    const tempButtonDisabled = ui.overlay !== "sst";
     const seasonButtonDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
     return (
       <div className={css.bottomBar}>
@@ -171,13 +171,11 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       this.stores.simulation.start();
       log("SimulationStarted");
     }
-    this.stores.ui.disableThermometer();
   }
 
   public handleRestart = () => {
     this.stores.simulation.restart();
     this.stores.ui.setNorthAtlanticView();
-    this.stores.ui.disableThermometer();
     log("SimulationRestarted");
   }
 

@@ -81,7 +81,7 @@ describe("BottomBar component", () => {
       expect(start.prop("disabled")).toEqual(true);
     });
 
-    it("is disabled when simulation is started", () => {
+    it("is enabled when simulation is started", () => {
       const wrapper = mount(
         <Provider stores={stores}>
           <BottomBar />
@@ -92,7 +92,7 @@ describe("BottomBar component", () => {
       stores.simulation.start();
       wrapper.update();
       start = wrapper.find('[data-test="temp-button"]').first();
-      expect(start.prop("disabled")).toEqual(true);
+      expect(start.prop("disabled")).toEqual(false);
     });
   });
 });
