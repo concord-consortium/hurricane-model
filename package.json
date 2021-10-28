@@ -126,6 +126,8 @@
     "@concord-consortium/lara-interactive-api": "^1.1.2",
     "@material-ui/core": "4.12.3",
     "@material-ui/icons": "^4.11.2",
+    "@turf/helpers": "^6.5.0",
+    "@turf/line-intersect": "^6.5.0",
     "d3-scale": "^3.3.0",
     "geolocation-utils": "1.2.5",
     "jquery": "^3.6.0",

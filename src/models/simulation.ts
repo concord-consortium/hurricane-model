@@ -1,5 +1,7 @@
+import { lineString, Position } from "@turf/helpers";
+import lineIntersect from "@turf/line-intersect";
 import {LatLngExpression, CRS, LatLngBounds, latLngBounds} from "leaflet";
-import { action, observable, computed, autorun } from "mobx";
+import { action, observable, computed, autorun, toJS } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
 import * as decWind from "../../wind-data-json/dec-simple.json";
@@ -501,9 +503,16 @@ export class SimulationModel {
         const [visStart, visEnd] = this.getVisibleTrackSegments(prevTrackIndex, thisTrackIndex, bounds) || [];
         if ((visStart != null) && (visEnd != null)) {
           const segmentCount = visEnd - visStart;
+          // single segment; find midpoint between intersections with bounds
+          if (segmentCount === 1) {
+            markerPositions.push({
+              position: this.getVisibleTrackSegmentsMidpoint(visStart, visEnd, bounds),
+              category: this.hurricaneTrack[visStart].category
+            });
+          }
           // even number of segments; put marker on middle join
-          if (segmentCount % 2 === 0) {
-            markerPositions.push(this.hurricaneTrack[visStart + (segmentCount / 2)]);
+          else if (segmentCount % 2 === 0) {
+            markerPositions.push(toJS(this.hurricaneTrack[visStart + (segmentCount / 2)]));
           }
           // odd number of segments; put marker in middle of center segment
           else {
@@ -539,16 +548,59 @@ export class SimulationModel {
     return bounds.intersects(segmentBounds);
   }
 
+  // If start/end correspond to a single segment, then the midpoint returned will be the midpoint of the
+  // visible part of the segment. This is the scenario in which this function is currently used.
+  // If start/end correspond to multiple segments, then the midpoint returned will be the midpoint of
+  // the bounding box, which may not actually correspond to a point on one of the segments.
+  private getVisibleTrackSegmentsMidpoint(start: number, end: number, bounds: LatLngBounds): ICoordinates {
+    const startPos = this.hurricaneTrack[start].position;
+    const endPos = this.hurricaneTrack[end].position;
+    const positions: Position[] = [];
+    for (let i = start; i <= end; ++i) {
+      const pt = this.hurricaneTrack[i].position;
+      positions.push([pt.lng, pt.lat]);
+    }
+    const trackSegments = lineString(positions);
+    const north = bounds.getNorth();
+    const east = bounds.getEast();
+    const south = bounds.getSouth();
+    const west = bounds.getWest();
+    const boundsSegments = lineString([[east, north], [west, north], [west, south], [east, south], [east, north]]);
+    const intersections = lineIntersect(trackSegments, boundsSegments);
+    // if two intersections, find the midpoint of the intersections
+    if (intersections.features.length === 2) {
+      const [p1Lng, p1Lat] = intersections.features[0].geometry.coordinates;
+      const [p2Lng, p2Lat] = intersections.features[1].geometry.coordinates;
+      return { lat: (p1Lat + p2Lat) / 2, lng: (p1Lng + p2Lng) / 2 };
+    }
+    // if one intersection, find the midpoint of the intersection and the visible endpoint
+    if (intersections.features.length === 1) {
+      const [p1Lng, p1Lat] = intersections.features[0].geometry.coordinates;
+      if (this.isTrackPointVisible(start, bounds)) {
+        return { lat: (startPos.lat + p1Lat) / 2, lng: (startPos.lng + p1Lng) / 2 };
+      }
+      if (this.isTrackPointVisible(end, bounds)) {
+        return { lat: (p1Lat + endPos.lat) / 2, lng: (p1Lng + endPos.lng) / 2 };
+      }
+    }
+    // if no intersections, just return midpoint of segment
+    return { lat: (startPos.lat + endPos.lat) / 2, lng: (startPos.lng + endPos.lng) / 2 };
+  }
+
   private getVisibleTrackSegments(start: number, end: number, bounds: LatLngBounds): [number, number] | undefined {
     if (!this.isTrackSegmentVisible(start, end, bounds)) return;
     // if we get here, some part of the segment is visible
     if (!this.isTrackPointVisible(start, bounds)) {
-      while ((start < end) && !this.isTrackPointVisible(start + 1, bounds)) {
+      // eliminate subsegments that are out of view
+      while ((start < end) && !this.isTrackPointVisible(start + 1, bounds) &&
+              this.isTrackSegmentVisible(start + 1, end, bounds)) {
         ++start;
       }
     }
     if (!this.isTrackPointVisible(end, bounds)) {
-      while ((start < end) && !this.isTrackPointVisible(end - 1, bounds)) {
+      // eliminate subsegments that are out of view
+      while ((start < end) && !this.isTrackPointVisible(end - 1, bounds) &&
+              this.isTrackSegmentVisible(start, end - 1, bounds)) {
         --end;
       }
     }

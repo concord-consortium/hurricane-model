@@ -263,6 +263,24 @@ describe("SimulationModel store", () => {
       expect(sim.getCategoryMarkerPositions(mapBounds))
         .toEqual([{ position: { lat: 2, lng: -2 }, category: 0 }, { position: { lat: 4, lng: -4 }, category: 1 }]);
     });
+    it("should show marker in middle of visible part of segment for single segment spanning beyond bounds", () => {
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [
+        { position: { lat: 1, lng: -7 }, category: 0 },
+        { position: { lat: 1, lng: 6 }, category: 1 }
+      ];
+      sim.strengthChangePositions = [0, 1];
+      expect(sim.getCategoryMarkerPositions(mapBounds)).toEqual([{ position: { lat: 1, lng: 0 }, category: 0 }]);
+    });
+    it("should show marker in middle of visible part of segment for segment spanning partially beyond bounds", () => {
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [
+        { position: { lat: 1, lng: -3 }, category: 0 },
+        { position: { lat: 1, lng: 6 }, category: 1 }
+      ];
+      sim.strengthChangePositions = [0, 1];
+      expect(sim.getCategoryMarkerPositions(mapBounds)).toEqual([{ position: { lat: 1, lng: 1 }, category: 0 }]);
+    });
   });
 
   describe("tick", () => {
