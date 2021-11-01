@@ -1,7 +1,6 @@
 context("Pressure System", () => {
   it("can have strength adjusted by slider", () => {
-    //cy.visit("/");
-    cy.visit(Cypress.config('baseUrl'));
+    cy.visit("/");
     cy.window().then((win: any) => {
       // Limit number of pressure systems to 1.
       win.stores.simulation.pressureSystems.length = 1;

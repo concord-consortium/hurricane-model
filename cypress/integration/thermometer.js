@@ -1,6 +1,6 @@
 context("Test the Thermometer Icon", () => {
   beforeEach(() => {
-    cy.visit(Cypress.config('baseUrl'));
+    cy.visit("/");
   });
 
   it("thermometer at bottom bar", () => {

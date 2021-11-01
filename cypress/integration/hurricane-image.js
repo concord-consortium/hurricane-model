@@ -1,6 +1,6 @@
 context("Test the Hurricane Image", () => {
   beforeEach(() => {
-    cy.visit(Cypress.config('baseUrl'));
+    cy.visit("/");
   });
 
   it("hurricane image at bottom bar", () => {

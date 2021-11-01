@@ -1,7 +1,6 @@
 context("Test the Hurricane Model app", () => {
   beforeEach(() => {
-    //cy.visit("/");
-    cy.visit(Cypress.config('baseUrl'));
+    cy.visit("/");
   });
 
   it("renders Leaflet map", () => {
