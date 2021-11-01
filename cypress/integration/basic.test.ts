@@ -1,6 +1,7 @@
 context("Test the Hurricane Model app", () => {
   beforeEach(() => {
-    cy.visit("/");
+    //cy.visit("/");
+    cy.visit(Cypress.config('baseUrl'));
   });
 
   it("renders Leaflet map", () => {
@@ -44,5 +45,18 @@ context("Test the Hurricane Model app", () => {
         cy.get('[data-test="start-button"]').click();
       });
     });
+  });
+
+  it("colorblind friendly SST", () => {
+    cy.get(".map-tab--mapTabImage--__hurr-v1__.map-tab--impactMaps--__hurr-v1__")
+      .click()
+      .then(() => {
+        cy.get(".sst-key--checkbox--__hurr-v1__ .MuiSvgIcon-root")
+          .click()
+          .then(() => {
+            cy.get('[src="dd7d513dc937501a59bcfe0b12d93fe3.png"]').should("be.visible");
+          });
+      });
+
   });
 });
