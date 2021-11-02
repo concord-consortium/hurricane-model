@@ -14,7 +14,7 @@ context("Test the Thermometer Icon", () => {
         cy.get('[data-test="start-button"]').click();
 
       });
-      cy.get(".icon-button--iconButton--__hurr-v1__").should("be.visible");
+      cy.get('[data-test="temp-button"]').should("be.visible");
     });
 
     it("thermometer disabled for other map types", () => {
@@ -26,7 +26,8 @@ context("Test the Thermometer Icon", () => {
           cy.get('[data-test="map-button-precipitation"]')
             .click()
             .then(() => {
-              cy.get(".icon-button--disabled--__hurr-v1__").should("be.visible");
+              cy.get('[data-test="temp-button"]')
+              .should('have.disabled');
             });
         });
 
@@ -37,14 +38,15 @@ context("Test the Thermometer Icon", () => {
             cy.get('[data-test="map-button-stormSurge"]')
               .click()
               .then(() => {
-                cy.get(".icon-button--disabled--__hurr-v1__").should("be.visible");
+                cy.get('[data-test="temp-button"]')
+                .should('have.disabled');
               });
           });
 
     });
 
     it("thermometer reading readout", () => {
-        cy.get(".icon-button--iconButton--__hurr-v1__").click();
+        cy.get('[data-test="temp-button"]').click();
         cy.get(".category-number--categoryNumber--__hurr-v1__").click();
         cy.get(".thermometer-marker--thermometerReadout--__hurr-v1__").should("be.visible");
       });
