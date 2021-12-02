@@ -184,7 +184,7 @@ describe("SimulationModel store", () => {
 
     it("reports correct SST value", (done) => {
       // extend timeout, parsing can take some time.
-      jest.setTimeout(60000);
+      jest.setTimeout(20000);
       mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep-default.png"));
       const sim = new SimulationModel(options);
       sim._seaSurfaceTempDataParsed = () => {
@@ -212,10 +212,10 @@ describe("SimulationModel store", () => {
           expect(sim.seaSurfaceTempAt({lat: 20, lng: -20})).toEqual(20.73);
           expect(sim.seaSurfaceTempAt({lat: 20, lng: -90})).toEqual(null); // land
           done();
+          // restore original timeout value
+          jest.setTimeout(5000);
         };
       };
-      // restore original timeout value
-      jest.setTimeout(5000);
     });
   });
 
