@@ -184,7 +184,7 @@ describe("SimulationModel store", () => {
 
     it("reports correct SST value", (done) => {
       // extend timeout, parsing can take some time.
-      jest.setTimeout(30000);
+      jest.setTimeout(60000);
       mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep-default.png"));
       const sim = new SimulationModel(options);
       sim._seaSurfaceTempDataParsed = () => {
