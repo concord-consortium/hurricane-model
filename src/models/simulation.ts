@@ -410,6 +410,9 @@ export class SimulationModel {
     this.numberOfStepsOverSea = 0;
     this.numberOfStepsOverLand = 0;
     this.extendedLandfallAreas = Object.values(extendedLandfallBounds);
+    this.pressureSystems = this.initialState.pressureSystems.map(
+      (o: IPressureSystemOptions) => new PressureSystem(o)
+    );
     this.hurricane.reset();
   }
 
