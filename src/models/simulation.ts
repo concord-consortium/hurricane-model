@@ -214,7 +214,7 @@ export class SimulationModel {
   public numberOfStepsOverLand = 0;
   public extendedLandfallAreas: LatLngBounds[] = Object.values(extendedLandfallBounds);
   public windKdTreeCache: any;
-  public pressureSystemSettings: PressureSystem[];
+  public pressureSystemSettings: PressureSystem[] = [];
   // Callback used by tests.
   public _seaSurfaceTempDataParsed: () => void;
   protected initialState: SimulationModel;
@@ -412,8 +412,10 @@ export class SimulationModel {
     this.numberOfStepsOverSea = 0;
     this.numberOfStepsOverLand = 0;
     this.extendedLandfallAreas = Object.values(extendedLandfallBounds);
-    this.pressureSystems = this.pressureSystemSettings;
     this.hurricane.reset();
+    if (this.pressureSystemSettings.length) {
+      this.pressureSystems = this.pressureSystemSettings;
+    }
   }
 
   // That's a complete reset to the initial state.
