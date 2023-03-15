@@ -1,7 +1,6 @@
 import * as React from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { stores } from "../index";
 import TilelayerMask from "./react-leaflet-tilelayer-mask";
 import { ICoordinates } from "../types";
 import * as TopRightMaskUrl from "../assets/storm-surge-mask-top-right.png";
@@ -12,19 +11,12 @@ interface IState {}
 
 const stormSurgeAreaSize = 800; // km
 
-export const baseUrlUSA = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_" +
-                          "Category{category}_CONUS/MapServer/tile/{z}/{y}/{x}";
-export const baseUrlPuertoRico = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/data5_PR_" +
-                                 "USVI_SLOSH_MOMs_cat{category}/MapServer/tile/{z}/{y}/{x}";
+export const stormSurgeMapTiles = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/Storm_Surge_HazardMaps_Category{hurricaneCat}_v3/MapServer/tile/{z}/{y}/{x}";
 
 export const PuertoRicoBounds = extendedLandfallBounds.PuertoRico;
 
-export const getTilesUrl = (position: ICoordinates, category: number) => {
-  let url = baseUrlUSA;
-  if (PuertoRicoBounds.contains(position)) {
-    url = baseUrlPuertoRico;
-  }
-  return url.replace("{category}", category.toString());
+export const getTilesUrl = (category: number) => {
+  return stormSurgeMapTiles.replace("{hurricaneCat}", category.toString());
 };
 
 export const getMaskUrl = (position: ICoordinates) => {
@@ -47,7 +39,7 @@ export class StormSurgeOverlay extends BaseComponent<IProps, IState> {
         key={idx}
         maskCenter={lf.position}
         maskSize={stormSurgeAreaSize} // km
-        url={getTilesUrl(lf.position, lf.category)}
+        url={getTilesUrl(lf.category)}
         maskUrl={getMaskUrl(lf.position)}
       />
     ));

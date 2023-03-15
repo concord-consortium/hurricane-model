@@ -100,7 +100,7 @@
     "mercator-projection": "0.0.2",
     "mini-css-extract-plugin": "^0.12.0",
     "node-pre-gyp": "^0.17.0",
-    "node-sass": "^6.0.1",
+    "sass": "^1.59.3",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.3.9",
     "postcss-loader": "^4.3.0",

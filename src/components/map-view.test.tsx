@@ -70,8 +70,8 @@ describe("MapView component", () => {
       </Provider>
     );
     expect(wrapper.find({
-      url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_Category" +
-        "3_CONUS/MapServer/tile/{z}/{y}/{x}"
+      url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/Storm_Surge_HazardMaps_Category3" +
+           "_v3/MapServer/tile/{z}/{y}/{x}"
     }).length).toEqual(0);
 
     stores.ui.zoomedInView = {
@@ -82,8 +82,8 @@ describe("MapView component", () => {
     wrapper.update();
 
     expect(wrapper.find({
-      url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_Category" +
-           "3_CONUS/MapServer/tile/{z}/{y}/{x}"
+      url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/Storm_Surge_HazardMaps_Category3" +
+           "_v3/MapServer/tile/{z}/{y}/{x}"
     }).length).toBeGreaterThan(0);
   });
 });

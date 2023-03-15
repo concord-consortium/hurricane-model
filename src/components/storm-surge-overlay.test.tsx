@@ -3,7 +3,7 @@ import { Provider } from "mobx-react";
 import { Map } from "react-leaflet";
 import { mount } from "enzyme";
 import { createStores } from "../models/stores";
-import { StormSurgeOverlay, baseUrlUSA, PuertoRicoBounds, baseUrlPuertoRico } from "./storm-surge-overlay";
+import { StormSurgeOverlay, PuertoRicoBounds, stormSurgeMapTiles } from "./storm-surge-overlay";
 import TilelayerMask from "./react-leaflet-tilelayer-mask";
 
 describe("StormSurgeOverlay component", () => {
@@ -39,7 +39,7 @@ describe("StormSurgeOverlay component", () => {
         </Map>
       </Provider>
     );
-    expect(wrapper.find(TilelayerMask).prop("url")).toEqual(baseUrlUSA.replace("{category}", "3"));
+    expect(wrapper.find(TilelayerMask).prop("url")).toEqual(stormSurgeMapTiles.replace("{hurricaneCat}", "3"));
     expect(wrapper.find(TilelayerMask).prop("maskUrl")).not.toEqual(undefined);
   });
 
@@ -58,7 +58,7 @@ describe("StormSurgeOverlay component", () => {
         </Map>
       </Provider>
     );
-    expect(wrapper.find(TilelayerMask).prop("url")).toEqual(baseUrlPuertoRico.replace("{category}", "2"));
+    expect(wrapper.find(TilelayerMask).prop("url")).toEqual(stormSurgeMapTiles.replace("{hurricaneCat}", "2"));
     expect(wrapper.find(TilelayerMask).prop("maskUrl")).toEqual(undefined);
   });
 });
