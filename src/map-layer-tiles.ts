@@ -55,12 +55,14 @@ const layerInfo: MapTileLayer[] = [
     subdomains: []
   },
   {
+    // https://www.nhc.noaa.gov/nationalsurge/
+    // https://experience.arcgis.com/experience/203f772571cb48b1b8b50fdcc3272e2c
     mapType: "stormSurge",
     name: "Storm Surge",
     // tslint:disable-next-line:max-line-length
-    url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/NHC_NationalMOM_Category{hurricaneCat}_CONUS/MapServer/tile/{z}/{y}/{x}",
+    url: "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/Storm_Surge_HazardMaps_Category{hurricaneCat}_v3/MapServer/tile/{z}/{y}/{x}",
     // tslint:disable-next-line:max-line-length
-    attribution: "NOAA National Centers for Environmental Information (NCEI), https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad",
+    attribution: "Zachry, B. C., W. J. Booth, J. R. Rhome, and T. M. Sharon, 2015: A National View of Storm Surge Risk and Inundation. Weather, Climate, and Society, 7(2), 109–117. DOI: http://dx.doi.org/10.1175/WCAS–D–14–00049.1, https://www.nhc.noaa.gov/nationalsurge/",
     maxZoom: 13,
     subdomains: []
   }

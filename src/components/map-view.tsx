@@ -129,7 +129,8 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             // Source:
-            // https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
+            // https://www.nhc.noaa.gov/nationalsurge/
+            // https://experience.arcgis.com/experience/203f772571cb48b1b8b50fdcc3272e2c
             ui.overlay === "stormSurge" && ui.zoomedInView && ui.zoomedInView.stormSurgeAvailable &&
             <TileLayer
               attribution={mapLayer("stormSurge").attribution}
