@@ -1,6 +1,6 @@
 {
   "name": "hurricane-model",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Concord Consortium Hurricane Model",
   "main": "index.js",
   "jest": {
