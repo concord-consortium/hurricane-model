@@ -1,7 +1,8 @@
 context("Pressure System", () => {
   it("can have strength adjusted by slider", () => {
     cy.visit("/");
-    cy.window().then((win: any) => {
+    // cy.window().then((win: any) => {
+    cy.window().then((win) => { 
       // Limit number of pressure systems to 1.
       win.stores.simulation.pressureSystems.length = 1;
 
@@ -32,7 +33,8 @@ context("Pressure System", () => {
       }
     ];
     cy.visit(`/?pressureSystems=${encodeURIComponent(JSON.stringify(pressureSystems))}`);
-    cy.window().then((win: any) => {
+    // cy.window().then((win: any) => {
+    cy.window().then((win) => {
       expect(win.stores.simulation.pressureSystems.length).to.eql(pressureSystems.length);
       expect(win.stores.simulation.pressureSystems[0].type).to.eql("high");
       expect(win.stores.simulation.pressureSystems[0].center.lat).to.eql(10);
