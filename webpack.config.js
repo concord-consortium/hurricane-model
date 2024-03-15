@@ -4,6 +4,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+const DEPLOY_PATH = process.env.DEPLOY_PATH;
+
 module.exports = (env, argv) => {
   const devMode = argv.mode !== 'production';
 
@@ -84,7 +86,7 @@ module.exports = (env, argv) => {
       ]
     },
     resolve: {
-      extensions: [ '.ts', '.tsx', '.js' ]
+      extensions: ['.ts', '.tsx', '.js']
     },
     stats: {
       // suppress "export not found" warnings about re-exported types
@@ -98,8 +100,14 @@ module.exports = (env, argv) => {
         filename: 'index.html',
         template: 'src/index.html'
       }),
+      ...(DEPLOY_PATH ? [new HtmlWebpackPlugin({
+        filename: 'index-top.html',
+        template: 'src/index.html',
+        favicon: 'src/public/favicon.ico',
+        publicPath: DEPLOY_PATH,
+      })] : []),
       new CopyWebpackPlugin([
-        {from: 'src/public'}
+        { from: 'src/public' }
       ])
     ]
   };
