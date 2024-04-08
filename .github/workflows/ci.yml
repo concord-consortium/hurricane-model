@@ -30,7 +30,6 @@ jobs:
         with:
           install-command: npm ci --legacy-peer-deps
           start: npm start
-          env: NODE_OPTIONS=--openssl-legacy-provider
           wait-on: 'http://localhost:8080'
           # only record the results to dashboard.cypress.io if CYPRESS_RECORD_KEY is set
           record: ${{ !!secrets.CYPRESS_RECORD_KEY }}

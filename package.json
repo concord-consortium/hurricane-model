@@ -68,7 +68,6 @@
   "devDependencies": {
     "@babel/core": "^7.15.8",
     "@babel/preset-env": "^7.15.8",
-    "@cypress/webpack-preprocessor": "^5.9.1",
     "@svgr/webpack": "^5.5.0",
     "@types/enzyme": "^3.10.9",
     "@types/enzyme-adapter-react-16": "^1.0.6",
@@ -87,7 +86,7 @@
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^5.1.2",
     "css-loader": "^5.2.7",
-    "cypress": "^13.6.4",
+    "cypress": "^13.7.2",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
     "file-loader": "^4.3.0",
