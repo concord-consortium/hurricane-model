@@ -1,9 +1,7 @@
 import * as seedrandom from "seedrandom";
-// inexplicably, no longer exported
-type SeedRandomPrng = ReturnType<seedrandom>;
 
 const SEED = "HurricaneModel";
-let rand: SeedRandomPrng | null = null;
+let rand: seedrandom.StatefulPRNG<any> | null = null;
 
 export function initialize(deterministic: boolean) {
   // state: true enables state saving, entropy controls whether random generator is deterministic or not.
