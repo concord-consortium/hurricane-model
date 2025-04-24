@@ -2,7 +2,7 @@ import { log } from "@concord-consortium/lara-interactive-api";
 import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
-import { Season, seasonLabels } from "../types";
+import { StartLocation, startLocationLabels } from "../types";
 import config from "../config";
 import { SelectButton } from "./select-button";
 
@@ -12,16 +12,16 @@ interface IProps extends IBaseProps {
 }
 interface IState {}
 
-const seasons: Season[] = [ "fall", "winter", "spring", "summer" ];
-const menuItems = seasons.map(season => ({
-  label: seasonLabels[season],
-  testId: `season-item-${season}`,
-  value: season
+const startLocations: StartLocation[] = [ "atlantic", "gulf" ];
+const menuItems = startLocations.map(startLocation => ({
+  label: startLocationLabels[startLocation],
+  testId: `start-location-item-${startLocation}`,
+  value: startLocation
 }));
 
 @inject("stores")
 @observer
-export class SeasonButton extends BaseComponent<IProps, IState> {
+export class StartLocationButton extends BaseComponent<IProps, IState> {
   public render() {
     const { onMenuOpen, onMenuClose } = this.props;
     const sim = this.stores.simulation;
@@ -29,20 +29,20 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
     const uiDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
     return (
       <SelectButton
-        label="Season"
-        value={sim.season}
-        onChange={this.handleSeasonChange}
+        label="Start Location"
+        value={sim.startLocation}
+        onChange={this.handleStartLocationChange}
         menuItems={menuItems}
         disabled={uiDisabled}
-        onMenuOpen={onMenuOpen}
-        onMenuClose={onMenuClose}
+        onMenuOpen={this.props.onMenuOpen}
+        onMenuClose={this.props.onMenuClose}
       />
     );
   }
 
-  public handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const season = event.target.value as Season;
-    this.stores.simulation.setSeason(season);
-    log("SeasonChanged", { season });
+  public handleStartLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const startLocation = event.target.value as StartLocation;
+    this.stores.simulation.setStartLocation(startLocation);
+    log("StartLocationChanged", { startLocation });
   }
 }

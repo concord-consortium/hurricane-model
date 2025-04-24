@@ -137,12 +137,12 @@ $overflowHeight: 11px;
   }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1200px) {
   .logo {
     display: none;
   }
 }
-@media (min-width: 960px) {
+@media (min-width: 1200px) {
   .logoSmall {
     display: none;
   }

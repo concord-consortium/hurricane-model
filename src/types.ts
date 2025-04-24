@@ -35,6 +35,17 @@ export const seasonLabels: Record<Season, string> = {
   fall: "Fall"
 };
 
+export type StartLocation = "atlantic" | "gulf";
+export const startLocationLabels: Record<StartLocation, string> = {
+  atlantic: "Atlantic",
+  gulf: "Gulf"
+};
+
+export const startLocations: Record<StartLocation, ICoordinates> = {
+  atlantic: { lat: 10.5, lng: -20 },
+  gulf: { lat: 25, lng: -90 }
+};
+
 export interface ISSTImages {
   winter: string;
   spring: string;

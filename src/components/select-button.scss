@@ -1,6 +1,6 @@
 @import "common.scss";
 
-.seasonButton {
+.selectButton {
   margin-top: $bottomBarTopPadding;
   width: 96px;
   display: flex;
@@ -13,12 +13,12 @@
     .selectContainer:hover {
       background: white;
     }
-    .selectContainer .seasonSelect:hover {
+    .selectContainer .select:hover {
       background: white;
     }
   }
 
-  .seasonLabel {
+  .label {
     font-size: 12px;
     text-align: center;
   }
@@ -33,7 +33,7 @@
       background: rgba(255,255,255,0.5);
     }
 
-    .seasonSelect {
+    .select {
       left: 3px;
       top: 3px;
       width: 76px;

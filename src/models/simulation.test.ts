@@ -8,6 +8,7 @@ const mockFetch = require("jest-fetch-mock");
 const fs = require("fs");
 
 const options: ISimulationOptions = {
+  startLocation: "atlantic",
   // Ensure that the initial season is always the same.
   season: "fall",
   pressureSystems: []
@@ -58,6 +59,7 @@ describe("SimulationModel store", () => {
     it("takes pressure systems into account", () => {
       // High pressure system.
       let sim = new SimulationModel({
+        startLocation: "atlantic",
         season: "fall",
         pressureSystems: [
           {
@@ -84,6 +86,7 @@ describe("SimulationModel store", () => {
 
       // Low pressure system.
       sim = new SimulationModel({
+        startLocation: "atlantic",
         season: "fall",
         pressureSystems: [
           {
@@ -364,6 +367,7 @@ describe("SimulationModel store", () => {
   describe("restart", () => {
     it("restarts hurricane simulation without changing some of the initial conditions", () => {
       const sim = new SimulationModel({
+        startLocation: "atlantic",
         season: "fall",
         pressureSystems: [
           {
@@ -403,6 +407,7 @@ describe("SimulationModel store", () => {
   describe("reset", () => {
     it("triggers restart and resets initial conditions", () => {
       const sim = new SimulationModel({
+        startLocation: "atlantic",
         season: "fall",
         pressureSystems: [
           {

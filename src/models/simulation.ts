@@ -1,6 +1,6 @@
 import { lineString, Position } from "@turf/helpers";
 import lineIntersect from "@turf/line-intersect";
-import {LatLngExpression, CRS, LatLngBounds, latLngBounds} from "leaflet";
+import { LatLngExpression, CRS, LatLngBounds, latLngBounds, LatLngLiteral } from "leaflet";
 import { action, observable, computed, autorun, toJS } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
@@ -13,7 +13,8 @@ import * as marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
 import * as juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
 import * as septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages } from "../types";
+import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
+  StartLocation, startLocations } from "../types";
 import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
@@ -29,6 +30,7 @@ interface IWindDataset {
 }
 
 export interface ISimulationOptions {
+  startLocation?: StartLocation;
   season?: Season;
   pressureSystems?: IPressureSystemOptions[];
   hurricane?: IPressureSystemOptions;
@@ -191,6 +193,7 @@ export class SimulationModel {
   @observable public west = -45;
   @observable public south = -45;
   @observable public hurricaneTrack: ITrackPoint[] = [];
+  @observable public startLocation: StartLocation;
   // Current season, sets wind and sea temperature (in the future).
   @observable public season: Season;
   @observable public seaSurfaceTempData: PNG | null = null;
@@ -200,7 +203,7 @@ export class SimulationModel {
   // Pressure systems affect winds.
   @observable public pressureSystems: PressureSystem[] = [];
   @observable public hurricane: Hurricane = new Hurricane({
-    center: config.initialHurricanePosition,
+    center: startLocations[config.initialHurricanePosition as StartLocation],
     strength: config.hurricaneStrength,
     speed: config.initialHurricaneSpeed
   });
@@ -224,6 +227,7 @@ export class SimulationModel {
     if (!options) {
       options = {};
     }
+    this.startLocation = options.startLocation || config.initialHurricanePosition;
     this.season = options.season || config.season;
     this.pressureSystems = (options.pressureSystems || config.pressureSystems).map(
       (o: IPressureSystemOptions) => new PressureSystem(o)
@@ -242,6 +246,10 @@ export class SimulationModel {
     this.north = bounds.getNorth();
     this.west = bounds.getWest();
     this.south = bounds.getSouth();
+  }
+
+  @action.bound public setStartLocation(startLocation: StartLocation) {
+    this.startLocation = startLocation;
   }
 
   @action.bound public setSeason(season: Season) {
@@ -422,6 +430,7 @@ export class SimulationModel {
   @action.bound public reset() {
     this.restart();
     this.pressureSystems.forEach(ps => ps.reset());
+    this.startLocation = this.initialState.startLocation;
     this.season = this.initialState.season;
   }
 
