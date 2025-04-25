@@ -13,41 +13,41 @@ function getURLParam(name: string) {
 
 // Start position-specific pressure systems
 const atlanticStartHighPressure = {
-  type: "high" as PressureSystemType,
+  type: "high",
   center: {lat: 28, lng: -30},
   strength: 19.5
-};
+} as const;
 
 const atlanticStartLowPressure = {
-  type: "low" as PressureSystemType,
+  type: "low",
   center: {lat: 45, lng: -82},
   strength: 6
-};
+} as const;
 
 const gulfStartHighPressure = {
-  type: "high" as PressureSystemType,
+  type: "high",
   center: {lat: 34.5, lng: -107},
   strength: 9.54
-};
+} as const;
 
 const gulfStartLowPressure = {
-  type: "low" as PressureSystemType,
+  type: "low",
   center: {lat: 38, lng: -95},
   strength: 17.39
-};
+} as const;
 
 // Shared pressure systems (used for both start positions)
 const sharedHighPressure = {
-  type: "high" as PressureSystemType,
+  type: "high",
   center: {lat: 28.8, lng: -62.4},
   strength: 13.6
-};
+} as const;
 
 const sharedLowPressure = {
-  type: "low" as PressureSystemType,
+  type: "low",
   center: {lat: 47, lng: -60},
   strength: 7
-};
+} as const;
 
 export const selectPressureSystems = (startLocation: string) => {
   if (startLocation === "atlantic") {

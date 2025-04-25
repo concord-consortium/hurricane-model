@@ -60,10 +60,9 @@ export class PressureSystem {
     wind = Object.assign({}, wind);
     const direction = this.type === "high" ? 1 : -1;
     const offset = this.type === "high" ? config.highPressureSysAngleOffset : config.lowPressureSysAngleOffset;
-    const ctrLat = this.center.lat;
-    const ctrLon = this.center.lng;
-    const heading = headingTo({lat: ctrLat, lon: ctrLon}, {lat: wind.lat, lon: wind.lng}) + 90 * direction - offset;
-    const distNormalized = distanceTo({lat: ctrLat, lon: ctrLon}, {lat: wind.lat, lon: wind.lng}) / this.range;
+    const { lat: ctrLat, lng: ctrLng } = this.center;
+    const heading = headingTo({lat: ctrLat, lon: ctrLng}, {lat: wind.lat, lon: wind.lng}) + 90 * direction - offset;
+    const distNormalized = distanceTo({lat: ctrLat, lon: ctrLng}, {lat: wind.lat, lon: wind.lng}) / this.range;
     const exp = this.type === "high" ? 0.25 : 4;
     const distExp = Math.pow(distNormalized, exp);
     const length = this.type === "high" ? distExp * this.strength : (1 - distExp) * this.strength;

@@ -270,7 +270,6 @@ export class SimulationModel {
     const coordinates = resolveStartLocation(startLocation);
     this.hurricane.setCenter(coordinates, this.pressureSystems);
 
-    // Update pressure systems if start location is a named location.
     if (isStartLocationName(startLocation)) {
       this.pressureSystems = selectPressureSystems(startLocation).map(
         (o: IPressureSystemOptions) => new PressureSystem(o)
