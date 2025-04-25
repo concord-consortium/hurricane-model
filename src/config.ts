@@ -1,4 +1,5 @@
 import {LatLngBoundsLiteral} from "leaflet";
+import { PressureSystemType } from "./models/pressure-system";
 
 function getURLParam(name: string) {
   const url = (self || window).location.href;
@@ -9,6 +10,65 @@ function getURLParam(name: string) {
   if (!results[2]) return true;
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+
+// Start position-specific pressure systems
+const atlanticStartHighPressure = {
+  type: "high" as PressureSystemType,
+  center: {lat: 28, lng: -30},
+  strength: 19.5
+};
+
+const atlanticStartLowPressure = {
+  type: "low" as PressureSystemType,
+  center: {lat: 45, lng: -82},
+  strength: 6
+};
+
+const gulfStartHighPressure = {
+  type: "high" as PressureSystemType,
+  center: {lat: 34.5, lng: -107},
+  strength: 9.54
+};
+
+const gulfStartLowPressure = {
+  type: "low" as PressureSystemType,
+  center: {lat: 38, lng: -95},
+  strength: 17.39
+};
+
+// Shared pressure systems (used for both start positions)
+const sharedHighPressure = {
+  type: "high" as PressureSystemType,
+  center: {lat: 28.8, lng: -62.4},
+  strength: 13.6
+};
+
+const sharedLowPressure = {
+  type: "low" as PressureSystemType,
+  center: {lat: 47, lng: -60},
+  strength: 7
+};
+
+export const selectPressureSystems = (startLocation: string) => {
+  if (startLocation === "atlantic") {
+    return [
+      atlanticStartHighPressure,
+      sharedHighPressure,
+      sharedLowPressure,
+      atlanticStartLowPressure
+    ];
+  } else if (startLocation === "gulf") {
+    return [
+      gulfStartHighPressure,
+      sharedHighPressure,
+      sharedLowPressure,
+      gulfStartLowPressure
+    ];
+  }
+  return [];
+};
+
+const DEFAULT_START_LOCATION = "atlantic";
 
 const DEFAULT_CONFIG: any = {
   authoring: false,
@@ -21,28 +81,7 @@ const DEFAULT_CONFIG: any = {
   overlay: "sst",
   // LatLngBoundsLiteral: [[lat, lng], [lat, lng]]. Defaults to North Atlantic.
   initialBounds: [[5, -90], [50, -10]],
-  pressureSystems: [
-    {
-      type: "high",
-      center: {lat: 28, lng: -30},
-      strength: 19.5
-    },
-    {
-      type: "high",
-      center: {lat: 28.8, lng: -62.4},
-      strength: 13.6
-    },
-    {
-      type: "low",
-      center: {lat: 45, lng: -82},
-      strength: 6
-    },
-    {
-      type: "low",
-      center: {lat: 47, lng: -60},
-      strength: 7
-    }
-  ],
+  pressureSystems: selectPressureSystems(DEFAULT_START_LOCATION),
   availableOverlays: [
     "sst",
     "precipitation",
@@ -60,7 +99,7 @@ const DEFAULT_CONFIG: any = {
   landTemperature: 22,
   // Wind shear is present in winter and spring and it will cause hurricanes to die pretty fast.
   windShearStrength: 0.0015,
-  initialHurricanePosition: "atlantic",
+  initialHurricanePosition: DEFAULT_START_LOCATION,
   initialHurricaneSpeed: {u: 0, v: 0},
   // When wind is far enough from the center of the pressure system, pressure system effect is lower
   // and we start smoothing it out.
