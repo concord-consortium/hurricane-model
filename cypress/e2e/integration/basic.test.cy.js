@@ -7,9 +7,34 @@ context("Test the Hurricane Model app", () => {
     cy.get(".app--app--__hurr-v1__").get(".leaflet-container").should("be.visible") ;
   });
 
+  it("lets user change start location", () => {
+    // defaults to Atlantic
+    cy.get('[data-test="start-location-container"]').contains("Atlantic");
+    // can change to Gulf
+    cy.get('[data-test="start-location-button"]')
+      .click()
+      .then(() => {
+        cy.get('[data-test="start-location-item-gulf"]')
+          .click()
+          .then(() => {
+            cy.get('[data-test="start-location-container"]').contains("Gulf");
+          });
+      });
+    // can change to Atlantic
+    cy.get('[data-test="start-location-button"]')
+      .click()
+      .then(() => {
+        cy.get('[data-test="start-location-item-atlantic"]')
+          .click()
+          .then(() => {
+            cy.get('[data-test="start-location-container"]').contains("Atlantic");
+          });
+      });
+  });
+
   it("lets user change season", () => {
     // defaults to Fall
-    cy.contains(".season-button--seasonSelect--__hurr-v1__", "Fall");
+    cy.get('[data-test="season-container"]').contains("Fall");
     // can change to Winter
     cy.get('[data-test="season-button"]')
       .click()
@@ -17,7 +42,7 @@ context("Test the Hurricane Model app", () => {
         cy.get('[data-test="season-item-winter"]')
           .click()
           .then(() => {
-            cy.contains(".season-button--seasonSelect--__hurr-v1__", "Winter");
+            cy.get('[data-test="season-container"]').contains("Winter");
           });
       });
     // can change to Spring
@@ -27,7 +52,7 @@ context("Test the Hurricane Model app", () => {
         cy.get('[data-test="season-item-spring"]')
           .click()
           .then(() => {
-            cy.contains(".season-button--seasonSelect--__hurr-v1__", "Spring");
+            cy.get('[data-test="season-container"]').contains("Spring");
           });
       });
   });

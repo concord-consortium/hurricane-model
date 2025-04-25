@@ -13,7 +13,7 @@
     top: 0;
     height: 45px;
     width: 100%;
-    margin: $bottomBarTopPadding/2 auto 0 auto;
+    margin: calc($bottomBarTopPadding/2) auto 0 auto;
   }
 
   .iconButtonHighlightSvg, .iconButtonActiveSvg {

@@ -23,6 +23,7 @@ export default createTheme({
   overrides: {
     MuiButton: {
       root: {
+        "minWidth": "60px",
         "&:hover": {
           backgroundColor: "#dfdfdf",
         },

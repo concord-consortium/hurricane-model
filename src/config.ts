@@ -60,7 +60,7 @@ const DEFAULT_CONFIG: any = {
   landTemperature: 22,
   // Wind shear is present in winter and spring and it will cause hurricanes to die pretty fast.
   windShearStrength: 0.0015,
-  initialHurricanePosition: {lat: 10.5, lng: -20},
+  initialHurricanePosition: "atlantic",
   initialHurricaneSpeed: {u: 0, v: 0},
   // When wind is far enough from the center of the pressure system, pressure system effect is lower
   // and we start smoothing it out.
@@ -101,6 +101,7 @@ const DEFAULT_CONFIG: any = {
   // Accessible sea surface temperature image, available values are: "purple3", "purpleCC"
   accessibleSSTScale: "purple3",
   // --- UI elements can be shown or hidden using options below ---
+  startLocationButton: true,
   seasonButton: true,
   windArrowsToggle: true,
   hurricaneImageToggle: true

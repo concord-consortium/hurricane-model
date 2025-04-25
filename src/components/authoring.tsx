@@ -23,6 +23,14 @@ const keyTitleFormatter = ((key: string) => {
 });
 
 const customProperties: any = {
+  initialHurricanePosition: {
+    title: "Start Position",
+    type: "string",
+    enum: [
+      "atlantic",
+      "gulf"
+    ]
+  },
   season: {
     title: "Season",
     type: "string",

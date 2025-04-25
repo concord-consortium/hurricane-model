@@ -18,12 +18,14 @@ import ThermometerIcon from "../assets/thermometer.svg";
 import ThermometerHoverIcon from "../assets/thermometer-hover.svg";
 import { log } from "@concord-consortium/lara-interactive-api";
 import { IconButton } from "./icon-button";
+import { StartLocationButton } from "./start-location-button";
 import * as css from "./bottom-bar.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {
   fullscreen: boolean;
   isSeasonMenuOpen: boolean;
+  isStartLocationMenuOpen: boolean;
 }
 
 function toggleFullscreen() {
@@ -46,7 +48,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     super(props);
     this.state = {
       fullscreen: false,
-      isSeasonMenuOpen: false
+      isSeasonMenuOpen: false,
+      isStartLocationMenuOpen: false
     };
   }
 
@@ -69,9 +72,11 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   public render() {
     const sim = this.stores.simulation;
     const ui = this.stores.ui;
-    const { isSeasonMenuOpen } = this.state;
+    const { isSeasonMenuOpen, isStartLocationMenuOpen } = this.state;
+    const startLocationButtonHoveredClass = isStartLocationMenuOpen ? css.hovered : "";
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     const tempButtonDisabled = ui.overlay !== "sst";
+    const startLocationButtonDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
     const seasonButtonDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
     return (
       <div className={css.bottomBar}>
@@ -80,6 +85,19 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <CCLogoSmall className={css.logoSmall} />
         </div>
         <div className={css.mainContainer}>
+          {
+            config.startLocationButton &&
+            <div
+              className={`${css.widgetGroup} ${startLocationButtonDisabled ? "" : "hoverable"} ${startLocationButtonHoveredClass}`}
+            >
+              <StartLocationButton
+                onMenuOpen={() => this.setState({ isStartLocationMenuOpen: true })}
+                onMenuClose={() => {
+                  // delay to avoid flash between closing menu and :hover taking over
+                  setTimeout(() => this.setState({ isStartLocationMenuOpen: false }), 500);
+                }} />
+            </div>
+          }
           {
             config.seasonButton &&
             <div
