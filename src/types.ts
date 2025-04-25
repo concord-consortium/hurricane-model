@@ -8,6 +8,10 @@ export interface ICoordinates {
   lng: number;
 }
 
+export const isCoordinates = (value: unknown): value is ICoordinates => {
+  return typeof value === "object" && value !== null && "lat" in value && "lng" in value;
+};
+
 export interface IWindPoint extends IVector, ICoordinates {}
 
 export interface IPrecipitationPoint extends Array<number> {
@@ -35,15 +39,16 @@ export const seasonLabels: Record<Season, string> = {
   fall: "Fall"
 };
 
-export type StartLocation = "atlantic" | "gulf";
-export const startLocationLabels: Record<StartLocation, string> = {
+export type StartLocationNames = "atlantic" | "gulf";
+export type StartLocation = StartLocationNames | ICoordinates;
+
+export const startLocationNameLabels: Record<StartLocationNames, string> = {
   atlantic: "Atlantic",
   gulf: "Gulf"
 };
 
-export const startLocations: Record<StartLocation, ICoordinates> = {
-  atlantic: { lat: 10.5, lng: -20 },
-  gulf: { lat: 25, lng: -90 }
+export const isStartLocationName = (value: unknown): value is StartLocationNames => {
+  return value === "atlantic" || value === "gulf";
 };
 
 export interface ISSTImages {

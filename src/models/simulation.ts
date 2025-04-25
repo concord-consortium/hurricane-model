@@ -14,7 +14,7 @@ import * as juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
 import * as septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
 import { kdTree } from "kd-tree-javascript";
 import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
-  StartLocation, startLocations } from "../types";
+  StartLocation, StartLocationNames, isStartLocationName, isCoordinates} from "../types";
 import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
@@ -74,6 +74,23 @@ export const extendedLandfallBounds: {[key: string]: LatLngBounds} = {
     {lat: 28, lng: -84},
     {lat: 26, lng: -81.5}
   ]),
+};
+
+export const namedStartLocations: Record<StartLocationNames, ICoordinates> = {
+  atlantic: { lat: 10.5, lng: -20 },
+  gulf: { lat: 23.5, lng: -92 }
+};
+
+export const resolveStartLocation = (location: unknown): ICoordinates => {
+  if (isStartLocationName(location)) {
+    return namedStartLocations[location];
+  }
+
+  if (isCoordinates(location)) {
+    return location;
+  }
+
+  throw new Error("Invalid start location value");
 };
 
 // Landfall is detected when hurricane moves from sea to land. To avoid detecting too many landfalls, assume that
@@ -203,7 +220,9 @@ export class SimulationModel {
   // Pressure systems affect winds.
   @observable public pressureSystems: PressureSystem[] = [];
   @observable public hurricane: Hurricane = new Hurricane({
-    center: startLocations[config.initialHurricanePosition as StartLocation],
+    center: typeof config.initialHurricanePosition === "string"
+      ? namedStartLocations[config.initialHurricanePosition as StartLocationNames]
+      : config.initialHurricanePosition,
     strength: config.hurricaneStrength,
     speed: config.initialHurricaneSpeed
   });
@@ -250,6 +269,8 @@ export class SimulationModel {
 
   @action.bound public setStartLocation(startLocation: StartLocation) {
     this.startLocation = startLocation;
+    const coordinates = resolveStartLocation(startLocation);
+    this.hurricane.setCenter(coordinates, this.pressureSystems);
   }
 
   @action.bound public setSeason(season: Season) {
