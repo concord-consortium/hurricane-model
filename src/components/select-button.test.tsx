@@ -1,8 +1,7 @@
 import * as React from "react";
 import { mount } from "enzyme";
-import { SelectButton } from "./select-button";
 import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
+import { SelectButton } from "./select-button";
 
 describe("SelectButton component", () => {
   it("renders basic components", () => {
