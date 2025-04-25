@@ -220,9 +220,7 @@ export class SimulationModel {
   // Pressure systems affect winds.
   @observable public pressureSystems: PressureSystem[] = [];
   @observable public hurricane: Hurricane = new Hurricane({
-    center: typeof config.initialHurricanePosition === "string"
-      ? namedStartLocations[config.initialHurricanePosition as StartLocationNames]
-      : config.initialHurricanePosition,
+    center: resolveStartLocation(config.initialHurricanePosition),
     strength: config.hurricaneStrength,
     speed: config.initialHurricaneSpeed
   });
