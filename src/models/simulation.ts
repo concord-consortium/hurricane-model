@@ -446,6 +446,8 @@ export class SimulationModel {
     this.numberOfStepsOverLand = 0;
     this.extendedLandfallAreas = Object.values(extendedLandfallBounds);
     this.hurricane.reset();
+    const coordinates = resolveStartLocation(this.startLocation);
+    this.hurricane.setCenter(coordinates, this.pressureSystems);
     if (this.pressureSystemSettings.length) {
       this.pressureSystems = this.pressureSystemSettings;
     }
@@ -457,6 +459,13 @@ export class SimulationModel {
     this.pressureSystems.forEach(ps => ps.reset());
     this.startLocation = this.initialState.startLocation;
     this.season = this.initialState.season;
+    const coordinates = resolveStartLocation(this.startLocation);
+    this.hurricane.setCenter(coordinates, this.pressureSystems);
+    if (isStartLocationName(this.startLocation)) {
+      this.pressureSystems = selectPressureSystems(this.startLocation).map(
+        (o: IPressureSystemOptions) => new PressureSystem(o)
+      );
+    }
   }
 
   @action.bound public removePressureSystem(ps: PressureSystem) {
