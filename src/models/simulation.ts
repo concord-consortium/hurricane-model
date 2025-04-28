@@ -456,7 +456,6 @@ export class SimulationModel {
   // That's a complete reset to the initial state.
   @action.bound public reset() {
     this.restart();
-    this.pressureSystems.forEach(ps => ps.reset());
     this.startLocation = this.initialState.startLocation;
     this.season = this.initialState.season;
     const coordinates = resolveStartLocation(this.startLocation);

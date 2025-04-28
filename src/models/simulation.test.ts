@@ -6,6 +6,7 @@ import { PNG } from "pngjs";
 import * as Leaflet from "leaflet";
 const mockFetch = require("jest-fetch-mock");
 const fs = require("fs");
+import { PressureSystem } from "./pressure-system";
 
 const options: ISimulationOptions = {
   startLocation: "atlantic",
@@ -368,14 +369,7 @@ describe("SimulationModel store", () => {
     it("restarts hurricane simulation without changing some of the initial conditions", () => {
       const sim = new SimulationModel({
         startLocation: "atlantic",
-        season: "fall",
-        pressureSystems: [
-          {
-            type: "high",
-            center: {lat: 10, lng: 0},
-            strength: 13
-          }
-        ]
+        season: "fall"
       });
       sim.hurricane.reset = jest.fn();
       sim.pressureSystems[0].reset = jest.fn();
@@ -408,22 +402,26 @@ describe("SimulationModel store", () => {
     it("triggers restart and resets initial conditions", () => {
       const sim = new SimulationModel({
         startLocation: "atlantic",
-        season: "fall",
-        pressureSystems: [
-          {
-            type: "high",
-            center: {lat: 10, lng: 0},
-            strength: 13
-          }
-        ]
+        season: "fall"
       });
       jest.spyOn(sim, "restart");
-      sim.pressureSystems[0].reset = jest.fn();
       sim.season = "winter";
+      const initialPressureSystems = [...sim.pressureSystems];
+      // Modify the pressure systems
+      sim.pressureSystems = [
+        new PressureSystem({
+          type: "low",
+          center: {lat: 20, lng: -20},
+          strength: 15
+        })
+      ];
       sim.reset();
       expect(sim.restart).toHaveBeenCalled();
-      expect(sim.pressureSystems[0].reset).toHaveBeenCalled();
       expect(sim.season).toEqual("fall");
+      expect(sim.pressureSystems.length).toEqual(initialPressureSystems.length);
+      expect(sim.pressureSystems[0].type).toEqual(initialPressureSystems[0].type);
+      expect(sim.pressureSystems[0].center).toEqual(initialPressureSystems[0].center);
+      expect(sim.pressureSystems[0].strength).toEqual(initialPressureSystems[0].strength);
     });
   });
 
