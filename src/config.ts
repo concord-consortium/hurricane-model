@@ -11,61 +11,54 @@ function getURLParam(name: string) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-// Start position-specific pressure systems
-const atlanticStartHighPressure = {
-  type: "high",
-  center: {lat: 28, lng: -30},
-  strength: 19.5
-} as const;
-
-const atlanticStartLowPressure = {
-  type: "low",
-  center: {lat: 45, lng: -82},
-  strength: 6
-} as const;
-
-const gulfStartHighPressure = {
-  type: "high",
-  center: {lat: 34.5, lng: -107},
-  strength: 9.54
-} as const;
-
-const gulfStartLowPressure = {
-  type: "low",
-  center: {lat: 38, lng: -95},
-  strength: 17.39
-} as const;
-
-// Shared pressure systems (used for both start positions)
-const sharedHighPressure = {
-  type: "high",
-  center: {lat: 28.8, lng: -62.4},
-  strength: 13.6
-} as const;
-
+// Shared pressure system (used for both start positions)
 const sharedLowPressure = {
   type: "low",
   center: {lat: 47, lng: -60},
   strength: 7
 } as const;
 
+// Start position-specific pressure systems
+const pressureSystems = {
+  atlantic: [
+    {
+      type: "high",
+      center: {lat: 28, lng: -30},
+      strength: 19.5
+    },
+    {
+      type: "high",
+      center: {lat: 28.8, lng: -62.4},
+      strength: 13.6
+    },
+    {
+      type: "low",
+      center: {lat: 45, lng: -82},
+      strength: 6
+    }
+  ],
+  gulf: [
+    {
+      type: "high",
+      center: {lat: 37, lng: -107.1},
+      strength: 15.5
+    },
+    {
+      type: "high",
+      center: {lat: 33, lng: -67.5},
+      strength: 9.54
+    },
+    {
+      type: "low",
+      center: {lat: 39.15, lng: -91},
+      strength: 15
+    }
+  ]
+} as const;
+
 export const selectPressureSystems = (startLocation: string) => {
-  if (startLocation === "atlantic") {
-    return [
-      atlanticStartHighPressure,
-      sharedHighPressure,
-      sharedLowPressure,
-      atlanticStartLowPressure
-    ];
-  } else if (startLocation === "gulf") {
-    return [
-      gulfStartHighPressure,
-      sharedHighPressure,
-      sharedLowPressure,
-      gulfStartLowPressure
-    ];
-  }
-  return [];
+  const locationSystems = pressureSystems[startLocation as keyof typeof pressureSystems] || pressureSystems.atlantic;
+  return [...locationSystems, sharedLowPressure];
 };
 
 const DEFAULT_START_LOCATION = "atlantic";
