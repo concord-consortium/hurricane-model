@@ -37,6 +37,12 @@ export default createTheme({
         padding: 0,
       }
     },
+    MuiMenuItem: {
+      root: {
+        fontSize: "11px",
+        padding: "6px",
+      }
+    },
     MuiSwitch: {
       root: {
         padding: 14
