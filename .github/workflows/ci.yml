@@ -67,7 +67,7 @@ jobs:
           # skip installing cypress since it isn't needed for just building
           # This decreases the deploy time quite a bit
           CYPRESS_INSTALL_BINARY: 0
-      - uses: concord-consortium/s3-deploy-action@v1
+      - uses: concord-consortium/s3-deploy-action@v1.7.0
         with:
           bucket: models-resources
           prefix: hurricane-model
