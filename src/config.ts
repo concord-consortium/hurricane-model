@@ -1,5 +1,4 @@
-import {LatLngBoundsLiteral} from "leaflet";
-import { PressureSystemType } from "./models/pressure-system";
+import { StartLocationNames } from "./types";
 
 function getURLParam(name: string) {
   const url = (self || window).location.href;
@@ -56,8 +55,8 @@ const pressureSystems = {
   ]
 } as const;
 
-export const selectPressureSystems = (startLocation: string) => {
-  const locationSystems = pressureSystems[startLocation as keyof typeof pressureSystems] || pressureSystems.atlantic;
+export const selectPressureSystems = (startLocation: StartLocationNames) => {
+  const locationSystems = pressureSystems[startLocation] || pressureSystems.atlantic;
   return [...locationSystems, sharedLowPressure];
 };
 

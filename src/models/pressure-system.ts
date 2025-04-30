@@ -103,9 +103,9 @@ export class PressureSystem {
     while (minDist < config.minPressureSystemDistance) {
       const newPos = moveTo(
         {lat: center.lat, lon: center.lng},
-        { distance: step, heading: heading + 180 }
+        {distance: step, heading: heading + 180}
       );
-      center = { lat: newPos.lat, lng: newPos.lon };
+      center = {lat: newPos.lat, lng: newPos.lon};
       minDist = minDistToOtherSystems(center, otherPressureSystems).minDist;
     }
     this.center = center;
