@@ -40,7 +40,7 @@ export const SelectButton: React.FC<ISelectButtonProps> = (props) => {
           onClose={onMenuClose}
         >
           {menuItems.map(item => (
-            <MenuItem key={item.value} className={css.menuItem} value={item.value}>
+            <MenuItem key={item.value} value={item.value}>
               <div data-test={item.testId}>{item.label}</div>
             </MenuItem>
           ))}

@@ -1,4 +1,4 @@
-import {LatLngBoundsLiteral} from "leaflet";
+import { StartLocationNames } from "./types";
 
 function getURLParam(name: string) {
   const url = (self || window).location.href;
@@ -10,18 +10,16 @@ function getURLParam(name: string) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-const DEFAULT_CONFIG: any = {
-  authoring: false,
-  // Sets base wind data (and sea temperature in the future). "fall", "winter", "spring", or "summer".
-  season: "fall",
-  // One of the available maps: "satellite", "relief", "street" or "population".
-  map: "satellite",
-  enablePopulationMap: false,
-  // Enabled map overlay. One of the values listed in "availableOverlays".
-  overlay: "sst",
-  // LatLngBoundsLiteral: [[lat, lng], [lat, lng]]. Defaults to North Atlantic.
-  initialBounds: [[5, -90], [50, -10]],
-  pressureSystems: [
+// Shared pressure system (used for both start positions)
+const sharedLowPressure = {
+  type: "low",
+  center: {lat: 47, lng: -60},
+  strength: 7
+} as const;
+
+// Start position-specific pressure systems
+const pressureSystems = {
+  atlantic: [
     {
       type: "high",
       center: {lat: 28, lng: -30},
@@ -36,13 +34,46 @@ const DEFAULT_CONFIG: any = {
       type: "low",
       center: {lat: 45, lng: -82},
       strength: 6
+    }
+  ],
+  gulf: [
+    {
+      type: "high",
+      center: {lat: 37, lng: -107.1},
+      strength: 15.5
+    },
+    {
+      type: "high",
+      center: {lat: 33, lng: -67.5},
+      strength: 9.54
     },
     {
       type: "low",
-      center: {lat: 47, lng: -60},
-      strength: 7
+      center: {lat: 39.15, lng: -91},
+      strength: 15
     }
-  ],
+  ]
+} as const;
+
+export const selectPressureSystems = (startLocation: StartLocationNames) => {
+  const locationSystems = pressureSystems[startLocation] || pressureSystems.atlantic;
+  return [...locationSystems, sharedLowPressure];
+};
+
+const DEFAULT_START_LOCATION = "atlantic";
+
+const DEFAULT_CONFIG: any = {
+  authoring: false,
+  // Sets base wind data (and sea temperature in the future). "fall", "winter", "spring", or "summer".
+  season: "fall",
+  // One of the available maps: "satellite", "relief", "street" or "population".
+  map: "satellite",
+  enablePopulationMap: false,
+  // Enabled map overlay. One of the values listed in "availableOverlays".
+  overlay: "sst",
+  // LatLngBoundsLiteral: [[lat, lng], [lat, lng]]. Defaults to North Atlantic.
+  initialBounds: [[5, -90], [50, -10]],
+  pressureSystems: selectPressureSystems(DEFAULT_START_LOCATION),
   availableOverlays: [
     "sst",
     "precipitation",
@@ -60,7 +91,7 @@ const DEFAULT_CONFIG: any = {
   landTemperature: 22,
   // Wind shear is present in winter and spring and it will cause hurricanes to die pretty fast.
   windShearStrength: 0.0015,
-  initialHurricanePosition: "atlantic",
+  initialHurricanePosition: DEFAULT_START_LOCATION,
   initialHurricaneSpeed: {u: 0, v: 0},
   // When wind is far enough from the center of the pressure system, pressure system effect is lower
   // and we start smoothing it out.

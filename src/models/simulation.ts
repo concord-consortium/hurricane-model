@@ -19,7 +19,7 @@ import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
-import config from "../config";
+import config, { selectPressureSystems } from "../config";
 import { random } from "../seedrandom";
 
 interface IWindDataset {
@@ -269,6 +269,12 @@ export class SimulationModel {
     this.startLocation = startLocation;
     const coordinates = resolveStartLocation(startLocation);
     this.hurricane.setCenter(coordinates, this.pressureSystems);
+
+    if (isStartLocationName(startLocation)) {
+      this.pressureSystems = selectPressureSystems(startLocation).map(
+        (o: IPressureSystemOptions) => new PressureSystem(o)
+      );
+    }
   }
 
   @action.bound public setSeason(season: Season) {
@@ -440,6 +446,8 @@ export class SimulationModel {
     this.numberOfStepsOverLand = 0;
     this.extendedLandfallAreas = Object.values(extendedLandfallBounds);
     this.hurricane.reset();
+    const coordinates = resolveStartLocation(this.startLocation);
+    this.hurricane.setCenter(coordinates, this.pressureSystems);
     if (this.pressureSystemSettings.length) {
       this.pressureSystems = this.pressureSystemSettings;
     }
@@ -448,9 +456,15 @@ export class SimulationModel {
   // That's a complete reset to the initial state.
   @action.bound public reset() {
     this.restart();
-    this.pressureSystems.forEach(ps => ps.reset());
     this.startLocation = this.initialState.startLocation;
     this.season = this.initialState.season;
+    const coordinates = resolveStartLocation(this.startLocation);
+    this.hurricane.setCenter(coordinates, this.pressureSystems);
+    if (isStartLocationName(this.startLocation)) {
+      this.pressureSystems = selectPressureSystems(this.startLocation).map(
+        (o: IPressureSystemOptions) => new PressureSystem(o)
+      );
+    }
   }
 
   @action.bound public removePressureSystem(ps: PressureSystem) {
