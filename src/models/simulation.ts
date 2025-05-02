@@ -19,7 +19,7 @@ import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
-import config, { selectPressureSystems } from "../config";
+import config, { selectPressureSystems, startStrengths } from "../config";
 import { random } from "../seedrandom";
 
 interface IWindDataset {
@@ -274,6 +274,7 @@ export class SimulationModel {
       this.pressureSystems = selectPressureSystems(startLocation).map(
         (o: IPressureSystemOptions) => new PressureSystem(o)
       );
+      this.hurricane.setStrength(startStrengths[startLocation]);
     }
   }
 
@@ -448,6 +449,9 @@ export class SimulationModel {
     this.hurricane.reset();
     const coordinates = resolveStartLocation(this.startLocation);
     this.hurricane.setCenter(coordinates, this.pressureSystems);
+    if (isStartLocationName(this.startLocation)) {
+      this.hurricane.setStrength(startStrengths[this.startLocation]);
+    }
     if (this.pressureSystemSettings.length) {
       this.pressureSystems = this.pressureSystemSettings;
     }

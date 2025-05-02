@@ -497,4 +497,28 @@ describe("SimulationModel store", () => {
       expect(sim.pressureSystems[0].strength).toBeGreaterThan(15); // around ~ 15 + 11
     });
   });
+
+  describe("initial storm strength", () => {
+    it("sets correct initial strength according to start location", () => {
+      const sim = new SimulationModel({ startLocation: "atlantic" });
+      expect(sim.hurricane.strength).toBe(24);
+
+      sim.setStartLocation("gulf");
+      expect(sim.hurricane.strength).toBe(40);
+
+      sim.setStartLocation("atlantic");
+      expect(sim.hurricane.strength).toBe(24);
+    });
+
+    it("reverts to initial strength value after restart", () => {
+      const sim = new SimulationModel();
+      sim.setStartLocation("gulf");
+      expect(sim.hurricane.strength).toBe(40);
+
+      sim.hurricane.strength = 50;
+      sim.restart();
+
+      expect(sim.hurricane.strength).toBe(40);
+    });
+  });
 });
