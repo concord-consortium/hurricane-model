@@ -60,6 +60,12 @@ export const selectPressureSystems = (startLocation: StartLocationNames) => {
   return [...locationSystems, sharedLowPressure];
 };
 
+// max wind speed, m/s
+export const startStrengths = {
+  atlantic: 24,
+  gulf: 40
+} as const;
+
 const DEFAULT_START_LOCATION = "atlantic";
 
 const DEFAULT_CONFIG: any = {
@@ -85,7 +91,7 @@ const DEFAULT_CONFIG: any = {
   pressureSystemStrength: 15, // max wind speed, m/s
   lowPressureSysAngleOffset: 23, // deg
   highPressureSysAngleOffset: 8, // deg
-  hurricaneStrength: 24, // max wind speed, m/s
+  hurricaneStrength: startStrengths[DEFAULT_START_LOCATION], // max wind speed, m/s
   // Land temperature controls how fast the hurricane dies when it hits the land.
   // The smaller the number, the quicker it happens.
   landTemperature: 22,
