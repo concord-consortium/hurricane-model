@@ -1,0 +1,7 @@
+.laraAppContainer {
+  // In iframe mode, the app needs an explicit height since child elements
+  // use height: 100% which doesn't work with min-height.
+  // This matches the min-height in app.scss
+  height: 618px;
+  min-width: 831px;
+}

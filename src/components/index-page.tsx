@@ -30,7 +30,7 @@ export class IndexPage extends BaseComponent<IProps, IState> {
     const loading = this.stores.simulation.loading;
     return (
       <div className={css.index}>
-        <TopBar />
+        {config.topBarVisible && <TopBar />}
         {
           loading &&
           <CircularProgress className={css.progress} size={100} thickness={5} color="inherit" />

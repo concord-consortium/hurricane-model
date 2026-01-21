@@ -140,5 +140,6 @@ export class Hurricane extends PressureSystem {
     super.reset();
     this.speed = Object.assign({}, this.initialState.speed);
     this.strengthChange = 0;
+    this.cat3SSTThresholdReached = false;
   }
 }

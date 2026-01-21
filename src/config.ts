@@ -138,6 +138,7 @@ const DEFAULT_CONFIG: any = {
   // Accessible sea surface temperature image, available values are: "purple3", "purpleCC"
   accessibleSSTScale: "purple3",
   // --- UI elements can be shown or hidden using options below ---
+  topBarVisible: true,
   startLocationButton: true,
   seasonButton: true,
   windArrowsToggle: true,

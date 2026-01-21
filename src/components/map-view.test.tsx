@@ -63,6 +63,30 @@ describe("MapView component", () => {
     expect(wrapper.find(HurricaneMarker).length).toEqual(0);
   });
 
+  it("applies noTopBar class when topBarVisible is false", () => {
+    const oldTopBarVisible = config.topBarVisible;
+    config.topBarVisible = false;
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <MapView />
+      </Provider>
+    );
+    expect(wrapper.find("#mapView").hostNodes().hasClass("noTopBar")).toBe(true);
+    config.topBarVisible = oldTopBarVisible;
+  });
+
+  it("does not apply noTopBar class when topBarVisible is true", () => {
+    const oldTopBarVisible = config.topBarVisible;
+    config.topBarVisible = true;
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <MapView />
+      </Provider>
+    );
+    expect(wrapper.find("#mapView").hostNodes().hasClass("noTopBar")).toBe(false);
+    config.topBarVisible = oldTopBarVisible;
+  });
+
   it("renders storm surge overlay in zoomed-in view", () => {
     const wrapper = mount(
       <Provider stores={stores}>

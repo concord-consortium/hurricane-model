@@ -25,7 +25,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     const { sliderDrag } = this.state;
     const sim = this.stores.simulation;
     const ui = this.stores.ui;
-    const uiDisabled = config.pressureSystemsLocked || ui.thermometerActive ||
+    const uiDisabled = ui.isReportMode || config.pressureSystemsLocked || ui.thermometerActive ||
       (config.lockSimulationWhileRunning && sim.simulationStarted);
     return (
       <LeafletCustomMarker
@@ -37,6 +37,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
       >
         <PressureSystemIcon
           model={model}
+          disabled={uiDisabled}
           onSliderDrag={this.handleDrag}
           onSliderDragEnd={this.handleDragEnd}
         />

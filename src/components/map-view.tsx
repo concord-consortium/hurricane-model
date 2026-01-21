@@ -82,7 +82,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     const ui = this.stores.ui;
     const navigation = !!ui.zoomedInView || config.navigation;
     return (
-      <div className={css.mapView} id="mapView">
+      <div className={`${css.mapView} ${!config.topBarVisible ? css.noTopBar : ""}`} id="mapView">
         <Map ref={this.mapRef}
              dragging={navigation}
              doubleClickZoom={navigation}
@@ -159,7 +159,7 @@ export class MapView extends BaseComponent<IProps, IState> {
             sim.hurricane.active && <HurricaneMarker />
           }
           {
-            ui.categoryChangeMarkers &&
+            ui.categoryChangeMarkers && ui.mapBounds &&
             sim.getCategoryMarkerPositions(ui.mapBounds).map((ps, idx) =>
               <HurricaneCategoryMarker
                 point={ps}

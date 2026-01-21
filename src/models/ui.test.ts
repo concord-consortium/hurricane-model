@@ -112,4 +112,42 @@ describe("UI model", () => {
       expect(ui.overlay).toEqual("sst");
     });
   });
+
+  describe("mode and isReportMode", () => {
+    it("defaults to runtime mode", () => {
+      const ui = new UIModel();
+      expect(ui.mode).toBe("runtime");
+      expect(ui.isReportMode).toBe(false);
+    });
+
+    it("setMode updates the mode", () => {
+      const ui = new UIModel();
+      ui.setMode("authoring");
+      expect(ui.mode).toBe("authoring");
+    });
+
+    it("isReportMode returns true for report mode", () => {
+      const ui = new UIModel();
+      ui.setMode("report");
+      expect(ui.isReportMode).toBe(true);
+    });
+
+    it("isReportMode returns true for reportItem mode", () => {
+      const ui = new UIModel();
+      ui.setMode("reportItem");
+      expect(ui.isReportMode).toBe(true);
+    });
+
+    it("isReportMode returns false for runtime mode", () => {
+      const ui = new UIModel();
+      ui.setMode("runtime");
+      expect(ui.isReportMode).toBe(false);
+    });
+
+    it("isReportMode returns false for authoring mode", () => {
+      const ui = new UIModel();
+      ui.setMode("authoring");
+      expect(ui.isReportMode).toBe(false);
+    });
+  });
 });
