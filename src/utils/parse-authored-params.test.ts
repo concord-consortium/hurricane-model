@@ -121,6 +121,20 @@ describe("parse-authored-params", () => {
       expect(invalidResult.valid).toBe(false);
       expect(invalidResult.errors[0]).toContain("must be one of");
     });
+
+    it("does not validate descriptive validValues as enumerations", () => {
+      // Parameters with descriptive validValues like "positive number" or "0-1"
+      // should not be validated as enumerations even if they contain commas
+      // timestep has validValues "positive number" - any number should pass
+      const result = validateUrlParams("timestep=999");
+      expect(result.valid).toBe(true);
+      expect(result.errors).toEqual([]);
+
+      // seaSurfaceTempOpacity has validValues "0-1" - should accept any number
+      const result2 = validateUrlParams("seaSurfaceTempOpacity=0.5");
+      expect(result2.valid).toBe(true);
+      expect(result2.errors).toEqual([]);
+    });
   });
 
   describe("KNOWN_PARAMETERS", () => {

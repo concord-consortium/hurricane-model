@@ -256,11 +256,14 @@ export function validateUrlParams(urlParams: string): IParseResult {
     }
 
     // Validate against known valid values (for string enums)
-    // Only validate if validValues contains a comma, indicating it's an enumeration.
-    // Non-enumeration descriptions (e.g., "positive number") are skipped.
-    if (paramDoc.type === "string" && paramDoc.validValues && paramDoc.validValues.includes(",")) {
+    if (paramDoc.type === "string" && paramDoc.validValues) {
       const validOptions = paramDoc.validValues.split(",").map(v => v.trim());
-      if (!validOptions.includes(value)) {
+      // Only validate if this looks like an enumeration of actual values, not a description.
+      // Enumerations have multiple single-word options (e.g., "fall, winter, spring, summer").
+      // Descriptions may have spaces within options (e.g., "positive number") or be a single option.
+      const looksLikeEnumeration = validOptions.length > 1 &&
+        validOptions.every(opt => !opt.includes(" "));
+      if (looksLikeEnumeration && !validOptions.includes(value)) {
         const msg = `Parameter "${key}" must be one of: ${paramDoc.validValues}. Got: "${value}"`;
         result.errors.push(msg);
       }
