@@ -159,6 +159,9 @@ export class MapView extends BaseComponent<IProps, IState> {
             sim.hurricane.active && <HurricaneMarker />
           }
           {
+            // ui.mapBounds can be null/undefined before the Leaflet map has finished initializing
+            // or before bounds have been computed; in that case we skip rendering category change
+            // markers to avoid null reference errors and unnecessary work.
             ui.categoryChangeMarkers && ui.mapBounds &&
             sim.getCategoryMarkerPositions(ui.mapBounds).map((ps, idx) =>
               <HurricaneCategoryMarker
