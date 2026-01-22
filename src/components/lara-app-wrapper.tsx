@@ -97,7 +97,7 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- stores is stable
   }, [initMessage?.mode]);
 
-  // Apply authored state once on mount (only in runtime/report mode).
+  // Apply authored state once when initMessage becomes available (only in runtime/report mode).
   // Authored state establishes initial defaults only; any restored interactive
   // state always takes precedence (applied in the next useEffect).
   // Must come BEFORE conditional returns to comply with Rules of Hooks.
@@ -105,7 +105,11 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
     if (initMessage && stores.ui.mode !== "authoring" && authoredState) {
       applyAuthoredState(authoredState);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Intentionally depends only on initMessage:
+    // - stores.ui.mode is set synchronously in the previous useEffect from initMessage.mode
+    // - authoredState is available from LARA at the same time as initMessage
+    // - We only want to apply authored state once as initial defaults, not re-apply on changes
   }, [initMessage]);
 
   // Restore interactive state once on initial load.

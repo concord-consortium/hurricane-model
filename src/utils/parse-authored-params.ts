@@ -170,13 +170,18 @@ export const KNOWN_PARAMETERS: IParameterDoc[] = [
 // Build a map for quick lookup
 const KNOWN_PARAM_MAP = new Map(KNOWN_PARAMETERS.map(p => [p.name, p]));
 
+// Minimum prefix length for fuzzy matching when suggesting similar parameters.
+// Using 4 characters balances between catching typos (e.g., "seas" matches "season")
+// and avoiding too many false positives from very short prefixes.
+const MIN_SIMILARITY_PREFIX_LENGTH = 4;
+
 // Helper to find similar parameter names for suggestions
 function findSimilarParams(unknown: string): string[] {
   const lower = unknown.toLowerCase();
   return KNOWN_PARAMETERS
     .filter(p => {
       const pLower = p.name.toLowerCase();
-      return pLower.includes(lower) || lower.includes(pLower.slice(0, 4));
+      return pLower.includes(lower) || lower.includes(pLower.slice(0, MIN_SIMILARITY_PREFIX_LENGTH));
     })
     .map(p => p.name)
     .slice(0, 3);

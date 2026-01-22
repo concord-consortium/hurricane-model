@@ -32,7 +32,12 @@ function applyConfigParam(key: string, value: string): void {
 
   // Handle JSON values (arrays, objects)
   if (isJSON(value)) {
-    (config as any)[key] = JSON.parse(value);
+    try {
+      (config as any)[key] = JSON.parse(value);
+    } catch (e) {
+      // tslint:disable-next-line:no-console
+      console.warn(`Failed to parse JSON value for config parameter "${key}": ${value}`);
+    }
     return;
   }
 

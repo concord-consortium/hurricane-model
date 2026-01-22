@@ -135,6 +135,11 @@ export function setInteractiveState(
         simulation.numberOfStepsOverLand = simState.numberOfStepsOverLand;
       }
       if (simState.consumedExtendedLandfallAreas) {
+        // Reconstruct available landfall areas by filtering out consumed ones.
+        // We store consumed area keys (not the remaining areas) because:
+        // 1. LatLngBounds objects don't serialize cleanly to JSON
+        // 2. Storing keys is more compact and version-resilient if bounds change
+        // 3. The full set of areas is defined in extendedLandfallBounds
         simulation.extendedLandfallAreas = Object.entries(extendedLandfallBounds)
           .filter(([key]) => !simState.consumedExtendedLandfallAreas!.includes(key))
           .map(([, bounds]) => bounds);
