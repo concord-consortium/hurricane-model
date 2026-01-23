@@ -4,6 +4,10 @@
   width: 100%;
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
 
+  &.noTopBar {
+    height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + 1});
+  }
+
   .highPressure, .lowPressure {
     color: white;
     font-size: 40px;

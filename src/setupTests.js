@@ -1,6 +1,16 @@
+const crypto = require("crypto");
 const enzyme = require("enzyme");
 const Adapter = require("enzyme-adapter-react-16");
 const seedrandom = require("./seedrandom");
+
+// Polyfill crypto.getRandomValues for nanoid (used by @concord-consortium/lara-interactive-api)
+if (!global.crypto) {
+  global.crypto = {
+    getRandomValues: function(buffer) {
+      return crypto.randomFillSync(buffer);
+    }
+  };
+}
 
 enzyme.configure({ adapter: new Adapter() });
 

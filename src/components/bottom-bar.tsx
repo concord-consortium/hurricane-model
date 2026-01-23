@@ -76,8 +76,12 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const startLocationButtonHoveredClass = isStartLocationMenuOpen ? css.hovered : "";
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     const tempButtonDisabled = ui.overlay !== "sst";
-    const startLocationButtonDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
-    const seasonButtonDisabled = config.lockSimulationWhileRunning && sim.simulationStarted;
+    const isReportMode = ui.isReportMode;
+    const startLocationButtonDisabled = isReportMode ||
+      (config.lockSimulationWhileRunning && sim.simulationStarted);
+    const seasonButtonDisabled = isReportMode ||
+      (config.lockSimulationWhileRunning && sim.simulationStarted);
+    const simulationControlsDisabled = isReportMode;
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -138,6 +142,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               className={css.playbackButton}
               data-test="reload-button"
               onClick={this.handleReload}
+              disabled={simulationControlsDisabled}
               disableRipple={true}
             >
               <span><ReloadIcon/> Reload</span>
@@ -146,6 +151,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               className={css.playbackButton}
               data-test="restart-button"
               onClick={this.handleRestart}
+              disabled={simulationControlsDisabled}
               disableRipple={true}
             >
               <span><RestartIcon/> Restart</span>
@@ -154,7 +160,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <div className={`${css.widgetGroup} ${css.stopStart}`}>
             <Button
               onClick={this.handleStartStop}
-              disabled={!sim.ready}
+              disabled={simulationControlsDisabled || !sim.ready}
               className={css.playbackButton}
               data-test="start-button"
               disableRipple={true}

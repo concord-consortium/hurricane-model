@@ -56,12 +56,11 @@ describe("PressureSystemIcon component", () => {
     );
   });
 
-  it("icon and sliders are disabled while model is running by default", () => {
-    stores.simulation.simulationStarted = true;
+  it("icon and sliders are disabled when disabled prop is true", () => {
     const model = stores.simulation.pressureSystems[0];
     const wrapper = mount(
       <Provider stores={stores}>
-        <PressureSystemIcon model={model}/>
+        <PressureSystemIcon model={model} disabled={true}/>
       </Provider>
     );
     const pressureIcon = wrapper.find('[data-test="pressure-system-icon"]').first();
@@ -71,9 +70,21 @@ describe("PressureSystemIcon component", () => {
     expect(pressureIconSlider.prop("disabled")).toEqual(true);
   });
 
-  it("icon and sliders can be enabled while model is running", () => {
-    stores.simulation.simulationStarted = true;
-    config.lockSimulationWhileRunning = false;
+  it("icon and sliders are enabled when disabled prop is false", () => {
+    const model = stores.simulation.pressureSystems[0];
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <PressureSystemIcon model={model} disabled={false}/>
+      </Provider>
+    );
+    const pressureIcon = wrapper.find('[data-test="pressure-system-icon"]').first();
+    expect(pressureIcon.hasClass(css.disabled)).toEqual(false);
+
+    const pressureIconSlider = wrapper.find('[data-test="pressure-system-slider"]').first();
+    expect(pressureIconSlider.prop("disabled")).toEqual(false);
+  });
+
+  it("icon and sliders are enabled by default when disabled prop is not provided", () => {
     const model = stores.simulation.pressureSystems[0];
     const wrapper = mount(
       <Provider stores={stores}>

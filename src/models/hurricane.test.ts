@@ -128,5 +128,14 @@ describe("Hurricane store", () => {
       expect(hurricane.strength).toEqual(params.strength);
       expect(hurricane.strengthChange).toEqual(0);
     });
+
+    it("should reset cat3SSTThresholdReached to false", () => {
+      const hurricane = new Hurricane(options);
+      hurricane.cat3SSTThresholdReached = true;
+
+      hurricane.reset();
+
+      expect(hurricane.cat3SSTThresholdReached).toEqual(false);
+    });
   });
 });

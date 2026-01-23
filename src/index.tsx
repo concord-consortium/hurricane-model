@@ -1,9 +1,11 @@
 import { Provider } from "mobx-react";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { inIframe } from "@concord-consortium/lara-interactive-api";
 import config from "./config";
 import * as seedrandom from "./seedrandom";
 import { AppComponent } from "./components/app";
+import { LaraAppWrapper } from "./components/lara-app-wrapper";
 import { createStores } from "./models/stores";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import hurricanesTheme from "./material-ui-theme";
@@ -13,10 +15,13 @@ seedrandom.initialize(config.deterministic);
 
 export const stores = createStores();
 
+// Detect if running in an iframe (LARA/Activity Player context)
+const isIframed = inIframe();
+
 ReactDOM.render(
   <Provider stores={stores}>
     <MuiThemeProvider theme={hurricanesTheme}>
-      <AppComponent />
+      {isIframed ? <LaraAppWrapper stores={stores} /> : <AppComponent />}
     </MuiThemeProvider>
   </Provider>,
   document.getElementById("app")

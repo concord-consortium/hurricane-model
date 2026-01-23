@@ -3,6 +3,8 @@ import { LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds, LatLng
 import config from "../config";
 import { mapLayer, MapTilesName, mapTilesNames } from "../map-layer-tiles";
 import { Season, ISSTImages } from "../types";
+
+export type InteractiveMode = "runtime" | "authoring" | "report" | "reportItem";
 import * as decSeaTempDefault from "../../sea-surface-temp-img/dec-default.png";
 import * as marchSeaTempDefault from "../../sea-surface-temp-img/mar-default.png";
 import * as juneSeaTempDefault from "../../sea-surface-temp-img/jun-default.png";
@@ -55,6 +57,7 @@ export type Overlay = "sst" | "precipitation" | "stormSurge";
 export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAvailable: boolean; };
 
 export class UIModel {
+  @observable public mode: InteractiveMode = "runtime";
   @observable public initialBounds = config.initialBounds;
   @observable public zoomedInView: ZoomedInViewProps = false;
   @observable public mapModifiedByUser = false;
@@ -104,6 +107,14 @@ export class UIModel {
 
   @computed public get sstScaleName() {
     return this.accessibleSSTScale ? config.accessibleSSTScale : config.defaultSSTScale;
+  }
+
+  @computed public get isReportMode(): boolean {
+    return this.mode === "report" || this.mode === "reportItem";
+  }
+
+  @action.bound public setMode(mode: InteractiveMode) {
+    this.mode = mode;
   }
 
   public getVisibleSeaSurfaceTempImgUrl(season: Season) {
