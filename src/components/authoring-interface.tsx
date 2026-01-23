@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { IHurricaneAuthoredState } from "../types/interactive-state";
 import {
   parseAuthoredUrlParams,
@@ -24,6 +24,16 @@ export const AuthoringInterface: React.FC<IProps> = ({ authoredState, setAuthore
   const [validationResult, setValidationResult] = useState<IValidationResult | null>(null);
   const [showDocs, setShowDocs] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saved">("idle");
+  const saveTimeoutRef = useRef<number | null>(null);
+
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current !== null) {
+        window.clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleValidate = useCallback(() => {
     const result = validateUrlParams(urlParams);
@@ -46,7 +56,7 @@ export const AuthoringInterface: React.FC<IProps> = ({ authoredState, setAuthore
     // Normalize to query string format before saving
     const { params } = parseAuthoredUrlParams(urlParams);
     const normalizedUrlParams = Object.entries(params)
-      .map(([key, value]) => `${key}=${value}`)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join("&");
 
     setAuthoredState({
@@ -61,7 +71,10 @@ export const AuthoringInterface: React.FC<IProps> = ({ authoredState, setAuthore
     });
 
     // Reset save status after 3 seconds
-    setTimeout(() => setSaveStatus("idle"), 3000);
+    if (saveTimeoutRef.current !== null) {
+      window.clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = window.setTimeout(() => setSaveStatus("idle"), 3000);
   }, [urlParams, setAuthoredState]);
 
   const validationClass = validationResult

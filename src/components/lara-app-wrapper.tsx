@@ -18,7 +18,6 @@ import { AuthoringInterface } from "./authoring-interface";
 import { LoadingIndicator } from "./loading-indicator";
 import * as css from "./lara-app-wrapper.scss";
 
-// Declare supported features on module load
 setSupportedFeatures({
   interactiveState: true,
   authoredState: true

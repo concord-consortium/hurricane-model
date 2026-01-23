@@ -195,6 +195,15 @@ describe("interactive-state", () => {
       expect(stores.simulation.time).toBe(1000);
       expect(stores.simulation.hurricane.center.lat).toBe(25);
       expect(stores.simulation.hurricane.strength).toBe(50);
+      expect(stores.simulation.pressureSystems.length).toBe(1);
+      expect(stores.simulation.pressureSystems[0].type).toBe("high");
+      expect(stores.simulation.pressureSystems[0].center.lat).toBe(30);
+      expect(stores.simulation.simulationFinished).toBe(false);
+      expect(stores.simulation.hurricaneTrack.length).toBe(1);
+      expect(stores.simulation.hurricaneTrack[0].category).toBe(2);
+      expect(stores.simulation.landfalls).toEqual([]);
+      expect(stores.simulation.strengthChangePositions).toEqual([0, 100]);
+      expect(stores.simulation.precipitationPoints).toEqual([]);
     });
 
     it("restores UI properties", () => {
@@ -235,6 +244,9 @@ describe("interactive-state", () => {
       expect(stores.ui.hurricaneImage).toBe(true);
       expect(stores.ui.accessibleSSTScale).toBe(true);
       expect(stores.ui.thermometerActive).toBe(true);
+      expect(stores.ui.categoryChangeMarkers).toBe(false);
+      expect(stores.ui.thermometerPositionSaved).toEqual([30, -85]);
+      expect(stores.ui.zoomedInView).toBe(false);
     });
 
     it("restores cat3SSTThresholdReached", () => {

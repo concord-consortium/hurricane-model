@@ -88,11 +88,20 @@ describe("parse-authored-params", () => {
     });
 
     it("returns error for unknown parameter with suggestion when similar exists", () => {
-      // "seas" is a partial match for "season" so should suggest it
+      // "seas" matches "season" because "season" starts with "seas"
       const result = validateUrlParams("seas=fall");
       expect(result.valid).toBe(false);
       expect(result.errors[0]).toContain("Unknown parameter: \"seas\"");
-      // The similar param finder looks for partial matches
+      expect(result.errors[0]).toContain("Did you mean:");
+      expect(result.errors[0]).toContain("season");
+    });
+
+    it("suggests similar parameters for typos", () => {
+      // "windArrow" should suggest "windArrows"
+      const result = validateUrlParams("windArrow=true");
+      expect(result.valid).toBe(false);
+      expect(result.errors[0]).toContain("Did you mean:");
+      expect(result.errors[0]).toContain("windArrows");
     });
 
     it("validates boolean parameters", () => {
