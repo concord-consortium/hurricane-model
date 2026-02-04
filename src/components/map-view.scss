@@ -96,6 +96,7 @@
     letter-spacing: normal;
     color: $controlLabel;
     transition: 0.1s;
+    z-index: 90; // to place it under the CLUE drag thumb in the top right corner
   }
   :global(.leaflet-control-attribution:hover) {
     background: rgba(255, 255, 255, 0.7) !important;
