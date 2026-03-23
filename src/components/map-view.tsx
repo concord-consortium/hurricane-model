@@ -16,7 +16,7 @@ import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
 import Home from "@material-ui/icons/Home";
 import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
-import { log } from "@concord-consortium/lara-interactive-api";
+import { log } from "../log";
 import { LeafletMouseEvent } from "leaflet";
 import * as css from "./map-view.scss";
 import { ThermometerMarker } from "./thermometer-marker";
@@ -33,6 +33,7 @@ export class MapView extends BaseComponent<IProps, IState> {
   private mapRef = React.createRef<Map>();
   private _programmaticMapUpdate = false;
   private _lastThermometerUpdateTime = 0;
+  private _thermometerHoverTimeout: number | null = null;
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
@@ -75,6 +76,9 @@ export class MapView extends BaseComponent<IProps, IState> {
   public componentWillUnmount(): void {
     window.removeEventListener("resize", this.handleWindowResize);
     window.removeEventListener("fullscreenchange", this.handleWindowResize);
+    if (this._thermometerHoverTimeout) {
+      window.clearTimeout(this._thermometerHoverTimeout);
+    }
   }
 
   public render() {
@@ -242,6 +246,25 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   private handleMouseClick = (e: LeafletMouseEvent) => {
+    // Skip logging if click originated from a pressure system marker (e.g., slider)
+    const target = e.originalEvent?.target as HTMLElement;
+    const isMarkerClick = target &&
+      target.closest(".leaflet-marker-pane");
+
+    if (this.stores.ui.thermometerActive) {
+      // Log ThermometerPinned instead of MapClicked when the temperature tool is active
+      const temp = this.stores.simulation.seaSurfaceTempAt(e.latlng);
+      if (temp !== null) {
+        log("ThermometerPinned", {
+          position: { lat: e.latlng.lat, lng: e.latlng.lng },
+          temperature: temp
+        });
+      }
+    } else if (!isMarkerClick) {
+      log("MapClicked", {
+        position: { lat: e.latlng.lat, lng: e.latlng.lng }
+      });
+    }
     this.stores.ui.setThermometerPositionSaved(e.latlng);
   }
 
@@ -251,6 +274,26 @@ export class MapView extends BaseComponent<IProps, IState> {
     if (time - this._lastThermometerUpdateTime >= (1000 / targetFPS)) {
       this.stores.ui.setThermometerPositionHover(e.latlng);
       this._lastThermometerUpdateTime = time;
+    }
+
+    // Debounced thermometer hover logging (1s)
+    if (this.stores.ui.thermometerActive) {
+      if (this._thermometerHoverTimeout) {
+        window.clearTimeout(this._thermometerHoverTimeout);
+      }
+      this._thermometerHoverTimeout = window.setTimeout(() => {
+        // Re-check thermometerActive — user may have toggled it off during the debounce
+        if (this.stores.ui.thermometerActive) {
+          const temp = this.stores.simulation.seaSurfaceTempAt(e.latlng);
+          if (temp !== null) {
+            log("ThermometerHover", {
+              position: { lat: e.latlng.lat, lng: e.latlng.lng },
+              temperature: temp
+            });
+          }
+        }
+        this._thermometerHoverTimeout = null;
+      }, 1000);
     }
   }
 }

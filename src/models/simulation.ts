@@ -21,6 +21,7 @@ import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
 import config, { selectPressureSystems, startStrengths } from "../config";
 import { random } from "../seedrandom";
+import { log } from "../log";
 
 interface IWindDataset {
   winter: IWindPoint[];
@@ -375,6 +376,11 @@ export class SimulationModel {
       if (this.hurricaneTrack.length - 1 > lastChangeIndex) {
         this.strengthChangePositions.push(this.hurricaneTrack.length - 1);
       }
+      // Log after final track point so outcome data includes the complete track
+      log("SimulationEnded", {
+        reason: "ByItself",
+        outcome: this.getOutcomeData()
+      });
     }
 
     if (this.simulationRunning) {
@@ -469,6 +475,35 @@ export class SimulationModel {
         (o: IPressureSystemOptions) => new PressureSystem(o)
       );
     }
+  }
+
+  public getOutcomeData() {
+    const r = (n: number) => Math.round(n * 10000) / 10000;
+    const pos = (p: ICoordinates) => ({ lat: r(p.lat), lng: r(p.lng) });
+    const track = this.hurricaneTrack;
+    const notablePoints = this.strengthChangePositions
+      .filter(idx => idx < track.length)
+      .map(idx => ({
+        position: pos(track[idx].position),
+        category: track[idx].category
+      }));
+    return {
+      initialPosition: track.length > 0
+        ? { ...pos(track[0].position), category: track[0].category }
+        : null,
+      finalPosition: track.length > 0
+        ? {
+            ...pos(track[track.length - 1].position),
+            category: track[track.length - 1].category
+          }
+        : null,
+      strengthChanges: notablePoints,
+      landfalls: this.landfalls.map(lf => ({
+        position: pos(lf.position),
+        category: lf.category
+      })),
+      trackPointCount: track.length
+    };
   }
 
   @action.bound public removePressureSystem(ps: PressureSystem) {

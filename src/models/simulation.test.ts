@@ -521,4 +521,99 @@ describe("SimulationModel store", () => {
       expect(sim.hurricane.strength).toBe(40);
     });
   });
+
+  describe("getOutcomeData", () => {
+    it("returns null positions when track is empty", () => {
+      const sim = new SimulationModel(options);
+      const outcome = sim.getOutcomeData();
+      expect(outcome.initialPosition).toBeNull();
+      expect(outcome.finalPosition).toBeNull();
+      expect(outcome.strengthChanges).toEqual([]);
+      expect(outcome.landfalls).toEqual([]);
+      expect(outcome.trackPointCount).toBe(0);
+    });
+
+    it("returns correct data with track points", () => {
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [
+        { position: { lat: 10, lng: -20 }, category: 1 },
+        { position: { lat: 15, lng: -30 }, category: 2 },
+        { position: { lat: 20, lng: -40 }, category: 3 }
+      ];
+      sim.strengthChangePositions = [0, 1, 2];
+      sim.landfalls = [
+        { position: { lat: 18, lng: -35 }, category: 2 }
+      ];
+
+      const outcome = sim.getOutcomeData();
+      expect(outcome.initialPosition).toEqual({ lat: 10, lng: -20, category: 1 });
+      expect(outcome.finalPosition).toEqual({ lat: 20, lng: -40, category: 3 });
+      expect(outcome.strengthChanges).toHaveLength(3);
+      expect(outcome.strengthChanges[1]).toEqual({
+        position: { lat: 15, lng: -30 },
+        category: 2
+      });
+      expect(outcome.landfalls).toHaveLength(1);
+      expect(outcome.landfalls[0]).toEqual({
+        position: { lat: 18, lng: -35 },
+        category: 2
+      });
+      expect(outcome.trackPointCount).toBe(3);
+    });
+
+    it("filters out-of-bounds strength change indices", () => {
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [
+        { position: { lat: 10, lng: -20 }, category: 1 }
+      ];
+      sim.strengthChangePositions = [0, 5, 10]; // 5 and 10 are out of bounds
+
+      const outcome = sim.getOutcomeData();
+      expect(outcome.strengthChanges).toHaveLength(1);
+      expect(outcome.strengthChanges[0].position).toEqual({ lat: 10, lng: -20 });
+    });
+
+    it("rounds lat/lng to 4 decimal places", () => {
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [
+        { position: { lat: 10.123456789, lng: -20.987654321 }, category: 1 },
+        { position: { lat: 15.555555555, lng: -30.111111111 }, category: 2 }
+      ];
+      sim.strengthChangePositions = [0];
+      sim.landfalls = [
+        { position: { lat: 18.999999999, lng: -35.000011111 }, category: 2 }
+      ];
+
+      const outcome = sim.getOutcomeData();
+      expect(outcome.initialPosition).toEqual({ lat: 10.1235, lng: -20.9877, category: 1 });
+      expect(outcome.finalPosition).toEqual({ lat: 15.5556, lng: -30.1111, category: 2 });
+      expect(outcome.strengthChanges[0].position).toEqual({ lat: 10.1235, lng: -20.9877 });
+      expect(outcome.landfalls[0].position).toEqual({ lat: 19, lng: -35.0000 });
+    });
+
+    it("includes end-of-track strength change added during natural end", () => {
+      // Simulate what tick() does when the hurricane dissipates:
+      // 1. Track has multiple points with strength changes at some indices
+      // 2. The final track point gets added to strengthChangePositions
+      // 3. getOutcomeData() should include that final point
+      const sim = new SimulationModel(options);
+      sim.hurricaneTrack = [
+        { position: { lat: 10, lng: -20 }, category: 2 },
+        { position: { lat: 12, lng: -25 }, category: 2 },
+        { position: { lat: 14, lng: -30 }, category: 1 },
+        { position: { lat: 16, lng: -35 }, category: 0 }
+      ];
+      // Strength changed at index 0 and 2, and final end-of-track at index 3
+      // (the end-of-track push happens before getOutcomeData is called in tick)
+      sim.strengthChangePositions = [0, 2, 3];
+
+      const outcome = sim.getOutcomeData();
+      expect(outcome.strengthChanges).toHaveLength(3);
+      // Verify the final point is included
+      expect(outcome.strengthChanges[2]).toEqual({
+        position: { lat: 16, lng: -35 },
+        category: 0
+      });
+    });
+  });
 });

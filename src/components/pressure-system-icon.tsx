@@ -8,7 +8,7 @@ import High from "../assets/high.svg";
 import Low from "../assets/low.svg";
 import DragIcon from "../assets/drag.svg";
 import config from "../config";
-import { log } from "@concord-consortium/lara-interactive-api";
+import { log } from "../log";
 import * as css from "./pressure-system-icon.scss";
 
 export const minStrength = 3;
@@ -100,6 +100,11 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     if (onSliderDragEnd) {
       onSliderDragEnd();
     }
-    log("PressureSystemStrengthUpdated", { value: getPressureLabel(model) });
+    log("PressureSystemStrengthUpdated", {
+      type: model.type,
+      lat: model.center.lat,
+      lng: model.center.lng,
+      value: getPressureLabel(model)
+    });
   }
 }

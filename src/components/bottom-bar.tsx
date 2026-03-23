@@ -16,7 +16,7 @@ import ReloadIcon from "../assets/reload.svg";
 import RestartIcon from "../assets/restart.svg";
 import ThermometerIcon from "../assets/thermometer.svg";
 import ThermometerHoverIcon from "../assets/thermometer-hover.svg";
-import { log } from "@concord-consortium/lara-interactive-api";
+import { log } from "../log";
 import { IconButton } from "./icon-button";
 import { StartLocationButton } from "./start-location-button";
 import * as css from "./bottom-bar.scss";
@@ -190,20 +190,58 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   public handleStartStop = () => {
     if (this.stores.simulation.simulationRunning) {
       this.stores.simulation.stop();
-      log("SimulationStopped");
+      log("SimulationStopped", {
+        outcome: this.stores.simulation.getOutcomeData()
+      });
     } else {
+      const sim = this.stores.simulation;
+      const ui = this.stores.ui;
+      // Log before start() to capture the exact state the student sees before simulation begins,
+      // consistent with SimulationEnded logging before restart/reset.
+      log("SimulationStarted", {
+        startLocation: sim.startLocation,
+        season: sim.season,
+        windArrows: ui.windArrows,
+        hurricaneImage: ui.hurricaneImage,
+        baseMap: ui.baseMap,
+        overlay: ui.overlay,
+        accessibleSSTScale: ui.accessibleSSTScale,
+        thermometerActive: ui.thermometerActive,
+        pressureSystems: sim.pressureSystems.map(ps => ({
+          type: ps.type,
+          center: { lat: ps.center.lat, lng: ps.center.lng },
+          strength: ps.strength
+        })),
+        hurricane: {
+          strength: sim.hurricane.strength,
+          center: { lat: sim.hurricane.center.lat, lng: sim.hurricane.center.lng }
+        },
+        deterministic: config.deterministic,
+        timestep: config.timestep,
+        pressureSystemsLocked: config.pressureSystemsLocked,
+        lockSimulationWhileRunning: config.lockSimulationWhileRunning,
+        seaSurfaceTempOpacity: config.seaSurfaceTempOpacity,
+        markLandfalls: config.markLandfalls
+      });
       this.stores.simulation.start();
-      log("SimulationStarted");
     }
   }
 
   public handleRestart = () => {
+    log("SimulationEnded", {
+      reason: "SimulationRestarted",
+      outcome: this.stores.simulation.getOutcomeData()
+    });
     this.stores.simulation.restart();
     this.stores.ui.setNorthAtlanticView();
     log("SimulationRestarted");
   }
 
   public handleReload = () => {
+    log("SimulationEnded", {
+      reason: "SimulationReloaded",
+      outcome: this.stores.simulation.getOutcomeData()
+    });
     this.stores.simulation.reset();
     this.stores.ui.reset();
     log("SimulationReloaded");

@@ -5,8 +5,10 @@ import { MapView } from "./map-view";
 import { BottomBar } from "./bottom-bar";
 import { TopBar } from "./top-bar";
 import { RightPanel } from "./right-panel";
+import { LogMonitor } from "@concord-consortium/log-monitor";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
+import { log } from "../log";
 import config from "../config";
 
 import * as css from "./index-page.scss";
@@ -28,8 +30,8 @@ export class IndexPage extends BaseComponent<IProps, IState> {
 
   public render() {
     const loading = this.stores.simulation.loading;
-    return (
-      <div className={css.index}>
+    const content = (
+      <>
         {config.topBarVisible && <TopBar />}
         {
           loading &&
@@ -44,7 +46,44 @@ export class IndexPage extends BaseComponent<IProps, IState> {
             Steps per second: { this.stores.simulation.stepsPerSecond.toFixed(1) }
           </div>
         }
+      </>
+    );
+
+    return (
+      <div
+        className={css.index}
+        style={config.logMonitor ? { display: "flex" } : undefined}
+        onMouseEnter={this.handleMouseEnter}
+        onMouseLeave={this.handleMouseLeave}
+      >
+        {config.logMonitor
+          ? <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>{content}</div>
+          : content
+        }
+        {config.logMonitor && <LogMonitor logFilePrefix="hurricane-log-events" />}
       </div>
     );
   }
+
+  private getMousePosition(e: React.MouseEvent) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    return {
+      clientX: e.clientX,
+      clientY: e.clientY,
+      percentX: Math.round(((e.clientX - rect.left) / rect.width) * 100),
+      percentY: Math.round(((e.clientY - rect.top) / rect.height) * 100)
+    };
+  }
+
+  private handleMouseEnter = (e: React.MouseEvent) => {
+    log("SimulationMouseEnter", this.getMousePosition(e));
+  }
+
+  private handleMouseLeave = (e: React.MouseEvent) => {
+    log("SimulationMouseLeave", this.getMousePosition(e));
+  }
+
+  // Known limitation: When logMonitor is enabled, SimulationMouseEnter/Leave events
+  // track the entire container (including the sidebar). This is acceptable since
+  // logMonitor is a developer-only tool and won't be active during student sessions.
 }

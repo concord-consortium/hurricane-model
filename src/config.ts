@@ -142,8 +142,10 @@ const DEFAULT_CONFIG: any = {
   startLocationButton: true,
   seasonButton: true,
   windArrowsToggle: true,
-  hurricaneImageToggle: true
+  hurricaneImageToggle: true,
   // --- End of UI widgets ---
+  // Developer tools
+  logMonitor: false
 };
 
 const urlConfig: any = {};

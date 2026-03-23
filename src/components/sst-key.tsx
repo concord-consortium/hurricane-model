@@ -2,7 +2,7 @@ import * as React from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { temperatureScale } from "../temperature-scale";
-import { log } from "@concord-consortium/lara-interactive-api";
+import { log } from "../log";
 import Checkbox from "@material-ui/core/Checkbox";
 import * as genericKeyCss from "./map-button-key.scss";
 import * as css from "./sst-key.scss";

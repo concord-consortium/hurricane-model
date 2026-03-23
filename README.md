@@ -1,5 +1,15 @@
 # Hurricane Model
 
+## Logged Events
+
+See [LOGGED-EVENTS.md](LOGGED-EVENTS.md) for a complete reference of all logged events, their parameters, and trigger conditions.
+
+### Debugging Log Events
+
+Add `?logMonitor=true` to the URL to show a real-time log event sidebar. The sidebar displays all events as they fire, with expandable payload details, a filter input, and CSV/JSON export. This is useful for verifying logging during development or previewing what student log data will look like.
+
+Note: `logMonitor` is a developer tool and is intentionally not included in the authored state parameters.
+
 ## Early research spike notes
 
 https://docs.google.com/document/d/1gifmTd1_kFAumL7-1Pm2XibsnBZrrwkkLtW2eknzxI4/edit?usp=sharing
