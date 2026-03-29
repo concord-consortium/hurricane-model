@@ -20,7 +20,7 @@ describe("TopBar component", () => {
           <TopBar />
         </Provider>
       );
-      const topBar = wrapper.find(TopBar).childAt(0).instance() as TopBar;
+      const topBar = (wrapper.find(TopBar).instance() as any).wrappedInstance as TopBar;
       // https://remarkablemark.org/blog/2018/11/17/mock-window-location/#update-for-jsdom-14
       delete (window as any).location;
       window.location = { reload: jest.fn() } as any;
@@ -38,7 +38,7 @@ describe("TopBar component", () => {
           <TopBar />
         </Provider>
       );
-      const topBar = wrapper.find(TopBar).childAt(0).instance() as TopBar;
+      const topBar = (wrapper.find(TopBar).instance() as any).wrappedInstance as TopBar;
       delete (window as any).location;
       window.location = { reload: jest.fn() } as any;
       topBar.handleReload();

@@ -70,8 +70,8 @@ export class IndexPage extends BaseComponent<IProps, IState> {
     return {
       clientX: e.clientX,
       clientY: e.clientY,
-      percentX: Math.round(((e.clientX - rect.left) / rect.width) * 100),
-      percentY: Math.round(((e.clientY - rect.top) / rect.height) * 100)
+      percentX: rect.width > 0 ? Math.round(((e.clientX - rect.left) / rect.width) * 100) : 0,
+      percentY: rect.height > 0 ? Math.round(((e.clientY - rect.top) / rect.height) * 100) : 0
     };
   }
 

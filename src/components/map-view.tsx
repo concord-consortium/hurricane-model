@@ -251,19 +251,21 @@ export class MapView extends BaseComponent<IProps, IState> {
     const isMarkerClick = target &&
       target.closest(".leaflet-marker-pane");
 
-    if (this.stores.ui.thermometerActive) {
-      // Log ThermometerPinned instead of MapClicked when the temperature tool is active
-      const temp = this.stores.simulation.seaSurfaceTempAt(e.latlng);
-      if (temp !== null) {
-        log("ThermometerPinned", {
-          position: { lat: e.latlng.lat, lng: e.latlng.lng },
-          temperature: temp
+    if (!isMarkerClick) {
+      if (this.stores.ui.thermometerActive) {
+        // Log ThermometerPinned instead of MapClicked when the temperature tool is active
+        const temp = this.stores.simulation.seaSurfaceTempAt(e.latlng);
+        if (temp !== null) {
+          log("ThermometerPinned", {
+            position: { lat: e.latlng.lat, lng: e.latlng.lng },
+            temperature: temp
+          });
+        }
+      } else {
+        log("MapClicked", {
+          position: { lat: e.latlng.lat, lng: e.latlng.lng }
         });
       }
-    } else if (!isMarkerClick) {
-      log("MapClicked", {
-        position: { lat: e.latlng.lat, lng: e.latlng.lng }
-      });
     }
     this.stores.ui.setThermometerPositionSaved(e.latlng);
   }

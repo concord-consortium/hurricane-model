@@ -42,7 +42,7 @@ describe("IndexPage component", () => {
           <IndexPage />
         </Provider>
       );
-      const indexPage = wrapper.find(IndexPage).childAt(0).instance() as IndexPage;
+      const indexPage = (wrapper.find(IndexPage).instance() as any).wrappedInstance as IndexPage;
       const mockEvent = {
         clientX: 150,
         clientY: 200,
@@ -72,7 +72,7 @@ describe("IndexPage component", () => {
           <IndexPage />
         </Provider>
       );
-      const indexPage = wrapper.find(IndexPage).childAt(0).instance() as IndexPage;
+      const indexPage = (wrapper.find(IndexPage).instance() as any).wrappedInstance as IndexPage;
       const mockEvent = {
         clientX: 500,
         clientY: 400,
@@ -102,7 +102,7 @@ describe("IndexPage component", () => {
           <IndexPage />
         </Provider>
       );
-      const indexPage = wrapper.find(IndexPage).childAt(0).instance() as IndexPage;
+      const indexPage = (wrapper.find(IndexPage).instance() as any).wrappedInstance as IndexPage;
       const mockEvent = {
         clientX: 33,
         clientY: 33,
