@@ -8,3 +8,7 @@ npm-error.log
 .idea
 
 cypress/screenshots
+
+# yalc local package linking
+.yalc/
+yalc.lock

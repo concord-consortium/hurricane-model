@@ -122,7 +122,8 @@
     "webpack-dev-server": "3.11.2"
   },
   "dependencies": {
-    "@concord-consortium/lara-interactive-api": "^1.12.0",
+    "@concord-consortium/lara-interactive-api": "^1.13.0",
+    "@concord-consortium/log-monitor": "^1.0.0",
     "@material-ui/core": "4.12.3",
     "@material-ui/icons": "^4.11.2",
     "@turf/helpers": "^6.5.0",

@@ -5,7 +5,7 @@ import { PressureSystem } from "../models/pressure-system";
 import { PressureSystemIcon } from "./pressure-system-icon";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import config from "../config";
-import { log } from "@concord-consortium/lara-interactive-api";
+import { log } from "../log";
 import * as Leaflet from "leaflet";
 
 interface IProps extends IBaseProps {

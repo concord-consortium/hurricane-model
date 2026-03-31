@@ -6,7 +6,7 @@ import { MapButton } from "./map-button";
 import config from "../config";
 
 import * as css from "./right-panel.scss";
-import { log } from "@concord-consortium/lara-interactive-api";
+import { log } from "../log";
 
 export type MapType = "base" | "overlay";
 

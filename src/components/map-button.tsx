@@ -14,7 +14,7 @@ import * as precipitationThumbImg from "../assets/precipitation-thumb.png";
 import * as stormSurgeThumbImg from "../assets/storm-surge-thumb.png";
 
 import * as css from "./map-button.scss";
-import { log } from "@concord-consortium/lara-interactive-api";
+import { log } from "../log";
 
 interface IProps extends IBaseProps {
   label: string;

@@ -6,6 +6,9 @@ import { PressureSystemIcon, minStrength, maxStrength, mbLabelRange } from "./pr
 import Slider from "@material-ui/core/Slider";
 import * as css from "./pressure-system-icon.scss";
 import config from "../config";
+import * as logModule from "../log";
+
+jest.spyOn(logModule, "log").mockImplementation(() => undefined);
 
 describe("PressureSystemIcon component", () => {
   let stores = createStores();
@@ -96,5 +99,26 @@ describe("PressureSystemIcon component", () => {
 
     const pressureIconSlider = wrapper.find('[data-test="pressure-system-slider"]').first();
     expect(pressureIconSlider.prop("disabled")).toEqual(false);
+  });
+
+  it("logs PressureSystemStrengthUpdated with type, position, and value on slider drag end", () => {
+    (logModule.log as jest.Mock).mockClear();
+    const model = stores.simulation.pressureSystems[0];
+    const wrapper = mount(
+      <Provider stores={stores}>
+        <PressureSystemIcon model={model}/>
+      </Provider>
+    );
+    const icon = (wrapper.find(PressureSystemIcon).instance() as any).wrappedInstance as PressureSystemIcon;
+    icon.handleSliderDragEnd();
+    const call = (logModule.log as jest.Mock).mock.calls.find(
+      (c: any[]) => c[0] === "PressureSystemStrengthUpdated"
+    );
+    expect(call).toBeDefined();
+    expect(call[1]).toHaveProperty("type", model.type);
+    expect(call[1]).toHaveProperty("lat", model.center.lat);
+    expect(call[1]).toHaveProperty("lng", model.center.lng);
+    expect(call[1]).toHaveProperty("value");
+    expect(typeof call[1].value).toBe("string"); // e.g. "1025mb"
   });
 });
