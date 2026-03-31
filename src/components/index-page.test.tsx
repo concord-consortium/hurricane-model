@@ -105,19 +105,20 @@ describe("IndexPage component", () => {
       const indexPage = (wrapper.find(IndexPage).instance() as any).wrappedInstance as IndexPage;
       const mockEvent = {
         clientX: 33,
-        clientY: 33,
+        clientY: 77,
         currentTarget: {
           getBoundingClientRect: () => ({
-            left: 0, top: 0, width: 100, height: 100
+            left: 0, top: 0, width: 200, height: 300
           })
         }
       } as unknown as React.MouseEvent;
+      // (33/200)*100 = 16.5 → 17, (77/300)*100 ≈ 25.667 → 26
       (indexPage as any).handleMouseEnter(mockEvent);
       const call = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationMouseEnter"
       );
-      expect(call[1].percentX).toBe(33);
-      expect(call[1].percentY).toBe(33);
+      expect(call[1].percentX).toBe(17);
+      expect(call[1].percentY).toBe(26);
       expect(Number.isInteger(call[1].percentX)).toBe(true);
       expect(Number.isInteger(call[1].percentY)).toBe(true);
     });
