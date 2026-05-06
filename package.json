@@ -132,7 +132,7 @@
     "geolocation-utils": "1.2.6",
     "jquery": "^3.6.0",
     "kd-tree-javascript": "^1.0.3",
-    "leaflet": "^1.7.1",
+    "leaflet": "^1.9.4",
     "mobx": "^5.15.7",
     "mobx-react": "^5.4.4",
     "pixi.js": "^4.8.9",
@@ -144,6 +144,6 @@
     "react-leaflet-control": "^2.1.2",
     "screenfull": "^4.2.1",
     "seedrandom": "^3.0.5",
-    "shutterbug": "^1.3.2"
+    "shutterbug": "^1.5.0"
   }
 }
