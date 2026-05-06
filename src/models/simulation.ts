@@ -1,4 +1,5 @@
-import { lineString, Position } from "@turf/helpers";
+import { lineString } from "@turf/helpers";
+import { Position } from "geojson";
 import lineIntersect from "@turf/line-intersect";
 import { LatLngExpression, CRS, LatLngBounds, latLngBounds, LatLngLiteral } from "leaflet";
 import { action, observable, computed, autorun, toJS } from "mobx";
@@ -697,7 +698,9 @@ export class SimulationModel {
           const png = new PNG();
           png.parse(Buffer.from(buffer), (err, validPng) => {
             if (err) {
-              throw err;
+              // tslint:disable-next-line:no-console
+              console.error("Failed to parse sea surface temperature PNG:", err);
+              return;
             }
             this.seaSurfaceTempData = validPng;
             // Callback used for testing.

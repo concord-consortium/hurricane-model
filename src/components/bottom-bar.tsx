@@ -58,13 +58,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public componentDidMount() {
-    if (screenfull && screenfull.enabled) {
+    if (screenfull && screenfull.isEnabled) {
       document.addEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
   }
 
   public componentWillUnmount() {
-    if (screenfull && screenfull.enabled) {
+    if (screenfull && screenfull.isEnabled) {
       document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
   }
@@ -175,7 +175,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         {/* This empty container is necessary so the spacing works correctly */}
         <div className={css.rightContainer}>
           {
-            screenfull && screenfull.enabled &&
+            screenfull && screenfull.isEnabled &&
             <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" />
           }
         </div>
