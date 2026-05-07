@@ -21,7 +21,7 @@
       "/cypress/"
     ],
     "transformIgnorePatterns": [
-      "/node_modules/(?!(screenfull|d3-scale|d3-array|d3-color|d3-format|d3-interpolate|d3-time|d3-time-format|internmap)/)"
+      "/node_modules/(?!(screenfull|d3-scale|d3-array|d3-color|d3-format|d3-interpolate|d3-time|d3-time-format|internmap|pixi\\.js|@pixi|eventemitter3|earcut|tiny-lru|gifuct-js|ismobilejs|@xmldom)/)"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
@@ -30,7 +30,8 @@
     "moduleNameMapper": {
       "\\.svg$": "<rootDir>/__mocks__/svgMock.js",
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
+      "\\.(css|less|sass|scss)$": "identity-obj-proxy",
+      "^pixi\\.js$": "<rootDir>/__mocks__/pixi.js.js"
     },
     "moduleFileExtensions": [
       "ts",
@@ -140,7 +141,7 @@
     "leaflet": "^1.9.4",
     "mobx": "^6.15.2",
     "mobx-react": "^9.2.1",
-    "pixi.js-legacy": "^7.4.3",
+    "pixi.js": "^8.18.1",
     "pngjs": "^7.0.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",

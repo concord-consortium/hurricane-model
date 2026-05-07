@@ -3,7 +3,7 @@ import CanvasLayer from "./react-leaflet-canvas-layer";
 import { autorun } from "mobx";
 import {inject, observer} from "mobx-react";
 import {BaseComponent, IBaseProps} from "./base";
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import {IVector, IWindPoint} from "../types";
 import { IStores } from "../models/stores";
 
@@ -69,12 +69,12 @@ let lineTexture: PIXI.Texture | null = null;
 let arrowTexture: PIXI.Texture | null = null;
 function ensureTextures() {
   if (!lineTexture) {
-    lineTexture = PIXI.Texture.from(buildLineCanvas(), { scaleMode: PIXI.SCALE_MODES.LINEAR });
-    lineTexture.defaultAnchor = new PIXI.Point(0.5, 1);
+    const source = new PIXI.CanvasSource({ resource: buildLineCanvas(), scaleMode: "linear" });
+    lineTexture = new PIXI.Texture({ source, defaultAnchor: { x: 0.5, y: 1 } });
   }
   if (!arrowTexture) {
-    arrowTexture = PIXI.Texture.from(buildArrowCanvas(), { scaleMode: PIXI.SCALE_MODES.LINEAR });
-    arrowTexture.defaultAnchor = new PIXI.Point(0.5, 0.5);
+    const source = new PIXI.CanvasSource({ resource: buildArrowCanvas(), scaleMode: "linear" });
+    arrowTexture = new PIXI.Texture({ source, defaultAnchor: { x: 0.5, y: 0.5 } });
   }
 }
 
@@ -90,6 +90,7 @@ interface IState {}
 @observer
 export class PixiWindLayer extends BaseComponent<IProps, IState> {
   public pixiApp: PIXI.Application | null = null;
+  private pixiAppInit: Promise<PIXI.Application> | null = null;
   // TODO: Better solution for stores.
   // We can't reference it as a prop in the reaction set up in componentDidMount.
   private _stores: IStores | null = null;
@@ -97,10 +98,6 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
 
   public componentDidMount(): void {
     this._stores = this.props.stores ?? null;
-    this.disposeObserver = autorun(() => {
-      // Use MobX autorun to observe all the store properties that are necessary to update wind arrows.
-      this.updateArrows();
-    });
   }
 
   public componentWillUnmount(): void {
@@ -118,22 +115,35 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
   }
 
   private drawCanvas = (info: any) => {
-    if (!this.pixiApp) {
-      // Setup PIXI app.
-      this.pixiApp = new PIXI.Application({
+    if (!this.pixiAppInit) {
+      const app = new PIXI.Application();
+      this.pixiAppInit = app.init({
         width: info.canvas.width,
         height: info.canvas.height,
         antialias: true,
-        autoStart: false, // do not start animation, render only when necessary
         backgroundAlpha: 0,
-        view: info.canvas,
-        resolution: window.devicePixelRatio
+        canvas: info.canvas,
+        resolution: window.devicePixelRatio,
+        autoStart: false
+      }).then(() => {
+        this.pixiApp = app;
+        ensureTextures();
+
+        // Add shutterbug support. See: shutterbug-support.ts.
+        info.canvas.render = app.render.bind(app);
+        info.canvas.classList.add("canvas-3d");
+        app.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
+
+        // Use MobX autorun to observe all the store properties that are necessary to update wind arrows.
+        this.disposeObserver = autorun(() => this.updateArrows());
+
+        return app;
       });
-      ensureTextures();
-      // Add shutterbug support. See: shutterbug-support.ts.
-      info.canvas.render = this.pixiApp.render.bind(this.pixiApp);
-      info.canvas.classList.add("canvas-3d");
+      return;
     }
+
+    if (!this.pixiApp) return; // init still pending
+
     this.pixiApp.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
     this.pixiApp.render();
   }
