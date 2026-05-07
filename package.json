@@ -20,6 +20,9 @@
       "/node_modules/",
       "/cypress/"
     ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(screenfull|d3-scale|d3-array|d3-color|d3-format|d3-interpolate|d3-time|d3-time-format|internmap)/)"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "src/utilities/test-utils.ts"
@@ -131,7 +134,7 @@
     "@material-ui/icons": "^4.11.3",
     "@turf/helpers": "^7.3.5",
     "@turf/line-intersect": "^7.3.5",
-    "d3-scale": "^3.3.0",
+    "d3-scale": "^4.0.2",
     "geolocation-utils": "1.2.6",
     "jquery": "^3.6.0",
     "kd-tree-javascript": "^1.0.3",
@@ -145,7 +148,7 @@
     "react-jsonschema-form": "^1.8.1",
     "react-leaflet": "^2.8.0",
     "react-leaflet-control": "^2.1.2",
-    "screenfull": "^5.2.0",
+    "screenfull": "^6.0.2",
     "seedrandom": "^3.0.5",
     "shutterbug": "^1.5.0"
   }

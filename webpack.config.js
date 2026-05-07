@@ -38,6 +38,20 @@ module.exports = (env, argv) => {
           }
         },
         {
+          // TODO(webpack-5-cleanup): Remove this rule when upgrading to webpack 5.
+          // Some node_modules ship modern ESM JS (optional chaining etc.) that webpack 4's
+          // bundled acorn parser can't handle. Transpile them down with babel here.
+          // A matching `transformIgnorePatterns` block in package.json's jest config does
+          // the equivalent for tests and should be removed at the same time (webpack 5's
+          // ecosystem and jest 30's ESM support both make this unnecessary).
+          test: /\.js$/,
+          include: /node_modules\/(screenfull|d3-scale|d3-array|d3-color|d3-format|d3-interpolate|d3-time|d3-time-format|internmap)/,
+          use: {
+            loader: 'babel-loader',
+            options: { presets: ['@babel/preset-env'] }
+          }
+        },
+        {
           test: /\.(sa|sc)ss$/i,
           use: [
             devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
