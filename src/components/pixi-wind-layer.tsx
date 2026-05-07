@@ -3,7 +3,7 @@ import CanvasLayer from "./react-leaflet-canvas-layer";
 import { autorun } from "mobx";
 import {inject, observer} from "mobx-react";
 import {BaseComponent, IBaseProps} from "./base";
-import * as PIXI from "pixi.js";
+import * as PIXI from "pixi.js-legacy";
 import {IVector, IWindPoint} from "../types";
 import { IStores } from "../models/stores";
 
@@ -13,7 +13,9 @@ const color = 0xffffff;
 const shadow = 0x000000;
 const opacity = 1;
 
-const lineTexture = (() => {
+// Build the source Graphics at module scope; convert to textures lazily once the
+// pixiApp's renderer is available (see ensureTextures).
+const lineGraphics = (() => {
   const graph = new PIXI.Graphics();
   const shadowOffset = 1;
   graph.beginFill(shadow);
@@ -22,13 +24,10 @@ const lineTexture = (() => {
   graph.beginFill(color);
   graph.drawRect(0, 0, vectorWidth, 1);
   graph.endFill();
-  const tex = graph.generateCanvasTexture(1, 2);
-  // Move anchor to the bottom of this texture.
-  tex.defaultAnchor = new PIXI.Point(0.5, 1);
-  return tex;
+  return graph;
 })();
 
-const arrowTexture = (() => {
+const arrowGraphics = (() => {
   const graph = new PIXI.Graphics();
   const shadowOffset = 1;
   graph.beginFill(shadow);
@@ -45,11 +44,21 @@ const arrowTexture = (() => {
     arrowHeadSize * vectorWidth, 0
   ]);
   graph.endFill();
-  const tex = graph.generateCanvasTexture(2, 2);
-  // Move anchor to the bottom of this texture.
-  tex.defaultAnchor = new PIXI.Point(0.5, 0.5);
-  return tex;
+  return graph;
 })();
+
+let lineTexture: PIXI.Texture | null = null;
+let arrowTexture: PIXI.Texture | null = null;
+function ensureTextures(renderer: PIXI.Renderer | PIXI.AbstractRenderer) {
+  if (!lineTexture) {
+    lineTexture = renderer.generateTexture(lineGraphics, PIXI.SCALE_MODES.LINEAR, 2);
+    lineTexture.defaultAnchor = new PIXI.Point(0.5, 1);
+  }
+  if (!arrowTexture) {
+    arrowTexture = renderer.generateTexture(arrowGraphics, PIXI.SCALE_MODES.LINEAR, 2);
+    arrowTexture.defaultAnchor = new PIXI.Point(0.5, 0.5);
+  }
+}
 
 // Use this function to tweak visual length of the wind arrows.
 const arrowLengthFunc = (vec: IVector) => {
@@ -93,23 +102,26 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
   private drawCanvas = (info: any) => {
     if (!this.pixiApp) {
       // Setup PIXI app.
-      this.pixiApp = new PIXI.Application(info.canvas.width, info.canvas.height, {
+      this.pixiApp = new PIXI.Application({
+        width: info.canvas.width,
+        height: info.canvas.height,
         transparent: true,
         antialias: true,
         autoStart: false, // do not start animation, render only when necessary
         view: info.canvas,
         resolution: window.devicePixelRatio
       });
+      ensureTextures(this.pixiApp.renderer);
       // Add shutterbug support. See: shutterbug-support.ts.
       info.canvas.render = this.pixiApp.render.bind(this.pixiApp);
       info.canvas.classList.add("canvas-3d");
     }
-    this.pixiApp?.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
-    this.pixiApp?.render();
+    this.pixiApp.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
+    this.pixiApp.render();
   }
 
   private updateArrows() {
-    if (!this.pixiApp || !this._stores) return;
+    if (!this.pixiApp || !this._stores || !lineTexture || !arrowTexture) return;
     const stage = this.pixiApp.stage;
     const enabled = this._stores.ui.windArrows;
     stage.alpha = enabled ? opacity : 0;
@@ -117,6 +129,9 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
       this.pixiApp.render();
       return;
     }
+    // Capture in locals so TS preserves narrowing inside the forEach closure.
+    const lineTex = lineTexture;
+    const arrowTex = arrowTexture;
     const data = this._stores.simulation.windIncHurricane;
     const latLngToContainerPoint = this._stores.ui.latLngToContainerPoint;
     data.forEach((w: IWindPoint, idx: number) => {
@@ -130,9 +145,9 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
       arrowContainer.x = point.x;
       arrowContainer.y = point.y;
       arrowContainer.rotation = rotation;
-      const line = updateOnly ? arrowContainer.children[0] : new PIXI.Sprite(lineTexture);
+      const line = updateOnly ? arrowContainer.children[0] : new PIXI.Sprite(lineTex);
       line.scale = lineScale;
-      const arrow = updateOnly ? arrowContainer.children[1] : new PIXI.Sprite(arrowTexture);
+      const arrow = updateOnly ? arrowContainer.children[1] : new PIXI.Sprite(arrowTex);
       arrow.y = -length;
       if (!updateOnly) {
         arrowContainer.addChild(line);
