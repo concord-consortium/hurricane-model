@@ -59,7 +59,12 @@ export class TopBar extends BaseComponent<IProps, IState> {
     log("TopBarReloadButtonClicked");
     // Give some time for the log message to be delivered. Note it goes only to the parent window using postMessage,
     // so we don't have to wait for network request.
-    setTimeout(() => window.location.reload(), 100);
+    setTimeout(() => this.reloadWindow(), 100);
+  }
+
+  // reloadWindow is a separate function so it can be mocked in jest tests.
+  public reloadWindow() {
+    window.location.reload();
   }
 
   public handleShareOpen = () => {

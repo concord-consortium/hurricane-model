@@ -21,12 +21,10 @@ describe("TopBar component", () => {
         </Provider>
       );
       const topBar = wrapper.find((TopBar as any).wrappedComponent).instance() as TopBar;
-      // https://remarkablemark.org/blog/2018/11/17/mock-window-location/#update-for-jsdom-14
-      delete (window as any).location;
-      window.location = { reload: jest.fn() } as any;
+      const reloadSpy = jest.spyOn(topBar, "reloadWindow").mockImplementation(() => undefined);
       topBar.handleReload();
       setTimeout(() => {
-        expect(window.location.reload).toHaveBeenCalled();
+        expect(reloadSpy).toHaveBeenCalled();
         done();
       }, 150);
     });
@@ -39,8 +37,7 @@ describe("TopBar component", () => {
         </Provider>
       );
       const topBar = wrapper.find((TopBar as any).wrappedComponent).instance() as TopBar;
-      delete (window as any).location;
-      window.location = { reload: jest.fn() } as any;
+      jest.spyOn(topBar, "reloadWindow").mockImplementation(() => undefined);
       topBar.handleReload();
       const endedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationEnded"
