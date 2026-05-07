@@ -3,7 +3,7 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import { LatLngExpression } from "leaflet";
-import * as css from "./thermometer-marker.scss";
+import css from "./thermometer-marker.scss";
 
 interface IProps extends IBaseProps {
   position: LatLngExpression | null;

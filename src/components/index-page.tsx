@@ -11,7 +11,7 @@ import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import { log } from "../log";
 import config from "../config";
 
-import * as css from "./index-page.scss";
+import css from "./index-page.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {}

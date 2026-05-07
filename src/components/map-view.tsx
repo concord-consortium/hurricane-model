@@ -18,7 +18,7 @@ import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
 import { LeafletMouseEvent } from "leaflet";
-import * as css from "./map-view.scss";
+import css from "./map-view.scss";
 import { ThermometerMarker } from "./thermometer-marker";
 import "leaflet/dist/leaflet.css";
 

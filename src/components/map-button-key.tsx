@@ -5,7 +5,7 @@ import { Overlay } from "../models/ui";
 import leveedAreaKey from "../assets/leveed-area-key.png";
 import { SSTKey } from "./sst-key";
 
-import * as css from "./map-button-key.scss";
+import css from "./map-button-key.scss";
 
 interface IProps extends IBaseProps {
   value: MapTilesName | Overlay;

@@ -7,7 +7,7 @@ import config from "../config";
 import { CategoryNumber } from "./category-number";
 
 import HurricaneImageSrc from "../assets/hurricane-image.png";
-import * as css from "./hurricane-marker.scss";
+import css from "./hurricane-marker.scss";
 
 interface IProps extends IBaseProps { }
 interface IState {}

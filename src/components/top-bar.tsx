@@ -6,7 +6,7 @@ import { Dialog } from "./dialog";
 import { AboutDialogContent } from "./about-dialog-content";
 import { ShareDialogContent } from "./share-dialog-content";
 import { log } from "../log";
-import * as css from "./top-bar.scss";
+import css from "./top-bar.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {

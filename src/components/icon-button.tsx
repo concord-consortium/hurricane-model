@@ -1,6 +1,6 @@
 import * as React from "react";
 import Button from "@material-ui/core/Button";
-import * as css from "./icon-button.scss";
+import css from "./icon-button.scss";
 
 interface IProps {
   icon: JSX.Element;

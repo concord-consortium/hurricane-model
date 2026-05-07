@@ -13,7 +13,7 @@ import sstThumbImg from "../assets/sst-thumb.png";
 import precipitationThumbImg from "../assets/precipitation-thumb.png";
 import stormSurgeThumbImg from "../assets/storm-surge-thumb.png";
 
-import * as css from "./map-button.scss";
+import css from "./map-button.scss";
 import { log } from "../log";
 
 interface IProps extends IBaseProps {

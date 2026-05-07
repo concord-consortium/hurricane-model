@@ -4,7 +4,7 @@ import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { MapTab } from "./map-tab";
 import { MapType } from "./right-panel";
-import * as css from "./map-tab.scss";
+import css from "./map-tab.scss";
 
 describe("MapTab component", () => {
   let stores = createStores();

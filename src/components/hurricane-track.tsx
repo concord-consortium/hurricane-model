@@ -3,7 +3,7 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { Polyline } from "react-leaflet";
 import { ITrackPoint } from "../types";
-import * as css from "./hurricane-track.scss";
+import css from "./hurricane-track.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {}

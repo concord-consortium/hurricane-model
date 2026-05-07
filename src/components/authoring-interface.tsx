@@ -6,7 +6,7 @@ import {
   validateUrlParams,
   KNOWN_PARAMETERS
 } from "../utils/parse-authored-params";
-import * as css from "./authoring-interface.scss";
+import css from "./authoring-interface.scss";
 
 interface IProps {
   authoredState: IHurricaneAuthoredState | null;

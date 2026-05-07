@@ -19,7 +19,7 @@ import ThermometerHoverIcon from "../assets/thermometer-hover.svg";
 import { log } from "../log";
 import { IconButton } from "./icon-button";
 import { StartLocationButton } from "./start-location-button";
-import * as css from "./bottom-bar.scss";
+import css from "./bottom-bar.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {

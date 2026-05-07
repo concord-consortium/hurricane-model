@@ -9,7 +9,7 @@ import Low from "../assets/low.svg";
 import DragIcon from "../assets/drag.svg";
 import config from "../config";
 import { log } from "../log";
-import * as css from "./pressure-system-icon.scss";
+import css from "./pressure-system-icon.scss";
 
 export const minStrength = 3;
 export const maxStrength = 20;

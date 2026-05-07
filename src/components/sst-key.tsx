@@ -4,8 +4,8 @@ import { BaseComponent, IBaseProps } from "./base";
 import { temperatureScale } from "../temperature-scale";
 import { log } from "../log";
 import Checkbox from "@material-ui/core/Checkbox";
-import * as genericKeyCss from "./map-button-key.scss";
-import * as css from "./sst-key.scss";
+import genericKeyCss from "./map-button-key.scss";
+import css from "./sst-key.scss";
 
 const getFahrenheit = (celsius: number) => {
   return (celsius * 9 / 5) + 32;

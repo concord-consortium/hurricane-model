@@ -2,7 +2,7 @@ import * as React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select, { SelectProps } from "@material-ui/core/Select";
 
-import * as css from "./select-button.scss";
+import css from "./select-button.scss";
 
 // Material-UI's Select doesn't export the event type, but its onChange handler
 // signature gives it to us by extraction.

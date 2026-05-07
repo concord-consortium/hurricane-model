@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as css from "./loading-indicator.scss";
+import css from "./loading-indicator.scss";
 
 interface IProps {
   message?: string;

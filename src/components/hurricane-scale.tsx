@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as css from "./hurricane-scale.scss";
+import css from "./hurricane-scale.scss";
 
 interface IProps {}
 interface IState {}

@@ -2,7 +2,7 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapType } from "./right-panel";
-import * as css from "./map-tab.scss";
+import css from "./map-tab.scss";
 import baseMapTabImg from "../assets/base-map-tab.png";
 import overlayTabImg from "../assets/overlay-tab.png";
 

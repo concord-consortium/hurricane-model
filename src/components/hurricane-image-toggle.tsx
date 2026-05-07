@@ -3,7 +3,7 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import Switch from "@material-ui/core/Switch";
 import { log } from "../log";
-import * as css from "./hurricane-image-toggle.scss";
+import css from "./hurricane-image-toggle.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {}
