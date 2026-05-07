@@ -53,7 +53,7 @@ module.exports = (env, argv) => {
           // the equivalent for tests and should be removed at the same time (webpack 5's
           // ecosystem and jest 30's ESM support both make this unnecessary).
           test: /\.js$/,
-          include: /node_modules\/(screenfull|d3-scale|d3-array|d3-color|d3-format|d3-interpolate|d3-time|d3-time-format|internmap)/,
+          include: /node_modules\/(screenfull|d3-scale|d3-array|d3-color|d3-format|d3-interpolate|d3-time|d3-time-format|internmap|@pixi|pixi\.js|pixi\.js-legacy)/,
           use: {
             loader: 'babel-loader',
             options: { presets: ['@babel/preset-env'] }

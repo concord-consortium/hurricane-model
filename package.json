@@ -140,7 +140,7 @@
     "leaflet": "^1.9.4",
     "mobx": "^6.15.2",
     "mobx-react": "^9.2.1",
-    "pixi.js-legacy": "^6.5.10",
+    "pixi.js-legacy": "^7.4.3",
     "pngjs": "^7.0.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
