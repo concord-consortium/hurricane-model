@@ -263,6 +263,10 @@ export class SimulationModel {
     return sstImages[this.season];
   }
 
+  @action.bound public setSeaSurfaceTempData(seaSurfaceTempData: PNG | null) {
+    this.seaSurfaceTempData = seaSurfaceTempData;
+  }
+
   @action.bound public updateBounds(bounds: LatLngBounds) {
     this.east = bounds.getEast();
     this.north = bounds.getNorth();
@@ -694,7 +698,7 @@ export class SimulationModel {
 
   private updateSeaSurfaceTempData() {
     // Set data to null so the model know that it's not available while the new one is being downloaded.
-    this.seaSurfaceTempData = null;
+    this.setSeaSurfaceTempData(null);
     fetch(this.dataSeaSurfaceTempImgUrl).then(response => {
       if (response.ok) {
         response.arrayBuffer().then(buffer => {
@@ -705,7 +709,7 @@ export class SimulationModel {
               console.error("Failed to parse sea surface temperature PNG:", err);
               return;
             }
-            this.seaSurfaceTempData = validPng;
+            this.setSeaSurfaceTempData(validPng);
             // Callback used for testing.
             this._seaSurfaceTempDataParsed?.();
           });
