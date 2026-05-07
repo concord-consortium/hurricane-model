@@ -136,7 +136,7 @@
     "@turf/line-intersect": "^7.3.5",
     "d3-scale": "^4.0.2",
     "geolocation-utils": "1.2.6",
-    "jquery": "^3.6.0",
+    "jquery": "^4.0.0",
     "kd-tree-javascript": "^1.0.3",
     "leaflet": "^1.9.4",
     "mobx": "^6.15.2",
