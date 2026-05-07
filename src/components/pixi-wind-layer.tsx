@@ -63,10 +63,10 @@ interface IState {}
 @observer
 export class PixiWindLayer extends BaseComponent<IProps, IState> {
   public pixiApp: PIXI.Application | null = null;
-  private disposeObserver: () => void = () => null;
   // TODO: Better solution for stores.
   // We can't reference it as a prop in the reaction set up in componentDidMount.
   private _stores: IStores | null = null;
+  private disposeObserver: null | (() => void) = null;
 
   public componentDidMount(): void {
     this._stores = this.props.stores ?? null;
@@ -77,7 +77,7 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
   }
 
   public componentWillUnmount(): void {
-    this.disposeObserver();
+    this.disposeObserver?.();
   }
 
   public componentDidUpdate(): void {
