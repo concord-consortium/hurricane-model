@@ -8,6 +8,7 @@ import * as PrecipitationScaleSrc from "../assets/precipitation-scale.png";
 import { BaseComponent, IBaseProps } from "./base";
 import * as React from "react";
 import * as L from "leaflet";
+import { IStores } from "../models/stores";
 
 interface IProps extends IBaseProps {}
 interface IState {}
@@ -18,9 +19,13 @@ const alphaRange = 0.025;
 @observer
 export class PrecipitationLayer extends BaseComponent<IProps, IState> {
   public webglHeatmap: any = null;
-  private disposeObserver: () => void;
+  private disposeObserver: () => void = () => null;
+  // TODO: Better solution for stores.
+  // We can't reference it as a prop in the reaction set up in componentDidMount.
+  private _stores: IStores | null = null;
 
   public componentDidMount(): void {
+    this._stores = this.props.stores ?? null;
     this.disposeObserver = autorun(() => {
       this.updateData();
     });
@@ -28,6 +33,10 @@ export class PrecipitationLayer extends BaseComponent<IProps, IState> {
 
   public componentWillUnmount(): void {
     this.disposeObserver();
+  }
+
+  public componentDidUpdate(): void {
+    this._stores = this.props.stores ?? null;
   }
 
   public render() {
@@ -54,8 +63,10 @@ export class PrecipitationLayer extends BaseComponent<IProps, IState> {
   }
 
   private updateData() {
-    const data = this.stores.simulation.precipitationPointsWithinBounds;
-    const latLngToContainerPoint = this.stores.ui.latLngToContainerPoint;
+    if (!this.webglHeatmap || !this._stores) return;
+
+    const data = this._stores.simulation.precipitationPointsWithinBounds;
+    const latLngToContainerPoint = this._stores.ui.latLngToContainerPoint;
 
     const scaleFn = (latlng: ICoordinates, size: number) => {
       // Necessary to maintain accurately sized circles to change scale to miles (for example), you will need

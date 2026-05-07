@@ -35,7 +35,7 @@ describe("PixiWindLayer component", () => {
     const canvasLayer = wrapper.find(CanvasLayer);
     expect(canvasLayer.length).toEqual(1);
 
-    const windLayer = (wrapper.find(PixiWindLayer).instance() as any).wrappedInstance as PixiWindLayer;
+    const windLayer = wrapper.find((PixiWindLayer as any).wrappedComponent).instance() as PixiWindLayer;
     expect(windLayer.pixiApp).not.toEqual(null);
     expect(windLayer.pixiApp!.stage.children.length).toEqual(stores.simulation.windWithinBounds.length);
   });
@@ -50,7 +50,7 @@ describe("PixiWindLayer component", () => {
     );
     const arrowsCount = stores.simulation.windWithinBounds.length;
 
-    const windLayer = (wrapper.find(PixiWindLayer).instance() as any).wrappedInstance as PixiWindLayer;
+    const windLayer = wrapper.find((PixiWindLayer as any).wrappedComponent).instance() as PixiWindLayer;
     expect(windLayer.pixiApp).not.toEqual(null);
     expect(windLayer.pixiApp!.stage.children.length).toEqual(arrowsCount);
 

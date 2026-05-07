@@ -32,7 +32,7 @@ describe("PressureSystemIcon component", () => {
         <PressureSystemIcon model={model}/>
       </Provider>
     );
-    const icon = (wrapper.find(PressureSystemIcon).instance() as any).wrappedInstance as PressureSystemIcon;
+    const icon = wrapper.find((PressureSystemIcon as any).wrappedComponent).instance() as PressureSystemIcon;
     icon.handleStrengthChange(null, 123);
     expect(model.strength).toEqual(123);
   });
@@ -44,7 +44,7 @@ describe("PressureSystemIcon component", () => {
         <PressureSystemIcon model={model}/>
       </Provider>
     );
-    const icon = (wrapper.find(PressureSystemIcon).instance() as any).wrappedInstance as PressureSystemIcon;
+    const icon = wrapper.find((PressureSystemIcon as any).wrappedComponent).instance() as PressureSystemIcon;
 
     model.setStrength(1500000);
     model.type = "high";
@@ -109,7 +109,7 @@ describe("PressureSystemIcon component", () => {
         <PressureSystemIcon model={model}/>
       </Provider>
     );
-    const icon = (wrapper.find(PressureSystemIcon).instance() as any).wrappedInstance as PressureSystemIcon;
+    const icon = wrapper.find((PressureSystemIcon as any).wrappedComponent).instance() as PressureSystemIcon;
     icon.handleSliderDragEnd();
     const call = (logModule.log as jest.Mock).mock.calls.find(
       (c: any[]) => c[0] === "PressureSystemStrengthUpdated"

@@ -1,10 +1,11 @@
 import * as React from "react";
 import CanvasLayer from "./react-leaflet-canvas-layer";
+import { autorun } from "mobx";
 import {inject, observer} from "mobx-react";
 import {BaseComponent, IBaseProps} from "./base";
 import * as PIXI from "pixi.js";
-import {autorun} from "mobx";
 import {IVector, IWindPoint} from "../types";
+import { IStores } from "../models/stores";
 
 const vectorWidth = 2;
 const arrowHeadSize = 4;
@@ -62,9 +63,13 @@ interface IState {}
 @observer
 export class PixiWindLayer extends BaseComponent<IProps, IState> {
   public pixiApp: PIXI.Application | null = null;
-  private disposeObserver: () => void;
+  private disposeObserver: () => void = () => null;
+  // TODO: Better solution for stores.
+  // We can't reference it as a prop in the reaction set up in componentDidMount.
+  private _stores: IStores | null = null;
 
   public componentDidMount(): void {
+    this._stores = this.props.stores ?? null;
     this.disposeObserver = autorun(() => {
       // Use MobX autorun to observe all the store properties that are necessary to update wind arrows.
       this.updateArrows();
@@ -73,6 +78,10 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
 
   public componentWillUnmount(): void {
     this.disposeObserver();
+  }
+
+  public componentDidUpdate(): void {
+    this._stores = this.props.stores ?? null;
   }
 
   public render() {
@@ -95,21 +104,21 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
       info.canvas.render = this.pixiApp.render.bind(this.pixiApp);
       info.canvas.classList.add("canvas-3d");
     }
-    this.pixiApp.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
-    this.pixiApp.render();
+    this.pixiApp?.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
+    this.pixiApp?.render();
   }
 
   private updateArrows() {
-    if (!this.pixiApp) return;
+    if (!this.pixiApp || !this._stores) return;
     const stage = this.pixiApp.stage;
-    const enabled = this.stores.ui.windArrows;
+    const enabled = this._stores.ui.windArrows;
     stage.alpha = enabled ? opacity : 0;
     if (!enabled) {
       this.pixiApp.render();
       return;
     }
-    const data = this.stores.simulation.windIncHurricane;
-    const latLngToContainerPoint = this.stores.ui.latLngToContainerPoint;
+    const data = this._stores.simulation.windIncHurricane;
+    const latLngToContainerPoint = this._stores.ui.latLngToContainerPoint;
     data.forEach((w: IWindPoint, idx: number) => {
       // Try to reuse Pixi arrows.
       const updateOnly = !!stage.children[idx];

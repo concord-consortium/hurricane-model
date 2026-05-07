@@ -27,7 +27,7 @@ describe("WindArrowsToggle component", () => {
         <WindArrowsToggle />
       </Provider>
     );
-    const toggle = (wrapper.find(WindArrowsToggle).instance() as any).wrappedInstance as WindArrowsToggle;
+    const toggle = wrapper.find((WindArrowsToggle as any).wrappedComponent).instance() as WindArrowsToggle;
     toggle.handleChange(null, true);
     expect(stores.ui.windArrows).toEqual(true);
     toggle.handleChange(null, false);

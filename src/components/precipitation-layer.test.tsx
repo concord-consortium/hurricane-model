@@ -35,7 +35,7 @@ describe("PrecipitationLayer component", () => {
       </Provider>
     );
     const precipitationLayer =
-      (wrapper.find(PrecipitationLayer).instance() as any).wrappedInstance as PrecipitationLayer;
+      wrapper.find((PrecipitationLayer as any).wrappedComponent).instance() as PrecipitationLayer;
     expect(precipitationLayer.webglHeatmap).not.toEqual(null);
   });
 
@@ -48,7 +48,7 @@ describe("PrecipitationLayer component", () => {
       </Provider>
     );
     const precipitationLayer =
-      (wrapper.find(PrecipitationLayer).instance() as any).wrappedInstance as PrecipitationLayer;
+      wrapper.find((PrecipitationLayer as any).wrappedComponent).instance() as PrecipitationLayer;
     expect(precipitationLayer.webglHeatmap).not.toEqual(null);
     expect(precipitationLayer.webglHeatmap.addPoint).not.toHaveBeenCalled();
     stores.simulation.addPrecipitation();

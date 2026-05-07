@@ -32,7 +32,7 @@ describe("Right Panel component", () => {
         <RightPanel />
       </Provider>
     );
-    const panel = (wrapper.find(RightPanel).instance() as any).wrappedInstance as RightPanel;
+    const panel = wrapper.find((RightPanel as any).wrappedComponent).instance() as RightPanel;
     // right panel hidden by default
     expect(panel.state.open).toBe(false);
     wrapper.find("#base").simulate("click");
@@ -48,7 +48,7 @@ describe("Right Panel component", () => {
         <RightPanel />
       </Provider>
     );
-    const panel = (wrapper.find(RightPanel).instance() as any).wrappedInstance as RightPanel;
+    const panel = wrapper.find((RightPanel as any).wrappedComponent).instance() as RightPanel;
     expect(panel.state.open).toBe(false);
     wrapper.find("#base").simulate("click");
     expect(panel.state.open).toBe(true);
@@ -62,7 +62,7 @@ describe("Right Panel component", () => {
         <RightPanel />
       </Provider>
     );
-    const panel = (wrapper.find(RightPanel).instance() as any).wrappedInstance as RightPanel;
+    const panel = wrapper.find((RightPanel as any).wrappedComponent).instance() as RightPanel;
     expect(panel.state.open).toBe(false);
     wrapper.find("#base").simulate("click");
     expect(panel.state.open).toBe(true);
@@ -102,7 +102,7 @@ describe("Right Panel component", () => {
         <RightPanel />
       </Provider>
     );
-    const panel = (wrapper.find(RightPanel).instance() as any).wrappedInstance as RightPanel;
+    const panel = wrapper.find((RightPanel as any).wrappedComponent).instance() as RightPanel;
     expect(panel.state.open).toBe(false);
     wrapper.find("#overlay").simulate("click");
     expect(panel.state.open).toBe(true);

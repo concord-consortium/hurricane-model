@@ -132,7 +132,7 @@ describe("MapView component", () => {
           <MapView />
         </Provider>
       );
-      const mapView = (wrapper.find(MapView).instance() as any).wrappedInstance;
+      const mapView = wrapper.find((MapView as any).wrappedComponent).instance() as any;
       stores.ui.thermometerActive = false;
       const mockEvent = createMockLeafletMouseEvent(25.5, -70.3);
       mapView.handleMouseClick(mockEvent);
@@ -150,7 +150,7 @@ describe("MapView component", () => {
           <MapView />
         </Provider>
       );
-      const mapView = (wrapper.find(MapView).instance() as any).wrappedInstance;
+      const mapView = wrapper.find((MapView as any).wrappedComponent).instance() as any;
       stores.ui.thermometerActive = true;
       // Mock seaSurfaceTempAt to return a temperature
       jest.spyOn(stores.simulation, "seaSurfaceTempAt")
@@ -176,7 +176,7 @@ describe("MapView component", () => {
           <MapView />
         </Provider>
       );
-      const mapView = (wrapper.find(MapView).instance() as any).wrappedInstance;
+      const mapView = wrapper.find((MapView as any).wrappedComponent).instance() as any;
       stores.ui.thermometerActive = false;
       // Create a target inside a leaflet-marker-pane
       const markerPane = document.createElement("div");
@@ -210,7 +210,7 @@ describe("MapView component", () => {
           <MapView />
         </Provider>
       );
-      const mapView = (wrapper.find(MapView).instance() as any).wrappedInstance;
+      const mapView = wrapper.find((MapView as any).wrappedComponent).instance() as any;
       stores.ui.thermometerActive = true;
       jest.spyOn(stores.simulation, "seaSurfaceTempAt")
         .mockReturnValue(27.3);
@@ -240,7 +240,7 @@ describe("MapView component", () => {
           <MapView />
         </Provider>
       );
-      const mapView = (wrapper.find(MapView).instance() as any).wrappedInstance;
+      const mapView = wrapper.find((MapView as any).wrappedComponent).instance() as any;
       stores.ui.thermometerActive = true;
       jest.spyOn(stores.simulation, "seaSurfaceTempAt")
         .mockReturnValue(26.0);

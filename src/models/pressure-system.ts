@@ -1,4 +1,4 @@
-import { action, observable, computed } from "mobx";
+import { action, observable, computed, makeObservable } from "mobx";
 import { ICoordinates, IWindPoint } from "../types";
 import { vecAverage } from "../math-utils";
 import { headingTo, moveTo, distanceTo } from "geolocation-utils";
@@ -53,6 +53,7 @@ export class PressureSystem {
     if (props.strength !== undefined) {
       this.strength = props.strength;
     }
+    makeObservable(this);
     this.initialState = JSON.parse(JSON.stringify(this));
   }
 

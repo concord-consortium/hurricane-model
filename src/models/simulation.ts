@@ -2,7 +2,7 @@ import { lineString } from "@turf/helpers";
 import { Position } from "geojson";
 import lineIntersect from "@turf/line-intersect";
 import { LatLngExpression, CRS, LatLngBounds, latLngBounds, LatLngLiteral } from "leaflet";
-import { action, observable, computed, autorun, toJS } from "mobx";
+import { action, observable, computed, autorun, toJS, makeObservable } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
 import * as decWind from "../../wind-data-json/dec-simple.json";
@@ -238,7 +238,7 @@ export class SimulationModel {
   public windKdTreeCache: any;
   public pressureSystemSettings: PressureSystem[] = [];
   // Callback used by tests.
-  public _seaSurfaceTempDataParsed: () => void;
+  public _seaSurfaceTempDataParsed: () => void = () => null;
   protected initialState: SimulationModel;
   private previousTimestamp = 0;
 
@@ -251,6 +251,7 @@ export class SimulationModel {
     this.pressureSystems = (options.pressureSystems || config.pressureSystems).map(
       (o: IPressureSystemOptions) => new PressureSystem(o)
     );
+    makeObservable(this);
     autorun(() => {
       // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
       // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature

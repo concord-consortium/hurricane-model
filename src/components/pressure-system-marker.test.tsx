@@ -33,7 +33,7 @@ describe("PressureSystemMarker component", () => {
         </Map>
       </Provider>
     );
-    const marker = (wrapper.find(PressureSystemMarker).instance() as any).wrappedInstance as PressureSystemMarker;
+    const marker = wrapper.find((PressureSystemMarker as any).wrappedComponent).instance() as PressureSystemMarker;
     marker.handlePressureSysDrag({latlng: {lat: 20, lng: 30} as LatLng} as LeafletMouseEvent);
     expect(model.center).toEqual({lat: 20, lng: 30});
 

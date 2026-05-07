@@ -110,7 +110,7 @@ describe("BottomBar component", () => {
           <BottomBar />
         </Provider>
       );
-      const bottomBar = (wrapper.find(BottomBar).instance() as any).wrappedInstance as BottomBar;
+      const bottomBar = wrapper.find((BottomBar as any).wrappedComponent).instance() as BottomBar;
       // Start the simulation first so we can stop it
       bottomBar.handleStartStop();
       (logModule.log as jest.Mock).mockClear();
@@ -133,7 +133,7 @@ describe("BottomBar component", () => {
           <BottomBar />
         </Provider>
       );
-      const bottomBar = (wrapper.find(BottomBar).instance() as any).wrappedInstance as BottomBar;
+      const bottomBar = wrapper.find((BottomBar as any).wrappedComponent).instance() as BottomBar;
       bottomBar.handleStartStop();
       const startedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationStarted"

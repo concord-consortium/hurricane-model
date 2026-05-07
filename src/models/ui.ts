@@ -1,4 +1,4 @@
-import { action, observable, computed } from "mobx";
+import { action, observable, computed, makeObservable } from "mobx";
 import { LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds, LatLngTuple } from "leaflet";
 import config from "../config";
 import { mapLayer, MapTilesName, mapTilesNames } from "../map-layer-tiles";
@@ -66,7 +66,7 @@ export class UIModel {
   };
   @observable public windArrows = config.windArrows;
   @observable public hurricaneImage = config.hurricaneImage;
-  @observable public mapBounds: LatLngBounds;
+  @observable public mapBounds: LatLngBounds | null = null;
   @observable public mapZoom = 1;
   @observable public baseMap: MapTilesName = config.map;
   @observable public overlay: Overlay | null = config.overlay;
@@ -79,6 +79,7 @@ export class UIModel {
   protected initialState: UIModel;
 
   constructor() {
+    makeObservable(this);
     this.initialState = JSON.parse(JSON.stringify(this));
     if ((this.initialState.baseMap === "population") && !config.enablePopulationMap) {
       this.initialState.baseMap = "street";
