@@ -2,7 +2,7 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapTilesName } from "../map-layer-tiles";
 import { Overlay } from "../models/ui";
-import * as leveedAreaKey from "../assets/leveed-area-key.png";
+import leveedAreaKey from "../assets/leveed-area-key.png";
 import { SSTKey } from "./sst-key";
 
 import * as css from "./map-button-key.scss";

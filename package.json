@@ -30,7 +30,7 @@
     "moduleNameMapper": {
       "\\.svg$": "<rootDir>/__mocks__/svgMock.js",
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
+      "\\.(css|less|sass|scss)$": "<rootDir>/__mocks__/cssMock.js"
     },
     "moduleFileExtensions": [
       "ts",
@@ -120,7 +120,7 @@
     "tslint": "^5.20.1",
     "tslint-loader": "^3.5.4",
     "tslint-react": "^4.2.0",
-    "typescript": "^4.9.5",
+    "typescript": "^5.9.3",
     "url-loader": "^2.3.0",
     "wait-on": "^9.0.5",
     "webpack": "^4.47.0",

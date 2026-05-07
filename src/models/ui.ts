@@ -5,22 +5,22 @@ import { mapLayer, MapTilesName, mapTilesNames } from "../map-layer-tiles";
 import { Season, ISSTImages } from "../types";
 
 export type InteractiveMode = "runtime" | "authoring" | "report" | "reportItem";
-import * as decSeaTempDefault from "../../sea-surface-temp-img/dec-default.png";
-import * as marchSeaTempDefault from "../../sea-surface-temp-img/mar-default.png";
-import * as juneSeaTempDefault from "../../sea-surface-temp-img/jun-default.png";
-import * as septSeaTempDefault from "../../sea-surface-temp-img/sep-default.png";
-import * as decSeaTempPurple3 from "../../sea-surface-temp-img/dec-purple3.png";
-import * as marchSeaTempPurple3 from "../../sea-surface-temp-img/mar-purple3.png";
-import * as juneSeaTempPurple3 from "../../sea-surface-temp-img/jun-purple3.png";
-import * as septSeaTempPurple3 from "../../sea-surface-temp-img/sep-purple3.png";
-import * as decSeaTempPurpleCC from "../../sea-surface-temp-img/dec-purpleCC.png";
-import * as marchSeaTempPurpleCC from "../../sea-surface-temp-img/mar-purpleCC.png";
-import * as juneSeaTempPurpleCC from "../../sea-surface-temp-img/jun-purpleCC.png";
-import * as septSeaTempPurpleCC from "../../sea-surface-temp-img/sep-purpleCC.png";
-import * as decSeaTempRainbowCC from "../../sea-surface-temp-img/dec-rainbowCC.png";
-import * as marchSeaTempRainbowCC from "../../sea-surface-temp-img/mar-rainbowCC.png";
-import * as juneSeaTempRainbowCC from "../../sea-surface-temp-img/jun-rainbowCC.png";
-import * as septSeaTempRainbowCC from "../../sea-surface-temp-img/sep-rainbowCC.png";
+import decSeaTempDefault from "../../sea-surface-temp-img/dec-default.png";
+import marchSeaTempDefault from "../../sea-surface-temp-img/mar-default.png";
+import juneSeaTempDefault from "../../sea-surface-temp-img/jun-default.png";
+import septSeaTempDefault from "../../sea-surface-temp-img/sep-default.png";
+import decSeaTempPurple3 from "../../sea-surface-temp-img/dec-purple3.png";
+import marchSeaTempPurple3 from "../../sea-surface-temp-img/mar-purple3.png";
+import juneSeaTempPurple3 from "../../sea-surface-temp-img/jun-purple3.png";
+import septSeaTempPurple3 from "../../sea-surface-temp-img/sep-purple3.png";
+import decSeaTempPurpleCC from "../../sea-surface-temp-img/dec-purpleCC.png";
+import marchSeaTempPurpleCC from "../../sea-surface-temp-img/mar-purpleCC.png";
+import juneSeaTempPurpleCC from "../../sea-surface-temp-img/jun-purpleCC.png";
+import septSeaTempPurpleCC from "../../sea-surface-temp-img/sep-purpleCC.png";
+import decSeaTempRainbowCC from "../../sea-surface-temp-img/dec-rainbowCC.png";
+import marchSeaTempRainbowCC from "../../sea-surface-temp-img/mar-rainbowCC.png";
+import juneSeaTempRainbowCC from "../../sea-surface-temp-img/jun-rainbowCC.png";
+import septSeaTempRainbowCC from "../../sea-surface-temp-img/sep-rainbowCC.png";
 
 export const sstImages: Record<string, ISSTImages> = {
   default: {

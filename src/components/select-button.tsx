@@ -1,15 +1,19 @@
 import * as React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
+import Select, { SelectProps } from "@material-ui/core/Select";
 
 import * as css from "./select-button.scss";
+
+// Material-UI's Select doesn't export the event type, but its onChange handler
+// signature gives it to us by extraction.
+export type SelectChangeEvent = Parameters<NonNullable<SelectProps["onChange"]>>[0];
 
 interface ISelectButtonProps {
   disabled?: boolean;
   label: string;
   menuItems: Array<{ value: string; label: string; testId: string }>;
   value: string;
-  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onChange: SelectProps["onChange"];
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
 }
@@ -31,7 +35,7 @@ export const SelectButton: React.FC<ISelectButtonProps> = (props) => {
           data-test={selectTestId}
           disabled={disabled}
           disableUnderline={true}
-          renderValue={(selectedValue: string) => (
+          renderValue={(selectedValue) => (
             <span style={{ paddingLeft: 8 }}>
               {menuItems.find(item => item.value === selectedValue)?.label}
             </span>

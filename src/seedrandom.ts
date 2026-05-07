@@ -1,4 +1,4 @@
-import * as seedrandom from "seedrandom";
+import seedrandom from "seedrandom";
 
 const SEED = "HurricaneModel";
 let rand: seedrandom.StatefulPRNG<any> | null = null;

@@ -9,10 +9,10 @@ import * as decWind from "../../wind-data-json/dec-simple.json";
 import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
 import * as septWind from "../../wind-data-json/sep-simple.json";
-import * as decSeaTemp from "../../sea-surface-temp-img/dec-default.png";
-import * as marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
-import * as juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
-import * as septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
+import decSeaTemp from "../../sea-surface-temp-img/dec-default.png";
+import marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
+import juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
+import septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
 import { kdTree } from "kd-tree-javascript";
 import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
   StartLocation, StartLocationNames, isStartLocationName, isCoordinates} from "../types";

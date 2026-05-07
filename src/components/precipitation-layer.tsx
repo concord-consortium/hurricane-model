@@ -4,7 +4,7 @@ import CanvasLayer from "./react-leaflet-canvas-layer";
 import { ICoordinates } from "../types";
 import { inject, observer } from "mobx-react";
 import { autorun } from "mobx";
-import * as PrecipitationScaleSrc from "../assets/precipitation-scale.png";
+import PrecipitationScaleSrc from "../assets/precipitation-scale.png";
 import { BaseComponent, IBaseProps } from "./base";
 import * as React from "react";
 import * as L from "leaflet";
