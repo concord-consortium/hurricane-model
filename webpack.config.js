@@ -21,6 +21,14 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
+          // TODO(webpack-5-cleanup): Remove this rule when upgrading to webpack 5.
+          // Pixi v6 ships .mjs ESM files imported by sibling .js CJS files; webpack 4
+          // refuses that combination unless .mjs is treated as javascript/auto.
+          test: /\.mjs$/,
+          include: /node_modules/,
+          type: 'javascript/auto'
+        },
+        {
           test: /\.tsx?$/,
           enforce: 'pre',
           use: [
@@ -100,7 +108,15 @@ module.exports = (env, argv) => {
       ]
     },
     resolve: {
-      extensions: ['.ts', '.tsx', '.js']
+      extensions: ['.ts', '.tsx', '.js'],
+      // TODO(webpack-5-cleanup): Prefer `main` (CJS) over `module` (ESM) for package
+      // resolution. Pixi v6 ships dual ESM/CJS — when webpack picks ESM at our
+      // import site but the bundle's internal `require()`s pick CJS, we end up
+      // with two copies of every pixi class. The canvas mixins patch one set, our
+      // `new PIXI.Container()` instantiates from the other, and runtime methods
+      // (e.g., `renderCanvas`) are missing. Webpack 5 handles this cleanly via
+      // conditional exports.
+      mainFields: ['browser', 'main', 'module']
     },
     stats: {
       // suppress "export not found" warnings about re-exported types

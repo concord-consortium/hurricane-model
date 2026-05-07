@@ -13,49 +13,67 @@ const color = 0xffffff;
 const shadow = 0x000000;
 const opacity = 1;
 
-// Build the source Graphics at module scope; convert to textures lazily once the
-// pixiApp's renderer is available (see ensureTextures).
-const lineGraphics = (() => {
-  const graph = new PIXI.Graphics();
-  const shadowOffset = 1;
-  graph.beginFill(shadow);
-  graph.drawRect(0, 0, vectorWidth + shadowOffset, 1);
-  graph.endFill();
-  graph.beginFill(color);
-  graph.drawRect(0, 0, vectorWidth, 1);
-  graph.endFill();
-  return graph;
-})();
+// Build textures from a 2D canvas rather than from PIXI.Graphics. The shapes are
+// trivial (solid-color rect + triangle) and PIXI.Graphics-to-texture went through
+// pixi's batch system, which crashes on un-rendered Graphics in v6.
+function colorToCss(c: number) {
+  return `#${c.toString(16).padStart(6, "0")}`;
+}
 
-const arrowGraphics = (() => {
-  const graph = new PIXI.Graphics();
+function buildLineCanvas() {
   const shadowOffset = 1;
-  graph.beginFill(shadow);
-  graph.drawPolygon([
-    0, 0,
-    arrowHeadSize * 0.5 * vectorWidth + shadowOffset, -arrowHeadSize * vectorWidth - shadowOffset,
-    arrowHeadSize * vectorWidth + shadowOffset, 0
-  ]);
-  graph.endFill();
-  graph.beginFill(color);
-  graph.drawPolygon([
-    0, 0,
-    arrowHeadSize * 0.5 * vectorWidth, -arrowHeadSize * vectorWidth,
-    arrowHeadSize * vectorWidth, 0
-  ]);
-  graph.endFill();
-  return graph;
-})();
+  const w = vectorWidth + shadowOffset;
+  const h = 1;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = colorToCss(shadow);
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = colorToCss(color);
+  ctx.fillRect(0, 0, vectorWidth, h);
+  return canvas;
+}
+
+function buildArrowCanvas() {
+  const shadowOffset = 1;
+  const headW = arrowHeadSize * vectorWidth + shadowOffset;
+  const headH = arrowHeadSize * vectorWidth + shadowOffset;
+  const canvas = document.createElement("canvas");
+  canvas.width = headW;
+  canvas.height = headH;
+  const ctx = canvas.getContext("2d")!;
+  // Source coordinates use y-up, with the apex at -arrowHeadSize * vectorWidth.
+  // Translate so the canvas covers [0,0]..[headW, headH], with the base at the bottom.
+  ctx.translate(0, headH);
+  // Shadow polygon
+  ctx.fillStyle = colorToCss(shadow);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(arrowHeadSize * 0.5 * vectorWidth + shadowOffset, -arrowHeadSize * vectorWidth - shadowOffset);
+  ctx.lineTo(arrowHeadSize * vectorWidth + shadowOffset, 0);
+  ctx.closePath();
+  ctx.fill();
+  // Foreground polygon
+  ctx.fillStyle = colorToCss(color);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(arrowHeadSize * 0.5 * vectorWidth, -arrowHeadSize * vectorWidth);
+  ctx.lineTo(arrowHeadSize * vectorWidth, 0);
+  ctx.closePath();
+  ctx.fill();
+  return canvas;
+}
 
 let lineTexture: PIXI.Texture | null = null;
 let arrowTexture: PIXI.Texture | null = null;
-function ensureTextures(renderer: PIXI.Renderer | PIXI.AbstractRenderer) {
+function ensureTextures() {
   if (!lineTexture) {
-    lineTexture = renderer.generateTexture(lineGraphics, PIXI.SCALE_MODES.LINEAR, 2);
+    lineTexture = PIXI.Texture.from(buildLineCanvas(), { scaleMode: PIXI.SCALE_MODES.LINEAR });
     lineTexture.defaultAnchor = new PIXI.Point(0.5, 1);
   }
   if (!arrowTexture) {
-    arrowTexture = renderer.generateTexture(arrowGraphics, PIXI.SCALE_MODES.LINEAR, 2);
+    arrowTexture = PIXI.Texture.from(buildArrowCanvas(), { scaleMode: PIXI.SCALE_MODES.LINEAR });
     arrowTexture.defaultAnchor = new PIXI.Point(0.5, 0.5);
   }
 }
@@ -105,13 +123,13 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
       this.pixiApp = new PIXI.Application({
         width: info.canvas.width,
         height: info.canvas.height,
-        transparent: true,
         antialias: true,
         autoStart: false, // do not start animation, render only when necessary
+        backgroundAlpha: 0,
         view: info.canvas,
         resolution: window.devicePixelRatio
       });
-      ensureTextures(this.pixiApp.renderer);
+      ensureTextures();
       // Add shutterbug support. See: shutterbug-support.ts.
       info.canvas.render = this.pixiApp.render.bind(this.pixiApp);
       info.canvas.classList.add("canvas-3d");
