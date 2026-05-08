@@ -138,7 +138,8 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
         this.disposeObserver = autorun(() => this.updateArrows());
 
         return app;
-      });
+      })
+      // TODO: Catch and properly handle errors if pixi fails to init.
       return;
     }
 
