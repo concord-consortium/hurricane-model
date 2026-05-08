@@ -34,8 +34,7 @@ export const SelectButton: React.FC<ISelectButtonProps> = (props) => {
           className={css.select}
           data-test={selectTestId}
           disabled={disabled}
-          disableUnderline={true}
-          renderValue={(selectedValue) => (
+          renderValue={(selectedValue: string) => (
             <span style={{ paddingLeft: 8 }}>
               {menuItems.find(item => item.value === selectedValue)?.label}
             </span>
