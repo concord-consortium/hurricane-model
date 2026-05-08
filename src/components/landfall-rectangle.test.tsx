@@ -32,7 +32,7 @@ describe("Landfall rectangle", () => {
         </Map>
       </Provider>
     );
-    const rect = (wrapper.find(LandfallRectangle).instance() as any).wrappedInstance as LandfallRectangle;
+    const rect = wrapper.find((LandfallRectangle as any).wrappedComponent).instance() as LandfallRectangle;
     const bounds = rect.getBounds();
     expect(lat).toBeGreaterThan(bounds[0][0]);
     expect(lat).toBeLessThan(bounds[1][0]);
@@ -49,7 +49,7 @@ describe("Landfall rectangle", () => {
         </Map>
       </Provider>
     );
-    const rect = (wrapper.find(LandfallRectangle).instance() as any).wrappedInstance as LandfallRectangle;
+    const rect = wrapper.find((LandfallRectangle as any).wrappedComponent).instance() as LandfallRectangle;
     rect.handleClick();
     expect(stores.ui.setZoomedInView).toHaveBeenCalled();
   });

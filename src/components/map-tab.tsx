@@ -2,9 +2,9 @@ import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapType } from "./right-panel";
-import * as css from "./map-tab.scss";
-import * as baseMapTabImg from "../assets/base-map-tab.png";
-import * as overlayTabImg from "../assets/overlay-tab.png";
+import css from "./map-tab.scss";
+import baseMapTabImg from "../assets/base-map-tab.png";
+import overlayTabImg from "../assets/overlay-tab.png";
 
 interface IProps extends IBaseProps {
   tabType: MapType;

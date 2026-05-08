@@ -4,7 +4,7 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { Season, seasonLabels } from "../types";
 import config from "../config";
-import { SelectButton } from "./select-button";
+import { SelectButton, SelectChangeEvent } from "./select-button";
 
 interface IProps extends IBaseProps {
   onMenuOpen?: () => void;
@@ -42,7 +42,7 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
     );
   }
 
-  public handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  public handleSeasonChange = (event: SelectChangeEvent) => {
     const season = event.target.value as Season;
     this.stores.simulation.setSeason(season);
     log("SeasonChanged", { season });

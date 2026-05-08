@@ -27,7 +27,7 @@ describe("MapButton component", () => {
         <MapButton mapType="base" label="Street" value="street" />
       </Provider>
     );
-    const btn = (wrapper.find(MapButton).instance() as any).wrappedInstance as MapButton;
+    const btn = wrapper.find((MapButton as any).wrappedComponent).instance() as MapButton;
     expect(stores.ui.baseMap).toEqual("satellite");
     btn.handleMapSelect();
     expect(stores.ui.setMapTiles).toHaveBeenCalled();
@@ -41,7 +41,7 @@ describe("MapButton component", () => {
         <MapButton mapType="overlay" label="Precipitation" value="precipitation" />
       </Provider>
     );
-    const btn = (wrapper.find(MapButton).instance() as any).wrappedInstance as MapButton;
+    const btn = wrapper.find((MapButton as any).wrappedComponent).instance() as MapButton;
     expect(stores.ui.overlay).toEqual(config.overlay);
     btn.handleMapSelect();
     expect(stores.ui.setOverlay).toHaveBeenCalled();

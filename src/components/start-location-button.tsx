@@ -4,7 +4,7 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { StartLocationNames, startLocationNameLabels } from "../types";
 import config from "../config";
-import { SelectButton } from "./select-button";
+import { SelectButton, SelectChangeEvent } from "./select-button";
 
 interface IProps extends IBaseProps {
   onMenuOpen?: () => void;
@@ -44,7 +44,7 @@ export class StartLocationButton extends BaseComponent<IProps, IState> {
     );
   }
 
-  public handleStartLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  public handleStartLocationChange = (event: SelectChangeEvent) => {
     const startLocation = event.target.value as StartLocationNames;
     this.stores.simulation.setStartLocation(startLocation);
     log("StartLocationChanged", { startLocation });

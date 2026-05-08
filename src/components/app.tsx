@@ -5,7 +5,7 @@ import { IndexPage } from "./index-page";
 
 import config from "../config";
 
-import * as css from "./app.scss";
+import css from "./app.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {}

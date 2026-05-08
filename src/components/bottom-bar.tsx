@@ -19,7 +19,7 @@ import ThermometerHoverIcon from "../assets/thermometer-hover.svg";
 import { log } from "../log";
 import { IconButton } from "./icon-button";
 import { StartLocationButton } from "./start-location-button";
-import * as css from "./bottom-bar.scss";
+import css from "./bottom-bar.scss";
 
 interface IProps extends IBaseProps {}
 interface IState {
@@ -58,13 +58,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public componentDidMount() {
-    if (screenfull && screenfull.enabled) {
+    if (screenfull && screenfull.isEnabled) {
       document.addEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
   }
 
   public componentWillUnmount() {
-    if (screenfull && screenfull.enabled) {
+    if (screenfull && screenfull.isEnabled) {
       document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
   }
@@ -175,7 +175,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         {/* This empty container is necessary so the spacing works correctly */}
         <div className={css.rightContainer}>
           {
-            screenfull && screenfull.enabled &&
+            screenfull && screenfull.isEnabled &&
             <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" />
           }
         </div>

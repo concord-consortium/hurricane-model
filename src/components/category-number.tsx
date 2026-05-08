@@ -6,7 +6,7 @@ import SVG3 from "../assets/3.svg";
 import SVG4 from "../assets/4.svg";
 import SVG5 from "../assets/5.svg";
 
-import * as css from "./category-number.scss";
+import css from "./category-number.scss";
 
 const CategorySVG: Record<number, React.ReactElement> = {
   0: <SVGTS />,

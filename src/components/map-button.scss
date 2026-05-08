@@ -1,4 +1,4 @@
-@import "common";
+@use "common" as *;
 
 .mapButton {
   box-sizing: border-box !important;

@@ -1,4 +1,4 @@
-@import "common.scss";
+@use "common" as *;
 
 .landfallRectangle {
   fill-opacity: 0.1;

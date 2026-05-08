@@ -1,17 +1,18 @@
-import { lineString, Position } from "@turf/helpers";
+import { lineString } from "@turf/helpers";
+import { Position } from "geojson";
 import lineIntersect from "@turf/line-intersect";
 import { LatLngExpression, CRS, LatLngBounds, latLngBounds, LatLngLiteral } from "leaflet";
-import { action, observable, computed, autorun, toJS } from "mobx";
+import { action, observable, computed, autorun, toJS, makeObservable } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
 import * as decWind from "../../wind-data-json/dec-simple.json";
 import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
 import * as septWind from "../../wind-data-json/sep-simple.json";
-import * as decSeaTemp from "../../sea-surface-temp-img/dec-default.png";
-import * as marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
-import * as juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
-import * as septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
+import decSeaTemp from "../../sea-surface-temp-img/dec-default.png";
+import marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
+import juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
+import septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
 import { kdTree } from "kd-tree-javascript";
 import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
   StartLocation, StartLocationNames, isStartLocationName, isCoordinates} from "../types";
@@ -101,6 +102,62 @@ const benchmarkInterval = 30;
 const precipitationUpdateInterval = 5;
 
 export class SimulationModel {
+  // Region boundaries. Used only for optimization.
+  @observable public east = 45;
+  @observable public north = 45;
+  @observable public west = -45;
+  @observable public south = -45;
+  @observable public hurricaneTrack: ITrackPoint[] = [];
+  @observable public startLocation: StartLocation;
+  // Current season, sets wind and sea temperature (in the future).
+  @observable public season: Season;
+  @observable public seaSurfaceTempData: PNG | null = null;
+  @observable public precipitationPoints: IPrecipitationPoint[] = [];
+  // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
+  @observable public simulationFinished = false;
+  // Pressure systems affect winds.
+  @observable public pressureSystems: PressureSystem[] = [];
+  @observable public hurricane: Hurricane = new Hurricane({
+    center: resolveStartLocation(config.initialHurricanePosition),
+    strength: config.hurricaneStrength,
+    speed: config.initialHurricaneSpeed
+  });
+  @observable public simulationStarted = false;
+  @observable public simulationRunning = false;
+  @observable public strengthChangePositions: number[] = [];
+  @observable public landfalls: ILandfall[] = [];
+  @observable public stepsPerSecond = 0;
+  public time = 0;
+  public numberOfStepsOverSea = 0;
+  public numberOfStepsOverLand = 0;
+  public extendedLandfallAreas: LatLngBounds[] = Object.values(extendedLandfallBounds);
+  public windKdTreeCache: any;
+  public pressureSystemSettings: PressureSystem[] = [];
+  // Callback used by tests.
+  public _seaSurfaceTempDataParsed: null | (() => void) = null;
+
+  protected initialState: SimulationModel;
+  private previousTimestamp = 0;
+
+  constructor(options?: ISimulationOptions) {
+    if (!options) {
+      options = {};
+    }
+    this.startLocation = options.startLocation || config.initialHurricanePosition;
+    this.season = options.season || config.season;
+    this.pressureSystems = (options.pressureSystems || config.pressureSystems).map(
+      (o: IPressureSystemOptions) => new PressureSystem(o)
+    );
+    makeObservable(this);
+    autorun(() => {
+      // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
+      // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
+      // data is always updated when necessary.
+      this.updateSeaSurfaceTempData();
+    });
+    this.initialState = JSON.parse(JSON.stringify(this));
+  }
+
   @computed get areaWidth() {
     return this.east - this.west;
   }
@@ -205,58 +262,9 @@ export class SimulationModel {
   @computed get dataSeaSurfaceTempImgUrl() {
     return sstImages[this.season];
   }
-  // Region boundaries. Used only for optimization.
-  @observable public east = 45;
-  @observable public north = 45;
-  @observable public west = -45;
-  @observable public south = -45;
-  @observable public hurricaneTrack: ITrackPoint[] = [];
-  @observable public startLocation: StartLocation;
-  // Current season, sets wind and sea temperature (in the future).
-  @observable public season: Season;
-  @observable public seaSurfaceTempData: PNG | null = null;
-  @observable public precipitationPoints: IPrecipitationPoint[] = [];
-  // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
-  @observable public simulationFinished = false;
-  // Pressure systems affect winds.
-  @observable public pressureSystems: PressureSystem[] = [];
-  @observable public hurricane: Hurricane = new Hurricane({
-    center: resolveStartLocation(config.initialHurricanePosition),
-    strength: config.hurricaneStrength,
-    speed: config.initialHurricaneSpeed
-  });
-  @observable public simulationStarted = false;
-  @observable public simulationRunning = false;
-  @observable public strengthChangePositions: number[] = [];
-  @observable public landfalls: ILandfall[] = [];
-  @observable public stepsPerSecond = 0;
-  public time = 0;
-  public numberOfStepsOverSea = 0;
-  public numberOfStepsOverLand = 0;
-  public extendedLandfallAreas: LatLngBounds[] = Object.values(extendedLandfallBounds);
-  public windKdTreeCache: any;
-  public pressureSystemSettings: PressureSystem[] = [];
-  // Callback used by tests.
-  public _seaSurfaceTempDataParsed: () => void;
-  protected initialState: SimulationModel;
-  private previousTimestamp = 0;
 
-  constructor(options?: ISimulationOptions) {
-    if (!options) {
-      options = {};
-    }
-    this.startLocation = options.startLocation || config.initialHurricanePosition;
-    this.season = options.season || config.season;
-    this.pressureSystems = (options.pressureSystems || config.pressureSystems).map(
-      (o: IPressureSystemOptions) => new PressureSystem(o)
-    );
-    autorun(() => {
-      // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
-      // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
-      // data is always updated when necessary.
-      this.updateSeaSurfaceTempData();
-    });
-    this.initialState = JSON.parse(JSON.stringify(this));
+  @action.bound public setSeaSurfaceTempData(seaSurfaceTempData: PNG | null) {
+    this.seaSurfaceTempData = seaSurfaceTempData;
   }
 
   @action.bound public updateBounds(bounds: LatLngBounds) {
@@ -690,20 +698,20 @@ export class SimulationModel {
 
   private updateSeaSurfaceTempData() {
     // Set data to null so the model know that it's not available while the new one is being downloaded.
-    this.seaSurfaceTempData = null;
+    this.setSeaSurfaceTempData(null);
     fetch(this.dataSeaSurfaceTempImgUrl).then(response => {
       if (response.ok) {
         response.arrayBuffer().then(buffer => {
           const png = new PNG();
           png.parse(Buffer.from(buffer), (err, validPng) => {
             if (err) {
-              throw err;
+              // tslint:disable-next-line:no-console
+              console.error("Failed to parse sea surface temperature PNG:", err);
+              return;
             }
-            this.seaSurfaceTempData = validPng;
+            this.setSeaSurfaceTempData(validPng);
             // Callback used for testing.
-            if (this._seaSurfaceTempDataParsed) {
-              this._seaSurfaceTempDataParsed();
-            }
+            this._seaSurfaceTempDataParsed?.();
           });
         });
       }

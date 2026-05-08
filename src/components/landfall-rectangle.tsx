@@ -4,7 +4,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import { Rectangle } from "react-leaflet";
 import { ICoordinates } from "../types";
 import {LatLngBoundsLiteral} from "leaflet";
-import * as css from "./landfall-rectangle.scss";
+import css from "./landfall-rectangle.scss";
 
 interface IProps extends IBaseProps {
   position: ICoordinates;

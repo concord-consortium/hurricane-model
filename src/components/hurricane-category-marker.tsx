@@ -3,8 +3,8 @@ import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import CategoryMarkerSVG from "../assets/category-marker.svg";
 import { ITrackPoint } from "../types";
 import { CategoryNumber } from "./category-number";
-import * as categoryCss from "./hurricane-marker.scss";
-import * as css from "./hurricane-category-marker.scss";
+import categoryCss from "./hurricane-marker.scss";
+import css from "./hurricane-category-marker.scss";
 
 interface IProps  {
   point: ITrackPoint;

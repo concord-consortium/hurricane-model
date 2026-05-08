@@ -1,15 +1,18 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
+    "rootDir": "./src/",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "commonjs",
-    "target": "es5",
+    "target": "ES6",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "strictNullChecks": true,
+    "skipLibCheck": true,
     "types": ["jest"],
     "jsx": "react",
     "lib": [

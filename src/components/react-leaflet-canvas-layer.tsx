@@ -38,7 +38,7 @@ export default withLeaflet(class CanvasLayer extends MapLayer<IProps> {
     const center = this.map.getCenter();
     const corner = this.map.containerPointToLatLng(this.map.getSize());
     const data = this.props.data;
-    this.props.drawMethod && this.props.drawMethod({
+    this.props.drawMethod?.({
       map: this.map,
       canvas: this.canvas,
       bounds,

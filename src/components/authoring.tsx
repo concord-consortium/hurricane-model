@@ -3,7 +3,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import Form, { ISubmitEvent } from "react-jsonschema-form";
 import config from "../config";
 import { JSONSchema6 } from "json-schema";
-import * as css from "./authoring.scss";
+import css from "./authoring.scss";
 
 interface IProps extends IBaseProps {}
 interface IState { }

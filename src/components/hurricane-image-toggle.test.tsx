@@ -27,7 +27,7 @@ describe("HurricaneImageToggle component", () => {
         <HurricaneImageToggle />
       </Provider>
     );
-    const toggle = (wrapper.find(HurricaneImageToggle).instance() as any).wrappedInstance as HurricaneImageToggle;
+    const toggle = wrapper.find((HurricaneImageToggle as any).wrappedComponent).instance() as HurricaneImageToggle;
     toggle.handleChange(null, true);
     expect(stores.ui.hurricaneImage).toEqual(true);
     toggle.handleChange(null, false);

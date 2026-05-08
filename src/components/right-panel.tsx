@@ -5,7 +5,7 @@ import { MapTab } from "./map-tab";
 import { MapButton } from "./map-button";
 import config from "../config";
 
-import * as css from "./right-panel.scss";
+import css from "./right-panel.scss";
 import { log } from "../log";
 
 export type MapType = "base" | "overlay";

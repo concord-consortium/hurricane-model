@@ -2,6 +2,11 @@ const crypto = require("crypto");
 const enzyme = require("enzyme");
 const Adapter = require("enzyme-adapter-react-16");
 const seedrandom = require("./seedrandom");
+const { configure } = require("mobx");
+
+// Allow tests to use jest.spyOn against @action.bound methods. mobx 6 makes them
+// non-writable by default, which breaks direct-assignment spies.
+configure({ safeDescriptors: false });
 
 // Polyfill crypto.getRandomValues for nanoid (used by @concord-consortium/lara-interactive-api)
 if (!global.crypto) {

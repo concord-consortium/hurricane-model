@@ -79,7 +79,7 @@ context("Test the Hurricane Model app", () => {
         cy.get(".sst-key--checkbox--__hurr-v1__ .MuiIconButton-label")
           .click()
           .then(() => {
-            cy.get('[src="dd7d513dc937501a59bcfe0b12d93fe3.png"]').should("be.visible");
+            cy.get('[src="91071a502fa66c0cde3e.png"]').should("be.visible");
           });
       });
 

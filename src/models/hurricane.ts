@@ -1,5 +1,5 @@
 import { IVector } from "../types";
-import { computed, action } from "mobx";
+import { computed, makeObservable, override } from "mobx";
 import { latLngPlusVector } from "../math-utils";
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 import config from "../config";
@@ -48,7 +48,7 @@ export class Hurricane extends PressureSystem {
     this.initialState = JSON.parse(JSON.stringify(this));
   }
 
-  @computed public get range() {
+  @override public get range() {
     // Hurricane range is a bit different than a pressure system range.
     return Math.pow(this.strength, 0.7) * 45000;
   }
@@ -136,7 +136,7 @@ export class Hurricane extends PressureSystem {
     }
   }
 
-  @action public reset() {
+  @override public reset() {
     super.reset();
     this.speed = Object.assign({}, this.initialState.speed);
     this.strengthChange = 0;

@@ -1,10 +1,11 @@
 import * as React from "react";
 import CanvasLayer from "./react-leaflet-canvas-layer";
+import { autorun } from "mobx";
 import {inject, observer} from "mobx-react";
 import {BaseComponent, IBaseProps} from "./base";
 import * as PIXI from "pixi.js";
-import {autorun} from "mobx";
 import {IVector, IWindPoint} from "../types";
+import { IStores } from "../models/stores";
 
 const vectorWidth = 2;
 const arrowHeadSize = 4;
@@ -12,43 +13,70 @@ const color = 0xffffff;
 const shadow = 0x000000;
 const opacity = 1;
 
-const lineTexture = (() => {
-  const graph = new PIXI.Graphics();
-  const shadowOffset = 1;
-  graph.beginFill(shadow);
-  graph.drawRect(0, 0, vectorWidth + shadowOffset, 1);
-  graph.endFill();
-  graph.beginFill(color);
-  graph.drawRect(0, 0, vectorWidth, 1);
-  graph.endFill();
-  const tex = graph.generateCanvasTexture(1, 2);
-  // Move anchor to the bottom of this texture.
-  tex.defaultAnchor = new PIXI.Point(0.5, 1);
-  return tex;
-})();
+// Build textures from a 2D canvas rather than from PIXI.Graphics. The shapes are
+// trivial (solid-color rect + triangle) and PIXI.Graphics-to-texture went through
+// pixi's batch system, which crashes on un-rendered Graphics in v6.
+function colorToCss(c: number) {
+  return `#${c.toString(16).padStart(6, "0")}`;
+}
 
-const arrowTexture = (() => {
-  const graph = new PIXI.Graphics();
+function buildLineCanvas() {
   const shadowOffset = 1;
-  graph.beginFill(shadow);
-  graph.drawPolygon([
-    0, 0,
-    arrowHeadSize * 0.5 * vectorWidth + shadowOffset, -arrowHeadSize * vectorWidth - shadowOffset,
-    arrowHeadSize * vectorWidth + shadowOffset, 0
-  ]);
-  graph.endFill();
-  graph.beginFill(color);
-  graph.drawPolygon([
-    0, 0,
-    arrowHeadSize * 0.5 * vectorWidth, -arrowHeadSize * vectorWidth,
-    arrowHeadSize * vectorWidth, 0
-  ]);
-  graph.endFill();
-  const tex = graph.generateCanvasTexture(2, 2);
-  // Move anchor to the bottom of this texture.
-  tex.defaultAnchor = new PIXI.Point(0.5, 0.5);
-  return tex;
-})();
+  const w = vectorWidth + shadowOffset;
+  const h = 1;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = colorToCss(shadow);
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = colorToCss(color);
+  ctx.fillRect(0, 0, vectorWidth, h);
+  return canvas;
+}
+
+function buildArrowCanvas() {
+  const shadowOffset = 1;
+  const headW = arrowHeadSize * vectorWidth + shadowOffset;
+  const headH = arrowHeadSize * vectorWidth + shadowOffset;
+  const canvas = document.createElement("canvas");
+  canvas.width = headW;
+  canvas.height = headH;
+  const ctx = canvas.getContext("2d")!;
+  // Source coordinates use y-up, with the apex at -arrowHeadSize * vectorWidth.
+  // Translate so the canvas covers [0,0]..[headW, headH], with the base at the bottom.
+  ctx.translate(0, headH);
+  // Shadow polygon
+  ctx.fillStyle = colorToCss(shadow);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(arrowHeadSize * 0.5 * vectorWidth + shadowOffset, -arrowHeadSize * vectorWidth - shadowOffset);
+  ctx.lineTo(arrowHeadSize * vectorWidth + shadowOffset, 0);
+  ctx.closePath();
+  ctx.fill();
+  // Foreground polygon
+  ctx.fillStyle = colorToCss(color);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(arrowHeadSize * 0.5 * vectorWidth, -arrowHeadSize * vectorWidth);
+  ctx.lineTo(arrowHeadSize * vectorWidth, 0);
+  ctx.closePath();
+  ctx.fill();
+  return canvas;
+}
+
+let lineTexture: PIXI.Texture | null = null;
+let arrowTexture: PIXI.Texture | null = null;
+function ensureTextures() {
+  if (!lineTexture) {
+    const source = new PIXI.CanvasSource({ resource: buildLineCanvas(), scaleMode: "linear" });
+    lineTexture = new PIXI.Texture({ source, defaultAnchor: { x: 0.5, y: 1 } });
+  }
+  if (!arrowTexture) {
+    const source = new PIXI.CanvasSource({ resource: buildArrowCanvas(), scaleMode: "linear" });
+    arrowTexture = new PIXI.Texture({ source, defaultAnchor: { x: 0.5, y: 0.5 } });
+  }
+}
 
 // Use this function to tweak visual length of the wind arrows.
 const arrowLengthFunc = (vec: IVector) => {
@@ -62,17 +90,22 @@ interface IState {}
 @observer
 export class PixiWindLayer extends BaseComponent<IProps, IState> {
   public pixiApp: PIXI.Application | null = null;
-  private disposeObserver: () => void;
+  private pixiAppInit: Promise<PIXI.Application> | null = null;
+  // TODO: Better solution for stores.
+  // We can't reference it as a prop in the reaction set up in componentDidMount.
+  private _stores: IStores | null = null;
+  private disposeObserver: null | (() => void) = null;
 
   public componentDidMount(): void {
-    this.disposeObserver = autorun(() => {
-      // Use MobX autorun to observe all the store properties that are necessary to update wind arrows.
-      this.updateArrows();
-    });
+    this._stores = this.props.stores ?? null;
   }
 
   public componentWillUnmount(): void {
-    this.disposeObserver();
+    this.disposeObserver?.();
+  }
+
+  public componentDidUpdate(): void {
+    this._stores = this.props.stores ?? null;
   }
 
   public render() {
@@ -82,34 +115,54 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
   }
 
   private drawCanvas = (info: any) => {
-    if (!this.pixiApp) {
-      // Setup PIXI app.
-      this.pixiApp = new PIXI.Application(info.canvas.width, info.canvas.height, {
-        transparent: true,
+    if (!this.pixiAppInit) {
+      const app = new PIXI.Application();
+      this.pixiAppInit = app.init({
+        width: info.canvas.width,
+        height: info.canvas.height,
         antialias: true,
-        autoStart: false, // do not start animation, render only when necessary
-        view: info.canvas,
-        resolution: window.devicePixelRatio
+        backgroundAlpha: 0,
+        canvas: info.canvas,
+        resolution: window.devicePixelRatio,
+        autoStart: false
+      }).then(() => {
+        this.pixiApp = app;
+        ensureTextures();
+
+        // Add shutterbug support. See: shutterbug-support.ts.
+        info.canvas.render = app.render.bind(app);
+        info.canvas.classList.add("canvas-3d");
+        app.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
+
+        // Use MobX autorun to observe all the store properties that are necessary to update wind arrows.
+        this.disposeObserver = autorun(() => this.updateArrows());
+
+        return app;
       });
-      // Add shutterbug support. See: shutterbug-support.ts.
-      info.canvas.render = this.pixiApp.render.bind(this.pixiApp);
-      info.canvas.classList.add("canvas-3d");
+      // TODO: Catch and properly handle errors if pixi fails to init.
+      return;
     }
+
+    if (!this.pixiApp) return; // init still pending
+
     this.pixiApp.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
     this.pixiApp.render();
   }
 
   private updateArrows() {
-    if (!this.pixiApp) return;
+    if (!this.pixiApp || !this._stores || !lineTexture || !arrowTexture) return;
     const stage = this.pixiApp.stage;
-    const enabled = this.stores.ui.windArrows;
+    const enabled = this._stores.ui.windArrows;
     stage.alpha = enabled ? opacity : 0;
     if (!enabled) {
       this.pixiApp.render();
       return;
     }
-    const data = this.stores.simulation.windIncHurricane;
-    const latLngToContainerPoint = this.stores.ui.latLngToContainerPoint;
+    // Capture in locals so TS preserves narrowing inside the forEach closure.
+    const lineTex = lineTexture;
+    const arrowTex = arrowTexture;
+    const data = this._stores.simulation.windIncHurricane;
+    const latLngToContainerPoint = this._stores.ui.latLngToContainerPoint;
     data.forEach((w: IWindPoint, idx: number) => {
       // Try to reuse Pixi arrows.
       const updateOnly = !!stage.children[idx];
@@ -121,9 +174,9 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
       arrowContainer.x = point.x;
       arrowContainer.y = point.y;
       arrowContainer.rotation = rotation;
-      const line = updateOnly ? arrowContainer.children[0] : new PIXI.Sprite(lineTexture);
+      const line = updateOnly ? arrowContainer.children[0] : new PIXI.Sprite(lineTex);
       line.scale = lineScale;
-      const arrow = updateOnly ? arrowContainer.children[1] : new PIXI.Sprite(arrowTexture);
+      const arrow = updateOnly ? arrowContainer.children[1] : new PIXI.Sprite(arrowTex);
       arrow.y = -length;
       if (!updateOnly) {
         arrowContainer.addChild(line);

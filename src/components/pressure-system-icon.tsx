@@ -9,7 +9,7 @@ import Low from "../assets/low.svg";
 import DragIcon from "../assets/drag.svg";
 import config from "../config";
 import { log } from "../log";
-import * as css from "./pressure-system-icon.scss";
+import css from "./pressure-system-icon.scss";
 
 export const minStrength = 3;
 export const maxStrength = 20;
@@ -83,15 +83,16 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     return getPressureLabel(model);
   }
 
-  public handleStrengthChange = (e: any, value: number) => {
+  public handleStrengthChange = (e: any, value: number | number[]) => {
     const { model, onSliderDrag } = this.props;
     if (onSliderDrag) {
       onSliderDrag();
     }
+    const numericValue = Array.isArray(value) ? value[0] : value;
     if (model.type === "low") {
-      model.setStrength(maxStrength + minStrength - value);
+      model.setStrength(maxStrength + minStrength - numericValue);
     } else {
-      model.setStrength(value);
+      model.setStrength(numericValue);
     }
   }
 

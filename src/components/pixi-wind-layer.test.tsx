@@ -24,7 +24,7 @@ describe("PixiWindLayer component", () => {
     expect(wrapper.find(CanvasLayer).length).toEqual(1);
   });
 
-  it("creates Pixi app and renders correct number of wind arrows", () => {
+  it("creates Pixi app and renders correct number of wind arrows", async () => {
     const wrapper = mount(
       <Provider stores={stores}>
         <Map center={[0, 0]} zoom={10}>
@@ -35,12 +35,14 @@ describe("PixiWindLayer component", () => {
     const canvasLayer = wrapper.find(CanvasLayer);
     expect(canvasLayer.length).toEqual(1);
 
-    const windLayer = (wrapper.find(PixiWindLayer).instance() as any).wrappedInstance as PixiWindLayer;
+    const windLayer = wrapper.find((PixiWindLayer as any).wrappedComponent).instance() as PixiWindLayer;
+    // pixi v8's Application.init is async; flush microtasks before asserting on pixiApp.
+    await Promise.resolve();
     expect(windLayer.pixiApp).not.toEqual(null);
     expect(windLayer.pixiApp!.stage.children.length).toEqual(stores.simulation.windWithinBounds.length);
   });
 
-  it("ensures that number of Pixi objects is always equal to number of wind arrows", () => {
+  it("ensures that number of Pixi objects is always equal to number of wind arrows", async () => {
     const wrapper = mount(
       <Provider stores={stores}>
         <Map center={[0, 0]} zoom={4}>
@@ -50,7 +52,8 @@ describe("PixiWindLayer component", () => {
     );
     const arrowsCount = stores.simulation.windWithinBounds.length;
 
-    const windLayer = (wrapper.find(PixiWindLayer).instance() as any).wrappedInstance as PixiWindLayer;
+    const windLayer = wrapper.find((PixiWindLayer as any).wrappedComponent).instance() as PixiWindLayer;
+    await Promise.resolve();
     expect(windLayer.pixiApp).not.toEqual(null);
     expect(windLayer.pixiApp!.stage.children.length).toEqual(arrowsCount);
 
