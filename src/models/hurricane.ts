@@ -45,7 +45,6 @@ export class Hurricane extends PressureSystem {
     if (props.speed !== undefined) {
       this.speed = Object.assign({}, props.speed);
     }
-    makeObservable(this);
     this.initialState = JSON.parse(JSON.stringify(this));
   }
 
