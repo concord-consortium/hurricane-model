@@ -139,6 +139,7 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
 
         return app;
       });
+      // TODO: Catch and properly handle errors if pixi fails to init.
       return;
     }
 
