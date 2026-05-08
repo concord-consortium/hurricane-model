@@ -1,5 +1,6 @@
 'use strict';
 
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -15,7 +16,8 @@ module.exports = (env, argv) => {
     entry: './src/index.tsx',
     mode: 'development',
     output: {
-      filename: 'assets/index.[hash].js'
+      filename: 'assets/index.[contenthash].js',
+      publicPath: ''
     },
     performance: { hints: false },
     module: {
@@ -85,11 +87,11 @@ module.exports = (env, argv) => {
           ]
         },
         {
+          // Webpack 5 asset modules replace url-loader. `type: 'asset'` inlines as
+          // a data URI under the size threshold and emits a separate file above it.
           test: /\.(png|woff|woff2|eot|ttf)$/,
-          loader: 'url-loader',
-          options: {
-            limit: 8192
-          }
+          type: 'asset',
+          parser: { dataUrlCondition: { maxSize: 8192 } }
         },
         {
           test: /\.svg$/,
@@ -97,7 +99,7 @@ module.exports = (env, argv) => {
             {
               // Do not apply SVGR import in (S)CSS files.
               issuer: /\.scss$/,
-              use: 'url-loader'
+              type: 'asset/resource'
             },
             {
               issuer: /\.tsx?$/,
@@ -109,22 +111,33 @@ module.exports = (env, argv) => {
     },
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
-      // TODO(webpack-5-cleanup): Prefer `main` (CJS) over `module` (ESM) for package
-      // resolution. Pixi v6 ships dual ESM/CJS — when webpack picks ESM at our
-      // import site but the bundle's internal `require()`s pick CJS, we end up
-      // with two copies of every pixi class. The canvas mixins patch one set, our
-      // `new PIXI.Container()` instantiates from the other, and runtime methods
-      // (e.g., `renderCanvas`) are missing. Webpack 5 handles this cleanly via
-      // conditional exports.
-      mainFields: ['browser', 'main', 'module']
+      // pngjs (used to decode the SST images) imports several Node core modules.
+      // Webpack 5 no longer auto-polyfills them; supply browser-friendly versions.
+      fallback: {
+        util: require.resolve('util/'),
+        stream: require.resolve('stream-browserify'),
+        zlib: require.resolve('browserify-zlib'),
+        assert: require.resolve('assert/'),
+        buffer: require.resolve('buffer/')
+      }
     },
-    stats: {
+    ignoreWarnings: [
       // suppress "export not found" warnings about re-exported types
-      warningsFilter: /export .* was not found in/
+      /export .* was not found in/
+    ],
+    devServer: {
+      hot: true,
+      static: { directory: __dirname + '/dist' }
     },
     plugins: [
+      // pngjs (and the util/buffer polyfills) reference `process` and `Buffer` as
+      // globals. Webpack 5 doesn't auto-shim these the way webpack 4 did.
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer']
+      }),
       new MiniCssExtractPlugin({
-        filename: devMode ? "assets/index.css" : "assets/index.[hash].css"
+        filename: devMode ? "assets/index.css" : "assets/index.[contenthash].css"
       }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
