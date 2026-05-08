@@ -1,25 +1,25 @@
 import * as React from "react";
 import { Provider } from "mobx-react";
-import { mount } from "enzyme";
-import Select from "@material-ui/core/Select";
+import { render, screen } from "@testing-library/react";
 import { createStores } from "../models/stores";
 import { StartLocationButton } from "./start-location-button";
 
 describe("StartLocationButton component", () => {
   const stores = createStores();
-  const wrapper = () => mount(
+  const renderButton = () => render(
     <Provider stores={stores}>
       <StartLocationButton />
     </Provider>
   );
 
   it("renders basic components", () => {
-    expect(wrapper().find(Select).length).toEqual(1);
+    renderButton();
+    expect(screen.getByTestId("start-location-container")).toBeInTheDocument();
   });
 
   it("start location button is disabled while model is running", () => {
     stores.simulation.simulationStarted = true;
-    const button = wrapper().find('[data-test="start-location-button"]').first();
-    expect(button.prop("disabled")).toEqual(true);
+    renderButton();
+    expect(screen.getByTestId("start-location-container")).toHaveClass("disabled");
   });
 });

@@ -1,9 +1,9 @@
 import * as React from "react";
-import { mount } from "enzyme";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { HurricaneImageToggle } from "./hurricane-image-toggle";
-import Switch from "@material-ui/core/Switch";
 
 describe("HurricaneImageToggle component", () => {
   let stores = createStores();
@@ -12,25 +12,26 @@ describe("HurricaneImageToggle component", () => {
   });
 
   it("renders basic components", () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
         <HurricaneImageToggle />
       </Provider>
     );
-    expect(wrapper.find(Switch).length).toEqual(1);
-    expect(wrapper.text()).toEqual(expect.stringContaining("Hurricane Image"));
+    expect(screen.getByRole("checkbox")).toBeInTheDocument();
+    expect(screen.getByText(/Hurricane Image/)).toBeInTheDocument();
   });
 
   it("turns on or off the hurricane image", () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
         <HurricaneImageToggle />
       </Provider>
     );
-    const toggle = wrapper.find((HurricaneImageToggle as any).wrappedComponent).instance() as HurricaneImageToggle;
-    toggle.handleChange(null, true);
+    const toggle = screen.getByRole("checkbox");
+    expect(stores.ui.hurricaneImage).toEqual(false);
+    userEvent.click(toggle);
     expect(stores.ui.hurricaneImage).toEqual(true);
-    toggle.handleChange(null, false);
+    userEvent.click(toggle);
     expect(stores.ui.hurricaneImage).toEqual(false);
   });
 });

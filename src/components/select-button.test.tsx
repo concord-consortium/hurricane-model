@@ -1,11 +1,10 @@
 import * as React from "react";
-import { mount } from "enzyme";
-import Select from "@material-ui/core/Select";
+import { render, screen } from "@testing-library/react";
 import { SelectButton } from "./select-button";
 
 describe("SelectButton component", () => {
   it("renders basic components", () => {
-    const wrapper = mount(
+    render(
       <SelectButton
         label="Test"
         value="test"
@@ -13,13 +12,12 @@ describe("SelectButton component", () => {
         menuItems={[{ value: "test", label: "Test", testId: "test-menu-item" }]}
       />
     );
-    expect(wrapper.find(Select).length).toEqual(1);
-    expect(wrapper.find('div[data-test="test-container"]')).toHaveLength(1);
-    expect(wrapper.find('div[data-test="test-button"]')).toHaveLength(1);
+    expect(screen.getByTestId("test-container")).toBeInTheDocument();
+    expect(screen.getByTestId("test-button")).toBeInTheDocument();
   });
 
   it("disables the button when disabled prop is true", () => {
-    const wrapper = mount(
+    render(
       <SelectButton
         label="Test"
         value="test"
@@ -28,7 +26,6 @@ describe("SelectButton component", () => {
         disabled={true}
       />
     );
-    const select = wrapper.find(Select);
-    expect(select.prop("disabled")).toEqual(true);
+    expect(screen.getByTestId("test-container")).toHaveClass("disabled");
   });
 });

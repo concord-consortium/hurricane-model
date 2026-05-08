@@ -26,7 +26,7 @@ export class CategoryNumber extends React.Component<IProps, IState> {
   public render() {
     const { value } = this.props;
     return (
-      <div className={css.categoryNumber} data-test="hurricane-category">
+      <div className={css.categoryNumber} data-test="hurricane-category" data-value={value}>
         { CategorySVG[value] }
       </div>
     );

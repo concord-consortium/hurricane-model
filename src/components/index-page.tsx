@@ -52,6 +52,7 @@ export class IndexPage extends BaseComponent<IProps, IState> {
     return (
       <div
         className={css.index}
+        data-test="index-page"
         style={config.logMonitor ? { display: "flex" } : undefined}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}

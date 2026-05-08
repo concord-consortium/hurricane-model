@@ -1,13 +1,10 @@
 import * as React from "react";
-import { mount } from "enzyme";
-import {Dialog} from "./dialog";
-import MuiDialog from "@material-ui/core/Dialog";
+import { render, screen } from "@testing-library/react";
+import { Dialog } from "./dialog";
 
 describe("Dialog component", () => {
   it("renders Material UI Dialog component", () => {
-    const wrapper = mount(
-      <Dialog open={true} onClose={jest.fn()} />
-    );
-    expect(wrapper.find(MuiDialog).length).toBe(1);
+    render(<Dialog open={true} onClose={jest.fn()} />);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 });

@@ -46,14 +46,14 @@ export class RightPanel extends BaseComponent<IProps, IState> {
         <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
           <ul className={css.rightPanelTabs}>
             <li>
-              <div id="base" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
+              <div id="base" data-test="tab-base" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
                 <MapTab tabType="base" active={selectedTab === "base" || !open} />
               </div>
             </li>
             {
               overlayTabVisible() &&
               <li>
-                <div id="overlay" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
+                <div id="overlay" data-test="tab-overlay" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
                   <MapTab tabType="overlay" active={selectedTab === "overlay" || !open} />
                 </div>
               </li>
