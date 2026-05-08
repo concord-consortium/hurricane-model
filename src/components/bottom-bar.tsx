@@ -9,7 +9,7 @@ import CCLogo from "../assets/cc-logo.svg";
 import CCLogoSmall from "../assets/cc-logo-small.svg";
 import config from "../config";
 import screenfull from "screenfull";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import PauseIcon from "../assets/pause.svg";
 import StartIcon from "../assets/start.svg";
 import ReloadIcon from "../assets/reload.svg";

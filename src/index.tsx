@@ -7,7 +7,7 @@ import * as seedrandom from "./seedrandom";
 import { AppComponent } from "./components/app";
 import { LaraAppWrapper } from "./components/lara-app-wrapper";
 import { createStores } from "./models/stores";
-import { MuiThemeProvider } from "@material-ui/core/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import hurricanesTheme from "./material-ui-theme";
 
 // Setup seedrandom helper.
@@ -20,9 +20,9 @@ const isIframed = inIframe();
 
 ReactDOM.render(
   <Provider stores={stores}>
-    <MuiThemeProvider theme={hurricanesTheme}>
+    <ThemeProvider theme={hurricanesTheme}>
       {isIframed ? <LaraAppWrapper stores={stores} /> : <AppComponent />}
-    </MuiThemeProvider>
+    </ThemeProvider>
   </Provider>,
   document.getElementById("app")
 );

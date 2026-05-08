@@ -1,7 +1,7 @@
 import * as React from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import RefreshIcon from "@material-ui/icons/Refresh";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { Dialog } from "./dialog";
 import { AboutDialogContent } from "./about-dialog-content";
 import { ShareDialogContent } from "./share-dialog-content";
