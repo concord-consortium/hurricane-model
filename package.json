@@ -127,7 +127,7 @@
     "util": "^0.12.5",
     "wait-on": "^9.0.5",
     "webpack": "^5.106.2",
-    "webpack-cli": "^5.1.4",
+    "webpack-cli": "^7.0.2",
     "webpack-dev-server": "^5.2.3"
   },
   "dependencies": {
@@ -142,7 +142,7 @@
     "jquery": "^4.0.0",
     "kd-tree-javascript": "^1.0.3",
     "leaflet": "^1.9.4",
-    "mobx": "^6.15.2",
+    "mobx": "^6.15.3",
     "mobx-react": "^9.2.1",
     "pixi.js": "^8.18.1",
     "pngjs": "^7.0.0",
