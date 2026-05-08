@@ -23,42 +23,10 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          // TODO(webpack-5-cleanup): Remove this rule when upgrading to webpack 5.
-          // Pixi v6 ships .mjs ESM files imported by sibling .js CJS files; webpack 4
-          // refuses that combination unless .mjs is treated as javascript/auto.
-          test: /\.mjs$/,
-          include: /node_modules/,
-          type: 'javascript/auto'
-        },
-        {
-          test: /\.tsx?$/,
-          enforce: 'pre',
-          use: [
-            {
-              loader: 'tslint-loader',
-              options: {}
-            }
-          ]
-        },
-        {
           test: /\.tsx?$/,
           loader: 'ts-loader',
           options: {
             transpileOnly: true // IMPORTANT! use transpileOnly mode to speed-up compilation
-          }
-        },
-        {
-          // TODO(webpack-5-cleanup): Remove this rule when upgrading to webpack 5.
-          // Some node_modules ship modern ESM JS (optional chaining etc.) that webpack 4's
-          // bundled acorn parser can't handle. Transpile them down with babel here.
-          // A matching `transformIgnorePatterns` block in package.json's jest config does
-          // the equivalent for tests and should be removed at the same time (webpack 5's
-          // ecosystem and jest 30's ESM support both make this unnecessary).
-          test: /\.js$/,
-          include: /node_modules\/(screenfull|d3-scale|d3-array|d3-color|d3-format|d3-interpolate|d3-time|d3-time-format|internmap|@pixi|pixi\.js|pixi\.js-legacy)/,
-          use: {
-            loader: 'babel-loader',
-            options: { presets: ['@babel/preset-env'] }
           }
         },
         {
@@ -69,7 +37,12 @@ module.exports = (env, argv) => {
               loader: 'css-loader',
               options: {
                 modules: {
-                  localIdentName: '[name]--[local]--__hurr-v1__'
+                  localIdentName: '[name]--[local]--__hurr-v1__',
+                  // Keep css-loader v5/v6 behavior: a single default export object
+                  // (so `import css from "./X.scss"; css.foo` works). v7 flipped
+                  // `namedExport` to true by default.
+                  namedExport: false,
+                  exportLocalsConvention: 'as-is'
                 },
                 sourceMap: true,
                 importLoaders: 1
@@ -149,9 +122,9 @@ module.exports = (env, argv) => {
         favicon: 'src/public/favicon.ico',
         publicPath: DEPLOY_PATH,
       })] : []),
-      new CopyWebpackPlugin([
-        { from: 'src/public' }
-      ])
+      new CopyWebpackPlugin({
+        patterns: [{ from: 'src/public' }]
+      })
     ]
   };
 };

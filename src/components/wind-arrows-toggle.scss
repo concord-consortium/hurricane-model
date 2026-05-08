@@ -1,4 +1,4 @@
-@import "common";
+@use "common" as *;
 
 .windArrowsToggle {
   margin-top: $bottomBarTopPadding;

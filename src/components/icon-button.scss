@@ -1,4 +1,4 @@
-@import "common.scss";
+@use "common" as *;
 
 .iconButton {
   min-width: 60px;
