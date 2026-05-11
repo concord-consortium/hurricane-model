@@ -3,8 +3,8 @@ import Button from "@mui/material/Button";
 import css from "./icon-button.scss";
 
 interface IProps {
-  icon: JSX.Element;
-  highlightIcon: JSX.Element;
+  icon: React.JSX.Element;
+  highlightIcon: React.JSX.Element;
   buttonText?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   disabled?: boolean;

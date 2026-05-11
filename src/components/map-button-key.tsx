@@ -64,7 +64,7 @@ const keyData: { [name: string]: IMapButtonKeyDef } = {
   }
 };
 
-const keyElement: { [name: string]: JSX.Element } = {
+const keyElement: { [name: string]: React.JSX.Element } = {
   sst: <SSTKey />
 };
 
