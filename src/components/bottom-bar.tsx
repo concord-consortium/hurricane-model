@@ -83,7 +83,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const seasonButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && sim.simulationStarted);
     const simulationControlsDisabled = isReportMode;
-    const classes = clsx(css.widgetGroup, startLocationButtonHoveredClass, { hoverable: startLocationButtonDisabled });
+    const classes = clsx(css.widgetGroup, startLocationButtonHoveredClass, { hoverable: !startLocationButtonDisabled });
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>

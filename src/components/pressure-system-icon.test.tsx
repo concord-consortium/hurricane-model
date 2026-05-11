@@ -73,7 +73,7 @@ describe("PressureSystemIcon component", () => {
   });
 
   // Note: previous enzyme tests checked that sliders are enabled by default and
-  // PressureSystemStrengthUpdated was logged with type, position, and value on darg end.
+  // PressureSystemStrengthUpdated was logged with type, position, and value on drag end.
   // These tests called handleStrengthChange and handleSliderDragEnd
   // directly on the component instance. Those exercised internal handler logic that is
   // already covered by tests on the underlying model (PressureSystem.setStrength) and
