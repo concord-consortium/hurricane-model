@@ -53,7 +53,12 @@ export class RightPanel extends BaseComponent<IProps, IState> {
             {
               overlayTabVisible() &&
               <li>
-                <div id="overlay" data-test="tab-overlay" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
+                <div
+                  id="overlay"
+                  data-test="tab-overlay"
+                  className={css.rightPanelTab}
+                  onClick={this.handleToggleDrawer}
+                >
                   <MapTab tabType="overlay" active={selectedTab === "overlay" || !open} />
                 </div>
               </li>

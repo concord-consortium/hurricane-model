@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
@@ -82,6 +83,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const seasonButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && sim.simulationStarted);
     const simulationControlsDisabled = isReportMode;
+    const classes = clsx(css.widgetGroup, startLocationButtonHoveredClass, { hoverable: startLocationButtonDisabled });
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -91,9 +93,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         <div className={css.mainContainer}>
           {
             config.startLocationButton &&
-            <div
-              className={`${css.widgetGroup} ${startLocationButtonDisabled ? "" : "hoverable"} ${startLocationButtonHoveredClass}`}
-            >
+            <div className={classes}>
               <StartLocationButton
                 onMenuOpen={() => this.setState({ isStartLocationMenuOpen: true })}
                 onMenuClose={() => {
