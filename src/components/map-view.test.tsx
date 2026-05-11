@@ -37,6 +37,9 @@ describe("MapView component", () => {
     expect(document.querySelector("#mapView")).toBeInTheDocument();
   });
 
+  // TODO: previous tests checked that landfall rectangles are handled correctly and
+  // that the hurricane doesn't render if it's not active. These should be recreated.
+
   it("applies noTopBar class when topBarVisible is false", () => {
     const oldTopBarVisible = config.topBarVisible;
     config.topBarVisible = false;
