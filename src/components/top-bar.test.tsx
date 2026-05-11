@@ -15,8 +15,9 @@ describe("TopBar component", () => {
   });
 
   describe("Reload button", () => {
-    it("reloads the model using window.location.reload", () => {
+    it("reloads the model using window.location.reload", async () => {
       jest.useFakeTimers();
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
       // reloadWindow is a separate method specifically so we can stub it in tests
       // (jsdom 26 makes window.location.reload itself non-mockable).
       const reloadSpy = jest.spyOn((TopBar as any).wrappedComponent.prototype, "reloadWindow")
@@ -27,7 +28,7 @@ describe("TopBar component", () => {
           <TopBar />
         </Provider>
       );
-      userEvent.click(screen.getByTestId("reload"));
+      await user.click(screen.getByTestId("reload"));
       jest.advanceTimersByTime(150);
       expect(reloadSpy).toHaveBeenCalled();
 
@@ -35,7 +36,8 @@ describe("TopBar component", () => {
       jest.useRealTimers();
     });
 
-    it("logs SimulationEnded with reason TopBarReloadButtonClicked before reloading", () => {
+    it("logs SimulationEnded with reason TopBarReloadButtonClicked before reloading", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
       const reloadSpy = jest.spyOn((TopBar as any).wrappedComponent.prototype, "reloadWindow")
         .mockImplementation(() => undefined);
@@ -45,7 +47,7 @@ describe("TopBar component", () => {
           <TopBar />
         </Provider>
       );
-      userEvent.click(screen.getByTestId("reload"));
+      await user.click(screen.getByTestId("reload"));
 
       const endedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationEnded"
@@ -60,27 +62,29 @@ describe("TopBar component", () => {
   });
 
   describe("Share button", () => {
-    it("opens share dialog", () => {
+    it("opens share dialog", async () => {
+      const user = userEvent.setup();
       render(
         <Provider stores={stores}>
           <TopBar />
         </Provider>
       );
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-      userEvent.click(screen.getByTestId("share"));
+      await user.click(screen.getByTestId("share"));
       expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
   });
 
   describe("About button", () => {
-    it("opens about dialog", () => {
+    it("opens about dialog", async () => {
+      const user = userEvent.setup();
       render(
         <Provider stores={stores}>
           <TopBar />
         </Provider>
       );
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-      userEvent.click(screen.getByTestId("about"));
+      await user.click(screen.getByTestId("about"));
       expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
   });

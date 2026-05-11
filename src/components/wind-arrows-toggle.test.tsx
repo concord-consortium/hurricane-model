@@ -21,7 +21,8 @@ describe("WindArrowsToggle component", () => {
     expect(screen.getByText(/Wind Direction and Speed/)).toBeInTheDocument();
   });
 
-  it("turns on or off the wind arrows", () => {
+  it("turns on or off the wind arrows", async () => {
+    const user = userEvent.setup();
     render(
       <Provider stores={stores}>
         <WindArrowsToggle />
@@ -29,9 +30,9 @@ describe("WindArrowsToggle component", () => {
     );
     const toggle = screen.getByRole("checkbox");
     const initial = stores.ui.windArrows;
-    userEvent.click(toggle);
+    await user.click(toggle);
     expect(stores.ui.windArrows).toEqual(!initial);
-    userEvent.click(toggle);
+    await user.click(toggle);
     expect(stores.ui.windArrows).toEqual(initial);
   });
 });

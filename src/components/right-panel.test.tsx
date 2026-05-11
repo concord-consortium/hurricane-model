@@ -26,7 +26,8 @@ describe("Right Panel component", () => {
     expect(screen.queryByTestId("overlay-panel")).not.toBeInTheDocument();
   });
 
-  it("opens when a tab is clicked", () => {
+  it("opens when a tab is clicked", async () => {
+    const user = userEvent.setup();
     render(
       <Provider stores={stores}>
         <RightPanel />
@@ -34,40 +35,43 @@ describe("Right Panel component", () => {
     );
     // right panel hidden by default
     expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
-    userEvent.click(screen.getByTestId("tab-base"));
+    await user.click(screen.getByTestId("tab-base"));
     expect(screen.getByTestId("right-panel")).toHaveClass("open");
     // looking at base maps panel, no overlay panel rendered
     expect(screen.queryByTestId("base-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("overlay-panel")).not.toBeInTheDocument();
   });
 
-  it("remains open when a different tab is clicked", () => {
+  it("remains open when a different tab is clicked", async () => {
+    const user = userEvent.setup();
     render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
     expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
-    userEvent.click(screen.getByTestId("tab-base"));
+    await user.click(screen.getByTestId("tab-base"));
     expect(screen.getByTestId("right-panel")).toHaveClass("open");
-    userEvent.click(screen.getByTestId("tab-overlay"));
+    await user.click(screen.getByTestId("tab-overlay"));
     expect(screen.getByTestId("right-panel")).toHaveClass("open");
   });
 
-  it("closes when the same tab is clicked", () => {
+  it("closes when the same tab is clicked", async () => {
+    const user = userEvent.setup();
     render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
     expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
-    userEvent.click(screen.getByTestId("tab-base"));
+    await user.click(screen.getByTestId("tab-base"));
     expect(screen.getByTestId("right-panel")).toHaveClass("open");
-    userEvent.click(screen.getByTestId("tab-base"));
+    await user.click(screen.getByTestId("tab-base"));
     expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
   });
 
-  it("provides the population base map option when configured to do so", () => {
+  it("provides the population base map option when configured to do so", async () => {
+    const user = userEvent.setup();
     const defaultValue = config.enablePopulationMap;
 
     config.enablePopulationMap = true;
@@ -76,7 +80,7 @@ describe("Right Panel component", () => {
         <RightPanel />
       </Provider>
     );
-    userEvent.click(screen.getByTestId("tab-base"));
+    await user.click(screen.getByTestId("tab-base"));
     expect(screen.queryByTestId("base-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("map-button-population")).toBeInTheDocument();
     unmount();
@@ -87,28 +91,30 @@ describe("Right Panel component", () => {
         <RightPanel />
       </Provider>
     );
-    userEvent.click(screen.getByTestId("tab-base"));
+    await user.click(screen.getByTestId("tab-base"));
     expect(screen.queryByTestId("base-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("map-button-population")).not.toBeInTheDocument();
 
     config.enablePopulationMap = defaultValue;
   });
 
-  it("renders the overlay panel when the overlay tab is clicked", () => {
+  it("renders the overlay panel when the overlay tab is clicked", async () => {
+    const user = userEvent.setup();
     render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
     expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
-    userEvent.click(screen.getByTestId("tab-overlay"));
+    await user.click(screen.getByTestId("tab-overlay"));
     expect(screen.getByTestId("right-panel")).toHaveClass("open");
     // base maps panel now hidden, overlay is visible
     expect(screen.queryByTestId("base-panel")).not.toBeInTheDocument();
     expect(screen.queryByTestId("overlay-panel")).toBeInTheDocument();
   });
 
-  it("respects config.availableOverlay options", () => {
+  it("respects config.availableOverlay options", async () => {
+    const user = userEvent.setup();
     const defValue = config.availableOverlays;
 
     config.availableOverlays = ["sst", "precipitation", "stormSurge"];
@@ -118,7 +124,7 @@ describe("Right Panel component", () => {
       </Provider>
     );
     expect(screen.queryByTestId("tab-overlay")).toBeInTheDocument();
-    userEvent.click(screen.getByTestId("tab-overlay"));
+    await user.click(screen.getByTestId("tab-overlay"));
     expect(screen.queryByTestId("map-button-sst")).toBeInTheDocument();
     expect(screen.queryByTestId("map-button-precipitation")).toBeInTheDocument();
     expect(screen.queryByTestId("map-button-stormSurge")).toBeInTheDocument();
@@ -131,7 +137,7 @@ describe("Right Panel component", () => {
       </Provider>
     );
     expect(screen.queryByTestId("tab-overlay")).toBeInTheDocument();
-    userEvent.click(screen.getByTestId("tab-overlay"));
+    await user.click(screen.getByTestId("tab-overlay"));
     expect(screen.queryByTestId("map-button-sst")).toBeInTheDocument();
     expect(screen.queryByTestId("map-button-precipitation")).not.toBeInTheDocument();
     expect(screen.queryByTestId("map-button-stormSurge")).toBeInTheDocument();
@@ -144,7 +150,7 @@ describe("Right Panel component", () => {
       </Provider>
     );
     expect(screen.queryByTestId("tab-overlay")).toBeInTheDocument();
-    userEvent.click(screen.getByTestId("tab-overlay"));
+    await user.click(screen.getByTestId("tab-overlay"));
     expect(screen.queryByTestId("map-button-sst")).toBeInTheDocument();
     expect(screen.queryByTestId("map-button-precipitation")).not.toBeInTheDocument();
     expect(screen.queryByTestId("map-button-stormSurge")).not.toBeInTheDocument();

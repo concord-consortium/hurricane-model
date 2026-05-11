@@ -21,7 +21,8 @@ describe("MapButton component", () => {
     expect(screen.getByTestId("map-button-street")).toBeInTheDocument();
   });
 
-  it("reacts to click and changes map layer", () => {
+  it("reacts to click and changes map layer", async () => {
+    const user = userEvent.setup();
     jest.spyOn(stores.ui, "setMapTiles");
     render(
       <Provider stores={stores}>
@@ -29,12 +30,13 @@ describe("MapButton component", () => {
       </Provider>
     );
     expect(stores.ui.baseMap).toEqual("satellite");
-    userEvent.click(screen.getByTestId("map-button-street"));
+    await user.click(screen.getByTestId("map-button-street"));
     expect(stores.ui.setMapTiles).toHaveBeenCalled();
     expect(stores.ui.baseMap).toEqual("street");
   });
 
-  it("reacts to click and changes map overlay", () => {
+  it("reacts to click and changes map overlay", async () => {
+    const user = userEvent.setup();
     jest.spyOn(stores.ui, "setOverlay");
     render(
       <Provider stores={stores}>
@@ -42,7 +44,7 @@ describe("MapButton component", () => {
       </Provider>
     );
     expect(stores.ui.overlay).toEqual(config.overlay);
-    userEvent.click(screen.getByTestId("map-button-precipitation"));
+    await user.click(screen.getByTestId("map-button-precipitation"));
     expect(stores.ui.setOverlay).toHaveBeenCalled();
     expect(stores.ui.overlay).toEqual("precipitation");
   });

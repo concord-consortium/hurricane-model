@@ -38,7 +38,8 @@ describe("BottomBar component", () => {
   });
 
   describe("restart button", () => {
-    it("restarts simulation and sets view to the default North Atlantic area", () => {
+    it("restarts simulation and sets view to the default North Atlantic area", async () => {
+      const user = userEvent.setup();
       jest.spyOn(stores.simulation, "restart");
       jest.spyOn(stores.ui, "setNorthAtlanticView");
       render(
@@ -46,19 +47,20 @@ describe("BottomBar component", () => {
           <BottomBar />
         </Provider>
       );
-      userEvent.click(screen.getByTestId("restart-button"));
+      await user.click(screen.getByTestId("restart-button"));
       expect(stores.simulation.restart).toHaveBeenCalled();
       expect(stores.ui.setNorthAtlanticView).toHaveBeenCalled();
     });
 
-    it("logs SimulationEnded with reason SimulationRestarted before restarting", () => {
+    it("logs SimulationEnded with reason SimulationRestarted before restarting", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
       render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      userEvent.click(screen.getByTestId("restart-button"));
+      await user.click(screen.getByTestId("restart-button"));
       const endedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationEnded"
       );
@@ -70,7 +72,8 @@ describe("BottomBar component", () => {
   });
 
   describe("reload button", () => {
-    it("resets simulation and resets view", () => {
+    it("resets simulation and resets view", async () => {
+      const user = userEvent.setup();
       jest.spyOn(stores.simulation, "reset");
       jest.spyOn(stores.ui, "reset");
       render(
@@ -78,19 +81,20 @@ describe("BottomBar component", () => {
           <BottomBar />
         </Provider>
       );
-      userEvent.click(screen.getByTestId("reload-button"));
+      await user.click(screen.getByTestId("reload-button"));
       expect(stores.simulation.reset).toHaveBeenCalled();
       expect(stores.ui.reset).toHaveBeenCalled();
     });
 
-    it("logs SimulationEnded with reason SimulationReloaded before resetting", () => {
+    it("logs SimulationEnded with reason SimulationReloaded before resetting", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
       render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      userEvent.click(screen.getByTestId("reload-button"));
+      await user.click(screen.getByTestId("reload-button"));
       const endedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationEnded"
       );
@@ -101,7 +105,8 @@ describe("BottomBar component", () => {
   });
 
   describe("stop button logging", () => {
-    it("logs SimulationStopped with outcome data", () => {
+    it("logs SimulationStopped with outcome data", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
       // Make the simulation "ready" so the start button isn't disabled. Stub `start`
       // so it just toggles simulationRunning without ticking — the synchronous tick
@@ -121,10 +126,10 @@ describe("BottomBar component", () => {
         </Provider>
       );
       // Click start
-      userEvent.click(screen.getByTestId("start-button"));
+      await user.click(screen.getByTestId("start-button"));
       (logModule.log as jest.Mock).mockClear();
       // Click again — now it's stop
-      userEvent.click(screen.getByTestId("start-button"));
+      await user.click(screen.getByTestId("start-button"));
       const stoppedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationStopped"
       );
@@ -135,7 +140,8 @@ describe("BottomBar component", () => {
   });
 
   describe("start button logging", () => {
-    it("logs SimulationStarted with full parameters before starting", () => {
+    it("logs SimulationStarted with full parameters before starting", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
       stores.simulation.seaSurfaceTempData = new PNG();
       // Stub start to avoid tick crashing on uninitialized PNG data.
@@ -148,7 +154,7 @@ describe("BottomBar component", () => {
           <BottomBar />
         </Provider>
       );
-      userEvent.click(screen.getByTestId("start-button"));
+      await user.click(screen.getByTestId("start-button"));
       const startedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationStarted"
       );

@@ -21,7 +21,8 @@ describe("HurricaneImageToggle component", () => {
     expect(screen.getByText(/Hurricane Image/)).toBeInTheDocument();
   });
 
-  it("turns on or off the hurricane image", () => {
+  it("turns on or off the hurricane image", async () => {
+    const user = userEvent.setup();
     render(
       <Provider stores={stores}>
         <HurricaneImageToggle />
@@ -29,9 +30,9 @@ describe("HurricaneImageToggle component", () => {
     );
     const toggle = screen.getByRole("checkbox");
     expect(stores.ui.hurricaneImage).toEqual(false);
-    userEvent.click(toggle);
+    await user.click(toggle);
     expect(stores.ui.hurricaneImage).toEqual(true);
-    userEvent.click(toggle);
+    await user.click(toggle);
     expect(stores.ui.hurricaneImage).toEqual(false);
   });
 });
