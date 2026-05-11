@@ -17,7 +17,7 @@ describe("HurricaneImageToggle component", () => {
         <HurricaneImageToggle />
       </Provider>
     );
-    expect(screen.getByRole("checkbox")).toBeInTheDocument();
+    expect(screen.getByRole("switch")).toBeInTheDocument();
     expect(screen.getByText(/Hurricane Image/)).toBeInTheDocument();
   });
 
@@ -28,7 +28,7 @@ describe("HurricaneImageToggle component", () => {
         <HurricaneImageToggle />
       </Provider>
     );
-    const toggle = screen.getByRole("checkbox");
+    const toggle = screen.getByRole("switch");
     expect(stores.ui.hurricaneImage).toEqual(false);
     await user.click(toggle);
     expect(stores.ui.hurricaneImage).toEqual(true);

@@ -17,7 +17,7 @@ describe("WindArrowsToggle component", () => {
         <WindArrowsToggle />
       </Provider>
     );
-    expect(screen.getByRole("checkbox")).toBeInTheDocument();
+    expect(screen.getByRole("switch")).toBeInTheDocument();
     expect(screen.getByText(/Wind Direction and Speed/)).toBeInTheDocument();
   });
 
@@ -28,7 +28,7 @@ describe("WindArrowsToggle component", () => {
         <WindArrowsToggle />
       </Provider>
     );
-    const toggle = screen.getByRole("checkbox");
+    const toggle = screen.getByRole("switch");
     const initial = stores.ui.windArrows;
     await user.click(toggle);
     expect(stores.ui.windArrows).toEqual(!initial);
