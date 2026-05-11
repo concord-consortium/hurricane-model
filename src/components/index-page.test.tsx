@@ -42,11 +42,9 @@ describe("IndexPage component", () => {
     // dimensions to compute percentX/percentY.
     function withRect(width: number, height: number) {
       const original = Element.prototype.getBoundingClientRect;
-      Element.prototype.getBoundingClientRect = function() {
-        return {
-          left: 0, top: 0, right: width, bottom: height, width, height, x: 0, y: 0, toJSON: () => ({})
-        } as DOMRect;
-      };
+      Element.prototype.getBoundingClientRect = () => ({
+        left: 0, top: 0, right: width, bottom: height, width, height, x: 0, y: 0, toJSON: () => ({})
+      } as DOMRect);
       return () => { Element.prototype.getBoundingClientRect = original; };
     }
 

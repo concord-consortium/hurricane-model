@@ -37,8 +37,11 @@ export default tseslint.config(
       "no-console": noConsole,
       "no-debugger": noDebugger,
       "no-empty": ["error", { allowEmptyCatch: true }],
+      "no-trailing-spaces": "error",
       "no-unused-expressions": ["error", { allowShortCircuit: true, allowTernary: true }],
       "max-classes-per-file": "off",
+      // Translated from TSLint's `array-type` — bans `Array<T>` in favor of `T[]`.
+      "@typescript-eslint/array-type": ["error", { default: "array" }],
       // typescript-eslint defaults flag a lot of pre-existing patterns (any, ts-ignore, unused vars)
       // that TSLint never caught. Keep behavior unchanged on migration; tighten later if desired.
       "@typescript-eslint/no-empty-interface": "off",

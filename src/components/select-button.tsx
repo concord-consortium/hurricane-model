@@ -8,10 +8,16 @@ import css from "./select-button.scss";
 // signature gives it to us by extraction.
 export type SelectChangeEvent = Parameters<NonNullable<SelectProps["onChange"]>>[0];
 
+interface MenuItem {
+  value: string;
+  label: string;
+  testId: string;
+}
+
 interface ISelectButtonProps {
   disabled?: boolean;
   label: string;
-  menuItems: Array<{ value: string; label: string; testId: string }>;
+  menuItems: MenuItem[];
   value: string;
   onChange: SelectProps["onChange"];
   onMenuOpen?: () => void;

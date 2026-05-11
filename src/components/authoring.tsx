@@ -127,7 +127,7 @@ export class Authoring extends BaseComponent<IProps, IState> {
   public onSubmit = (e: IChangeEvent<QueryParams>) => {
     const formData = e.formData;
     if (!formData) return;
-  
+
     const formValues: any = {};
     Object.keys(formData).forEach(key => {
       const newValue = formData[key];
