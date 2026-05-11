@@ -99,7 +99,7 @@
     "html-webpack-plugin": "^5.6.7",
     "identity-obj-proxy": "^3.0.0",
     "istanbul-lib-coverage": "^3.2.2",
-    "jest": "^30.4.1",
+    "jest": "^30.4.2",
     "jest-canvas-mock": "^2.5.2",
     "jest-environment-jsdom": "^30.4.1",
     "jest-fetch-mock": "^3.0.3",
@@ -124,7 +124,7 @@
     "tslint-react": "^4.2.0",
     "typescript": "^6.0.3",
     "util": "^0.12.5",
-    "wait-on": "^9.0.5",
+    "wait-on": "^9.0.10",
     "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2",
     "webpack-dev-server": "^5.2.3"
