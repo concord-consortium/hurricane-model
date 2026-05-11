@@ -3,7 +3,7 @@ import { PrecipitationLayer } from "./precipitation-layer";
 import { render } from "@testing-library/react";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
-import { Map } from "react-leaflet";
+import { MapContainer } from "react-leaflet";
 // Mock webgl-heatmap. The original is an old CoffeeScript module that defines its methods
 // on `this` (not on the prototype), so jest.mock's auto-mock can't see them. Provide an
 // explicit instance shape so tests can inspect addPoint calls.
@@ -37,9 +37,9 @@ describe("PrecipitationLayer component", () => {
   it("renders without crashing", () => {
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <PrecipitationLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
   });
@@ -47,9 +47,9 @@ describe("PrecipitationLayer component", () => {
   it("creates WebGLHeatmap", () => {
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <PrecipitationLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
     expect(MockedWebGLHeatmap).toHaveBeenCalledTimes(1);
@@ -58,9 +58,9 @@ describe("PrecipitationLayer component", () => {
   it("ensures that all the precipitation points are added to heatmap", () => {
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={4}>
+        <MapContainer center={[0, 0]} zoom={4}>
           <PrecipitationLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
     const heatmapInstance = MockedWebGLHeatmap.instances[0];

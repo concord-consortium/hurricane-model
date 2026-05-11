@@ -2,7 +2,7 @@ import * as React from "react";
 import { render } from "@testing-library/react";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
-import { Map } from "react-leaflet";
+import { MapContainer } from "react-leaflet";
 import { PressureSystemMarker } from "./pressure-system-marker";
 
 describe("PressureSystemMarker component", () => {
@@ -14,9 +14,9 @@ describe("PressureSystemMarker component", () => {
   it("renders without crashing", () => {
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <PressureSystemMarker model={stores.simulation.pressureSystems[0]}/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
   });

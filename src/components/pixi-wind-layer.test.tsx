@@ -3,7 +3,7 @@ import { PixiWindLayer } from "./pixi-wind-layer";
 import { render } from "@testing-library/react";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
-import { Map } from "react-leaflet";
+import { MapContainer } from "react-leaflet";
 import * as Leaflet from "leaflet";
 import * as PIXI from "pixi.js";
 
@@ -18,9 +18,9 @@ describe("PixiWindLayer component", () => {
   it("renders without crashing", () => {
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <PixiWindLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
   });
@@ -28,9 +28,9 @@ describe("PixiWindLayer component", () => {
   it("creates Pixi app and renders correct number of wind arrows", async () => {
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <PixiWindLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
     // pixi v8's Application.init is async; flush microtasks before asserting on the app.
@@ -43,9 +43,9 @@ describe("PixiWindLayer component", () => {
   it("ensures that number of Pixi objects is always equal to number of wind arrows", async () => {
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={4}>
+        <MapContainer center={[0, 0]} zoom={4}>
           <PixiWindLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
     const arrowsCount = stores.simulation.windWithinBounds.length;

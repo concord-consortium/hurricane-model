@@ -39,6 +39,9 @@ export class LeafletCustomMarker extends React.Component<IProps, IState> {
       }, 1);
     }
 
+    const eventHandlers: Leaflet.LeafletEventHandlerFnMap = {};
+    if (onDrag) eventHandlers.drag = onDrag;
+    if (onDragEnd) eventHandlers.dragend = onDragEnd;
     return (
       [
         <Marker
@@ -46,8 +49,7 @@ export class LeafletCustomMarker extends React.Component<IProps, IState> {
           // this.icon will eventually cause that iconContainer is inserted into DOM and found in this render method.
           icon={this.icon}
           position={position}
-          onDrag={onDrag}
-          onDragEnd={onDragEnd}
+          eventHandlers={eventHandlers}
           draggable={draggable}
         />,
         iconContainer && ReactDOM.createPortal(children, iconContainer)

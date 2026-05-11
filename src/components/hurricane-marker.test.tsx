@@ -2,7 +2,7 @@ import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
-import { Map } from "react-leaflet";
+import { MapContainer } from "react-leaflet";
 import { HurricaneMarker, HurricaneIcon } from "./hurricane-marker";
 
 describe("HurricaneMarker component", () => {
@@ -14,9 +14,9 @@ describe("HurricaneMarker component", () => {
   it("renders without crashing", () => {
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <HurricaneMarker/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
   });
@@ -31,9 +31,9 @@ describe("HurricaneIcon component", () => {
   it("renders hurricane category", () => {
     const { rerender } = render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <HurricaneIcon />
-        </Map>
+        </MapContainer>
       </Provider>
     );
     expect(screen.getByTestId("hurricane-category")).toBeInTheDocument();
@@ -41,9 +41,9 @@ describe("HurricaneIcon component", () => {
     stores.simulation.hurricane.strength = 20;
     rerender(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <HurricaneIcon />
-        </Map>
+        </MapContainer>
       </Provider>
     );
     expect(screen.getByTestId("hurricane-category")).toHaveAttribute("data-value", "0"); // tropical storm
@@ -51,9 +51,9 @@ describe("HurricaneIcon component", () => {
     stores.simulation.hurricane.strength = 54;
     rerender(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <HurricaneIcon />
-        </Map>
+        </MapContainer>
       </Provider>
     );
     expect(screen.getByTestId("hurricane-category"))
@@ -62,9 +62,9 @@ describe("HurricaneIcon component", () => {
     stores.simulation.hurricane.strength = 100;
     rerender(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <HurricaneIcon />
-        </Map>
+        </MapContainer>
       </Provider>
     );
     expect(screen.getByTestId("hurricane-category")).toHaveAttribute("data-value", "5");

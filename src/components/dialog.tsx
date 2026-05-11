@@ -7,6 +7,7 @@ interface IProps {
   onClose: () => void;
   open: boolean;
   title?: string;
+  children?: React.ReactNode;
 }
 
 export class Dialog extends React.Component<IProps> {

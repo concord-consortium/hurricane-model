@@ -1,7 +1,7 @@
 import * as React from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import TilelayerMask from "./react-leaflet-tilelayer-mask";
+import { TilelayerMask } from "./react-leaflet-tilelayer-mask";
 import { ICoordinates } from "../types";
 import TopRightMaskUrl from "../assets/storm-surge-mask-top-right.png";
 import { extendedLandfallBounds } from "../models/simulation";

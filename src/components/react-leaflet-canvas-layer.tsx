@@ -1,67 +1,56 @@
 import {Map, Layer, Class, DomUtil, Browser, DomEvent, LatLng, ZoomAnimEvent, Point} from "leaflet";
-import { MapLayer, MapLayerProps, withLeaflet } from "react-leaflet";
+import { createLayerComponent, LayerProps } from "@react-leaflet/core";
 
 interface ILeafletCanvasLayer extends Layer {
   map: Map;
   canvas: HTMLCanvasElement;
+  scheduleRedraw: () => void;
+  draw: () => void;
+  onMouseMove: (event: MouseEvent, pos: Point) => void;
+  onMouseClick: (event: MouseEvent, pos: Point) => void;
+  _props: IProps;
 }
 
-interface IProps extends MapLayerProps {
+interface IProps extends LayerProps {
   drawMethod: (info: any) => void;
   onMouseMove?: (event: MouseEvent, pos: Point) => void;
   onMouseClick?: (event: MouseEvent, pos: Point) => void;
   data?: any;
 }
 
-export default withLeaflet(class CanvasLayer extends MapLayer<IProps> {
-  public createLeafletElement(): ILeafletCanvasLayer {
+export const CanvasLayer = createLayerComponent<ILeafletCanvasLayer, IProps>(
+  (props, context) => {
     // @ts-ignore
-    const leafletCanvasLayer = new LeafletCanvasLayer();
-    leafletCanvasLayer.draw = this.onDraw.bind(this);
-    leafletCanvasLayer.onMouseMove = this.onMouseMove.bind(this);
-    leafletCanvasLayer.onMouseClick = this.onMouseClick.bind(this);
-    return leafletCanvasLayer;
-  }
-
-  public get map() {
-    return (this.leafletElement as ILeafletCanvasLayer).map;
-  }
-
-  public get canvas() {
-    return (this.leafletElement as ILeafletCanvasLayer).canvas;
-  }
-
-  public onDraw() {
-    const size = this.map.getSize();
-    const bounds = this.map.getBounds();
-    const zoom = this.map.getZoom();
-    const center = this.map.getCenter();
-    const corner = this.map.containerPointToLatLng(this.map.getSize());
-    const data = this.props.data;
-    this.props.drawMethod?.({
-      map: this.map,
-      canvas: this.canvas,
-      bounds,
-      size,
-      zoom,
-      center,
-      corner,
-      data
-    });
-  }
-
-  public onMouseMove(event: MouseEvent, pos: Point) {
-    if (this.props.onMouseMove) {
-      this.props.onMouseMove(event, pos);
+    const instance: ILeafletCanvasLayer = new LeafletCanvasLayer();
+    instance.draw = () => {
+      const { canvas, map } = instance;
+      instance._props.drawMethod?.({
+        map,
+        canvas,
+        bounds: map.getBounds(),
+        size: map.getSize(),
+        zoom: map.getZoom(),
+        center: map.getCenter(),
+        corner: map.containerPointToLatLng(map.getSize()),
+        data: instance._props.data
+      });
+    };
+    instance.onMouseMove = (event: MouseEvent, pos: Point) => {
+      instance._props.onMouseMove?.(event, pos);
+    };
+    instance.onMouseClick = (event: MouseEvent, pos: Point) => {
+      instance._props.onMouseClick?.(event, pos);
+    };
+    instance._props = props;
+    return { instance, context };
+  },
+  (instance, props, prevProps) => {
+    instance._props = props;
+    if (props.data !== prevProps.data) {
+      instance.scheduleRedraw();
     }
   }
-
-  public onMouseClick(event: MouseEvent, pos: Point) {
-    if (this.props.onMouseClick) {
-      this.props.onMouseClick(event, pos);
-    }
-  }
-});
+);
 
 // Generic Leaflet CanvasLayer, based on:
 // - https://github.com/Leaflet/Leaflet.heat

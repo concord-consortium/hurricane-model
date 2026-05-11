@@ -1,6 +1,6 @@
 import { LandfallRectangle } from "./landfall-rectangle";
 import { createStores } from "../models/stores";
-import { Map } from "react-leaflet";
+import { MapContainer } from "react-leaflet";
 import { render } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import * as React from "react";
@@ -14,9 +14,9 @@ describe("Landfall rectangle", () => {
   it("renders without crashing", () => {
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <LandfallRectangle position={{lat: 10, lng: 10}} category={3} />
-        </Map>
+        </MapContainer>
       </Provider>
     );
   });

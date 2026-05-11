@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Provider } from "mobx-react";
-import { Map } from "react-leaflet";
+import { MapContainer } from "react-leaflet";
 import { render } from "@testing-library/react";
 import { createStores } from "../models/stores";
 import {
@@ -20,9 +20,9 @@ describe("StormSurgeOverlay component", () => {
     });
     render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <StormSurgeOverlay />
-        </Map>
+        </MapContainer>
       </Provider>
     );
   });
