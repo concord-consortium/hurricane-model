@@ -61,11 +61,11 @@ const LeafletCanvasLayer = (Layer || Class).extend({
     // Should be overwritten by a subclass or in an instance.
   },
 
-  onMouseMove(event: any, pos: Point) {
+  onMouseMove(_event: any, _pos: Point) {
     // Can be overwritten by a subclass or in an instance.
   },
 
-  onMouseClick(event: any, pos: Point) {
+  onMouseClick(_event: any, _pos: Point) {
     // Can be overwritten by a subclass or in an instance.
   },
 

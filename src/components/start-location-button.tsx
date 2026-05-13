@@ -23,7 +23,6 @@ const menuItems = startLocations.map(startLocation => ({
 @observer
 export class StartLocationButton extends BaseComponent<IProps, IState> {
   public render() {
-    const { onMenuOpen, onMenuClose } = this.props;
     const sim = this.stores.simulation;
     const ui = this.stores.ui;
     // If set to lock the UI while the simulation is running, lock UI once the sim is started until it is reset
