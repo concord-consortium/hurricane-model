@@ -72,6 +72,7 @@ const DEFAULT_CONFIG: any = {
   authoring: false,
   // Sets base wind data (and sea temperature in the future). "fall", "winter", "spring", or "summer".
   season: "fall",
+  mode: "hurricane",
   // One of the available maps: "satellite", "relief", "street" or "population".
   map: "satellite",
   enablePopulationMap: false,
