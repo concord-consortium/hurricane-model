@@ -29,6 +29,12 @@ export const KNOWN_PARAMETERS: IParameterDoc[] = [
     validValues: "atlantic, gulf",
     description: "Hurricane starting position"
   },
+  {
+    name: "mode",
+    type: "string",
+    validValues: "hurricane, storm",
+    description: "App Mode (hurricane or storm)"
+  },
 
   // Map settings
   {
@@ -188,7 +194,7 @@ function findSimilarParams(unknown: string): string[] {
 }
 
 export function parseAuthoredUrlParams(urlParams: string | undefined): IParseResult {
-  if (!urlParams || !urlParams.trim()) {
+  if (!urlParams?.trim()) {
     return { valid: true, params: {}, errors: [] };
   }
 
@@ -205,7 +211,9 @@ export function parseAuthoredUrlParams(urlParams: string | undefined): IParseRes
     for (const pair of pairs) {
       const eqIndex = pair.indexOf("=");
       if (eqIndex === -1) {
-        errors.push(`Invalid parameter (no '='): "${pair}"`);
+        // Treat parameters without an = as true.
+        // This stays consistent with getURLParam in config.ts.
+        params[pair] = "true";
         continue;
       }
 

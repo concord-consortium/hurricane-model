@@ -55,10 +55,11 @@ describe("parse-authored-params", () => {
       expect(result.params).toEqual({ season: "fall" });
     });
 
-    it("returns error for parameter without equals sign", () => {
-      const result = parseAuthoredUrlParams("invalidparam");
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain("Invalid parameter (no '='): \"invalidparam\"");
+    it("returns true for parameters without equals sign", () => {
+      const param = "exists";
+      const result = parseAuthoredUrlParams(param);
+      expect(result.valid).toBe(true);
+      expect(result.params[param]).toBe("true");
     });
 
     it("returns error for empty key", () => {
