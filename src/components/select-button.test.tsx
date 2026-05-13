@@ -26,6 +26,9 @@ describe("SelectButton component", () => {
         disabled={true}
       />
     );
-    expect(screen.getByTestId("test-container")).toHaveClass("disabled");
+    const testContainer = screen.getByTestId("test-container");
+    expect(testContainer).toHaveClass("disabled");
+    expect(screen.getByRole("combobox")).toHaveAttribute("aria-disabled", "true");
+    expect(testContainer.querySelector("input")).toBeDisabled();
   });
 });

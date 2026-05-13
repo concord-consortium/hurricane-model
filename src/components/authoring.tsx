@@ -9,7 +9,6 @@ import css from "./authoring.scss";
 
 interface IProps extends IBaseProps {}
 interface IState { }
-type QueryParams = any;
 
 const ignoreConfig = ["authoring"];
 
@@ -124,28 +123,28 @@ export class Authoring extends BaseComponent<IProps, IState> {
     );
   }
 
-  public onSubmit = (e: IChangeEvent<QueryParams>) => {
+  public onSubmit = (e: IChangeEvent) => {
     const formData = e.formData;
     if (!formData) return;
 
-    const formValues: any = {};
+    const formValues: Record<string, unknown> = {};
     Object.keys(formData).forEach(key => {
       const newValue = formData[key];
       formValues[key] = newValue;
-      if (newValue.constructor === Array) {
+      if (Array.isArray(newValue)) {
         formValues[key] = JSON.stringify(newValue);
       }
     });
     const params = Object.keys(formData)
       .filter(key => {
         let defValue = config[key];
-        if (defValue.constructor === Array) {
+        if (Array.isArray(defValue)) {
           defValue = JSON.stringify(defValue);
         }
         return formValues[key] !== defValue;
       })
       .map(key => {
-        return encodeURIComponent(key) + "=" + encodeURIComponent(formData[key]);
+        return encodeURIComponent(key) + "=" + encodeURIComponent(String(formData[key]));
       }).join("&");
     window.open(`${location.origin}${location.pathname}?${params}`, "_blank");
   }

@@ -38,7 +38,7 @@ export default tseslint.config(
       "no-debugger": noDebugger,
       "no-empty": ["error", { allowEmptyCatch: true }],
       "no-trailing-spaces": "error",
-      "no-unused-expressions": ["error", { allowShortCircuit: true, allowTernary: true }],
+      "no-unused-expressions": "off",
       "max-classes-per-file": "off",
       // Translated from TSLint's `array-type` — bans `Array<T>` in favor of `T[]`.
       "@typescript-eslint/array-type": ["error", { default: "array" }],
@@ -52,7 +52,7 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-this-alias": "off",
-      "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-unused-expressions": ["error", { allowShortCircuit: true, allowTernary: true }],
       // React rules — match the tslint-react settings that were disabled.
       "react/prop-types": "off",
       "react/display-name": "off",

@@ -20,6 +20,9 @@ describe("StartLocationButton component", () => {
   it("start location button is disabled while model is running", () => {
     stores.simulation.simulationStarted = true;
     renderButton();
-    expect(screen.getByTestId("start-location-container")).toHaveClass("disabled");
+    const container = screen.getByTestId("start-location-container");
+    expect(container).toHaveClass("disabled");
+    expect(screen.getByRole("combobox")).toHaveAttribute("aria-disabled", "true");
+    expect(container.querySelector("input")).toBeDisabled();
   });
 });

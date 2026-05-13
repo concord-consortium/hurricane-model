@@ -113,7 +113,7 @@ describe("Right Panel component", () => {
     expect(screen.queryByTestId("overlay-panel")).toBeInTheDocument();
   });
 
-  it("respects config.availableOverlay options", async () => {
+  it("respects config.availableOverlays options", async () => {
     const user = userEvent.setup();
     const defValue = config.availableOverlays;
 
