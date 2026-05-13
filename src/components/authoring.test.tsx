@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Authoring } from "./authoring";
-import Form, { ISubmitEvent } from "react-jsonschema-form";
-import { mount } from "enzyme";
+import { render } from "@testing-library/react";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 
@@ -11,7 +10,7 @@ describe("App component", () => {
     stores = createStores();
   });
   it("renders without crashing", () => {
-    mount(
+    render(
       <Provider stores={stores}>
         <Authoring />
       </Provider>
@@ -19,22 +18,20 @@ describe("App component", () => {
   });
 
   it("shows a form", () => {
-    const wrapper = mount(
+    const { container } = render(
       <Provider stores={stores}>
         <Authoring />
       </Provider>
     );
-    expect(wrapper.find(Form).length).toEqual(1);
-
+    expect(container.querySelectorAll("form")).toHaveLength(1);
   });
 
   it("shows configuration options", () => {
-    const wrapper = mount(
+    const { container } = render(
       <Provider stores={stores}>
         <Authoring />
       </Provider>
     );
-
-    expect(wrapper.find("div.form-group").length).toBeGreaterThan(5);
+    expect(container.querySelectorAll("div.form-group").length).toBeGreaterThan(5);
   });
 });

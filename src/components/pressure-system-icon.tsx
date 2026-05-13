@@ -2,7 +2,7 @@ import * as React from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { PressureSystem } from "../models/pressure-system";
-import Slider from "@material-ui/core/Slider";
+import Slider, { SliderThumb } from "@mui/material/Slider";
 import VerticalHandle from "../assets/slider-vertical.svg";
 import High from "../assets/high.svg";
 import Low from "../assets/low.svg";
@@ -14,6 +14,18 @@ import css from "./pressure-system-icon.scss";
 export const minStrength = 3;
 export const maxStrength = 20;
 export const mbLabelRange = 13;
+
+const VerticalThumb = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
+  (props, ref) => {
+    const { children, ...other } = props;
+    return (
+      <SliderThumb ref={ref} {...other}>
+        {children}
+        <VerticalHandle />
+      </SliderThumb>
+    );
+  }
+);
 
 interface IProps extends IBaseProps {
   model: PressureSystem;
@@ -56,7 +68,11 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
         }
         {
           !config.pressureSystemsLocked &&
-          <div className={css.sliderContainer}>
+          <div
+            className={css.sliderContainer}
+            onMouseDown={this.stopPropagation}
+            onTouchStart={this.stopPropagation}
+          >
             <Slider
               classes={{ thumb: css.thumb, track: css.track, rail: css.rail, disabled: css.disabled }}
               value={model.type === "high" ? model.strength : maxStrength + minStrength - model.strength}
@@ -65,7 +81,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
               onChange={this.handleStrengthChange}
               onChangeCommitted={this.handleSliderDragEnd}
               orientation="vertical"
-              ThumbComponent={VerticalHandle}
+              slots={{ thumb: VerticalThumb }}
               disabled={uiDisabled}
               data-test="pressure-system-slider"
             />
@@ -94,6 +110,10 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     } else {
       model.setStrength(numericValue);
     }
+  }
+
+  public stopPropagation = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
   }
 
   public handleSliderDragEnd = () => {

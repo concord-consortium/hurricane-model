@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
@@ -9,7 +10,7 @@ import CCLogo from "../assets/cc-logo.svg";
 import CCLogoSmall from "../assets/cc-logo-small.svg";
 import config from "../config";
 import screenfull from "screenfull";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import PauseIcon from "../assets/pause.svg";
 import StartIcon from "../assets/start.svg";
 import ReloadIcon from "../assets/reload.svg";
@@ -82,6 +83,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const seasonButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && sim.simulationStarted);
     const simulationControlsDisabled = isReportMode;
+    const classes = clsx(css.widgetGroup, startLocationButtonHoveredClass, { hoverable: !startLocationButtonDisabled });
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -91,9 +93,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         <div className={css.mainContainer}>
           {
             config.startLocationButton &&
-            <div
-              className={`${css.widgetGroup} ${startLocationButtonDisabled ? "" : "hoverable"} ${startLocationButtonHoveredClass}`}
-            >
+            <div className={classes}>
               <StartLocationButton
                 onMenuOpen={() => this.setState({ isStartLocationMenuOpen: true })}
                 onMenuClose={() => {

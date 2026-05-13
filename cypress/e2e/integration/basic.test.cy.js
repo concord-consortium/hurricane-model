@@ -76,7 +76,7 @@ context("Test the Hurricane Model app", () => {
     cy.get(".map-tab--mapTabImage--__hurr-v1__.map-tab--impactMaps--__hurr-v1__")
       .click()
       .then(() => {
-        cy.get(".sst-key--checkbox--__hurr-v1__ .MuiIconButton-label")
+        cy.get('.sst-key--checkbox--__hurr-v1__ input[type="checkbox"]')
           .click()
           .then(() => {
             cy.get('[src="91071a502fa66c0cde3e.png"]').should("be.visible");

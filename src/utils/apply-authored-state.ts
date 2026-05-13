@@ -35,7 +35,7 @@ function applyConfigParam(key: string, value: string): void {
     try {
       (config as any)[key] = JSON.parse(value);
     } catch (e) {
-      // tslint:disable-next-line:no-console
+      // eslint-disable-next-line no-console
       console.warn(`Failed to parse JSON value for config parameter "${key}": ${value}`);
     }
     return;

@@ -1,6 +1,6 @@
 import * as React from "react";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select, { SelectProps } from "@material-ui/core/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectProps } from "@mui/material/Select";
 
 import css from "./select-button.scss";
 
@@ -8,10 +8,16 @@ import css from "./select-button.scss";
 // signature gives it to us by extraction.
 export type SelectChangeEvent = Parameters<NonNullable<SelectProps["onChange"]>>[0];
 
+interface IMenuItem {
+  value: string;
+  label: string;
+  testId: string;
+}
+
 interface ISelectButtonProps {
   disabled?: boolean;
   label: string;
-  menuItems: Array<{ value: string; label: string; testId: string }>;
+  menuItems: IMenuItem[];
   value: string;
   onChange: SelectProps["onChange"];
   onMenuOpen?: () => void;
@@ -34,8 +40,7 @@ export const SelectButton: React.FC<ISelectButtonProps> = (props) => {
           className={css.select}
           data-test={selectTestId}
           disabled={disabled}
-          disableUnderline={true}
-          renderValue={(selectedValue) => (
+          renderValue={(selectedValue: string) => (
             <span style={{ paddingLeft: 8 }}>
               {menuItems.find(item => item.value === selectedValue)?.label}
             </span>

@@ -1,5 +1,6 @@
 import * as React from "react";
-import { mount } from "enzyme";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { RightPanel } from "./right-panel";
@@ -12,151 +13,156 @@ describe("Right Panel component", () => {
   });
 
   it("renders basic components", () => {
-    const wrapper = mount(
+    const { container } = render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    expect(wrapper.find(RightPanel).length).toBe(1);
-    expect(wrapper.find("ul").length).toBe(1);
-    expect(wrapper.find("li").length).toBe(2);
+    expect(container.querySelectorAll("ul")).toHaveLength(1);
+    expect(container.querySelectorAll("li")).toHaveLength(2);
     // default is the base maps panel
-    expect(wrapper.find('[data-test="base-panel"]').exists()).toEqual(true);
+    expect(screen.queryByTestId("base-panel")).toBeInTheDocument();
     // overlay panel is not rendered until the tab is clicked
-    expect(wrapper.find('[data-test="overlay-panel"]').length).toEqual(0);
+    expect(screen.queryByTestId("overlay-panel")).not.toBeInTheDocument();
   });
 
-  it("opens when a tab is clicked", () => {
-    const wrapper = mount(
+  it("opens when a tab is clicked", async () => {
+    const user = userEvent.setup();
+    render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    const panel = wrapper.find((RightPanel as any).wrappedComponent).instance() as RightPanel;
     // right panel hidden by default
-    expect(panel.state.open).toBe(false);
-    wrapper.find("#base").simulate("click");
-    expect(panel.state.open).toBe(true);
+    expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
+    await user.click(screen.getByTestId("tab-base"));
+    expect(screen.getByTestId("right-panel")).toHaveClass("open");
     // looking at base maps panel, no overlay panel rendered
-    expect(wrapper.find('[data-test="base-panel"]').exists()).toEqual(true);
-    expect(wrapper.find('[data-test="overlay-panel"]').length).toEqual(0);
+    expect(screen.queryByTestId("base-panel")).toBeInTheDocument();
+    expect(screen.queryByTestId("overlay-panel")).not.toBeInTheDocument();
   });
 
-  it("remains open when a different tab is clicked", () => {
-    const wrapper = mount(
+  it("remains open when a different tab is clicked", async () => {
+    const user = userEvent.setup();
+    render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    const panel = wrapper.find((RightPanel as any).wrappedComponent).instance() as RightPanel;
-    expect(panel.state.open).toBe(false);
-    wrapper.find("#base").simulate("click");
-    expect(panel.state.open).toBe(true);
-    wrapper.find("#overlay").simulate("click");
-    expect(panel.state.open).toBe(true);
+    expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
+    await user.click(screen.getByTestId("tab-base"));
+    expect(screen.getByTestId("right-panel")).toHaveClass("open");
+    await user.click(screen.getByTestId("tab-overlay"));
+    expect(screen.getByTestId("right-panel")).toHaveClass("open");
   });
 
-  it("closes when the same tab is clicked", () => {
-    const wrapper = mount(
+  it("closes when the same tab is clicked", async () => {
+    const user = userEvent.setup();
+    render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    const panel = wrapper.find((RightPanel as any).wrappedComponent).instance() as RightPanel;
-    expect(panel.state.open).toBe(false);
-    wrapper.find("#base").simulate("click");
-    expect(panel.state.open).toBe(true);
-    wrapper.find("#base").simulate("click");
-    expect(panel.state.open).toBe(false);
+    expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
+    await user.click(screen.getByTestId("tab-base"));
+    expect(screen.getByTestId("right-panel")).toHaveClass("open");
+    await user.click(screen.getByTestId("tab-base"));
+    expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
   });
 
-  it("provides the population base map option when configured to do so", () => {
+  it("provides the population base map option when configured to do so", async () => {
+    const user = userEvent.setup();
     const defaultValue = config.enablePopulationMap;
 
     config.enablePopulationMap = true;
-    let wrapper = mount(
+    const { unmount } = render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    wrapper.find("#base").simulate("click");
-    expect(wrapper.find('[data-test="base-panel"]').exists()).toBe(true);
-    expect(wrapper.find('[data-test="map-button-population"]').exists()).toBe(true);
+    await user.click(screen.getByTestId("tab-base"));
+    expect(screen.queryByTestId("base-panel")).toBeInTheDocument();
+    expect(screen.queryByTestId("map-button-population")).toBeInTheDocument();
+    unmount();
 
     config.enablePopulationMap = false;
-    wrapper = mount(
+    render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    wrapper.find("#base").simulate("click");
-    expect(wrapper.find('[data-test="base-panel"]').exists()).toBe(true);
-    expect(wrapper.find('[data-test="map-button-population"]').exists()).toBe(false);
+    await user.click(screen.getByTestId("tab-base"));
+    expect(screen.queryByTestId("base-panel")).toBeInTheDocument();
+    expect(screen.queryByTestId("map-button-population")).not.toBeInTheDocument();
 
     config.enablePopulationMap = defaultValue;
   });
 
-  it("renders the overlay panel when the overlay tab is clicked", () => {
-    const wrapper = mount(
+  it("renders the overlay panel when the overlay tab is clicked", async () => {
+    const user = userEvent.setup();
+    render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    const panel = wrapper.find((RightPanel as any).wrappedComponent).instance() as RightPanel;
-    expect(panel.state.open).toBe(false);
-    wrapper.find("#overlay").simulate("click");
-    expect(panel.state.open).toBe(true);
+    expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
+    await user.click(screen.getByTestId("tab-overlay"));
+    expect(screen.getByTestId("right-panel")).toHaveClass("open");
     // base maps panel now hidden, overlay is visible
-    expect(wrapper.find('[data-test="base-panel"]').length).toEqual(0);
-    expect(wrapper.find('[data-test="overlay-panel"]').exists()).toEqual(true);
+    expect(screen.queryByTestId("base-panel")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("overlay-panel")).toBeInTheDocument();
   });
 
-  it("respects config.availableOverlay options", () => {
+  it("respects config.availableOverlays options", async () => {
+    const user = userEvent.setup();
     const defValue = config.availableOverlays;
 
     config.availableOverlays = ["sst", "precipitation", "stormSurge"];
-    let wrapper = mount(
+    let result = render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    expect(wrapper.exists({tabType: "overlay"})).toEqual(true);
-    wrapper.find("#overlay").simulate("click");
-    expect(wrapper.exists({mapType: "overlay", value: "sst"})).toEqual(true);
-    expect(wrapper.exists({mapType: "overlay", value: "precipitation"})).toEqual(true);
-    expect(wrapper.exists({mapType: "overlay", value: "stormSurge"})).toEqual(true);
+    expect(screen.queryByTestId("tab-overlay")).toBeInTheDocument();
+    await user.click(screen.getByTestId("tab-overlay"));
+    expect(screen.queryByTestId("map-button-sst")).toBeInTheDocument();
+    expect(screen.queryByTestId("map-button-precipitation")).toBeInTheDocument();
+    expect(screen.queryByTestId("map-button-stormSurge")).toBeInTheDocument();
+    result.unmount();
 
     config.availableOverlays = ["sst", "stormSurge"];
-    wrapper = mount(
+    result = render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    expect(wrapper.exists({tabType: "overlay"})).toEqual(true);
-    wrapper.find("#overlay").simulate("click");
-    expect(wrapper.exists({mapType: "overlay", value: "sst"})).toEqual(true);
-    expect(wrapper.exists({mapType: "overlay", value: "precipitation"})).toEqual(false);
-    expect(wrapper.exists({mapType: "overlay", value: "stormSurge"})).toEqual(true);
+    expect(screen.queryByTestId("tab-overlay")).toBeInTheDocument();
+    await user.click(screen.getByTestId("tab-overlay"));
+    expect(screen.queryByTestId("map-button-sst")).toBeInTheDocument();
+    expect(screen.queryByTestId("map-button-precipitation")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("map-button-stormSurge")).toBeInTheDocument();
+    result.unmount();
 
     config.availableOverlays = ["sst"];
-    wrapper = mount(
+    result = render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    expect(wrapper.exists({tabType: "overlay"})).toEqual(true);
-    wrapper.find("#overlay").simulate("click");
-    expect(wrapper.exists({mapType: "overlay", value: "sst"})).toEqual(true);
-    expect(wrapper.exists({mapType: "overlay", value: "precipitation"})).toEqual(false);
-    expect(wrapper.exists({mapType: "overlay", value: "stormSurge"})).toEqual(false);
+    expect(screen.queryByTestId("tab-overlay")).toBeInTheDocument();
+    await user.click(screen.getByTestId("tab-overlay"));
+    expect(screen.queryByTestId("map-button-sst")).toBeInTheDocument();
+    expect(screen.queryByTestId("map-button-precipitation")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("map-button-stormSurge")).not.toBeInTheDocument();
+    result.unmount();
 
     config.availableOverlays = [];
-    wrapper = mount(
+    render(
       <Provider stores={stores}>
         <RightPanel />
       </Provider>
     );
-    expect(wrapper.exists({tabType: "overlay"})).toEqual(false);
+    expect(screen.queryByTestId("tab-overlay")).not.toBeInTheDocument();
 
     config.availableOverlays = defValue;
   });

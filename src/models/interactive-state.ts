@@ -36,7 +36,7 @@ export function migrateState(state: unknown): IHurricaneInteractiveState | null 
   // }
 
   // Unknown version - return null to use defaults
-  // tslint:disable-next-line:no-console
+  // eslint-disable-next-line no-console
   console.warn(`Unknown interactive state version: ${version}. Using defaults.`);
   return null;
 }

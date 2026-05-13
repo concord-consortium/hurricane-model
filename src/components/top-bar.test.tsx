@@ -1,5 +1,6 @@
 import * as React from "react";
-import { mount } from "enzyme";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import { createStores } from "../models/stores";
 import { TopBar } from "./top-bar";
@@ -14,31 +15,40 @@ describe("TopBar component", () => {
   });
 
   describe("Reload button", () => {
-    it("reloads the model using window.location.reload", (done) => {
-      const wrapper = mount(
+    it("reloads the model using window.location.reload", async () => {
+      jest.useFakeTimers();
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+      // reloadWindow is a separate method specifically so we can stub it in tests
+      // (jsdom 26 makes window.location.reload itself non-mockable).
+      const reloadSpy = jest.spyOn((TopBar as any).wrappedComponent.prototype, "reloadWindow")
+        .mockImplementation(() => undefined);
+
+      render(
         <Provider stores={stores}>
           <TopBar />
         </Provider>
       );
-      const topBar = wrapper.find((TopBar as any).wrappedComponent).instance() as TopBar;
-      const reloadSpy = jest.spyOn(topBar, "reloadWindow").mockImplementation(() => undefined);
-      topBar.handleReload();
-      setTimeout(() => {
-        expect(reloadSpy).toHaveBeenCalled();
-        done();
-      }, 150);
+      await user.click(screen.getByTestId("reload"));
+      jest.advanceTimersByTime(150);
+      expect(reloadSpy).toHaveBeenCalled();
+
+      reloadSpy.mockRestore();
+      jest.useRealTimers();
     });
 
-    it("logs SimulationEnded with reason TopBarReloadButtonClicked before reloading", () => {
+    it("logs SimulationEnded with reason TopBarReloadButtonClicked before reloading", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
-      const wrapper = mount(
+      const reloadSpy = jest.spyOn((TopBar as any).wrappedComponent.prototype, "reloadWindow")
+        .mockImplementation(() => undefined);
+
+      render(
         <Provider stores={stores}>
           <TopBar />
         </Provider>
       );
-      const topBar = wrapper.find((TopBar as any).wrappedComponent).instance() as TopBar;
-      jest.spyOn(topBar, "reloadWindow").mockImplementation(() => undefined);
-      topBar.handleReload();
+      await user.click(screen.getByTestId("reload"));
+
       const endedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationEnded"
       );
@@ -46,32 +56,36 @@ describe("TopBar component", () => {
       expect(endedCall[1].reason).toBe("TopBarReloadButtonClicked");
       expect(endedCall[1].outcome).toBeDefined();
       expect(endedCall[1].outcome).toHaveProperty("trackPointCount");
+
+      reloadSpy.mockRestore();
     });
   });
 
   describe("Share button", () => {
-    it("opens share dialog", () => {
-      const wrapper = mount(
+    it("opens share dialog", async () => {
+      const user = userEvent.setup();
+      render(
         <Provider stores={stores}>
           <TopBar />
         </Provider>
       );
-      expect(wrapper.find({open: true }).length).toEqual(0);
-      wrapper.find("[data-test='share']").first().simulate("click");
-      expect(wrapper.find({open: true }).length).toBeGreaterThan(0);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      await user.click(screen.getByTestId("share"));
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
   });
 
   describe("About button", () => {
-    it("opens about dialog", () => {
-      const wrapper = mount(
+    it("opens about dialog", async () => {
+      const user = userEvent.setup();
+      render(
         <Provider stores={stores}>
           <TopBar />
         </Provider>
       );
-      expect(wrapper.find({open: true }).length).toEqual(0);
-      wrapper.find("[data-test='about']").first().simulate("click");
-      expect(wrapper.find({open: true }).length).toBeGreaterThan(0);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      await user.click(screen.getByTestId("about"));
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
   });
 });

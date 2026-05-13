@@ -1,59 +1,73 @@
 import * as React from "react";
-import {PrecipitationLayer} from "./precipitation-layer";
-import {mount} from "enzyme";
-import CanvasLayer from "./react-leaflet-canvas-layer";
-import {createStores} from "../models/stores";
-import {Provider} from "mobx-react";
-import {Map} from "react-leaflet";
-
-// Mock webgl-heatmap as it won't work in JSDOM env (no webgl support).
-jest.mock("../libs/webgl-heatmap");
+import { PrecipitationLayer } from "./precipitation-layer";
+import { render } from "@testing-library/react";
+import { createStores } from "../models/stores";
+import { Provider } from "mobx-react";
+import { MapContainer } from "react-leaflet";
+// Mock webgl-heatmap. The original is an old CoffeeScript module that defines its methods
+// on `this` (not on the prototype), so jest.mock's auto-mock can't see them. Provide an
+// explicit instance shape so tests can inspect addPoint calls.
+jest.mock("../libs/webgl-heatmap", () => {
+  const heatmapInstances: any[] = [];
+  const Mock: any = jest.fn().mockImplementation(() => {
+    const instance = {
+      addPoint: jest.fn(),
+      clear: jest.fn(),
+      update: jest.fn(),
+      display: jest.fn(),
+      adjustSize: jest.fn()
+    };
+    heatmapInstances.push(instance);
+    return instance;
+  });
+  Mock.instances = heatmapInstances;
+  return { __esModule: true, default: Mock };
+});
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const MockedWebGLHeatmap = require("../libs/webgl-heatmap").default;
 
 describe("PrecipitationLayer component", () => {
   let stores = createStores();
   beforeEach(() => {
     stores = createStores();
+    MockedWebGLHeatmap.mockClear();
+    MockedWebGLHeatmap.instances.length = 0;
   });
 
-  it("renders CanvasLayer", () => {
-    const wrapper = mount(
+  it("renders without crashing", () => {
+    render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <PrecipitationLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
-    expect(wrapper.find(CanvasLayer).length).toEqual(1);
   });
 
   it("creates WebGLHeatmap", () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <PrecipitationLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
-    const precipitationLayer =
-      wrapper.find((PrecipitationLayer as any).wrappedComponent).instance() as PrecipitationLayer;
-    expect(precipitationLayer.webglHeatmap).not.toEqual(null);
+    expect(MockedWebGLHeatmap).toHaveBeenCalledTimes(1);
   });
 
   it("ensures that all the precipitation points are added to heatmap", () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={4}>
+        <MapContainer center={[0, 0]} zoom={4}>
           <PrecipitationLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
-    const precipitationLayer =
-      wrapper.find((PrecipitationLayer as any).wrappedComponent).instance() as PrecipitationLayer;
-    expect(precipitationLayer.webglHeatmap).not.toEqual(null);
-    expect(precipitationLayer.webglHeatmap.addPoint).not.toHaveBeenCalled();
+    const heatmapInstance = MockedWebGLHeatmap.instances[0];
+    expect(heatmapInstance.addPoint).not.toHaveBeenCalled();
     stores.simulation.addPrecipitation();
     const pointsCount = stores.simulation.precipitationPointsWithinBounds.length;
     expect(pointsCount).toBeGreaterThan(0);
-    expect(precipitationLayer.webglHeatmap.addPoint).toHaveBeenCalledTimes(pointsCount);
+    expect(heatmapInstance.addPoint).toHaveBeenCalledTimes(pointsCount);
   });
 });

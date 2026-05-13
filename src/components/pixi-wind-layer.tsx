@@ -1,10 +1,10 @@
 import * as React from "react";
-import CanvasLayer from "./react-leaflet-canvas-layer";
+import { CanvasLayer } from "./react-leaflet-canvas-layer";
 import { autorun } from "mobx";
-import {inject, observer} from "mobx-react";
-import {BaseComponent, IBaseProps} from "./base";
+import { inject, observer } from "mobx-react";
+import { BaseComponent, IBaseProps } from "./base";
 import * as PIXI from "pixi.js";
-import {IVector, IWindPoint} from "../types";
+import { IVector, IWindPoint } from "../types";
 import { IStores } from "../models/stores";
 
 const vectorWidth = 2;
@@ -164,7 +164,7 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
     const data = this._stores.simulation.windIncHurricane;
     const latLngToContainerPoint = this._stores.ui.latLngToContainerPoint;
     data.forEach((w: IWindPoint, idx: number) => {
-      // Try to reuse Pixi arrows.
+      // Reuse Pixi arrows when possible.
       const updateOnly = !!stage.children[idx];
       const arrowContainer = updateOnly ? (stage.children[idx] as PIXI.Container) : new PIXI.Container();
       const length = arrowLengthFunc(w);
@@ -184,7 +184,7 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
         stage.addChild(arrowContainer);
       }
     });
-    // Remove unnecessary arrows.
+    // Remove excess arrows.
     if (stage.children.length > data.length) {
       stage.removeChildren(data.length);
     }

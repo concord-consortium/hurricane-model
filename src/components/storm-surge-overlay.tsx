@@ -1,7 +1,7 @@
 import * as React from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import TilelayerMask from "./react-leaflet-tilelayer-mask";
+import { TilelayerMask } from "./react-leaflet-tilelayer-mask";
 import { ICoordinates } from "../types";
 import TopRightMaskUrl from "../assets/storm-surge-mask-top-right.png";
 import { extendedLandfallBounds } from "../models/simulation";
@@ -11,6 +11,7 @@ interface IState {}
 
 const stormSurgeAreaSize = 800; // km
 
+// eslint-disable-next-line max-len
 export const stormSurgeMapTiles = "https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/Storm_Surge_HazardMaps_Category{hurricaneCat}_v3/MapServer/tile/{z}/{y}/{x}";
 
 export const PuertoRicoBounds = extendedLandfallBounds.PuertoRico;

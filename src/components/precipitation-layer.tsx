@@ -1,6 +1,6 @@
 // @ts-ignore
 import WebGLHeatmap from "../libs/webgl-heatmap";
-import CanvasLayer from "./react-leaflet-canvas-layer";
+import { CanvasLayer } from "./react-leaflet-canvas-layer";
 import { ICoordinates } from "../types";
 import { inject, observer } from "mobx-react";
 import { autorun } from "mobx";
@@ -63,9 +63,13 @@ export class PrecipitationLayer extends BaseComponent<IProps, IState> {
   }
 
   private updateData() {
-    if (!this.webglHeatmap || !this._stores) return;
+    if (!this._stores) return;
 
+    // Read observable up-front so the autorun establishes a MobX observation even when
+    // webglHeatmap isn't ready yet (it's created later from inside drawCanvas).
     const data = this._stores.simulation.precipitationPointsWithinBounds;
+    if (!this.webglHeatmap) return;
+
     const latLngToContainerPoint = this._stores.ui.latLngToContainerPoint;
 
     const scaleFn = (latlng: ICoordinates, size: number) => {

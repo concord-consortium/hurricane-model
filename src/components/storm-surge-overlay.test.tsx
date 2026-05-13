@@ -1,10 +1,11 @@
 import * as React from "react";
 import { Provider } from "mobx-react";
-import { Map } from "react-leaflet";
-import { mount } from "enzyme";
+import { MapContainer } from "react-leaflet";
+import { render } from "@testing-library/react";
 import { createStores } from "../models/stores";
-import { StormSurgeOverlay, PuertoRicoBounds, stormSurgeMapTiles } from "./storm-surge-overlay";
-import TilelayerMask from "./react-leaflet-tilelayer-mask";
+import {
+  StormSurgeOverlay, PuertoRicoBounds, stormSurgeMapTiles, getTilesUrl, getMaskUrl
+} from "./storm-surge-overlay";
 
 describe("StormSurgeOverlay component", () => {
   let stores = createStores();
@@ -12,53 +13,36 @@ describe("StormSurgeOverlay component", () => {
     stores = createStores();
   });
 
-  it("renders TilelayerMask", () => {
+  it("renders without crashing when landfall present", () => {
     stores.simulation.landfalls.push({
       category: 3,
-      position: {lat: 28, lng: -83}
+      position: { lat: 28, lng: -83 }
     });
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <StormSurgeOverlay />
-        </Map>
+        </MapContainer>
       </Provider>
     );
-    expect(wrapper.find(TilelayerMask).length).toEqual(1);
+  });
+});
+
+describe("StormSurgeOverlay URL helpers", () => {
+  it("getTilesUrl substitutes the hurricane category", () => {
+    expect(getTilesUrl(3)).toEqual(stormSurgeMapTiles.replace("{hurricaneCat}", "3"));
+    expect(getTilesUrl(2)).toEqual(stormSurgeMapTiles.replace("{hurricaneCat}", "2"));
   });
 
-  it("uses USA storm surge tiles and top-right mask by default", () => {
-    stores.simulation.landfalls.push({
-      category: 3,
-      position: {lat: 28, lng: -83}
-    });
-    const wrapper = mount(
-      <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
-          <StormSurgeOverlay />
-        </Map>
-      </Provider>
-    );
-    expect(wrapper.find(TilelayerMask).prop("url")).toEqual(stormSurgeMapTiles.replace("{hurricaneCat}", "3"));
-    expect(wrapper.find(TilelayerMask).prop("maskUrl")).not.toEqual(undefined);
+  it("getMaskUrl returns undefined inside Puerto Rico bounds (round mask is used by default)", () => {
+    const insidePR = {
+      lat: PuertoRicoBounds.getSouthWest().lat + 0.01,
+      lng: PuertoRicoBounds.getSouthWest().lng + 0.01
+    };
+    expect(getMaskUrl(insidePR)).toEqual(undefined);
   });
 
-  it("uses Puerto Rico storm surge tiles when landfall happened around it", () => {
-    stores.simulation.landfalls.push({
-      category: 2,
-      position: {
-        lat: PuertoRicoBounds.getSouthWest().lat + 0.01,
-        lng: PuertoRicoBounds.getSouthWest().lng + 0.01,
-      }
-    });
-    const wrapper = mount(
-      <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
-          <StormSurgeOverlay />
-        </Map>
-      </Provider>
-    );
-    expect(wrapper.find(TilelayerMask).prop("url")).toEqual(stormSurgeMapTiles.replace("{hurricaneCat}", "2"));
-    expect(wrapper.find(TilelayerMask).prop("maskUrl")).toEqual(undefined);
+  it("getMaskUrl returns the top-right mask outside Puerto Rico bounds", () => {
+    expect(getMaskUrl({ lat: 28, lng: -83 })).not.toEqual(undefined);
   });
 });

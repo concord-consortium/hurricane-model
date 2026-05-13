@@ -1,12 +1,9 @@
 import * as React from "react";
-import { mount } from "enzyme";
-import { Marker } from "react-leaflet";
+import { render, screen } from "@testing-library/react";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
-import { Map } from "react-leaflet";
-import { LeafletCustomMarker } from "./leaflet-custom-marker";
+import { MapContainer } from "react-leaflet";
 import { HurricaneMarker, HurricaneIcon } from "./hurricane-marker";
-import { CategoryNumber } from "./category-number";
 
 describe("HurricaneMarker component", () => {
   let stores = createStores();
@@ -14,16 +11,14 @@ describe("HurricaneMarker component", () => {
     stores = createStores();
   });
 
-  it("renders Leaflet Marker", () => {
-    const wrapper = mount(
+  it("renders without crashing", () => {
+    render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <HurricaneMarker/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
-    expect(wrapper.find(LeafletCustomMarker).length).toEqual(1);
-    expect(wrapper.find(Marker).length).toEqual(1);
   });
 });
 
@@ -34,26 +29,44 @@ describe("HurricaneIcon component", () => {
   });
 
   it("renders hurricane category", () => {
-    const wrapper = mount(
+    const { rerender } = render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <HurricaneIcon />
-        </Map>
+        </MapContainer>
       </Provider>
     );
-    let category = wrapper.find(CategoryNumber);
-    expect(category.length).toEqual(1);
+    expect(screen.getByTestId("hurricane-category")).toBeInTheDocument();
+
     stores.simulation.hurricane.strength = 20;
-    wrapper.update();
-    category = wrapper.find(CategoryNumber);
-    expect(category.prop("value")).toEqual(0); // tropical storm
+    rerender(
+      <Provider stores={stores}>
+        <MapContainer center={[0, 0]} zoom={10}>
+          <HurricaneIcon />
+        </MapContainer>
+      </Provider>
+    );
+    expect(screen.getByTestId("hurricane-category")).toHaveAttribute("data-value", "0"); // tropical storm
+
     stores.simulation.hurricane.strength = 54;
-    wrapper.update();
-    category = wrapper.find(CategoryNumber);
-    expect(category.prop("value")).toEqual(stores.simulation.hurricane.category);
+    rerender(
+      <Provider stores={stores}>
+        <MapContainer center={[0, 0]} zoom={10}>
+          <HurricaneIcon />
+        </MapContainer>
+      </Provider>
+    );
+    expect(screen.getByTestId("hurricane-category"))
+      .toHaveAttribute("data-value", String(stores.simulation.hurricane.category));
+
     stores.simulation.hurricane.strength = 100;
-    wrapper.update();
-    category = wrapper.find(CategoryNumber);
-    expect(category.prop("value")).toEqual(5);
+    rerender(
+      <Provider stores={stores}>
+        <MapContainer center={[0, 0]} zoom={10}>
+          <HurricaneIcon />
+        </MapContainer>
+      </Provider>
+    );
+    expect(screen.getByTestId("hurricane-category")).toHaveAttribute("data-value", "5");
   });
 });

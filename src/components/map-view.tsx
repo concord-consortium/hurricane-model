@@ -2,8 +2,9 @@ import * as React from "react";
 import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { Map, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
-import Control from "react-leaflet-control";
+import { MapContainer, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
+import { Map as LeafletMap } from "leaflet";
+import Control from "./leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
 import { HurricaneMarker } from "./hurricane-marker";
@@ -12,8 +13,8 @@ import { HurricaneTrack } from "./hurricane-track";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
 import config from "../config";
-import CenterFocusStrong from "@material-ui/icons/CenterFocusStrong";
-import Home from "@material-ui/icons/Home";
+import CenterFocusStrong from "@mui/icons-material/CenterFocusStrong";
+import Home from "@mui/icons-material/Home";
 import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
@@ -30,7 +31,7 @@ const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [
 @inject("stores")
 @observer
 export class MapView extends BaseComponent<IProps, IState> {
-  private mapRef = React.createRef<Map>();
+  private mapRef = React.createRef<LeafletMap>();
   private _programmaticMapUpdate = false;
   private _lastThermometerUpdateTime = 0;
   private _thermometerHoverTimeout: number | null = null;
@@ -39,6 +40,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     window.addEventListener("resize", this.handleWindowResize);
     window.addEventListener("fullscreenchange", this.handleWindowResize);
     setTimeout(this.handleWindowResize, 500);
+
     // Observe some properties manually. React-leaflet implementation is incomplete in some cases. Some properties
     // work only on the initial load, but it's impossible to update them later. That's why we need to access
     // Leaflet API directly.
@@ -63,6 +65,7 @@ export class MapView extends BaseComponent<IProps, IState> {
         });
       }
     });
+
     // This maxZoom option is not handled by react-leaftlet as a dynamic react property (it doesn't update after
     // Map component is created), so we need to use raw Leaflet API to dynamically change it.
     observe(this.stores.ui, "maxZoom", () => {
@@ -76,9 +79,26 @@ export class MapView extends BaseComponent<IProps, IState> {
   public componentWillUnmount(): void {
     window.removeEventListener("resize", this.handleWindowResize);
     window.removeEventListener("fullscreenchange", this.handleWindowResize);
+    const map = this.leafletMap;
+    if (map) {
+      map.off("click", this.handleMouseClick);
+      map.off("mousemove", this.handleMouseMove);
+      map.off("moveend", this.handleViewportChanged);
+    }
     if (this._thermometerHoverTimeout) {
       window.clearTimeout(this._thermometerHoverTimeout);
     }
+  }
+
+  // Leaflet invokes the whenReady callback with { target: map }, so we read the map from there.
+  public handleMapReady = (e: any) => {
+    const map: LeafletMap = e?.target;
+    if (!map) return;
+    map.on("click", this.handleMouseClick);
+    map.on("mousemove", this.handleMouseMove);
+    map.on("moveend", this.handleViewportChanged);
+    // Populate ui store with real bounds/latLngToContainerPoint (defaults are (0,0)-returning).
+    this.handleViewportChanged();
   }
 
   public render() {
@@ -87,16 +107,14 @@ export class MapView extends BaseComponent<IProps, IState> {
     const navigation = !!ui.zoomedInView || config.navigation;
     return (
       <div className={`${css.mapView} ${!config.topBarVisible ? css.noTopBar : ""}`} id="mapView">
-        <Map ref={this.mapRef}
+        <MapContainer ref={this.mapRef}
+             whenReady={this.handleMapReady as () => void}
              dragging={navigation}
              doubleClickZoom={navigation}
              scrollWheelZoom={navigation}
              boxZoom={navigation}
              keyboard={navigation}
              style={{width: "100%", height: "100%"}}
-             onViewportChanged={this.handleViewportChanged}
-             onclick={this.handleMouseClick}
-             onmousemove={this.handleMouseMove}
              zoom={4}
              maxZoom={ui.maxZoom}
              center={[30, -45]}
@@ -205,14 +223,13 @@ export class MapView extends BaseComponent<IProps, IState> {
             ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
           }
           <AttributionControl position="topright" />
-        </Map>
+        </MapContainer>
       </div>
     );
   }
 
   public get leafletMap() {
-    const map = this.mapRef.current;
-    return map && map.leafletElement;
+    return this.mapRef.current;
   }
 
   public handleWindowResize = () => {

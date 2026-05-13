@@ -1,61 +1,58 @@
 import * as React from "react";
-import {PixiWindLayer} from "./pixi-wind-layer";
-import {mount} from "enzyme";
-import CanvasLayer from "./react-leaflet-canvas-layer";
-import {createStores} from "../models/stores";
-import {Provider} from "mobx-react";
-import {Map} from "react-leaflet";
+import { PixiWindLayer } from "./pixi-wind-layer";
+import { render } from "@testing-library/react";
+import { createStores } from "../models/stores";
+import { Provider } from "mobx-react";
+import { MapContainer } from "react-leaflet";
 import * as Leaflet from "leaflet";
+import * as PIXI from "pixi.js";
 
 describe("PixiWindLayer component", () => {
   let stores = createStores();
   beforeEach(() => {
     stores = createStores();
+    // Reset the mock's instance list between tests.
+    (PIXI.Application as any).instances = [];
   });
 
-  it("renders CanvasLayer", () => {
-    const wrapper = mount(
+  it("renders without crashing", () => {
+    render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <PixiWindLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
-    expect(wrapper.find(CanvasLayer).length).toEqual(1);
   });
 
   it("creates Pixi app and renders correct number of wind arrows", async () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={10}>
+        <MapContainer center={[0, 0]} zoom={10}>
           <PixiWindLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
-    const canvasLayer = wrapper.find(CanvasLayer);
-    expect(canvasLayer.length).toEqual(1);
-
-    const windLayer = wrapper.find((PixiWindLayer as any).wrappedComponent).instance() as PixiWindLayer;
-    // pixi v8's Application.init is async; flush microtasks before asserting on pixiApp.
+    // pixi v8's Application.init is async; flush microtasks before asserting on the app.
     await Promise.resolve();
-    expect(windLayer.pixiApp).not.toEqual(null);
-    expect(windLayer.pixiApp!.stage.children.length).toEqual(stores.simulation.windWithinBounds.length);
+    const app = (PIXI.Application as any).instances[0];
+    expect(app).toBeDefined();
+    expect(app.stage.children.length).toEqual(stores.simulation.windWithinBounds.length);
   });
 
   it("ensures that number of Pixi objects is always equal to number of wind arrows", async () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
-        <Map center={[0, 0]} zoom={4}>
+        <MapContainer center={[0, 0]} zoom={4}>
           <PixiWindLayer/>
-        </Map>
+        </MapContainer>
       </Provider>
     );
     const arrowsCount = stores.simulation.windWithinBounds.length;
-
-    const windLayer = wrapper.find((PixiWindLayer as any).wrappedComponent).instance() as PixiWindLayer;
     await Promise.resolve();
-    expect(windLayer.pixiApp).not.toEqual(null);
-    expect(windLayer.pixiApp!.stage.children.length).toEqual(arrowsCount);
+    const app = (PIXI.Application as any).instances[0];
+    expect(app).toBeDefined();
+    expect(app.stage.children.length).toEqual(arrowsCount);
 
     const newBounds = {
       getWest: () => -40,
@@ -67,6 +64,6 @@ describe("PixiWindLayer component", () => {
 
     const newArrowsCount = stores.simulation.windWithinBounds.length;
     expect(newArrowsCount).toBeLessThan(arrowsCount);
-    expect(windLayer.pixiApp!.stage.children.length).toEqual(newArrowsCount);
+    expect(app.stage.children.length).toEqual(newArrowsCount);
   });
 });

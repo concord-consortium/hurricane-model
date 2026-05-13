@@ -3,7 +3,7 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { temperatureScale } from "../temperature-scale";
 import { log } from "../log";
-import Checkbox from "@material-ui/core/Checkbox";
+import Checkbox from "@mui/material/Checkbox";
 import genericKeyCss from "./map-button-key.scss";
 import css from "./sst-key.scss";
 

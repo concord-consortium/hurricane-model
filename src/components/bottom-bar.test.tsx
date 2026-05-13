@@ -1,12 +1,10 @@
 import * as React from "react";
-import { mount } from "enzyme";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { BottomBar } from "./bottom-bar";
-import { SeasonButton } from "./season-button";
-import { WindArrowsToggle } from "./wind-arrows-toggle";
-import { HurricaneImageToggle } from "./hurricane-image-toggle";
-import Button from "@material-ui/core/Button";
+import { PNG } from "pngjs";
 import * as logModule from "../log";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
@@ -18,49 +16,51 @@ describe("BottomBar component", () => {
   });
 
   it("renders basic components", () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
         <BottomBar />
       </Provider>
     );
-    expect(wrapper.find(SeasonButton).length).toEqual(1);
-    expect(wrapper.find(WindArrowsToggle).length).toEqual(1);
-    expect(wrapper.find(HurricaneImageToggle).length).toEqual(1);
-    expect(wrapper.find(Button).length).toEqual(4);
+    expect(screen.getByTestId("season-container")).toBeInTheDocument();
+    expect(screen.getByTestId("reload-button")).toBeInTheDocument();
+    expect(screen.getByTestId("restart-button")).toBeInTheDocument();
+    expect(screen.getByTestId("start-button")).toBeInTheDocument();
+    expect(screen.getByTestId("temp-button")).toBeInTheDocument();
   });
 
   it("start button is disabled until model is ready", () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
         <BottomBar />
       </Provider>
     );
-    const start = wrapper.find('[data-test="start-button"]').first();
-    expect(start.prop("disabled")).toEqual(true);
+    expect(screen.getByTestId("start-button")).toBeDisabled();
   });
 
   describe("restart button", () => {
-    it("restarts simulation and sets view to the default North Atlantic area", () => {
+    it("restarts simulation and sets view to the default North Atlantic area", async () => {
+      const user = userEvent.setup();
       jest.spyOn(stores.simulation, "restart");
       jest.spyOn(stores.ui, "setNorthAtlanticView");
-      const wrapper = mount(
+      render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      wrapper.find('[data-test="restart-button"]').first().simulate("click");
+      await user.click(screen.getByTestId("restart-button"));
       expect(stores.simulation.restart).toHaveBeenCalled();
       expect(stores.ui.setNorthAtlanticView).toHaveBeenCalled();
     });
 
-    it("logs SimulationEnded with reason SimulationRestarted before restarting", () => {
+    it("logs SimulationEnded with reason SimulationRestarted before restarting", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
-      const wrapper = mount(
+      render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      wrapper.find('[data-test="restart-button"]').first().simulate("click");
+      await user.click(screen.getByTestId("restart-button"));
       const endedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationEnded"
       );
@@ -72,27 +72,29 @@ describe("BottomBar component", () => {
   });
 
   describe("reload button", () => {
-    it("resets simulation and resets view", () => {
+    it("resets simulation and resets view", async () => {
+      const user = userEvent.setup();
       jest.spyOn(stores.simulation, "reset");
       jest.spyOn(stores.ui, "reset");
-      const wrapper = mount(
+      render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      wrapper.find('[data-test="reload-button"]').first().simulate("click");
+      await user.click(screen.getByTestId("reload-button"));
       expect(stores.simulation.reset).toHaveBeenCalled();
       expect(stores.ui.reset).toHaveBeenCalled();
     });
 
-    it("logs SimulationEnded with reason SimulationReloaded before resetting", () => {
+    it("logs SimulationEnded with reason SimulationReloaded before resetting", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
-      const wrapper = mount(
+      render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      wrapper.find('[data-test="reload-button"]').first().simulate("click");
+      await user.click(screen.getByTestId("reload-button"));
       const endedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationEnded"
       );
@@ -103,19 +105,31 @@ describe("BottomBar component", () => {
   });
 
   describe("stop button logging", () => {
-    it("logs SimulationStopped with outcome data", () => {
+    it("logs SimulationStopped with outcome data", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
-      const wrapper = mount(
+      // Make the simulation "ready" so the start button isn't disabled. Stub `start`
+      // so it just toggles simulationRunning without ticking — the synchronous tick
+      // would otherwise crash on uninitialized PNG data, and we're only testing the
+      // log call here, not the simulation step.
+      stores.simulation.seaSurfaceTempData = new PNG();
+      jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
+        this.simulationRunning = true;
+        this.simulationStarted = true;
+      });
+      jest.spyOn(stores.simulation, "stop").mockImplementation(function(this: any) {
+        this.simulationRunning = false;
+      });
+      render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      const bottomBar = wrapper.find((BottomBar as any).wrappedComponent).instance() as BottomBar;
-      // Start the simulation first so we can stop it
-      bottomBar.handleStartStop();
+      // Click start
+      await user.click(screen.getByTestId("start-button"));
       (logModule.log as jest.Mock).mockClear();
-      // Now stop it
-      bottomBar.handleStartStop();
+      // Click again — now it's stop
+      await user.click(screen.getByTestId("start-button"));
       const stoppedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationStopped"
       );
@@ -126,15 +140,21 @@ describe("BottomBar component", () => {
   });
 
   describe("start button logging", () => {
-    it("logs SimulationStarted with full parameters before starting", () => {
+    it("logs SimulationStarted with full parameters before starting", async () => {
+      const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
-      const wrapper = mount(
+      stores.simulation.seaSurfaceTempData = new PNG();
+      // Stub start to avoid tick crashing on uninitialized PNG data.
+      jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
+        this.simulationRunning = true;
+        this.simulationStarted = true;
+      });
+      render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      const bottomBar = wrapper.find((BottomBar as any).wrappedComponent).instance() as BottomBar;
-      bottomBar.handleStartStop();
+      await user.click(screen.getByTestId("start-button"));
       const startedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationStarted"
       );
@@ -158,31 +178,35 @@ describe("BottomBar component", () => {
 
   describe("thermometer button", () => {
     it("is disabled when overlay is different from SST", () => {
-      const wrapper = mount(
+      const { rerender } = render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      let start = wrapper.find('[data-test="temp-button"]').first();
-      expect(start.prop("disabled")).toEqual(false);
+      expect(screen.getByTestId("temp-button")).not.toBeDisabled();
       stores.ui.setOverlay("stormSurge");
-      wrapper.update();
-      start = wrapper.find('[data-test="temp-button"]').first();
-      expect(start.prop("disabled")).toEqual(true);
+      rerender(
+        <Provider stores={stores}>
+          <BottomBar />
+        </Provider>
+      );
+      expect(screen.getByTestId("temp-button")).toBeDisabled();
     });
 
     it("is enabled when simulation is started", () => {
-      const wrapper = mount(
+      const { rerender } = render(
         <Provider stores={stores}>
           <BottomBar />
         </Provider>
       );
-      let start = wrapper.find('[data-test="temp-button"]').first();
-      expect(start.prop("disabled")).toEqual(false);
+      expect(screen.getByTestId("temp-button")).not.toBeDisabled();
       stores.simulation.start();
-      wrapper.update();
-      start = wrapper.find('[data-test="temp-button"]').first();
-      expect(start.prop("disabled")).toEqual(false);
+      rerender(
+        <Provider stores={stores}>
+          <BottomBar />
+        </Provider>
+      );
+      expect(screen.getByTestId("temp-button")).not.toBeDisabled();
     });
   });
 });

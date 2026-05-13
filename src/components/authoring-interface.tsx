@@ -1,11 +1,7 @@
 import * as React from "react";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { IHurricaneAuthoredState } from "../types/interactive-state";
-import {
-  parseAuthoredUrlParams,
-  validateUrlParams,
-  KNOWN_PARAMETERS
-} from "../utils/parse-authored-params";
+import { parseAuthoredUrlParams, validateUrlParams, KNOWN_PARAMETERS } from "../utils/parse-authored-params";
 import css from "./authoring-interface.scss";
 
 interface IProps {

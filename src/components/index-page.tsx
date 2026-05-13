@@ -6,7 +6,7 @@ import { BottomBar } from "./bottom-bar";
 import { TopBar } from "./top-bar";
 import { RightPanel } from "./right-panel";
 import { LogMonitor } from "@concord-consortium/log-monitor";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import CircularProgress from "@mui/material/CircularProgress";
 import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import { log } from "../log";
 import config from "../config";
@@ -52,6 +52,7 @@ export class IndexPage extends BaseComponent<IProps, IState> {
     return (
       <div
         className={css.index}
+        data-test="index-page"
         style={config.logMonitor ? { display: "flex" } : undefined}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}

@@ -13,7 +13,7 @@
     "experimentalDecorators": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
-    "types": ["jest"],
+    "types": ["jest", "@testing-library/jest-dom"],
     "jsx": "react",
     "lib": [
       "dom",

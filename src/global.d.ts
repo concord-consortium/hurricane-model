@@ -2,7 +2,6 @@
 declare module "*.sass";
 declare module "*.scss";
 declare module "*.css";
-declare module "react-leaflet-canvas-layer";
 declare module "kd-tree-javascript";
 declare module "my-canvas-layer";
 declare module "*.svg" {
@@ -14,5 +13,4 @@ declare module "*.png" {
   export default value;
 }
 declare module "geolocation-utils";
-declare module "react-leaflet-control";
 declare module "shutterbug";
