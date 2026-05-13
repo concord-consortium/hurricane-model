@@ -8,11 +8,11 @@ context("Pressure System", () => {
 
       const oldStrength = win.stores.simulation.pressureSystems[0].strength;
       cy.get("[data-test='pressure-system-slider'] svg").first()
-        .trigger('mousedown', { which: 1 });
+        .trigger('pointerdown', { which: 1, button: 0, pointerType: 'mouse' });
       cy.get(".leaflet-container")
         // move slider up
-        .trigger('mousemove', { pageY: 0, clientY: 0 })
-        .trigger('mouseup', { force: true })
+        .trigger('pointermove', { pageY: 0, clientY: 0, pointerType: 'mouse' })
+        .trigger('pointerup', { pointerType: 'mouse', force: true })
         .then(() => {
           expect(win.stores.simulation.pressureSystems[0].strength).to.not.eql(oldStrength);
         });

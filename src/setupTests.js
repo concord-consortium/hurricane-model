@@ -1,6 +1,4 @@
 const crypto = require("crypto");
-const enzyme = require("enzyme");
-const Adapter = require("enzyme-adapter-react-16");
 const seedrandom = require("./seedrandom");
 const { configure } = require("mobx");
 
@@ -17,7 +15,10 @@ if (!global.crypto) {
   };
 }
 
-enzyme.configure({ adapter: new Adapter() });
+// React Testing Library matchers (toBeInTheDocument, toHaveClass, etc.)
+require("@testing-library/jest-dom");
+// The codebase uses `data-test` (not RTL's default `data-testid`); align RTL queries with it.
+require("@testing-library/react").configure({ testIdAttribute: "data-test" });
 
 global.fetch = require("jest-fetch-mock");
 

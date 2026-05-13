@@ -16,7 +16,7 @@ context("Test the Hurricane Image", () => {
     cy.get('[data-name="Hurricane Symbol"]').should("be.visible");
 
     // Enable hurricane image
-    cy.get(".hurricane-image-toggle--toggleContainer--__hurr-v1__ .MuiIconButton-root").click();
+    cy.get('.hurricane-image-toggle--toggleContainer--__hurr-v1__ input[type="checkbox"]').click();
 
     //verify hurricane image displayed
     cy.get(".hurricane-marker--hurricaneIcon--__hurr-v1__")

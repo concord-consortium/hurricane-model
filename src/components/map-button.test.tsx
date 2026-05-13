@@ -1,5 +1,6 @@
 import * as React from "react";
-import { mount } from "enzyme";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { MapButton } from "./map-button";
@@ -12,38 +13,38 @@ describe("MapButton component", () => {
   });
 
   it("renders basic components", () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
         <MapButton mapType="base" label="Street" value="street" />
       </Provider>
     );
-    expect(wrapper.find(MapButton).length).toBe(1);
+    expect(screen.getByTestId("map-button-street")).toBeInTheDocument();
   });
 
-  it("reacts to click and changes map layer", () => {
+  it("reacts to click and changes map layer", async () => {
+    const user = userEvent.setup();
     jest.spyOn(stores.ui, "setMapTiles");
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
         <MapButton mapType="base" label="Street" value="street" />
       </Provider>
     );
-    const btn = wrapper.find((MapButton as any).wrappedComponent).instance() as MapButton;
     expect(stores.ui.baseMap).toEqual("satellite");
-    btn.handleMapSelect();
+    await user.click(screen.getByTestId("map-button-street"));
     expect(stores.ui.setMapTiles).toHaveBeenCalled();
     expect(stores.ui.baseMap).toEqual("street");
   });
 
-  it("reacts to click and changes map overlay", () => {
+  it("reacts to click and changes map overlay", async () => {
+    const user = userEvent.setup();
     jest.spyOn(stores.ui, "setOverlay");
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
         <MapButton mapType="overlay" label="Precipitation" value="precipitation" />
       </Provider>
     );
-    const btn = wrapper.find((MapButton as any).wrappedComponent).instance() as MapButton;
     expect(stores.ui.overlay).toEqual(config.overlay);
-    btn.handleMapSelect();
+    await user.click(screen.getByTestId("map-button-precipitation"));
     expect(stores.ui.setOverlay).toHaveBeenCalled();
     expect(stores.ui.overlay).toEqual("precipitation");
   });

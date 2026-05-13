@@ -1,9 +1,9 @@
 import * as React from "react";
-import { mount } from "enzyme";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { WindArrowsToggle } from "./wind-arrows-toggle";
-import Switch from "@material-ui/core/Switch";
 
 describe("WindArrowsToggle component", () => {
   let stores = createStores();
@@ -12,25 +12,27 @@ describe("WindArrowsToggle component", () => {
   });
 
   it("renders basic components", () => {
-    const wrapper = mount(
+    render(
       <Provider stores={stores}>
         <WindArrowsToggle />
       </Provider>
     );
-    expect(wrapper.find(Switch).length).toEqual(1);
-    expect(wrapper.text()).toEqual(expect.stringContaining("Wind Direction and Speed"));
+    expect(screen.getByRole("switch")).toBeInTheDocument();
+    expect(screen.getByText(/Wind Direction and Speed/)).toBeInTheDocument();
   });
 
-  it("turns on or off the wind arrows", () => {
-    const wrapper = mount(
+  it("turns on or off the wind arrows", async () => {
+    const user = userEvent.setup();
+    render(
       <Provider stores={stores}>
         <WindArrowsToggle />
       </Provider>
     );
-    const toggle = wrapper.find((WindArrowsToggle as any).wrappedComponent).instance() as WindArrowsToggle;
-    toggle.handleChange(null, true);
-    expect(stores.ui.windArrows).toEqual(true);
-    toggle.handleChange(null, false);
-    expect(stores.ui.windArrows).toEqual(false);
+    const toggle = screen.getByRole("switch");
+    const initial = stores.ui.windArrows;
+    await user.click(toggle);
+    expect(stores.ui.windArrows).toEqual(!initial);
+    await user.click(toggle);
+    expect(stores.ui.windArrows).toEqual(initial);
   });
 });

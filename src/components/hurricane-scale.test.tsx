@@ -1,14 +1,12 @@
 import * as React from "react";
-import { shallow } from "enzyme";
+import { render, screen } from "@testing-library/react";
 import { HurricaneScale } from "./hurricane-scale";
 
 describe("HurricaneScale component", () => {
   it("renders basic components", () => {
-    const wrapper = shallow(
-      <HurricaneScale />
-    );
-    expect(wrapper.text()).toEqual(expect.stringContaining("Hurricane Scale"));
-    expect(wrapper.text()).toEqual(expect.stringContaining("Category"));
-    expect(wrapper.text()).toEqual(expect.stringContaining("Wind Speed"));
+    render(<HurricaneScale />);
+    expect(screen.getByText(/Hurricane Scale/)).toBeInTheDocument();
+    expect(screen.getByText(/Category/)).toBeInTheDocument();
+    expect(screen.getByText(/Wind Speed/)).toBeInTheDocument();
   });
 });

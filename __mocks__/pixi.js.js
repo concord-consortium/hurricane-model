@@ -68,6 +68,7 @@ class Application {
   constructor() {
     this.stage = new Container();
     this.renderer = new Renderer();
+    Application.instances.push(this);
   }
   init() {
     return Promise.resolve();
@@ -75,6 +76,8 @@ class Application {
   render() {}
   destroy() {}
 }
+// Tests can inspect created Application instances via this array. Reset between tests.
+Application.instances = [];
 
 module.exports = {
   Application,

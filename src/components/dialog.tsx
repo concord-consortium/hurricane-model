@@ -1,12 +1,13 @@
 import * as React from "react";
-import MuiDialog from "@material-ui/core/Dialog";
-import CloseIcon from "@material-ui/icons/Close";
+import MuiDialog from "@mui/material/Dialog";
+import CloseIcon from "@mui/icons-material/Close";
 import css from "./dialog.scss";
 
 interface IProps {
   onClose: () => void;
   open: boolean;
   title?: string;
+  children?: React.ReactNode;
 }
 
 export class Dialog extends React.Component<IProps> {

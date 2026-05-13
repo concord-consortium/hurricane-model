@@ -1,7 +1,7 @@
 import { inject, observer } from "mobx-react";
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import { MapType } from "./right-panel";
 import { mapLayer, MapTilesName } from "../map-layer-tiles";
 import { Overlay } from "../models/ui";

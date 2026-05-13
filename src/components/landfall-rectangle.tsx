@@ -25,7 +25,7 @@ export class LandfallRectangle extends BaseComponent<IProps, IState> {
       <Rectangle
         className={`${css.landfallRectangle} ${categoryCssClass}`}
         bounds={this.getBounds()}
-        onClick={this.handleClick}
+        eventHandlers={{ click: this.handleClick }}
       />
     );
   }

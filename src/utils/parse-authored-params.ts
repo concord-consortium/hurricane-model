@@ -194,7 +194,7 @@ function findSimilarParams(unknown: string): string[] {
 }
 
 export function parseAuthoredUrlParams(urlParams: string | undefined): IParseResult {
-  if (!urlParams || !urlParams.trim()) {
+  if (!urlParams?.trim()) {
     return { valid: true, params: {}, errors: [] };
   }
 
