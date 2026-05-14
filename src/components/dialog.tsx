@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { FC, ReactNode, useId } from "react";
 import MuiDialog from "@mui/material/Dialog";
 import CloseIcon from "@mui/icons-material/Close";
 import css from "./dialog.scss";
@@ -8,11 +8,11 @@ interface IProps {
   open: boolean;
   title: string;
   ariaDescribedBy?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
-export const Dialog: React.FC<IProps> = ({ onClose, open, title, ariaDescribedBy, children }) => {
-  const titleId = React.useId();
+export const Dialog: FC<IProps> = ({ onClose, open, title, ariaDescribedBy, children }) => {
+  const titleId = useId();
   return (
     <MuiDialog
       onClose={onClose}
