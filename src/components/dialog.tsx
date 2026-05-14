@@ -7,24 +7,36 @@ interface IProps {
   onClose: () => void;
   open: boolean;
   title?: string;
+  ariaLabel?: string;
+  ariaDescribedBy?: string;
   children?: React.ReactNode;
 }
 
-export class Dialog extends React.Component<IProps> {
-  public render() {
-    const { onClose, open, title, children } = this.props;
-    return (
-        <MuiDialog
-          onClose={onClose}
-          open={open}
-          maxWidth="lg"
+export const Dialog: React.FC<IProps> = ({ onClose, open, title, ariaLabel, ariaDescribedBy, children }) => {
+  const labelId = React.useId();
+  const labelText = title ?? ariaLabel;
+  return (
+    <MuiDialog
+      onClose={onClose}
+      open={open}
+      maxWidth="lg"
+      aria-labelledby={labelText ? labelId : undefined}
+      aria-describedby={ariaDescribedBy}
+    >
+      <div className={css.dialogBody}>
+        {title
+          ? <div id={labelId} className={css.title}>{ title }</div>
+          : ariaLabel && <span id={labelId} className={css.visuallyHidden}>{ ariaLabel }</span>}
+        <button
+          type="button"
+          aria-label="Close"
+          className={css.closeButton}
+          onClick={onClose}
         >
-          <div className={css.dialogBody}>
-            {title && <div className={css.title}>{ title }</div>}
-            <CloseIcon className={css.closeButton} onClick={onClose} />
-            <div className={css.content}>{ children }</div>
-          </div>
-        </MuiDialog>
-    );
-  }
-}
+          <CloseIcon />
+        </button>
+        <div className={css.content}>{ children }</div>
+      </div>
+    </MuiDialog>
+  );
+};

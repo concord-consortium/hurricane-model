@@ -92,6 +92,13 @@ describe("BottomBar component", () => {
       );
       expect(endedCall).toBeUndefined();
 
+      // Cancel button should have focus
+      expect(screen.getByTestId("reload-cancel-button")).toHaveFocus();
+
+      // Accessible name on the dialog
+      expect(screen.getByRole("dialog")).toHaveAccessibleName("Reload model confirmation");
+
+      // Cancel does not reset the sim
       await user.click(screen.getByTestId("reload-cancel-button"));
       expect(stores.simulation.reset).not.toHaveBeenCalled();
       expect(stores.ui.reset).not.toHaveBeenCalled();

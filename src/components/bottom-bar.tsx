@@ -185,13 +185,18 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         <Dialog
           onClose={this.cancelReload}
           open={this.state.reloadConfirmOpen}
+          ariaLabel="Reload model confirmation"
+          ariaDescribedBy="reload-confirm-message"
         >
-          <p>Are you sure you want to reload the model? You will lose all of your current settings.</p>
+          <p id="reload-confirm-message">
+            Are you sure you want to reload the model? You will lose all of your current settings.
+          </p>
           <div className={css.confirmActions}>
             <Button
               data-test="reload-cancel-button"
               onClick={this.cancelReload}
               disableRipple={true}
+              autoFocus={true}
             >
               Cancel
             </Button>
