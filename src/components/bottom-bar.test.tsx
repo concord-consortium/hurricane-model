@@ -96,7 +96,7 @@ describe("BottomBar component", () => {
       expect(screen.getByTestId("reload-cancel-button")).toHaveFocus();
 
       // Accessible name on the dialog
-      expect(screen.getByRole("dialog")).toHaveAccessibleName("Reload model confirmation");
+      expect(screen.getByRole("dialog")).toHaveAccessibleName("Reload Model");
 
       // Cancel does not reset the sim
       await user.click(screen.getByTestId("reload-cancel-button"));

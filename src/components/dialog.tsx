@@ -6,27 +6,23 @@ import css from "./dialog.scss";
 interface IProps {
   onClose: () => void;
   open: boolean;
-  title?: string;
-  ariaLabel?: string;
+  title: string;
   ariaDescribedBy?: string;
   children?: React.ReactNode;
 }
 
-export const Dialog: React.FC<IProps> = ({ onClose, open, title, ariaLabel, ariaDescribedBy, children }) => {
-  const labelId = React.useId();
-  const labelText = title ?? ariaLabel;
+export const Dialog: React.FC<IProps> = ({ onClose, open, title, ariaDescribedBy, children }) => {
+  const titleId = React.useId();
   return (
     <MuiDialog
       onClose={onClose}
       open={open}
       maxWidth="lg"
-      aria-labelledby={labelText ? labelId : undefined}
+      aria-labelledby={titleId}
       aria-describedby={ariaDescribedBy}
     >
       <div className={css.dialogBody}>
-        {title
-          ? <div id={labelId} className={css.title}>{ title }</div>
-          : ariaLabel && <span id={labelId} className={css.visuallyHidden}>{ ariaLabel }</span>}
+        <div id={titleId} className={css.title}>{ title }</div>
         <button
           type="button"
           aria-label="Close"

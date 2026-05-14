@@ -185,7 +185,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         <Dialog
           onClose={this.cancelReload}
           open={this.state.reloadConfirmOpen}
-          ariaLabel="Reload model confirmation"
+          title="Reload Model"
           ariaDescribedBy="reload-confirm-message"
         >
           <p id="reload-confirm-message">
