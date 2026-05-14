@@ -24,8 +24,6 @@ npx jest src/models/simulation.test.ts
 npx jest -t "name of test"
 ```
 
-If Jest hangs at startup, watchman is the usual culprit — see `~/.claude/projects/-Users-tealefristoe-concord-hurricane-model/memory/feedback_jest_no_watchman.md`. Fix is `brew reinstall watchman`, not `--no-watchman`.
-
 ## Big-picture architecture
 
 This is a physics-style hurricane simulation that runs in two embedding contexts:
@@ -53,6 +51,6 @@ Stores are injected via `mobx-react`'s `<Provider>` and read in class components
 - `src/temperature-scale.js` is used by **both** the runtime (color→temp via `invertedTemperatureScale`) and the offline scripts in `scripts/` that generate `sea-surface-temp-img/*.png`. If you change the scale, regenerate the PNGs — the README spells out the exact commands.
 - Wind data lives in `wind-data-json/{dec,mar,jun,sep}-simple.json` and is imported statically into `SimulationModel`. To regenerate from NetCDF, use `scripts/convert-wind-data.js` (requires `brew install netcdf`).
 - The codebase still uses MobX class decorators (`@observable`, `@computed`, `@action`) plus `makeObservable(this)` in constructors — this is the MobX 6 idiom, keep it consistent.
-- ESLint config ([eslint.config.mjs](eslint.config.mjs)) is mostly lenient (migrated from TSLint) — `@typescript-eslint/no-explicit-any`, `ban-ts-comment`, and several others are off. `@typescript-eslint/no-unused-vars` *is* an error, with `_`-prefix opt-out for args/vars/caught-errors/array-destructures — prefix with `_` when an arg must stay in the signature (interface impls, override stubs). `no-console` / `no-debugger` are only errors under `LINT_BUILD=1` (CI build), so local lint won't catch leftover logs.
+- ESLint config ([eslint.config.mjs](eslint.config.mjs)) is mostly lenient (migrated from TSLint) — `@typescript-eslint/no-explicit-any`, `ban-ts-comment`, and several others are off. `no-console` / `no-debugger` are only errors under `LINT_BUILD=1` (CI build), so local lint won't catch leftover logs.
 - Tests live next to source as `*.test.ts(x)`. Jest config is inline in [package.json](package.json) — `jsdom` env, `ts-jest`, asset mocks under `__mocks__/`, and an explicit `transformIgnorePatterns` allow-list for ESM-only packages (`d3-*`, `screenfull`, `react-leaflet`, etc.). Add new ESM deps to that list if Jest complains.
 - Cypress e2e specs are under `cypress/e2e/`. They share `package.json` but are excluded from Jest via `testPathIgnorePatterns`.
