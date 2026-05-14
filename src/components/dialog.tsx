@@ -20,7 +20,7 @@ export class Dialog extends React.Component<IProps> {
           maxWidth="lg"
         >
           <div className={css.dialogBody}>
-            <div className={css.title}>{ title }</div>
+            {title && <div className={css.title}>{ title }</div>}
             <CloseIcon className={css.closeButton} onClick={onClose} />
             <div className={css.content}>{ children }</div>
           </div>
