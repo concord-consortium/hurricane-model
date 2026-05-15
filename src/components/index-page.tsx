@@ -54,7 +54,10 @@ export class IndexPage extends BaseComponent<IProps, IState> {
         }
         <MapView />
         { config.mode === "storm" && (
-          <LeftPanel open={this.state.leftPanelOpen} />
+          <LeftPanel
+            open={this.state.leftPanelOpen}
+            toggleOpen={() => this.toggleLeftPanelOpen()}
+          />
         )}
         <RightPanel />
         <BottomBar toggleLeftPanelOpen={() => this.toggleLeftPanelOpen()}/>
