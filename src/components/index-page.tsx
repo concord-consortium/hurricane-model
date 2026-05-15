@@ -1,31 +1,46 @@
-import { inject, observer } from "mobx-react";
-import * as React from "react";
-import { BaseComponent, IBaseProps } from "./base";
-import { MapView } from "./map-view";
-import { BottomBar } from "./bottom-bar/bottom-bar";
-import { TopBar } from "./top-bar/top-bar";
-import { RightPanel } from "./right-panel/right-panel";
 import { LogMonitor } from "@concord-consortium/log-monitor";
 import CircularProgress from "@mui/material/CircularProgress";
-import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
-import { log } from "../log";
+import { inject, observer } from "mobx-react";
+import * as React from "react";
+
 import config from "../config";
+import { log } from "../log";
+import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
+import { BaseComponent, IBaseProps } from "./base";
+import { BottomBar } from "./bottom-bar/bottom-bar";
+import { LeftPanel } from "./left-panel/left-panel";
+import { MapView } from "./map-view";
+import { RightPanel } from "./right-panel/right-panel";
+import { TopBar } from "./top-bar/top-bar";
 
 import css from "./index-page.scss";
 
 interface IProps extends IBaseProps {}
-interface IState {}
+interface IState {
+  leftPanelOpen: boolean
+}
 
 @inject("stores")
 @observer
 
 export class IndexPage extends BaseComponent<IProps, IState> {
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      leftPanelOpen: false
+    };
+  }
+
   public componentDidMount() {
     enableShutterbug(css.index);
   }
 
   public componentWillUnmount() {
     disableShutterbug();
+  }
+
+  public toggleLeftPanelOpen() {
+    this.setState({ leftPanelOpen: !this.state.leftPanelOpen });
   }
 
   public render() {
@@ -38,8 +53,11 @@ export class IndexPage extends BaseComponent<IProps, IState> {
           <CircularProgress className={css.progress} size={100} thickness={5} color="inherit" />
         }
         <MapView />
+        { config.mode === "storm" && (
+          <LeftPanel open={this.state.leftPanelOpen} />
+        )}
         <RightPanel />
-        <BottomBar />
+        <BottomBar toggleLeftPanelOpen={() => this.toggleLeftPanelOpen()}/>
         {
           config.benchmark &&
           <div className={css.stepsPerSecond}>
