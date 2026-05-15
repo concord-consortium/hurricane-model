@@ -61,6 +61,7 @@ export const SelectButton: React.FC<ISelectButtonProps> = (props) => {
 
 // Original spec had a check mark; updated spec does not.
 // We leave the implementation in place in case the check mark comes back.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const OptionalCheck: React.FC<{ show: boolean }> = ({ show }) => {
   return null;
   // const checkMark = "\u2713"; // ✓

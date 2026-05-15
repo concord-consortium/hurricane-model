@@ -4,7 +4,7 @@ import { Dialog } from "./dialog";
 
 describe("Dialog component", () => {
   it("renders Material UI Dialog component", () => {
-    render(<Dialog open={true} onClose={jest.fn()} />);
+    render(<Dialog open={true} onClose={jest.fn()} title="Test Dialog" />);
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 });

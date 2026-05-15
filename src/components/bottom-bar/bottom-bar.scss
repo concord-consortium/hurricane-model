@@ -102,6 +102,13 @@ $overflowHeight: 11px;
   }
 }
 
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 1em;
+}
+
 .playbackButton {
   min-width: 60px;
   height: 100%;

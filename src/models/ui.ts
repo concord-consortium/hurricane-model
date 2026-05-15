@@ -1,5 +1,5 @@
 import { action, observable, computed, makeObservable } from "mobx";
-import { LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds, LatLngTuple } from "leaflet";
+import { LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds } from "leaflet";
 import config from "../config";
 import { mapLayer, MapTilesName, mapTilesNames } from "../map-layer-tiles";
 import { Season, ISSTImages } from "../types";

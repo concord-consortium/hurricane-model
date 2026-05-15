@@ -72,7 +72,39 @@ describe("BottomBar component", () => {
   });
 
   describe("reload button", () => {
-    it("resets simulation and resets view", async () => {
+    it("opens the confirmation dialog without resetting", async () => {
+      const user = userEvent.setup();
+      jest.spyOn(stores.simulation, "reset");
+      jest.spyOn(stores.ui, "reset");
+      (logModule.log as jest.Mock).mockClear();
+      render(
+        <Provider stores={stores}>
+          <BottomBar />
+        </Provider>
+      );
+      await user.click(screen.getByTestId("reload-button"));
+      expect(screen.getByTestId("reload-confirm-button")).toBeInTheDocument();
+      expect(screen.getByTestId("reload-cancel-button")).toBeInTheDocument();
+      expect(stores.simulation.reset).not.toHaveBeenCalled();
+      expect(stores.ui.reset).not.toHaveBeenCalled();
+      const endedCall = (logModule.log as jest.Mock).mock.calls.find(
+        (c: any[]) => c[0] === "SimulationEnded"
+      );
+      expect(endedCall).toBeUndefined();
+
+      // Cancel button should have focus
+      expect(screen.getByTestId("reload-cancel-button")).toHaveFocus();
+
+      // Accessible name on the dialog
+      expect(screen.getByRole("dialog")).toHaveAccessibleName("Reload Model");
+
+      // Cancel does not reset the sim
+      await user.click(screen.getByTestId("reload-cancel-button"));
+      expect(stores.simulation.reset).not.toHaveBeenCalled();
+      expect(stores.ui.reset).not.toHaveBeenCalled();
+    });
+
+    it("resets simulation and resets view when Reload is confirmed", async () => {
       const user = userEvent.setup();
       jest.spyOn(stores.simulation, "reset");
       jest.spyOn(stores.ui, "reset");
@@ -82,11 +114,12 @@ describe("BottomBar component", () => {
         </Provider>
       );
       await user.click(screen.getByTestId("reload-button"));
+      await user.click(screen.getByTestId("reload-confirm-button"));
       expect(stores.simulation.reset).toHaveBeenCalled();
       expect(stores.ui.reset).toHaveBeenCalled();
     });
 
-    it("logs SimulationEnded with reason SimulationReloaded before resetting", async () => {
+    it("logs SimulationEnded with reason SimulationReloaded when Reload is confirmed", async () => {
       const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
       render(
@@ -95,6 +128,7 @@ describe("BottomBar component", () => {
         </Provider>
       );
       await user.click(screen.getByTestId("reload-button"));
+      await user.click(screen.getByTestId("reload-confirm-button"));
       const endedCall = (logModule.log as jest.Mock).mock.calls.find(
         (c: any[]) => c[0] === "SimulationEnded"
       );
