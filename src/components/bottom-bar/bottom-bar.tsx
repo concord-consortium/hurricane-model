@@ -7,6 +7,7 @@ import screenfull from "screenfull";
 import config from "../../config";
 import { log } from "../../log";
 import { BaseComponent, IBaseProps } from "../base";
+import { BottomBarButton } from "./bottom-bar-button";
 import { IconButton } from "./icon-button";
 import { StartLocationButton } from "./start-location-button";
 import { SeasonButton } from "./season-button";
@@ -102,7 +103,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           {
             isStormMode &&
             <div className={css.widgetGroup}>
-              Test
+              <BottomBarButton
+                buttonText="Storm Setup"
+                onClick={() => console.log("test")}
+              />
             </div>
           }
           {
