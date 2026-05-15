@@ -13,10 +13,18 @@
   position: absolute;
   top: 8px;
   right: 8px;
+  padding: 0;
+  background: none;
+  border: none;
   color: #797979;
   cursor: pointer;
+  display: inline-flex;
   &:hover {
     color: $controlLabel;
+  }
+  &:focus-visible {
+    outline: 2px solid $controlLabel;
+    outline-offset: 2px;
   }
 }
 

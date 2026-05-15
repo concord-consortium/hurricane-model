@@ -1,5 +1,5 @@
 import { IVector } from "../types";
-import { computed, makeObservable, override } from "mobx";
+import { computed, override } from "mobx";
 import { latLngPlusVector } from "../math-utils";
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 import config from "../config";

@@ -34,7 +34,7 @@ function applyConfigParam(key: string, value: string): void {
   if (isJSON(value)) {
     try {
       (config as any)[key] = JSON.parse(value);
-    } catch (e) {
+    } catch {
       // eslint-disable-next-line no-console
       console.warn(`Failed to parse JSON value for config parameter "${key}": ${value}`);
     }
@@ -72,7 +72,7 @@ function isJSON(value: string): boolean {
   try {
     JSON.parse(value);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
