@@ -5,7 +5,7 @@ import { inIframe } from "@concord-consortium/lara-interactive-api";
 import config from "./config";
 import * as seedrandom from "./seedrandom";
 import { AppComponent } from "./components/app";
-import { LaraAppWrapper } from "./components/lara-app-wrapper";
+import { LaraAppWrapper } from "./components/lara/lara-app-wrapper";
 import { createStores } from "./models/stores";
 import { ThemeProvider } from "@mui/material/styles";
 import hurricanesTheme from "./material-ui-theme";

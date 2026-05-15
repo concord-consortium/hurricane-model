@@ -1,6 +1,6 @@
 import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
-import { Authoring } from "./authoring";
+import { Authoring } from "./authoring/authoring";
 import { IndexPage } from "./index-page";
 
 import config from "../config";
