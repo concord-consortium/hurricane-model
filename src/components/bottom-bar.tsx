@@ -20,6 +20,7 @@ import ThermometerHoverIcon from "../assets/thermometer-hover.svg";
 import { log } from "../log";
 import { IconButton } from "./icon-button";
 import { StartLocationButton } from "./start-location-button";
+import { Dialog } from "./dialog";
 import css from "./bottom-bar.scss";
 
 interface IProps extends IBaseProps {}
@@ -27,6 +28,7 @@ interface IState {
   fullscreen: boolean;
   isSeasonMenuOpen: boolean;
   isStartLocationMenuOpen: boolean;
+  reloadConfirmOpen: boolean;
 }
 
 function toggleFullscreen() {
@@ -50,7 +52,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     this.state = {
       fullscreen: false,
       isSeasonMenuOpen: false,
-      isStartLocationMenuOpen: false
+      isStartLocationMenuOpen: false,
+      reloadConfirmOpen: false
     };
   }
 
@@ -179,6 +182,33 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" />
           }
         </div>
+        <Dialog
+          onClose={this.cancelReload}
+          open={this.state.reloadConfirmOpen}
+          title="Reload Model"
+          ariaDescribedBy="reload-confirm-message"
+        >
+          <p id="reload-confirm-message">
+            Are you sure you want to reload the model? You will lose all of your current settings.
+          </p>
+          <div className={css.confirmActions}>
+            <Button
+              data-test="reload-cancel-button"
+              onClick={this.cancelReload}
+              disableRipple={true}
+              autoFocus={true}
+            >
+              Cancel
+            </Button>
+            <Button
+              data-test="reload-confirm-button"
+              onClick={this.confirmReload}
+              disableRipple={true}
+            >
+              Reload
+            </Button>
+          </div>
+        </Dialog>
       </div>
     );
   }
@@ -238,6 +268,14 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public handleReload = () => {
+    this.setState({ reloadConfirmOpen: true });
+  }
+
+  public cancelReload = () => {
+    this.setState({ reloadConfirmOpen: false });
+  }
+
+  public confirmReload = () => {
     log("SimulationEnded", {
       reason: "SimulationReloaded",
       outcome: this.stores.simulation.getOutcomeData()
@@ -245,6 +283,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     this.stores.simulation.reset();
     this.stores.ui.reset();
     log("SimulationReloaded");
+    this.setState({ reloadConfirmOpen: false });
   }
 
   public handleThermometerToggle = () => {

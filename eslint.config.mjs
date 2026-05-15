@@ -42,14 +42,20 @@ export default tseslint.config(
       "max-classes-per-file": "off",
       // Translated from TSLint's `array-type` — bans `Array<T>` in favor of `T[]`.
       "@typescript-eslint/array-type": ["error", { default: "array" }],
-      // typescript-eslint defaults flag a lot of pre-existing patterns (any, ts-ignore, unused vars)
+      // typescript-eslint defaults flag a lot of pre-existing patterns (any, ts-ignore)
       // that TSLint never caught. Keep behavior unchanged on migration; tighten later if desired.
       "@typescript-eslint/no-empty-interface": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-var-requires": "off",
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-unused-vars": "off",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": ["error", {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+        destructuredArrayIgnorePattern: "^_",
+      }],
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-this-alias": "off",
       "@typescript-eslint/no-unused-expressions": ["error", { allowShortCircuit: true, allowTernary: true }],

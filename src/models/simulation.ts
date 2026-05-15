@@ -1,7 +1,7 @@
 import { lineString } from "@turf/helpers";
 import { Position } from "geojson";
 import lineIntersect from "@turf/line-intersect";
-import { LatLngExpression, CRS, LatLngBounds, latLngBounds, LatLngLiteral } from "leaflet";
+import { LatLngExpression, CRS, LatLngBounds, latLngBounds } from "leaflet";
 import { action, observable, computed, autorun, toJS, makeObservable } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
