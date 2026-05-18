@@ -40,6 +40,7 @@ export class IndexPage extends BaseComponent<IProps, IState> {
   }
 
   public toggleLeftPanelOpen() {
+    this.stores.ui.setSetupMode(undefined);
     this.setState({ leftPanelOpen: !this.state.leftPanelOpen });
   }
 
