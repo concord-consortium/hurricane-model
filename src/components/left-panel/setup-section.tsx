@@ -3,7 +3,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from "@mui/material/Collapse";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 import React, { ReactNode } from "react";
 
 import { SetupMode } from "../../models/ui";

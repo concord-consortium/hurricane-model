@@ -35,16 +35,16 @@ context("Test the Hurricane Model app", () => {
 
     cy.log("Pressing a button opens and closes the section");
     setupPanel.getSectionButton(section1).click();
-    setupPanel.confirmOpen(section1);
+    setupPanel.confirmSectionOpen(section1);
     setupPanel.getSectionButton(section1).click();
     setupPanel.confirmSectionClosed(section1);
 
     cy.log("Opening a new section closes the old section");
     setupPanel.getSectionButton(section1).click();
-    setupPanel.confirmOpen(section1);
+    setupPanel.confirmSectionOpen(section1);
     setupPanel.confirmSectionClosed(section2);
     setupPanel.getSectionButton(section2).click();
-    setupPanel.confirmOpen(section2);
+    setupPanel.confirmSectionOpen(section2);
     setupPanel.confirmSectionClosed(section1);
 
     cy.log("Setup button closes panel");
