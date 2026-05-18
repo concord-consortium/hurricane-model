@@ -4,7 +4,6 @@ import config from "../config";
 import { mapLayer, MapTilesName, mapTilesNames } from "../map-layer-tiles";
 import { Season, ISSTImages } from "../types";
 
-export type InteractiveMode = "runtime" | "authoring" | "report" | "reportItem";
 import decSeaTempDefault from "../../sea-surface-temp-img/dec-default.png";
 import marchSeaTempDefault from "../../sea-surface-temp-img/mar-default.png";
 import juneSeaTempDefault from "../../sea-surface-temp-img/jun-default.png";
@@ -21,6 +20,9 @@ import decSeaTempRainbowCC from "../../sea-surface-temp-img/dec-rainbowCC.png";
 import marchSeaTempRainbowCC from "../../sea-surface-temp-img/mar-rainbowCC.png";
 import juneSeaTempRainbowCC from "../../sea-surface-temp-img/jun-rainbowCC.png";
 import septSeaTempRainbowCC from "../../sea-surface-temp-img/sep-rainbowCC.png";
+
+export type InteractiveMode = "runtime" | "authoring" | "report" | "reportItem";
+export type SetupMode = "stormLocation" | "stormCategory" | "season" | "seaSurfaceTemperatures" | "pressureSystems";
 
 export const sstImages: Record<string, ISSTImages> = {
   default: {
@@ -58,6 +60,7 @@ export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAv
 
 export class UIModel {
   @observable public mode: InteractiveMode = "runtime";
+  @observable public setupMode: SetupMode | undefined = undefined;
   @observable public initialBounds = config.initialBounds;
   @observable public zoomedInView: ZoomedInViewProps = false;
   @observable public mapModifiedByUser = false;
@@ -116,6 +119,10 @@ export class UIModel {
 
   @action.bound public setMode(mode: InteractiveMode) {
     this.mode = mode;
+  }
+
+  @action.bound public setSetupMode(mode: SetupMode | undefined) {
+    this.setupMode = mode;
   }
 
   public getVisibleSeaSurfaceTempImgUrl(season: Season) {

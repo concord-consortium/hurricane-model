@@ -1,9 +1,10 @@
 import CloseIcon from "@mui/icons-material/Close";
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import ListSubheader from "@mui/material/ListSubheader";
 import clsx from "clsx";
 import React from "react";
+
+import { SetupSection } from "./setup-section";
 
 import css from "./left-panel.scss";
 
@@ -35,9 +36,36 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
             </ListSubheader>
           }
         >
-          <ListItem>
-            Storm Start Location and more text to make things really wide
-          </ListItem>
+          <SetupSection
+            setupMode="stormLocation"
+            title="Storm Start Location"
+          >
+            Storm Start Location
+          </SetupSection>
+          <SetupSection
+            setupMode="stormCategory"
+            title="Storm Category"
+          >
+            Storm Category
+          </SetupSection>
+          <SetupSection
+            setupMode="season"
+            title="Starting Season"
+          >
+            Season
+          </SetupSection>
+          <SetupSection
+            setupMode="seaSurfaceTemperatures"
+            title="Sea Surface Temp Anomalies"
+          >
+            Sea Surface Temperature Anomalies
+          </SetupSection>
+          <SetupSection
+            setupMode="pressureSystems"
+            title="Pressure Systems"
+          >
+            Pressure Systems
+          </SetupSection>
         </List>
       </div>
     </div>

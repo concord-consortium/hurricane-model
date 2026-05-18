@@ -1,5 +1,5 @@
 import { Provider } from "mobx-react";
-import * as React from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
 import { inIframe } from "@concord-consortium/lara-interactive-api";
 import config from "./config";
@@ -9,6 +9,7 @@ import { LaraAppWrapper } from "./components/lara/lara-app-wrapper";
 import { createStores } from "./models/stores";
 import { ThemeProvider } from "@mui/material/styles";
 import hurricanesTheme from "./material-ui-theme";
+import { StoresContext } from "./stores-context";
 
 // Setup seedrandom helper.
 seedrandom.initialize(config.deterministic);
@@ -22,9 +23,11 @@ const container = document.getElementById("app");
 if (container) {
   createRoot(container).render(
     <Provider stores={stores}>
-      <ThemeProvider theme={hurricanesTheme}>
-        {isIframed ? <LaraAppWrapper stores={stores} /> : <AppComponent />}
-      </ThemeProvider>
+      <StoresContext value={stores}>
+        <ThemeProvider theme={hurricanesTheme}>
+          {isIframed ? <LaraAppWrapper stores={stores} /> : <AppComponent />}
+        </ThemeProvider>
+      </StoresContext>
     </Provider>
   );
 }
