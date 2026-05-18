@@ -11,12 +11,13 @@ import { useStores } from "../../stores-context";
 
 interface ISetupSectionProps {
   children?: ReactNode | ReactNode[];
+  dataTest?: string;
   setupMode: SetupMode;
   title: string;
 }
 
 export const SetupSection = observer(function SetupSection({
-  children, setupMode, title
+  children, dataTest, setupMode, title
 }: ISetupSectionProps) {
   const stores = useStores();
   const open = stores?.ui.setupMode === setupMode;
@@ -31,11 +32,11 @@ export const SetupSection = observer(function SetupSection({
 
   return (
     <>
-      <ListItemButton onClick={handleClick}>
+      <ListItemButton data-test={`${dataTest || title}-button`} onClick={handleClick}>
         <ListItemText primary={title} />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
-      <Collapse in={open} unmountOnExit>
+      <Collapse data-test={`${dataTest || title}-content`} in={open} unmountOnExit>
         {children}
       </Collapse>
     </>

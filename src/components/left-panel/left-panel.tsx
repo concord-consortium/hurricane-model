@@ -38,30 +38,35 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
           }
         >
           <SetupSection
+            dataTest="storm-location"
             setupMode="stormLocation"
             title="Storm Start Location"
           >
             Storm Start Location
           </SetupSection>
           <SetupSection
+            dataTest="storm-category"
             setupMode="stormCategory"
             title="Storm Category"
           >
             Storm Category
           </SetupSection>
           <SetupSection
+            dataTest="season"
             setupMode="season"
             title="Starting Season"
           >
             Season
           </SetupSection>
           <SetupSection
+            dataTest="sea-surface-temperatures"
             setupMode="seaSurfaceTemperatures"
             title="Sea Surface Temp Anomalies"
           >
             Sea Surface Temperature Anomalies
           </SetupSection>
           <SetupSection
+            dataTest="pressure-systems"
             setupMode="pressureSystems"
             title="Pressure Systems"
           >

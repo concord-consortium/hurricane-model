@@ -19,16 +19,39 @@ context("Test the Hurricane Model app", () => {
   });
 
   it("setup panel opens, contains the right sections, and closes", () => {
+    const section1 = "storm-location";
+    const section2 = "storm-category";
+    const sections = [section1, section2, "season", "sea-surface-temperatures", "pressure-systems"];
     bottomBar.stormSetupButton().contains("Storm Setup");
     setupPanel.confirmClosed();
     bottomBar.stormSetupButton().click();
     setupPanel.confirmOpen();
 
-    // setup button closes panel
+    cy.log("All sections have buttons and start closed");
+    sections.forEach(section => {
+      setupPanel.getSectionButton(section).should("exist");
+      setupPanel.confirmSectionClosed(section);
+    })
+
+    cy.log("Pressing a button opens and closes the section");
+    setupPanel.getSectionButton(section1).click();
+    setupPanel.confirmOpen(section1);
+    setupPanel.getSectionButton(section1).click();
+    setupPanel.confirmSectionClosed(section1);
+
+    cy.log("Opening a new section closes the old section");
+    setupPanel.getSectionButton(section1).click();
+    setupPanel.confirmOpen(section1);
+    setupPanel.confirmSectionClosed(section2);
+    setupPanel.getSectionButton(section2).click();
+    setupPanel.confirmOpen(section2);
+    setupPanel.confirmSectionClosed(section1);
+
+    cy.log("Setup button closes panel");
     bottomBar.stormSetupButton().click();
     setupPanel.confirmClosed();
 
-    // X button closes panel
+    cy.log("X button closes panel");
     bottomBar.stormSetupButton().click();
     setupPanel.confirmOpen();
     setupPanel.getCloseButton().click();
@@ -36,8 +59,7 @@ context("Test the Hurricane Model app", () => {
   });
 
   it("lets user start and stop the model", () => {
-    // cy.window().then((win: any) => {
-      cy.window().then((win) => {
+    cy.window().then((win) => {
       const oldHurrLng = win.stores.simulation.hurricane.center.lng;
       bottomBar.startButton().should("be.visible");
       bottomBar.startButton().click();

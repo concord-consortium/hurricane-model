@@ -62,8 +62,7 @@ context("Test the Hurricane Model app", () => {
   });
 
   it("lets user start and stop the model", () => {
-    // cy.window().then((win: any) => {
-      cy.window().then((win) => {
+    cy.window().then((win) => {
       const oldHurrLng = win.stores.simulation.hurricane.center.lng;
       bottomBar.startButton().should("be.visible");
       bottomBar.startButton().click();

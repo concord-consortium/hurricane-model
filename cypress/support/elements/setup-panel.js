@@ -1,5 +1,3 @@
-
-
 export class SetupPanel {
   getPanel() {
     return cy.get(`[data-test="left-panel"]`);
@@ -15,5 +13,21 @@ export class SetupPanel {
 
   getCloseButton() {
     return cy.get(`[data-test="left-panel-close-button"]`);
+  }
+
+  getSectionButton(section) {
+    return cy.get(`[data-test="${section}-button"]`);
+  }
+
+  getSectionContent(section) {
+    return cy.get(`[data-test="${section}-content"]`);
+  }
+
+  confirmSectionOpen(section) {
+    this.getSectionContent(section).should("be.visible");
+  }
+
+  confirmSectionClosed(section) {
+    this.getSectionContent(section).should("not.exist");
   }
 }
