@@ -21,7 +21,7 @@ export const BottomBarButton =
       onClick={onClick}
       className={`${css.bottomBarButton} ${disabled ? css.disabled : ""} ${active ? css.active : ""}`}
       disableRipple={true}
-      data-test={dataTest ? dataTest : "icon-button"}
+      data-test={dataTest ? dataTest : "bottom-bar-button"}
       disableTouchRipple={true}
       disabled={disabled}
     >

@@ -61,6 +61,7 @@ export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAv
 export class UIModel {
   @observable public mode: InteractiveMode = "runtime";
   @observable public setupMode: SetupMode | undefined = undefined;
+  @observable public leftPanelOpen = false;
   @observable public initialBounds = config.initialBounds;
   @observable public zoomedInView: ZoomedInViewProps = false;
   @observable public mapModifiedByUser = false;
@@ -123,6 +124,10 @@ export class UIModel {
 
   @action.bound public setSetupMode(mode: SetupMode | undefined) {
     this.setupMode = mode;
+  }
+
+  @action.bound public setLeftPanelOpen(open: boolean) {
+    this.leftPanelOpen = open;
   }
 
   public getVisibleSeaSurfaceTempImgUrl(season: Season) {

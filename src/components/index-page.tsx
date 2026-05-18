@@ -16,21 +16,12 @@ import { TopBar } from "./top-bar/top-bar";
 import css from "./index-page.scss";
 
 interface IProps extends IBaseProps {}
-interface IState {
-  leftPanelOpen: boolean
-}
+interface IState {}
 
 @inject("stores")
 @observer
 
 export class IndexPage extends BaseComponent<IProps, IState> {
-  constructor(props: IProps) {
-    super(props);
-    this.state = {
-      leftPanelOpen: false
-    };
-  }
-
   public componentDidMount() {
     enableShutterbug(css.index);
   }
@@ -41,7 +32,7 @@ export class IndexPage extends BaseComponent<IProps, IState> {
 
   public toggleLeftPanelOpen() {
     this.stores.ui.setSetupMode(undefined);
-    this.setState({ leftPanelOpen: !this.state.leftPanelOpen });
+    this.stores.ui.setLeftPanelOpen(!this.stores.ui.leftPanelOpen);
   }
 
   public render() {
@@ -56,7 +47,7 @@ export class IndexPage extends BaseComponent<IProps, IState> {
         <MapView />
         { config.mode === "storm" && (
           <LeftPanel
-            open={this.state.leftPanelOpen}
+            open={this.stores.ui.leftPanelOpen}
             toggleOpen={() => this.toggleLeftPanelOpen()}
           />
         )}
