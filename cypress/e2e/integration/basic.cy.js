@@ -1,3 +1,7 @@
+import { BottomBar } from "../../support/elements/bottom-bar";
+
+const bottomBar = new BottomBar;
+
 context("Test the Hurricane Model app", () => {
   beforeEach(() => {
     cy.visit("/");
@@ -9,50 +13,50 @@ context("Test the Hurricane Model app", () => {
 
   it("lets user change start location", () => {
     // defaults to Atlantic
-    cy.get('[data-test="start-location-container"]').contains("Atlantic");
+    bottomBar.checkStartLocation("Atlantic");
     // can change to Gulf
-    cy.get('[data-test="start-location-button"]')
+    bottomBar.startLocationButton()
       .click()
       .then(() => {
         cy.get('[data-test="start-location-item-gulf"]')
           .click()
           .then(() => {
-            cy.get('[data-test="start-location-container"]').contains("Gulf");
+            bottomBar.checkStartLocation("Gulf");
           });
       });
     // can change to Atlantic
-    cy.get('[data-test="start-location-button"]')
+    bottomBar.startLocationButton()
       .click()
       .then(() => {
         cy.get('[data-test="start-location-item-atlantic"]')
           .click()
           .then(() => {
-            cy.get('[data-test="start-location-container"]').contains("Atlantic");
+            bottomBar.checkStartLocation("Atlantic");
           });
       });
   });
 
   it("lets user change season", () => {
     // defaults to Fall
-    cy.get('[data-test="season-container"]').contains("Fall");
+    bottomBar.checkSeason("Fall");
     // can change to Winter
-    cy.get('[data-test="season-button"]')
+    bottomBar.seasonButton()
       .click()
       .then(() => {
         cy.get('[data-test="season-item-winter"]')
           .click()
           .then(() => {
-            cy.get('[data-test="season-container"]').contains("Winter");
+            bottomBar.checkSeason("Winter");
           });
       });
     // can change to Spring
-    cy.get('[data-test="season-button"]')
+    bottomBar.seasonButton()
       .click()
       .then(() => {
         cy.get('[data-test="season-item-spring"]')
           .click()
           .then(() => {
-            cy.get('[data-test="season-container"]').contains("Spring");
+            bottomBar.checkSeason("Spring");
           });
       });
   });
@@ -61,13 +65,13 @@ context("Test the Hurricane Model app", () => {
     // cy.window().then((win: any) => {
       cy.window().then((win) => {
       const oldHurrLng = win.stores.simulation.hurricane.center.lng;
-      cy.get('[data-test="start-button"]').should("be.visible");
-      cy.get('[data-test="start-button"]').click();
+      bottomBar.startButton().should("be.visible");
+      bottomBar.startButton().click();
       cy.wait(500).then(() => {
         const newHurrLng = win.stores.simulation.hurricane.center.lng;
         // Wind always goes from east to west.
         expect(newHurrLng).to.be.below(oldHurrLng);
-        cy.get('[data-test="start-button"]').click();
+        bottomBar.startButton().click();
       });
     });
   });

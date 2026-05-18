@@ -110,6 +110,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             <div className={css.widgetGroup}>
               <BottomBarButton
                 buttonText="Storm Setup"
+                dataTest="storm-setup-button"
                 onClick={() => this.props.toggleLeftPanelOpen()}
               />
             </div>

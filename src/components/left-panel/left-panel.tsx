@@ -29,6 +29,7 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
                 type="button"
                 aria-label="Close"
                 className={css.leftPanelCloseButton}
+                data-test="left-panel-close-button"
                 onClick={toggleOpen}
               >
                 <CloseIcon />
