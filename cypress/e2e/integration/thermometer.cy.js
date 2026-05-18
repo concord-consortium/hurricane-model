@@ -4,7 +4,7 @@ context("Test the Thermometer Icon", () => {
   });
 
   it("thermometer at bottom bar", () => {
-    cy.get(".icon-button--iconButton--__hurr-v1__").should("be.visible");
+    cy.get('[data-test="temp-button"]').should("be.visible");
   });
 
   it("thermometer enable after run", () => {
