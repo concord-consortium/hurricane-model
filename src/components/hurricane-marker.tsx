@@ -40,9 +40,11 @@ export class HurricaneMarker extends BaseComponent<IProps, IState> {
   }
 
   private handleDrag = (e: Leaflet.LeafletEvent) => {
+    const { hurricane, pressureSystems } = this.stores.simulation;
     const marker = e.target as Leaflet.Marker;
     const raw = marker.getLatLng();
     const clamped = clampToRegion({ lat: raw.lat, lng: raw.lng }, stormPlacementRegion);
+    hurricane.setCenter(clamped, pressureSystems);
     if (clamped.lat !== raw.lat || clamped.lng !== raw.lng) {
       marker.setLatLng(clamped);
     }
