@@ -15,8 +15,9 @@ describe("stormPlacementRegion", () => {
     const snapped = clampToRegion({ lat: 25, lng: -130 }, stormPlacementRegion);
     // nearestPointOnLine returns a point exactly on the boundary, but turf's
     // booleanPointInPolygon can return false due to floating-point precision.
-    // Instead, assert that the snapped point has moved significantly east
-    // toward the basin's western edge.
+    // Instead, assert the snapped point landed near the basin's western edge
+    // (around lng -97 at this latitude).
     expect(snapped.lng).toBeGreaterThan(-100);
+    expect(snapped.lng).toBeLessThan(-80);
   });
 });

@@ -64,6 +64,28 @@ describe("MapView component", () => {
     config.topBarVisible = oldTopBarVisible;
   });
 
+  describe("storm placement region overlay", () => {
+    it("renders the polygon overlay when setupMode is 'stormLocation'", () => {
+      stores.ui.setSetupMode("stormLocation");
+      render(
+        <Provider stores={stores}>
+          <MapView />
+        </Provider>
+      );
+      expect(document.querySelector("path.leaflet-interactive")).not.toBeNull();
+    });
+
+    it("does not render the polygon overlay when setupMode is undefined", () => {
+      stores.ui.setSetupMode(undefined);
+      render(
+        <Provider stores={stores}>
+          <MapView />
+        </Provider>
+      );
+      expect(document.querySelector("path.leaflet-interactive")).toBeNull();
+    });
+  });
+
   describe("map click logging via instance handler", () => {
     // The map click and thermometer-move handlers attach to Leaflet via react-leaflet 2's
     // onClick/onMouseMove props. Leaflet events aren't React synthetic events, so RTL
