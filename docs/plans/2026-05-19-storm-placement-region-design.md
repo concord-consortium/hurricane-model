@@ -166,10 +166,14 @@ const handleDrag = (e: L.LeafletEvent) => {
 };
 
 const handleDragEnd = (e: L.LeafletEvent) => {
-  const coords = (e.target as L.Marker).getLatLng();
-  simulation.setStartLocation(coords);
+  const { lat, lng } = (e.target as L.Marker).getLatLng();
+  const startLocation: ICoordinates = { lat, lng };
+  simulation.setStartLocation(startLocation);
+  log("StartLocationChanged", { startLocation });
 };
 ```
+
+The `dragend` log uses the same `StartLocationChanged` event name already defined in [LOGGED-EVENTS.md](../../LOGGED-EVENTS.md), so no doc update is needed — the `startLocation` payload is just `ICoordinates` here instead of a `StartLocationNames` string, which matches the existing `StartLocation` union (`StartLocationNames | ICoordinates`).
 
 Wire `draggable`, `drag`, `dragend` through whatever prop surface `LeafletCustomMarker` exposes. If it does not currently forward Leaflet event handlers, the smallest change is to add a passthrough for `eventHandlers` (react-leaflet's standard pattern). Verify before implementing — this is the one wiring detail I have not confirmed.
 
