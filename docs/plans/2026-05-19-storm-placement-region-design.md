@@ -36,9 +36,9 @@ src/
     region.ts                     (new) generic isInsideRegion / clampToRegion helpers
     storm-placement-region.ts     (new) builds the storm placement Region from the JSON
   components/
-    storm-placement-region.tsx    (new) react-leaflet <Polygon> overlay
+    polygon-region.tsx            (new) generic react-leaflet <Polygon> overlay (region + style props)
     hurricane-marker.tsx          (edit) draggable in setup mode, clamp on drag
-    map-view.tsx                  (edit) render the overlay
+    map-view.tsx                  (edit) render the storm placement region via <PolygonRegion>
 ```
 
 Data flow on drag:
@@ -124,31 +124,45 @@ export const stormPlacementRegion = createRegion(regionData as FeatureCollection
 
 New dependencies: `@turf/boolean-point-in-polygon`, `@turf/nearest-point-on-line`.
 
-## Overlay: `src/components/storm-placement-region.tsx`
+## Overlay: `src/components/polygon-region.tsx`
 
-Functional `observer` component:
+A reusable, stateless wrapper around react-leaflet's `<Polygon>`. It takes a `Region` and `pathOptions` as props — no store coupling, no visibility logic — so future callers can use it for any region with whatever styling they want. Conditional visibility (e.g. "only in setup mode") lives at the call site.
+
+```tsx
+import { Polygon, PolygonProps } from "react-leaflet";
+import { PathOptions } from "leaflet";
+import { Region } from "../utils/region";
+
+interface IProps {
+  region: Region;
+  pathOptions: PathOptions;
+}
+
+export const PolygonRegion = ({ region, pathOptions }: IProps) => (
+  <Polygon positions={region.latLngs} pathOptions={pathOptions} />
+);
+```
+
+Used in [src/components/map-view.tsx](../../src/components/map-view.tsx) — render inside `<MapContainer>`, gated on `ui.setupMode === "stormLocation"`:
 
 ```tsx
 import { observer } from "mobx-react";
-import { Polygon } from "react-leaflet";
-import { useStores } from "./base";   // or inject() — match existing patterns
+import { PolygonRegion } from "./polygon-region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
 
-const pathOptions = {
+const stormPlacementPathOptions = {
   color: "#<accent>",     // pick from common.scss to match the design language
   weight: 2,
   fillColor: "#<accent>",
   fillOpacity: 0.1,
 };
 
-export const StormPlacementRegion = observer(() => {
-  const { ui } = useStores();
-  if (ui.setupMode !== "stormLocation") return null;
-  return <Polygon positions={stormPlacementRegion.latLngs} pathOptions={pathOptions} />;
-});
+// inside MapView's render, where it has access to stores via inject():
+{ui.setupMode === "stormLocation" &&
+  <PolygonRegion region={stormPlacementRegion} pathOptions={stormPlacementPathOptions} />}
 ```
 
-Rendered inside `<MapContainer>` in [src/components/map-view.tsx](../../src/components/map-view.tsx), alongside other layers.
+`MapView` is already an `@inject("stores") @observer` class component, so the `ui.setupMode` read is reactive without any new wiring.
 
 ## Drag wiring: `src/components/hurricane-marker.tsx`
 
@@ -192,10 +206,14 @@ Test the generic helpers against a simple synthetic polygon (e.g. a unit square)
 
 - The singleton parses without errors and a known interior point (e.g. mid-Atlantic) is inside the region; a known exterior point (e.g. Pacific) is outside and clamps onto the boundary.
 
-**Component — `src/components/storm-placement-region.test.tsx`** (new)
+**Component — `src/components/polygon-region.test.tsx`** (new)
 
-- Renders a `<Polygon>` when `ui.setupMode === "stormLocation"`.
-- Renders `null` for every other `setupMode` value (including `undefined`).
+- Renders a react-leaflet `<Polygon>` with the `positions` from `region.latLngs` and the supplied `pathOptions`.
+- Different `pathOptions` props produce different rendered styles (sanity check that the prop is forwarded, not hardcoded).
+
+**Component — `src/components/map-view.test.tsx`** (edit, if it exists; otherwise rely on the cypress coverage)
+
+- The storm placement region is rendered when `ui.setupMode === "stormLocation"` and not otherwise.
 
 **Component — `src/components/hurricane-marker.test.tsx`** (edit)
 
