@@ -73,8 +73,7 @@ import { Feature, FeatureCollection, LineString, Polygon } from "geojson";
 import { point, polygon as turfPolygon, lineString } from "@turf/helpers";
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 import nearestPointOnLine from "@turf/nearest-point-on-line";
-
-export interface LatLng { lat: number; lng: number; }
+import { ICoordinates } from "../types";
 
 // Cached turf primitives plus Leaflet-friendly [lat, lng] positions for rendering.
 export interface Region {
@@ -99,13 +98,13 @@ export function createRegion(data: FeatureCollection): Region {
   };
 }
 
-export function isInsideRegion(latLng: LatLng, region: Region): boolean {
-  return booleanPointInPolygon(point([latLng.lng, latLng.lat]), region.polygon);
+export function isInsideRegion(coords: ICoordinates, region: Region): boolean {
+  return booleanPointInPolygon(point([coords.lng, coords.lat]), region.polygon);
 }
 
-export function clampToRegion(latLng: LatLng, region: Region): LatLng {
-  if (isInsideRegion(latLng, region)) return latLng;
-  const snapped = nearestPointOnLine(region.ring, point([latLng.lng, latLng.lat]));
+export function clampToRegion(coords: ICoordinates, region: Region): ICoordinates {
+  if (isInsideRegion(coords, region)) return coords;
+  const snapped = nearestPointOnLine(region.ring, point([coords.lng, coords.lat]));
   const [lng, lat] = snapped.geometry.coordinates;
   return { lat, lng };
 }
@@ -167,8 +166,8 @@ const handleDrag = (e: L.LeafletEvent) => {
 };
 
 const handleDragEnd = (e: L.LeafletEvent) => {
-  const { lat, lng } = (e.target as L.Marker).getLatLng();
-  simulation.setStartLocation({ lat, lng });
+  const coords = (e.target as L.Marker).getLatLng();
+  simulation.setStartLocation(coords);
 };
 ```
 
