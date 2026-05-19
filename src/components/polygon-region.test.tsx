@@ -28,6 +28,7 @@ describe("PolygonRegion component", () => {
     );
     // react-leaflet renders polygons as SVG paths inside the leaflet overlay pane.
     const paths = document.querySelectorAll("path.leaflet-interactive");
-    expect(paths.length).toBeGreaterThan(0);
+    expect(paths.length).toBe(1);
+    expect(paths[0].getAttribute("d")).toBeTruthy();
   });
 });
