@@ -52,7 +52,7 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 | Event | Parameters | When |
 |-------|-----------|------|
 | `SeasonChanged` | `{ season }` | User changes the season |
-| `StartLocationChanged` | `{ startLocation }` | User changes the start location |
+| `StartLocationChanged` | `{ startLocation }` | User changes the start location (`startLocation` is a preset name like `"atlantic"` when picked from the dropdown, or `{ lat, lng }` when the marker is dragged in setup mode) |
 | `WindArrowsShown` | — | User enables wind arrows |
 | `WindArrowsHidden` | — | User disables wind arrows |
 | `HurricaneImageShown` | — | User shows hurricane satellite image |
