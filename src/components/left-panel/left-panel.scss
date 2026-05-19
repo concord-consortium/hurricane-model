@@ -1,0 +1,63 @@
+@use "../common" as *;
+
+$leftPanelWidth: 257px;
+$leftPanelContainerWidth: calc($leftPanelWidth + 2px);
+
+.leftPanelContainer {
+  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
+  left: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  pointer-events: none;
+  position: absolute;
+  top: $topBarHeight;
+  width: $leftPanelContainerWidth;
+  z-index: 1000;
+
+  .leftPanel {
+    background-color: white;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    height: 100%;
+    left: -$leftPanelWidth;
+    pointer-events: all;
+    position: absolute;
+    top: 0;
+    transition: left 0.8s;
+    width: $leftPanelWidth;
+
+    &.open {
+      left: 0;
+    }
+
+    .leftPanelHeader {
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0);
+      display: flex;
+      justify-content: space-between;
+
+      .leftPanelTitle {
+        flex: 1;
+      }
+
+      .leftPanelCloseButton {
+        background: none;
+        border: none;
+        color: #797979;
+        cursor: pointer;
+        display: inline-flex;
+        height: 24px;
+        padding: 0;
+
+        &:hover {
+          color: $controlLabel;
+        }
+
+        &:focus-visible {
+          outline: 2px solid $controlLabel;
+          outline-offset: 2px;
+        }
+      }
+    }
+  }
+}
