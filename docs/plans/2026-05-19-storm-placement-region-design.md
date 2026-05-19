@@ -33,7 +33,8 @@ src/
   assets/
     storm-placement-region.json   (new) GeoJSON FeatureCollection
   utils/
-    storm-placement-region.ts     (new) isInside / clamp helpers + Leaflet-ready coords
+    region.ts                     (new) generic isInsideRegion / clampToRegion helpers
+    storm-placement-region.ts     (new) builds the storm placement Region from the JSON
   components/
     storm-placement-region.tsx    (new) react-leaflet <Polygon> overlay
     hurricane-marker.tsx          (edit) draggable in setup mode, clamp on drag
@@ -45,7 +46,7 @@ Data flow on drag:
 ```
 user drags marker
    → Leaflet "drag" event fires with the raw latlng
-   → handleDrag() calls clampToStormPlacementRegion(latlng)
+   → handleDrag() calls clampToRegion(latlng, stormPlacementRegion)
    → if clamped !== raw, marker.setLatLng(clamped) so the marker visually
      tracks the boundary instead of going off into the ocean
    → on "dragend", simulation.setStartLocation(clamped) commits the position
@@ -63,35 +64,63 @@ The provided GeoJSON, with two cleanups:
 
 The file is imported via webpack's built-in JSON loader — no config changes.
 
-## Utility: `src/utils/storm-placement-region.ts`
+## Utility: `src/utils/region.ts`
+
+Generic helpers that work on any region. Turf primitives are built once via `createRegion()` and reused — important because `clampToRegion` runs on every Leaflet `drag` event (many times per second). Re-parsing the GeoJSON each call would be wasteful.
 
 ```ts
+import { Feature, FeatureCollection, LineString, Polygon } from "geojson";
 import { point, polygon as turfPolygon, lineString } from "@turf/helpers";
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 import nearestPointOnLine from "@turf/nearest-point-on-line";
-import regionData from "../assets/storm-placement-region.json";
 
-// Coordinates are [lng, lat] per GeoJSON; ring is closed (first === last).
-const ring = regionData.features[0].geometry.coordinates as Array<[number, number]>;
-const stormRegionPolygon = turfPolygon([ring]);
-const stormRegionRing = lineString(ring);
+export interface LatLng { lat: number; lng: number; }
 
-// Leaflet uses [lat, lng]; pre-compute for the overlay component.
-export const stormPlacementRegionLatLngs: Array<[number, number]> =
-  ring.map(([lng, lat]) => [lat, lng]);
-
-export function isInsideStormPlacementRegion(latLng: { lat: number; lng: number }): boolean {
-  return booleanPointInPolygon(point([latLng.lng, latLng.lat]), stormRegionPolygon);
+// Cached turf primitives plus Leaflet-friendly [lat, lng] positions for rendering.
+export interface Region {
+  polygon: Feature<Polygon>;
+  ring: Feature<LineString>;
+  latLngs: Array<[number, number]>;
 }
 
-export function clampToStormPlacementRegion(
-  latLng: { lat: number; lng: number }
-): { lat: number; lng: number } {
-  if (isInsideStormPlacementRegion(latLng)) return latLng;
-  const snapped = nearestPointOnLine(stormRegionRing, point([latLng.lng, latLng.lat]));
+// Accepts either a Polygon FeatureCollection (one feature) or a closed-LineString
+// FeatureCollection. Coordinates are [lng, lat] per GeoJSON.
+export function createRegion(data: FeatureCollection): Region {
+  const geom = data.features[0].geometry;
+  const ring = (geom.type === "Polygon" ? geom.coordinates[0] : geom.coordinates) as Array<[number, number]>;
+  // Ensure the ring is closed (turfPolygon requires first === last).
+  const closed = ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]
+    ? ring
+    : [...ring, ring[0]];
+  return {
+    polygon: turfPolygon([closed]),
+    ring: lineString(closed),
+    latLngs: closed.map(([lng, lat]) => [lat, lng]),
+  };
+}
+
+export function isInsideRegion(latLng: LatLng, region: Region): boolean {
+  return booleanPointInPolygon(point([latLng.lng, latLng.lat]), region.polygon);
+}
+
+export function clampToRegion(latLng: LatLng, region: Region): LatLng {
+  if (isInsideRegion(latLng, region)) return latLng;
+  const snapped = nearestPointOnLine(region.ring, point([latLng.lng, latLng.lat]));
   const [lng, lat] = snapped.geometry.coordinates;
   return { lat, lng };
 }
+```
+
+## Storm placement region: `src/utils/storm-placement-region.ts`
+
+Thin module that builds the singleton `Region` from the JSON and exposes it for consumers (the overlay, the drag handler, tests):
+
+```ts
+import { FeatureCollection } from "geojson";
+import { createRegion } from "./region";
+import regionData from "../assets/storm-placement-region.json";
+
+export const stormPlacementRegion = createRegion(regionData as FeatureCollection);
 ```
 
 New dependencies: `@turf/boolean-point-in-polygon`, `@turf/nearest-point-on-line`.
@@ -104,7 +133,7 @@ Functional `observer` component:
 import { observer } from "mobx-react";
 import { Polygon } from "react-leaflet";
 import { useStores } from "./base";   // or inject() — match existing patterns
-import { stormPlacementRegionLatLngs } from "../utils/storm-placement-region";
+import { stormPlacementRegion } from "../utils/storm-placement-region";
 
 const pathOptions = {
   color: "#<accent>",     // pick from common.scss to match the design language
@@ -116,7 +145,7 @@ const pathOptions = {
 export const StormPlacementRegion = observer(() => {
   const { ui } = useStores();
   if (ui.setupMode !== "stormLocation") return null;
-  return <Polygon positions={stormPlacementRegionLatLngs} pathOptions={pathOptions} />;
+  return <Polygon positions={stormPlacementRegion.latLngs} pathOptions={pathOptions} />;
 });
 ```
 
@@ -131,7 +160,7 @@ const draggable = ui.setupMode === "stormLocation" && !simulation.simulationStar
 const handleDrag = (e: L.LeafletEvent) => {
   const marker = e.target as L.Marker;
   const raw = marker.getLatLng();
-  const clamped = clampToStormPlacementRegion({ lat: raw.lat, lng: raw.lng });
+  const clamped = clampToRegion({ lat: raw.lat, lng: raw.lng }, stormPlacementRegion);
   if (clamped.lat !== raw.lat || clamped.lng !== raw.lng) {
     marker.setLatLng(clamped);
   }
@@ -147,11 +176,18 @@ Wire `draggable`, `drag`, `dragend` through whatever prop surface `LeafletCustom
 
 ## Testing
 
-**Unit — `src/utils/storm-placement-region.test.ts`** (new)
+**Unit — `src/utils/region.test.ts`** (new)
 
-- A point clearly inside the basin returns unchanged.
-- A point clearly outside snaps to a known boundary segment. Use a point well east of the eastern edge so the nearest point is unambiguously on the long eastern segment; assert the snapped point lies on that segment within a small epsilon.
-- `isInsideStormPlacementRegion` returns `true` for an interior point and `false` for an exterior point.
+Test the generic helpers against a simple synthetic polygon (e.g. a unit square) so assertions are exact, not approximate:
+
+- `isInsideRegion` returns `true` for an interior point and `false` for an exterior point.
+- `clampToRegion` returns the same coords for an interior point.
+- `clampToRegion` snaps an exterior point to a known boundary point (use a point directly outside one edge so the nearest point is unambiguous).
+- `createRegion` accepts both a Polygon FeatureCollection and a closed-LineString FeatureCollection, and closes an open ring automatically.
+
+**Unit — `src/utils/storm-placement-region.test.ts`** (new, small)
+
+- The singleton parses without errors and a known interior point (e.g. mid-Atlantic) is inside the region; a known exterior point (e.g. Pacific) is outside and clamps onto the boundary.
 
 **Component — `src/components/storm-placement-region.test.tsx`** (new)
 
