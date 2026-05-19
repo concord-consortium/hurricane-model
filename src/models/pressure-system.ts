@@ -14,9 +14,6 @@ export interface IPressureSystemOptions {
   strength?: number;
 }
 
-// Limit pressure systems only to the northern hemisphere.
-const minLat = 15;
-
 const minDistToOtherSystems = (center: ICoordinates, otherSystems: PressureSystem[]) => {
   const dists = otherSystems.map(ps => distanceTo(
     {lat: ps.center.lat, lon: ps.center.lng},
@@ -41,6 +38,7 @@ export class PressureSystem {
   @observable public center: ICoordinates;
   @observable public strength = config.pressureSystemStrength;
   protected initialState: PressureSystem;
+  protected minLat = 15; // Limit pressure systems only to the northern hemisphere.
 
   @computed public get range() {
     // Range is proportional to strength.
@@ -92,7 +90,7 @@ export class PressureSystem {
   }
 
   @action.bound public setCenter(center: ICoordinates, otherPressureSystems: PressureSystem[]) {
-    center.lat = Math.max(minLat, center.lat);
+    center.lat = Math.max(this.minLat, center.lat);
     const step = config.minPressureSystemDistance / 100;
     const minDistRes = minDistToOtherSystems(center, otherPressureSystems);
     const heading = minDistRes.heading || 0; // Provide default heading if null
