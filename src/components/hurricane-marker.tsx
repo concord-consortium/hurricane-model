@@ -1,10 +1,14 @@
 import * as React from "react";
+import * as Leaflet from "leaflet";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import HurricaneIconSVG from "../assets/hurricane.svg";
 import config from "../config";
 import { CategoryNumber } from "./category-number";
+import { clampToRegion } from "../utils/region";
+import { stormPlacementRegion } from "../utils/storm-placement-region";
+import { log } from "../log";
 
 import HurricaneImageSrc from "../assets/hurricane-image.png";
 import css from "./hurricane-marker.scss";
@@ -20,12 +24,35 @@ const HURRICANE_IMG_SCALE_FACTOR = 0.05;
 @observer
 export class HurricaneMarker extends BaseComponent<IProps, IState> {
   public render() {
-    const hurricane = this.stores.simulation.hurricane;
+    const { ui, simulation } = this.stores;
+    const { hurricane, simulationStarted } = simulation;
+    const draggable = ui.setupMode === "stormLocation" && !simulationStarted;
     return (
-      <LeafletCustomMarker position={hurricane.center} draggable={false}>
+      <LeafletCustomMarker
+        position={hurricane.center}
+        draggable={draggable}
+        onDrag={this.handleDrag}
+        onDragEnd={this.handleDragEnd}
+      >
         <HurricaneIcon />
       </LeafletCustomMarker>
     );
+  }
+
+  private handleDrag = (e: Leaflet.LeafletEvent) => {
+    const marker = e.target as Leaflet.Marker;
+    const raw = marker.getLatLng();
+    const clamped = clampToRegion({ lat: raw.lat, lng: raw.lng }, stormPlacementRegion);
+    if (clamped.lat !== raw.lat || clamped.lng !== raw.lng) {
+      marker.setLatLng(clamped);
+    }
+  }
+
+  private handleDragEnd = (e: Leaflet.DragEndEvent) => {
+    const { lat, lng } = (e.target as Leaflet.Marker).getLatLng();
+    const startLocation = { lat, lng };
+    this.stores.simulation.setStartLocation(startLocation);
+    log("StartLocationChanged", { startLocation });
   }
 }
 
