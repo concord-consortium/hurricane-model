@@ -21,12 +21,21 @@ import { log } from "../log";
 import { LeafletMouseEvent } from "leaflet";
 import css from "./map-view.scss";
 import { ThermometerMarker } from "./thermometer-marker";
+import { PolygonRegion } from "./polygon-region";
+import { stormPlacementRegion } from "../utils/storm-placement-region";
 import "leaflet/dist/leaflet.css";
 
 interface IProps extends IBaseProps {}
 interface IState {}
 
 const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
+
+const stormPlacementPathOptions = {
+  color: "#0072B2",
+  weight: 2,
+  fillColor: "#0072B2",
+  fillOpacity: 0.1,
+};
 
 @inject("stores")
 @observer
@@ -221,6 +230,10 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
+          }
+          {
+            ui.setupMode === "stormLocation" &&
+            <PolygonRegion region={stormPlacementRegion} pathOptions={stormPlacementPathOptions} />
           }
           <AttributionControl position="topright" />
         </MapContainer>
