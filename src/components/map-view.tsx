@@ -287,6 +287,9 @@ export class MapView extends BaseComponent<IProps, IState> {
       }
       map.flyToBounds(latLngBounds(topLeft, bottomRight), opts);
     }
+    // An interrupted flyTo fires no moveend (Leaflet's _stop is silent), so rapid
+    // toggles just leave the flag true until the final flight settles. Stale once
+    // listeners that accumulate are idempotent — they all clear the same flag.
     map.once("moveend", () => {
       this._programmaticMapUpdate = false;
     });
