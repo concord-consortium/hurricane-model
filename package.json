@@ -130,7 +130,7 @@
     "wait-on": "^9.0.10",
     "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2",
-    "webpack-dev-server": "^5.2.3"
+    "webpack-dev-server": "^5.2.4"
   },
   "dependencies": {
     "@concord-consortium/lara-interactive-api": "^1.13.0",
