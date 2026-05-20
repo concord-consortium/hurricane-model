@@ -3,7 +3,7 @@ import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapContainer, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
-import { Map as LeafletMap } from "leaflet";
+import { Map as LeafletMap, PointTuple, latLngBounds } from "leaflet";
 import Control from "./leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
@@ -20,6 +20,7 @@ import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
 import { LeafletMouseEvent } from "leaflet";
 import css from "./map-view.scss";
+import commonStyles from "./common.scss";
 import { ThermometerMarker } from "./thermometer-marker";
 import { PolygonRegion } from "./polygon-region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
@@ -36,6 +37,11 @@ const stormPlacementPathOptions = {
   fillColor: "#0072B2",
   fillOpacity: 0.1,
 };
+
+// Keep in sync with $leftPanelWidth and $leftPanelTransitionSeconds in common.scss
+// (exported via :export, parsed here to strip the px/s units).
+const LEFT_PANEL_WIDTH_PX = parseInt(commonStyles.leftPanelWidth, 10);
+const LEFT_PANEL_TRANSITION_SECONDS = parseFloat(commonStyles.leftPanelTransitionSeconds);
 
 @inject("stores")
 @observer
@@ -82,6 +88,10 @@ export class MapView extends BaseComponent<IProps, IState> {
       if (map) {
         map.setMaxZoom(this.stores.ui.maxZoom);
       }
+    });
+
+    observe(this.stores.ui, "leftPanelOpen", () => {
+      this.handleLeftPanelToggle();
     });
   }
 
@@ -255,6 +265,31 @@ export class MapView extends BaseComponent<IProps, IState> {
   public resetView = () => {
     this.stores.ui.resetMapView();
     log("ResetMapViewClicked");
+  }
+
+  private handleLeftPanelToggle = () => {
+    const map = this.leafletMap;
+    if (!map) return;
+    const open = this.stores.ui.leftPanelOpen;
+    const paddingTopLeft: PointTuple = [open ? LEFT_PANEL_WIDTH_PX : 0, 0];
+    const opts = { paddingTopLeft, duration: LEFT_PANEL_TRANSITION_SECONDS };
+    this._programmaticMapUpdate = true;
+    if (open) {
+      map.flyToBounds(map.getBounds(), opts);
+    } else {
+      const size = map.getSize();
+      const topLeft = map.containerPointToLatLng([LEFT_PANEL_WIDTH_PX, 0]);
+      const bottomRight = map.containerPointToLatLng([size.x, size.y]);
+      if (!isFinite(topLeft.lat) || !isFinite(bottomRight.lng)) {
+        // Map isn't laid out yet; skip the flight to avoid passing NaN to Leaflet.
+        this._programmaticMapUpdate = false;
+        return;
+      }
+      map.flyToBounds(latLngBounds(topLeft, bottomRight), opts);
+    }
+    map.once("moveend", () => {
+      this._programmaticMapUpdate = false;
+    });
   }
 
   private handleViewportChanged = () => {
