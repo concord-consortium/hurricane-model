@@ -258,18 +258,18 @@ export class MapView extends BaseComponent<IProps, IState> {
     if (map) {
       const size = map.getSize();
       const { ui } = this.stores;
-      const { initialBounds } = ui;
+      const { visibleRegion } = config;
 
       // Remove restrictions for a moment so getBoundsZoom works correctly.
       map.setMinZoom(1);
       map.setMaxBounds([[-Infinity, -Infinity], [Infinity, Infinity]]);
 
-      // Get the min zoom that will show the complete initial bounds given the map size.
-      const minZoom = map.getBoundsZoom(initialBounds, false);
+      // Get the min zoom that will show the complete visible region given the map size.
+      const minZoom = map.getBoundsZoom(visibleRegion, false);
 
       // Determine actual bounds of max visible map given min zoom and map size.
-      // There might be some vertical or horizontal padding depending on the initial bounds and window aspect ratios.
-      const ib = latLngBounds(initialBounds);
+      // There might be some vertical or horizontal padding depending on the visible region and window aspect ratios.
+      const ib = latLngBounds(visibleRegion);
       const centerPx = map.project(ib.getSouthWest(), minZoom)
         .add(map.project(ib.getNorthEast(), minZoom))
         .divideBy(2);
@@ -284,18 +284,18 @@ export class MapView extends BaseComponent<IProps, IState> {
       // the full width of the left panel (if the window has a higher height to width ratio than the initial bounds),
       // or somewhere in between (if there is some horizontal padding, but not enough for the full left panel).
       // Extra height is divided between the top and bottom, keeping the focused area centered vertically.
-      const initialWidthLong = initialBounds[1][1] - initialBounds[0][1];
+      const visibleWidthLong = visibleRegion[1][1] - visibleRegion[0][1];
       // TODO: initWidthPixels is not quite right, because the zoom will ultimately be panelZoom, not minZoom
       // Also, this is longitude -> pixel at the equator, but we should really calculate this at the furthest lat
-      // from the equator (northern lat in the initial bounds)
-      const initWidthPixels = (initialWidthLong / 360) * 256 * (2 ** minZoom);
+      // from the equator (northern lat in the visible region)
+      const initWidthPixels = (visibleWidthLong / 360) * 256 * (2 ** minZoom);
       const widthPadding = (size.x - initWidthPixels) / 2;
       const extraLeftPanelWidth = LEFT_PANEL_WIDTH_PX - widthPadding;
       const extraLeftPanelHeight = extraLeftPanelWidth * size.y / size.x;
 
       // Determine the min zoom needed to show both the full inititial bounds and left panel.
       const panelPadding = new Point(extraLeftPanelWidth, extraLeftPanelHeight);
-      const panelZoom = map.getBoundsZoom(initialBounds, false, panelPadding);
+      const panelZoom = map.getBoundsZoom(visibleRegion, false, panelPadding);
 
       // Determine the bounds of max visible map + left panel given min zoom and map size.
       const ibCenter = ib.getCenter();
