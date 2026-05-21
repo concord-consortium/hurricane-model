@@ -22,7 +22,7 @@ $leftPanelContainerWidth: calc($leftPanelWidth + 2px);
     pointer-events: all;
     position: absolute;
     top: 0;
-    transition: left $leftPanelTransitionSeconds;
+    transition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.7, 1.0);
     width: $leftPanelWidth;
 
     &.open {

@@ -3,7 +3,7 @@ import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapContainer, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
-import { Map as LeafletMap, PointTuple, latLngBounds } from "leaflet";
+import { LatLng, Map as LeafletMap, Point, PointTuple, latLngBounds } from "leaflet";
 import Control from "./leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
@@ -60,25 +60,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     // work only on the initial load, but it's impossible to update them later. That's why we need to access
     // Leaflet API directly.
     observe(this.stores.ui, "initialBounds", () => {
-      const map = this.leafletMap;
-      if (map) {
-        // Remove restrictions for a moment so flyToBounds works correctly.
-        map.setMinZoom(1);
-        map.setMaxBounds([[-Infinity, -Infinity], [Infinity, Infinity]]);
-        this._programmaticMapUpdate = true;
-        map.flyToBounds(this.stores.ui.initialBounds);
-        map.once("moveend", () => {
-          // Calculate max bounds to be the area which is visible at the moment. It'll depend on the screen size.
-          // Since it's initially visible, we don't want to restrict users more when they zoom in and Leaflet can
-          // apply max bounds more precisely (that's why we don't use bounds as max bounds).
-          // Also, apply small padding (3%) as it feels better and otherwise Leaflet is triggering another animations.
-          const maxBounds = map.getBounds().pad(0.03);
-          const minZoom = map.getZoom();
-          map.setMinZoom(minZoom);
-          map.setMaxBounds(maxBounds);
-          this._programmaticMapUpdate = false;
-        });
-      }
+      this.updateMaxBounds();
     });
 
     // This maxZoom option is not handled by react-leaftlet as a dynamic react property (it doesn't update after
@@ -127,124 +109,125 @@ export class MapView extends BaseComponent<IProps, IState> {
     return (
       <div className={`${css.mapView} ${!config.topBarVisible ? css.noTopBar : ""}`} id="mapView">
         <MapContainer ref={this.mapRef}
-             whenReady={this.handleMapReady as () => void}
-             dragging={navigation}
-             doubleClickZoom={navigation}
-             scrollWheelZoom={navigation}
-             boxZoom={navigation}
-             keyboard={navigation}
-             style={{width: "100%", height: "100%"}}
-             zoom={4}
-             maxZoom={ui.maxZoom}
-             center={[30, -45]}
-             zoomControl={false}
-             attributionControl={false}
+          whenReady={this.handleMapReady as () => void}
+          dragging={navigation}
+          doubleClickZoom={navigation}
+          scrollWheelZoom={navigation}
+          boxZoom={navigation}
+          keyboard={navigation}
+          style={{width: "100%", height: "100%"}}
+          zoom={4}
+          maxZoom={ui.maxZoom}
+          center={[30, -45]}
+          zoomControl={false}
+          zoomSnap={0}
+          attributionControl={false}
         >
           <TileLayer
             url={ui.baseMapTileUrl}
             attribution={ui.baseMapTileAttribution}
           />
-          {
-            // Special case - "population" base map is actually combination of "street" base map and "population"
-            // overlay tiles.
-            ui.baseMap === "population" &&
-            <TileLayer
-              attribution={mapLayer("population").attribution}
-              url={mapLayer("population").url}
-              opacity={0.6}
-            />
-          }
-          <PixiWindLayer />
-          {
-            ui.overlay === "stormSurge" &&
-            <StormSurgeOverlay />
-          }
-          {
-            ui.overlay === "sst" &&
-            <ImageOverlay
-              // accessible version of sea surface temperature should always use 100% opacity
-              opacity={ui.accessibleSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
-              url={ui.getVisibleSeaSurfaceTempImgUrl(sim.season)}
-              bounds={imageOverlayBounds}
-            />
-          }
-          {
-            // Source:
-            // https://www.nhc.noaa.gov/nationalsurge/
-            // https://experience.arcgis.com/experience/203f772571cb48b1b8b50fdcc3272e2c
-            ui.overlay === "stormSurge" && ui.zoomedInView && ui.zoomedInView.stormSurgeAvailable &&
-            <TileLayer
-              attribution={mapLayer("stormSurge").attribution}
-              url={mapLayer("stormSurge").url.replace("{hurricaneCat}", ui.zoomedInView.landfallCategory.toString())}
-              opacity={0.75}
-            />
-          }
-          {
-            ui.overlay === "precipitation" && <PrecipitationLayer/>
-          }
-          <HurricaneTrack />
-          {
-            config.markLandfalls && sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
-              <LandfallRectangle key={idx} position={lf.position} category={lf.category} />
-            )
-          }
-          {
-            sim.pressureSystems.map((ps, idx) =>
-              <PressureSystemMarker
-                key={idx}
-                model={ps}
+            {
+              // Special case - "population" base map is actually combination of "street" base map and "population"
+              // overlay tiles.
+              ui.baseMap === "population" &&
+              <TileLayer
+                attribution={mapLayer("population").attribution}
+                url={mapLayer("population").url}
+                opacity={0.6}
               />
-            )
-          }
-          {
-            sim.hurricane.active && <HurricaneMarker />
-          }
-          {
-            // ui.mapBounds can be null/undefined before the Leaflet map has finished initializing
-            // or before bounds have been computed; in that case we skip rendering category change
-            // markers to avoid null reference errors and unnecessary work.
-            ui.categoryChangeMarkers && ui.mapBounds &&
-            sim.getCategoryMarkerPositions(ui.mapBounds).map((ps, idx) =>
-              <HurricaneCategoryMarker
-                point={ps}
-                key={idx}
+            }
+            <PixiWindLayer />
+            {
+              ui.overlay === "stormSurge" &&
+              <StormSurgeOverlay />
+            }
+            {
+              ui.overlay === "sst" &&
+              <ImageOverlay
+                // accessible version of sea surface temperature should always use 100% opacity
+                opacity={ui.accessibleSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
+                url={ui.getVisibleSeaSurfaceTempImgUrl(sim.season)}
+                bounds={imageOverlayBounds}
               />
-            )
-          }
-          { navigation && <ZoomControl position="topleft"/> }
-          {
-            navigation && ui.mapModifiedByUser &&
-            <Control position="topleft" className={`${css.resetViewContainer} leaflet-bar`}>
-              <a className={css.resetViewBtn}
-                 onClick={this.resetView}
-                 title="Reset view" role="button" aria-label="Reset view"
-              >
-                <CenterFocusStrong/>
-              </a>
-            </Control>
-          }
-          {
-            ui.zoomedInView &&
-            <Control position="topleft" className={`${css.fullMapViewContainer} leaflet-bar`}>
-              <a className={css.resetViewBtn}
-                 onClick={this.stores.ui.setNorthAtlanticView}
-                 title="Go to full map view" role="button" aria-label="Go to full map view"
-              >
-                <Home/>
-                <div className={css.mapButtonLabel}>Full Map View</div>
-              </a>
-            </Control>
-          }
-          {
-            ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionSaved} saved={true} />
-          }
-          {
-            ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
-          }
-          {
-            ui.setupMode === "stormLocation" &&
-            <PolygonRegion region={stormPlacementRegion} pathOptions={stormPlacementPathOptions} />
-          }
+            }
+            {
+              // Source:
+              // https://www.nhc.noaa.gov/nationalsurge/
+              // https://experience.arcgis.com/experience/203f772571cb48b1b8b50fdcc3272e2c
+              ui.overlay === "stormSurge" && ui.zoomedInView && ui.zoomedInView.stormSurgeAvailable &&
+              <TileLayer
+                attribution={mapLayer("stormSurge").attribution}
+                url={mapLayer("stormSurge").url.replace("{hurricaneCat}", ui.zoomedInView.landfallCategory.toString())}
+                opacity={0.75}
+              />
+            }
+            {
+              ui.overlay === "precipitation" && <PrecipitationLayer/>
+            }
+            <HurricaneTrack />
+            {
+              config.markLandfalls && sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
+                <LandfallRectangle key={idx} position={lf.position} category={lf.category} />
+              )
+            }
+            {
+              sim.pressureSystems.map((ps, idx) =>
+                <PressureSystemMarker
+                  key={idx}
+                  model={ps}
+                />
+              )
+            }
+            {
+              sim.hurricane.active && <HurricaneMarker />
+            }
+            {
+              // ui.mapBounds can be null/undefined before the Leaflet map has finished initializing
+              // or before bounds have been computed; in that case we skip rendering category change
+              // markers to avoid null reference errors and unnecessary work.
+              ui.categoryChangeMarkers && ui.mapBounds &&
+              sim.getCategoryMarkerPositions(ui.mapBounds).map((ps, idx) =>
+                <HurricaneCategoryMarker
+                  point={ps}
+                  key={idx}
+                />
+              )
+            }
+            { navigation && <ZoomControl position="topleft"/> }
+            {
+              navigation && ui.mapModifiedByUser &&
+              <Control position="topleft" className={`${css.resetViewContainer} leaflet-bar`}>
+                <a className={css.resetViewBtn}
+                  onClick={this.resetView}
+                  title="Reset view" role="button" aria-label="Reset view"
+                >
+                  <CenterFocusStrong/>
+                </a>
+              </Control>
+            }
+            {
+              ui.zoomedInView &&
+              <Control position="topleft" className={`${css.fullMapViewContainer} leaflet-bar`}>
+                <a className={css.resetViewBtn}
+                  onClick={this.stores.ui.setNorthAtlanticView}
+                  title="Go to full map view" role="button" aria-label="Go to full map view"
+                >
+                  <Home/>
+                  <div className={css.mapButtonLabel}>Full Map View</div>
+                </a>
+              </Control>
+            }
+            {
+              ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionSaved} saved={true} />
+            }
+            {
+              ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
+            }
+            {
+              ui.setupMode === "stormLocation" &&
+              <PolygonRegion region={stormPlacementRegion} pathOptions={stormPlacementPathOptions} />
+            }
           <AttributionControl position="topright" />
         </MapContainer>
       </div>
@@ -267,19 +250,93 @@ export class MapView extends BaseComponent<IProps, IState> {
     log("ResetMapViewClicked");
   }
 
+  private updateMaxBounds = () => {
+    const map = this.leafletMap;
+    if (map) {
+      const size = map.getSize();
+      const { ui } = this.stores;
+      const { initialBounds } = ui;
+
+      // Remove restrictions for a moment so getBoundsZoom works correctly.
+      map.setMinZoom(1);
+      map.setMaxBounds([[-Infinity, -Infinity], [Infinity, Infinity]]);
+
+      // Get the min zoom that will show the complete initial bounds given the map size.
+      const minZoom = map.getBoundsZoom(initialBounds, false);
+
+      // Determine actual bounds of max visible map given min zoom and map size.
+      // There might be some vertical or horizontal padding depending on the initial bounds and window aspect ratios.
+      const ib = latLngBounds(initialBounds);
+      const centerPx = map.project(ib.getSouthWest(), minZoom)
+        .add(map.project(ib.getNorthEast(), minZoom))
+        .divideBy(2);
+      const half = size.divideBy(2);
+      const fullBounds = latLngBounds(
+        map.unproject(centerPx.subtract(half), minZoom),
+        map.unproject(centerPx.add(half), minZoom)
+      )
+
+      // Determine how much extra area is necessary to show the left panel given the map size
+      // Extra width is all to the left. It can be 0 (if the window is very wide),
+      // the full width of the left panel (if the window has a higher height to width ratio than the initial bounds),
+      // or somewhere in between (if there is some horizontal padding, but not enough for the full left panel).
+      // Extra height is divided between the top and bottom, keeping the focused area centered vertically.
+      const initialWidthLong = initialBounds[1][1] - initialBounds[0][1];
+      // TODO: initWidthPixels is not quite right, because the zoom will ultimately be panelZoom, not minZoom
+      // Also, this is longitude -> pixel at the equator, but we should really calculate this at the furthest lat
+      // from the equator (northern lat in the initial bounds)
+      const initWidthPixels = (initialWidthLong / 360) * 256 * (2 ** minZoom);
+      const widthPadding = (size.x - initWidthPixels) / 2;
+      const extraLeftPanelWidth = LEFT_PANEL_WIDTH_PX - widthPadding;
+      const extraLeftPanelHeight = extraLeftPanelWidth * size.y / size.x;
+
+      // Determine the min zoom needed to show both the full inititial bounds and left panel.
+      const panelPadding = new Point(extraLeftPanelWidth, extraLeftPanelHeight);
+      const panelZoom = map.getBoundsZoom(initialBounds, false, panelPadding);
+
+      // Determine the bounds of max visible map + left panel given min zoom and map size.
+      const ibCenter = ib.getCenter();
+      const panelLongShift = extraLeftPanelWidth / 2 * 360 / 256 / (2 ** panelZoom);
+      const panelCenter = new LatLng(ibCenter.lat, ibCenter.lng - panelLongShift);
+      const panelPixelBounds = map.getPixelBounds(panelCenter, panelZoom);
+      const panelBounds = latLngBounds(
+        map.unproject(panelPixelBounds.getBottomLeft(), panelZoom),
+        map.unproject(panelPixelBounds.getTopRight(), panelZoom)
+      );
+
+      // Save the values we found so we can use them when opening/closing the left panel.
+      // We add a little padding to the bounds so the animations are smooth.
+      ui.minZoom = minZoom;
+      ui.maxBounds = fullBounds.pad(0.03);
+      ui.panelMinZoom = panelZoom;
+      ui.panelMaxBounds = panelBounds.pad(0.03);
+      ui.panelVerticalPadding = extraLeftPanelHeight / 2;
+
+      // Update minZoom and maxBounds
+      map.setMinZoom(ui.leftPanelOpen ? ui.panelMinZoom : ui.minZoom);
+      map.setMaxBounds(ui.leftPanelOpen ? ui.panelMaxBounds : ui.maxBounds);
+    }
+  }
+
   private handleLeftPanelToggle = () => {
     const map = this.leafletMap;
     if (!map) return;
-    const open = this.stores.ui.leftPanelOpen;
-    const paddingTopLeft: PointTuple = [open ? LEFT_PANEL_WIDTH_PX : 0, 0];
-    const opts = { paddingTopLeft, duration: LEFT_PANEL_TRANSITION_SECONDS };
+    const { ui } = this.stores;
+    const open = ui.leftPanelOpen;
+    const verticalPadding = (open ? 1 : -1) * ui.panelVerticalPadding;
+    const paddingTopLeft: PointTuple = [open ? LEFT_PANEL_WIDTH_PX : 0, verticalPadding];
+    const paddingBottomRight: PointTuple = [0, verticalPadding];
+    const opts = { duration: LEFT_PANEL_TRANSITION_SECONDS, paddingBottomRight, paddingTopLeft };
     this._programmaticMapUpdate = true;
     if (open) {
+      // Immediately set the min zoom/max bounds to the larger area so we can safely zoom out
+      map.setMinZoom(ui.panelMinZoom);
+      map.setMaxBounds(ui.panelMaxBounds);
       map.flyToBounds(map.getBounds(), opts);
     } else {
       const size = map.getSize();
-      const topLeft = map.containerPointToLatLng([LEFT_PANEL_WIDTH_PX, 0]);
-      const bottomRight = map.containerPointToLatLng([size.x, size.y]);
+      const topLeft = map.containerPointToLatLng([LEFT_PANEL_WIDTH_PX, ui.panelVerticalPadding]);
+      const bottomRight = map.containerPointToLatLng([size.x, size.y - ui.panelVerticalPadding]);
       if (!isFinite(topLeft.lat) || !isFinite(bottomRight.lng)) {
         // Map isn't laid out yet; skip the flight to avoid passing NaN to Leaflet.
         this._programmaticMapUpdate = false;
@@ -291,6 +348,11 @@ export class MapView extends BaseComponent<IProps, IState> {
     // toggles just leave the flag true until the final flight settles. Stale once
     // listeners that accumulate are idempotent — they all clear the same flag.
     map.once("moveend", () => {
+      if (!open) {
+        // Set the more restrictive panel-closed minZoom/maxBounds after flying to the panel-closed region
+        map.setMinZoom(ui.minZoom);
+        map.setMaxBounds(ui.maxBounds);
+      }
       this._programmaticMapUpdate = false;
     });
   }

@@ -80,6 +80,14 @@ export class UIModel {
   @observable public thermometerPositionSaved: LatLngExpression | null = null;
   @observable public thermometerPositionHover: LatLngExpression | null = null;
 
+  // These values are updated when the window size or initial bounds change.
+  // They are used to update the map view when the left panel is open and closed.
+  public maxBounds = this.initialBounds;
+  public minZoom = 1;
+  public panelMaxBounds = this.initialBounds;
+  public panelMinZoom = 1;
+  public panelVerticalPadding = 0;
+
   protected initialState: UIModel;
 
   constructor() {
