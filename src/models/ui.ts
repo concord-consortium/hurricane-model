@@ -63,6 +63,7 @@ export class UIModel {
   @observable public setupMode: SetupMode | undefined = undefined;
   @observable public leftPanelOpen = false;
   @observable public initialBounds = config.initialBounds;
+  @observable public mapSize = { x: 0, y: 0 };
   @observable public zoomedInView: ZoomedInViewProps = false;
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
@@ -147,6 +148,10 @@ export class UIModel {
     this.mapBounds = map.getBounds();
     this.mapZoom = map.getZoom();
     this.mapModifiedByUser = !programmaticUpdate;
+  }
+
+  @action.bound public setMapSize(size: { x: number, y: number }) {
+    this.mapSize = size;
   }
 
   @action.bound public resetMapView() {

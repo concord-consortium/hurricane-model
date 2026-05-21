@@ -62,6 +62,9 @@ export class MapView extends BaseComponent<IProps, IState> {
     observe(this.stores.ui, "initialBounds", () => {
       this.updateMaxBounds();
     });
+    observe(this.stores.ui, "mapSize", () => {
+      this.updateMaxBounds();
+    });
 
     // This maxZoom option is not handled by react-leaftlet as a dynamic react property (it doesn't update after
     // Map component is created), so we need to use raw Leaflet API to dynamically change it.
@@ -241,8 +244,8 @@ export class MapView extends BaseComponent<IProps, IState> {
   public handleWindowResize = () => {
     if (this.leafletMap) {
       this.leafletMap.invalidateSize(false);
+      this.stores.ui.setMapSize(this.leafletMap.getSize());
     }
-    this.resetView();
   }
 
   public resetView = () => {
