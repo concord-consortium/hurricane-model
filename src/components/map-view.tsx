@@ -298,10 +298,10 @@ export class MapView extends BaseComponent<IProps, IState> {
       const ibCenter = ib.getCenter();
       const panelLongShift = extraLeftPanelWidth / 2 * 360 / 256 / (2 ** panelZoom);
       const panelCenter = new LatLng(ibCenter.lat, ibCenter.lng - panelLongShift);
-      const panelPixelBounds = map.getPixelBounds(panelCenter, panelZoom);
+      const panelCenterPixels = map.project(panelCenter, panelZoom);
       const panelBounds = latLngBounds(
-        map.unproject(panelPixelBounds.getBottomLeft(), panelZoom),
-        map.unproject(panelPixelBounds.getTopRight(), panelZoom)
+        map.unproject(panelCenterPixels.subtract(half), panelZoom),
+        map.unproject(panelCenterPixels.add(half), panelZoom)
       );
 
       // Save the values we found so we can use them when opening/closing the left panel.
