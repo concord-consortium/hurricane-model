@@ -1,3 +1,5 @@
+import { clsx } from "clsx";
+import { Control as LeafletControl } from "leaflet";
 import * as React from "react";
 import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
@@ -50,6 +52,7 @@ export class MapView extends BaseComponent<IProps, IState> {
   private _programmaticMapUpdate = false;
   private _lastThermometerUpdateTime = 0;
   private _thermometerHoverTimeout: number | null = null;
+  private zoomRef = React.createRef<LeafletControl.Zoom>();
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
@@ -94,6 +97,15 @@ export class MapView extends BaseComponent<IProps, IState> {
     }
   }
 
+  public componentDidUpdate() {
+    this.zoomRef.current?.getContainer()?.classList.add(css.zoomControl);
+    if (this.stores.ui.leftPanelOpen) {
+      this.zoomRef.current?.getContainer()?.classList.add(css.leftPanelOpen);
+    } else {
+      this.zoomRef.current?.getContainer()?.classList.remove(css.leftPanelOpen);
+    }
+  }
+
   // Leaflet invokes the whenReady callback with { target: map }, so we read the map from there.
   public handleMapReady = (e: any) => {
     const map: LeafletMap = e?.target;
@@ -109,6 +121,10 @@ export class MapView extends BaseComponent<IProps, IState> {
     const sim = this.stores.simulation;
     const ui = this.stores.ui;
     const navigation = !!ui.zoomedInView || config.navigation;
+
+    const lpoClass = { [css.leftPanelOpen]: this.stores.ui.leftPanelOpen };
+    const resetButtonClasses = clsx(css.resetViewContainer, "leaflet-bar", lpoClass);
+
     return (
       <div className={`${css.mapView} ${!config.topBarVisible ? css.noTopBar : ""}`} id="mapView">
         <MapContainer ref={this.mapRef}
@@ -197,10 +213,10 @@ export class MapView extends BaseComponent<IProps, IState> {
                 />
               )
             }
-            { navigation && <ZoomControl position="topleft"/> }
+            { navigation && <ZoomControl position="topleft" ref={this.zoomRef} /> }
             {
               navigation && ui.mapModifiedByUser &&
-              <Control position="topleft" className={`${css.resetViewContainer} leaflet-bar`}>
+              <Control position="topleft" className={resetButtonClasses}>
                 <a className={css.resetViewBtn}
                   onClick={this.resetView}
                   title="Reset view" role="button" aria-label="Reset view"
@@ -332,7 +348,8 @@ export class MapView extends BaseComponent<IProps, IState> {
     const paddingTopLeft: PointTuple = [open ? LEFT_PANEL_WIDTH_PX : 0, verticalPadding];
     const paddingBottomRight: PointTuple = [0, verticalPadding];
     const opts = { duration: LEFT_PANEL_TRANSITION_SECONDS, paddingBottomRight, paddingTopLeft };
-    this._programmaticMapUpdate = true;
+    // TODO: Change how the reset view button is handled, so _programmaticMapUpdate is no longer needed.
+    // this._programmaticMapUpdate = true;
     if (open) {
       // Immediately set the min zoom/max bounds to the larger area so we can safely zoom out
       map.setMinZoom(ui.panelMinZoom);

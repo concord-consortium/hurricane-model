@@ -102,8 +102,23 @@
     background: rgba(255, 255, 255, 0.7) !important;
   }
 
+  .zoomControl {
+    left: 0;
+    transition: $leftPanelTransition;
+
+    &.leftPanelOpen {
+      left: $leftPanelWidth;
+    }
+  }
+
   .resetViewContainer {
+    left: 0;
     order: 1;
+    transition: $leftPanelTransition;
+
+    &.leftPanelOpen {
+      left: $leftPanelWidth;
+    }
   }
 
   .fullMapViewContainer {
