@@ -1,4 +1,3 @@
-import { clsx } from "clsx";
 import { FC, ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Control as LeafletControl, DomEvent, DomUtil } from "leaflet";
