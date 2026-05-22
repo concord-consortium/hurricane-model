@@ -11,12 +11,20 @@ export interface Region {
 }
 
 export function createRegion(data: FeatureCollection): Region {
-  const geom = data.features[0].geometry;
+  const geom = data.features?.[0]?.geometry;
+  if (!geom) {
+    throw new Error("createRegion requires a FeatureCollection with at least one feature with a geometry");
+  }
+
   const ring = geom.type === "Polygon"
     ? geom.coordinates[0]
     : geom.type === "LineString"
     ? geom.coordinates
     : [];
+  if (!ring.length) {
+    throw new Error("createRegion requires a Polygon or LineString with at least one coordinate");
+  }
+
   const first = ring[0];
   const last = ring[ring.length - 1];
   const closed = first[0] === last[0] && first[1] === last[1] ? ring : [...ring, first];

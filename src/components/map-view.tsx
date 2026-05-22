@@ -304,10 +304,10 @@ export class MapView extends BaseComponent<IProps, IState> {
       // from the equator (northern lat in the visible region)
       const initWidthPixels = (visibleWidthLong / 360) * 256 * (2 ** minZoom);
       const widthPadding = (size.x - initWidthPixels) / 2;
-      const extraLeftPanelWidth = LEFT_PANEL_WIDTH_PX - widthPadding;
+      const extraLeftPanelWidth = Math.max(LEFT_PANEL_WIDTH_PX - widthPadding, 0);
       const extraLeftPanelHeight = extraLeftPanelWidth * size.y / size.x;
 
-      // Determine the min zoom needed to show both the full inititial bounds and left panel.
+      // Determine the min zoom needed to show both the full initial bounds and left panel.
       const panelPadding = new Point(extraLeftPanelWidth, extraLeftPanelHeight);
       const panelZoom = map.getBoundsZoom(visibleRegion, false, panelPadding);
 
@@ -362,7 +362,7 @@ export class MapView extends BaseComponent<IProps, IState> {
       // toggles just leave the flag true until the final flight settles. Stale once
       // listeners that accumulate are idempotent — they all clear the same flag.
       map.once("moveend", () => {
-        if (!open) {
+        if (!this.stores.ui.leftPanelOpen) {
           map.setMinZoom(ui.minZoom);
           map.setMaxBounds(ui.maxBounds);
         }

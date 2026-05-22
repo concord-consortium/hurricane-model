@@ -42,7 +42,8 @@ export class Hurricane extends PressureSystem {
 
   constructor(props: IHurricaneOptions) {
     super(Object.assign({}, props, {type: "low"}));
-    this.minLat = -180; // The hurricane's position is restricted via dropdown options or a bound area
+    // The hurricane's position is restricted via other means (dropdown options or a bound area)
+    this.minLat = -Infinity;
     this.keepDistanceFromOtherSystems = false; // It's ok for hurricanes to overlap with pressure systems
     if (props.speed !== undefined) {
       this.speed = Object.assign({}, props.speed);
