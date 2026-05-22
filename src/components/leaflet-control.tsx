@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { FC, ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Control as LeafletControl, DomEvent, DomUtil } from "leaflet";
@@ -34,7 +35,7 @@ export const Control: FC<IProps> = ({ position, className, children }) => {
 
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.className = className || "";
+      containerRef.current.className = clsx("leaflet-control", className || "");
     }
   }, [className]);
 

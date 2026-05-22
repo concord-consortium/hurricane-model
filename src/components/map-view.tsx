@@ -245,10 +245,12 @@ export class MapView extends BaseComponent<IProps, IState> {
     if (this.leafletMap) {
       this.leafletMap.invalidateSize(false);
       this.stores.ui.setMapSize(this.leafletMap.getSize());
+      this.handleViewportChanged();
     }
   }
 
   public resetView = () => {
+    this.leafletMap?.flyToBounds(this.stores.ui.initialBounds);
     this.stores.ui.resetMapView();
     log("ResetMapViewClicked");
   }
