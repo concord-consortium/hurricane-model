@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import * as React from "react";
 import * as Leaflet from "leaflet";
 import { inject, observer } from "mobx-react";
@@ -79,14 +80,16 @@ export class HurricaneIcon extends BaseComponent<IProps, IState> {
     const temp = this.stores.simulation.seaSurfaceTempAt(hurricane.center);
     const opacity = hurrStrengthToOpacity(hurricane.strength);
 
-    const hurricaneImage = this.stores.ui.hurricaneImage;
-    const mapZoom = this.stores.ui.mapZoom;
+    const { hurricaneImage, mapZoom, setupMode } = this.stores.ui;
+    const dimmed = !!setupMode && setupMode !== "stormLocation";
+    const draggable = setupMode === "stormLocation";
+
     // Note that the realistic hurricane image should scale with the map. This is simplified scaling that only uses
     // the map zoom. The real one should also take into account the map projection. But since it's a simplified view
     // anyway, I don't think we want distract users with hurricane changing its size only because it moved on the map.
     const hurricaneImageScale = Math.pow(2, mapZoom) * HURRICANE_IMG_SCALE_FACTOR;
     return (
-      <div className={`${css.hurricaneIcon}`}>
+      <div className={clsx(css.hurricaneIcon, { [css.dimmed]: dimmed, [css.draggable]: draggable })}>
         <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
           {
             hurricaneImage ?
