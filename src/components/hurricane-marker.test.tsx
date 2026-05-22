@@ -11,14 +11,39 @@ describe("HurricaneMarker component", () => {
     stores = createStores();
   });
 
+  const renderMarker = () => render(
+    <Provider stores={stores}>
+      <MapContainer center={[0, 0]} zoom={10}>
+        <HurricaneMarker />
+      </MapContainer>
+    </Provider>
+  );
+
   it("renders without crashing", () => {
-    render(
-      <Provider stores={stores}>
-        <MapContainer center={[0, 0]} zoom={10}>
-          <HurricaneMarker/>
-        </MapContainer>
-      </Provider>
-    );
+    renderMarker();
+  });
+
+  it("is not draggable by default (outside of setup mode)", () => {
+    stores.ui.setSetupMode(undefined);
+    renderMarker();
+    const draggableEl = document.querySelector(".leaflet-marker-draggable");
+    expect(draggableEl).toBeNull();
+  });
+
+  it("is draggable while in stormLocation setup mode and simulation has not started", () => {
+    stores.ui.setSetupMode("stormLocation");
+    stores.simulation.simulationStarted = false;
+    renderMarker();
+    const draggableEl = document.querySelector(".leaflet-marker-draggable");
+    expect(draggableEl).not.toBeNull();
+  });
+
+  it("is not draggable once the simulation has started, even in setup mode", () => {
+    stores.ui.setSetupMode("stormLocation");
+    stores.simulation.simulationStarted = true;
+    renderMarker();
+    const draggableEl = document.querySelector(".leaflet-marker-draggable");
+    expect(draggableEl).toBeNull();
   });
 });
 

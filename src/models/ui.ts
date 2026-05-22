@@ -63,6 +63,7 @@ export class UIModel {
   @observable public setupMode: SetupMode | undefined = undefined;
   @observable public leftPanelOpen = false;
   @observable public initialBounds = config.initialBounds;
+  @observable public mapSize = { x: 0, y: 0 };
   @observable public zoomedInView: ZoomedInViewProps = false;
   @observable public mapModifiedByUser = false;
   @observable public layerOpacity: { [key: string]: number } = {
@@ -79,6 +80,14 @@ export class UIModel {
   @observable public thermometerActive = false;
   @observable public thermometerPositionSaved: LatLngExpression | null = null;
   @observable public thermometerPositionHover: LatLngExpression | null = null;
+
+  // These values are updated when the window size or initial bounds change.
+  // They are used to update the map view when the left panel is open and closed.
+  public maxBounds = this.initialBounds;
+  public minZoom = 1;
+  public panelMaxBounds = this.initialBounds;
+  public panelMinZoom = 1;
+  public panelVerticalPadding = 0;
 
   protected initialState: UIModel;
 
@@ -139,6 +148,10 @@ export class UIModel {
     this.mapBounds = map.getBounds();
     this.mapZoom = map.getZoom();
     this.mapModifiedByUser = !programmaticUpdate;
+  }
+
+  @action.bound public setMapSize(size: { x: number, y: number }) {
+    this.mapSize = size;
   }
 
   @action.bound public resetMapView() {

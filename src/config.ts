@@ -80,6 +80,8 @@ const DEFAULT_CONFIG: any = {
   overlay: "sst",
   // LatLngBoundsLiteral: [[lat, lng], [lat, lng]]. Defaults to North Atlantic.
   initialBounds: [[5, -90], [50, -10]],
+  // Determines the region the user can pan around.
+  visibleRegion: [[5, -100], [50, 0]],
   pressureSystems: selectPressureSystems(DEFAULT_START_LOCATION),
   availableOverlays: [
     "sst",

@@ -1,6 +1,5 @@
 @use "../common" as *;
 
-$leftPanelWidth: 257px;
 $leftPanelContainerWidth: calc($leftPanelWidth + 2px);
 
 .leftPanelContainer {
@@ -23,7 +22,7 @@ $leftPanelContainerWidth: calc($leftPanelWidth + 2px);
     pointer-events: all;
     position: absolute;
     top: 0;
-    transition: left 0.8s;
+    transition: $leftPanelTransition;
     width: $leftPanelWidth;
 
     &.open {

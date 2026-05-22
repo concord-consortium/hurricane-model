@@ -1,9 +1,11 @@
+import { clsx } from "clsx";
+import { Control as LeafletControl } from "leaflet";
 import * as React from "react";
 import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapContainer, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
-import { Map as LeafletMap } from "leaflet";
+import { LatLng, Map as LeafletMap, Point, PointTuple, latLngBounds } from "leaflet";
 import Control from "./leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
@@ -20,13 +22,21 @@ import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
 import { LeafletMouseEvent } from "leaflet";
 import css from "./map-view.scss";
+import commonStyles from "./common.scss";
 import { ThermometerMarker } from "./thermometer-marker";
+import { PolygonRegion } from "./polygon-region";
+import { stormPlacementRegion } from "../utils/storm-placement-region";
 import "leaflet/dist/leaflet.css";
 
 interface IProps extends IBaseProps {}
 interface IState {}
 
 const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
+
+// Keep in sync with $leftPanelWidth and $leftPanelTransitionSeconds in common.scss
+// (exported via :export, parsed here to strip the px/s units).
+const LEFT_PANEL_WIDTH_PX = parseInt(commonStyles.leftPanelWidth, 10);
+const LEFT_PANEL_TRANSITION_SECONDS = parseFloat(commonStyles.leftPanelTransitionSeconds);
 
 @inject("stores")
 @observer
@@ -35,6 +45,7 @@ export class MapView extends BaseComponent<IProps, IState> {
   private _programmaticMapUpdate = false;
   private _lastThermometerUpdateTime = 0;
   private _thermometerHoverTimeout: number | null = null;
+  private zoomRef = React.createRef<LeafletControl.Zoom>();
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
@@ -45,25 +56,10 @@ export class MapView extends BaseComponent<IProps, IState> {
     // work only on the initial load, but it's impossible to update them later. That's why we need to access
     // Leaflet API directly.
     observe(this.stores.ui, "initialBounds", () => {
-      const map = this.leafletMap;
-      if (map) {
-        // Remove restrictions for a moment so flyToBounds works correctly.
-        map.setMinZoom(1);
-        map.setMaxBounds([[-Infinity, -Infinity], [Infinity, Infinity]]);
-        this._programmaticMapUpdate = true;
-        map.flyToBounds(this.stores.ui.initialBounds);
-        map.once("moveend", () => {
-          // Calculate max bounds to be the area which is visible at the moment. It'll depend on the screen size.
-          // Since it's initially visible, we don't want to restrict users more when they zoom in and Leaflet can
-          // apply max bounds more precisely (that's why we don't use bounds as max bounds).
-          // Also, apply small padding (3%) as it feels better and otherwise Leaflet is triggering another animations.
-          const maxBounds = map.getBounds().pad(0.03);
-          const minZoom = map.getZoom();
-          map.setMinZoom(minZoom);
-          map.setMaxBounds(maxBounds);
-          this._programmaticMapUpdate = false;
-        });
-      }
+      this.updateMaxBounds();
+    });
+    observe(this.stores.ui, "mapSize", () => {
+      this.updateMaxBounds();
     });
 
     // This maxZoom option is not handled by react-leaftlet as a dynamic react property (it doesn't update after
@@ -73,6 +69,10 @@ export class MapView extends BaseComponent<IProps, IState> {
       if (map) {
         map.setMaxZoom(this.stores.ui.maxZoom);
       }
+    });
+
+    observe(this.stores.ui, "leftPanelOpen", () => {
+      this.handleLeftPanelToggle();
     });
   }
 
@@ -87,6 +87,16 @@ export class MapView extends BaseComponent<IProps, IState> {
     }
     if (this._thermometerHoverTimeout) {
       window.clearTimeout(this._thermometerHoverTimeout);
+    }
+  }
+
+  public componentDidUpdate() {
+    // Update the zoom control's classNames
+    this.zoomRef.current?.getContainer()?.classList.add(css.topLeftControl);
+    if (this.stores.ui.leftPanelOpen) {
+      this.zoomRef.current?.getContainer()?.classList.add(css.leftPanelOpen);
+    } else {
+      this.zoomRef.current?.getContainer()?.classList.remove(css.leftPanelOpen);
     }
   }
 
@@ -105,21 +115,28 @@ export class MapView extends BaseComponent<IProps, IState> {
     const sim = this.stores.simulation;
     const ui = this.stores.ui;
     const navigation = !!ui.zoomedInView || config.navigation;
+
+    const resetButtonClasses = clsx(
+      css.topLeftControl, css.resetViewContainer, "leaflet-bar",
+      { [css.leftPanelOpen]: this.stores.ui.leftPanelOpen }
+    );
+
     return (
       <div className={`${css.mapView} ${!config.topBarVisible ? css.noTopBar : ""}`} id="mapView">
         <MapContainer ref={this.mapRef}
-             whenReady={this.handleMapReady as () => void}
-             dragging={navigation}
-             doubleClickZoom={navigation}
-             scrollWheelZoom={navigation}
-             boxZoom={navigation}
-             keyboard={navigation}
-             style={{width: "100%", height: "100%"}}
-             zoom={4}
-             maxZoom={ui.maxZoom}
-             center={[30, -45]}
-             zoomControl={false}
-             attributionControl={false}
+          whenReady={this.handleMapReady as () => void}
+          dragging={navigation}
+          doubleClickZoom={navigation}
+          scrollWheelZoom={navigation}
+          boxZoom={navigation}
+          keyboard={navigation}
+          style={{width: "100%", height: "100%"}}
+          zoom={4}
+          maxZoom={ui.maxZoom}
+          center={[30, -45]}
+          zoomControl={false}
+          zoomSnap={0}
+          attributionControl={false}
         >
           <TileLayer
             url={ui.baseMapTileUrl}
@@ -192,13 +209,13 @@ export class MapView extends BaseComponent<IProps, IState> {
               />
             )
           }
-          { navigation && <ZoomControl position="topleft"/> }
+          { navigation && <ZoomControl position="topleft" ref={this.zoomRef} /> }
           {
             navigation && ui.mapModifiedByUser &&
-            <Control position="topleft" className={`${css.resetViewContainer} leaflet-bar`}>
+            <Control position="topleft" className={resetButtonClasses}>
               <a className={css.resetViewBtn}
-                 onClick={this.resetView}
-                 title="Reset view" role="button" aria-label="Reset view"
+                onClick={this.resetView}
+                title="Reset view" role="button" aria-label="Reset view"
               >
                 <CenterFocusStrong/>
               </a>
@@ -208,8 +225,8 @@ export class MapView extends BaseComponent<IProps, IState> {
             ui.zoomedInView &&
             <Control position="topleft" className={`${css.fullMapViewContainer} leaflet-bar`}>
               <a className={css.resetViewBtn}
-                 onClick={this.stores.ui.setNorthAtlanticView}
-                 title="Go to full map view" role="button" aria-label="Go to full map view"
+                onClick={this.stores.ui.setNorthAtlanticView}
+                title="Go to full map view" role="button" aria-label="Go to full map view"
               >
                 <Home/>
                 <div className={css.mapButtonLabel}>Full Map View</div>
@@ -221,6 +238,10 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
+          }
+          {
+            ui.setupMode === "stormLocation" &&
+            <PolygonRegion region={stormPlacementRegion} />
           }
           <AttributionControl position="topright" />
         </MapContainer>
@@ -235,13 +256,118 @@ export class MapView extends BaseComponent<IProps, IState> {
   public handleWindowResize = () => {
     if (this.leafletMap) {
       this.leafletMap.invalidateSize(false);
+      this.stores.ui.setMapSize(this.leafletMap.getSize());
+      this.handleViewportChanged();
     }
-    this.resetView();
   }
 
   public resetView = () => {
+    this.leafletMap?.flyToBounds(this.stores.ui.initialBounds);
     this.stores.ui.resetMapView();
     log("ResetMapViewClicked");
+  }
+
+  private updateMaxBounds = () => {
+    const map = this.leafletMap;
+    if (map) {
+      const size = map.getSize();
+      const { ui } = this.stores;
+      const { visibleRegion } = config;
+
+      // Remove restrictions for a moment so getBoundsZoom works correctly.
+      map.setMinZoom(1);
+      map.setMaxBounds([[-Infinity, -Infinity], [Infinity, Infinity]]);
+
+      // Get the min zoom that will show the complete visible region given the map size.
+      const minZoom = map.getBoundsZoom(visibleRegion, false);
+
+      // Determine actual bounds of max visible map given min zoom and map size.
+      // There might be some vertical or horizontal padding depending on the visible region and window aspect ratios.
+      const ib = latLngBounds(visibleRegion);
+      const centerPx = map.project(ib.getSouthWest(), minZoom)
+        .add(map.project(ib.getNorthEast(), minZoom))
+        .divideBy(2);
+      const half = size.divideBy(2);
+      const fullBounds = latLngBounds(
+        map.unproject(centerPx.subtract(half), minZoom),
+        map.unproject(centerPx.add(half), minZoom)
+      )
+
+      // Determine how much extra area is necessary to show the left panel given the map size
+      // Extra width is all to the left. It can be 0 (if the window is very wide),
+      // the full width of the left panel (if the window has a higher height to width ratio than the initial bounds),
+      // or somewhere in between (if there is some horizontal padding, but not enough for the full left panel).
+      // Extra height is divided between the top and bottom, keeping the focused area centered vertically.
+      const visibleWidthLong = visibleRegion[1][1] - visibleRegion[0][1];
+      // TODO: initWidthPixels is not quite right, because the zoom will ultimately be panelZoom, not minZoom
+      // Also, this is longitude -> pixel at the equator, but we should really calculate this at the furthest lat
+      // from the equator (northern lat in the visible region)
+      const initWidthPixels = (visibleWidthLong / 360) * 256 * (2 ** minZoom);
+      const widthPadding = (size.x - initWidthPixels) / 2;
+      const extraLeftPanelWidth = Math.max(LEFT_PANEL_WIDTH_PX - widthPadding, 0);
+      const extraLeftPanelHeight = extraLeftPanelWidth * size.y / size.x;
+
+      // Determine the min zoom needed to show both the full initial bounds and left panel.
+      const panelPadding = new Point(extraLeftPanelWidth, extraLeftPanelHeight);
+      const panelZoom = map.getBoundsZoom(visibleRegion, false, panelPadding);
+
+      // Determine the bounds of max visible map + left panel given min zoom and map size.
+      const ibCenter = ib.getCenter();
+      const panelLongShift = extraLeftPanelWidth / 2 * 360 / 256 / (2 ** panelZoom);
+      const panelCenter = new LatLng(ibCenter.lat, ibCenter.lng - panelLongShift);
+      const panelCenterPixels = map.project(panelCenter, panelZoom);
+      const panelBounds = latLngBounds(
+        map.unproject(panelCenterPixels.subtract(half), panelZoom),
+        map.unproject(panelCenterPixels.add(half), panelZoom)
+      );
+
+      // Save the values we found so we can use them when opening/closing the left panel.
+      // We add a little padding to the bounds so the animations are smooth.
+      ui.minZoom = minZoom;
+      ui.maxBounds = fullBounds.pad(0.03);
+      ui.panelMinZoom = panelZoom;
+      ui.panelMaxBounds = panelBounds.pad(0.03);
+      ui.panelVerticalPadding = extraLeftPanelHeight / 2;
+
+      // Update minZoom and maxBounds
+      map.setMinZoom(ui.leftPanelOpen ? ui.panelMinZoom : ui.minZoom);
+      map.setMaxBounds(ui.leftPanelOpen ? ui.panelMaxBounds : ui.maxBounds);
+    }
+  }
+
+  private handleLeftPanelToggle = () => {
+    const map = this.leafletMap;
+    if (!map) return;
+    const { ui } = this.stores;
+    const open = ui.leftPanelOpen;
+
+    const verticalPadding = (open ? 1 : -1) * ui.panelVerticalPadding;
+    const paddingTopLeft: PointTuple = [open ? LEFT_PANEL_WIDTH_PX : 0, verticalPadding];
+    const paddingBottomRight: PointTuple = [0, verticalPadding];
+    const opts = { duration: LEFT_PANEL_TRANSITION_SECONDS, paddingBottomRight, paddingTopLeft };
+
+    if (open) {
+      // Immediately set the min zoom/max bounds to the larger area so we can safely zoom out
+      map.setMinZoom(ui.panelMinZoom);
+      map.setMaxBounds(ui.panelMaxBounds);
+      map.flyToBounds(map.getBounds(), opts);
+    } else {
+      const size = map.getSize();
+      const topLeft = map.containerPointToLatLng([LEFT_PANEL_WIDTH_PX, ui.panelVerticalPadding]);
+      const bottomRight = map.containerPointToLatLng([size.x, size.y - ui.panelVerticalPadding]);
+      map.flyToBounds(latLngBounds(topLeft, bottomRight), opts);
+
+      // Set the more restrictive panel-closed minZoom/maxBounds after flying to the panel-closed region
+      // An interrupted flyTo fires no moveend (Leaflet's _stop is silent), so rapid
+      // toggles just leave the flag true until the final flight settles. Stale once
+      // listeners that accumulate are idempotent — they all clear the same flag.
+      map.once("moveend", () => {
+        if (!this.stores.ui.leftPanelOpen) {
+          map.setMinZoom(ui.minZoom);
+          map.setMaxBounds(ui.maxBounds);
+        }
+      });
+    }
   }
 
   private handleViewportChanged = () => {

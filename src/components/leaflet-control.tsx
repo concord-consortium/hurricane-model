@@ -12,6 +12,7 @@ interface IProps {
 export const Control: FC<IProps> = ({ position, className, children }) => {
   const map = useMap();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const prevClassName = useRef<string>("");
 
   if (!containerRef.current) {
     const div = DomUtil.create("div", className || "");
@@ -33,9 +34,19 @@ export const Control: FC<IProps> = ({ position, className, children }) => {
   }, [map, position]);
 
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.className = className || "";
+    if (prevClassName.current) {
+      const classes = prevClassName.current.split(" ");
+      classes.forEach(c => {
+        containerRef.current?.classList.remove(c);
+      });
     }
+    if (className) {
+      const classes = className.split(" ");
+      classes.forEach(c => {
+        containerRef.current?.classList.add(c);
+      });
+    }
+    prevClassName.current = className ?? "";
   }, [className]);
 
   return containerRef.current ? createPortal(children, containerRef.current) : null;

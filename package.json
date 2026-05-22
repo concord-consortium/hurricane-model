@@ -30,6 +30,7 @@
     "moduleNameMapper": {
       "\\.svg$": "<rootDir>/__mocks__/svgMock.js",
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "common\\.scss$": "<rootDir>/__mocks__/common-scss-mock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy",
       "^pixi\\.js$": "<rootDir>/__mocks__/pixi.js.js"
     },
@@ -143,8 +144,10 @@
     "@rjsf/core": "^6.5.2",
     "@rjsf/utils": "^6.5.2",
     "@rjsf/validator-ajv8": "^6.5.2",
+    "@turf/boolean-point-in-polygon": "^7.3.5",
     "@turf/helpers": "^7.3.5",
     "@turf/line-intersect": "^7.3.5",
+    "@turf/nearest-point-on-line": "^7.3.5",
     "clsx": "^2.1.1",
     "d3-scale": "^4.0.2",
     "geolocation-utils": "1.2.6",

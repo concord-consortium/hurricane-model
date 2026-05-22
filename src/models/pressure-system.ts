@@ -14,9 +14,6 @@ export interface IPressureSystemOptions {
   strength?: number;
 }
 
-// Limit pressure systems only to the northern hemisphere.
-const minLat = 15;
-
 const minDistToOtherSystems = (center: ICoordinates, otherSystems: PressureSystem[]) => {
   const dists = otherSystems.map(ps => distanceTo(
     {lat: ps.center.lat, lon: ps.center.lng},
@@ -41,6 +38,8 @@ export class PressureSystem {
   @observable public center: ICoordinates;
   @observable public strength = config.pressureSystemStrength;
   protected initialState: PressureSystem;
+  protected minLat = 15; // Limit pressure systems only to the northern hemisphere.
+  protected keepDistanceFromOtherSystems = true;
 
   @computed public get range() {
     // Range is proportional to strength.
@@ -92,23 +91,27 @@ export class PressureSystem {
   }
 
   @action.bound public setCenter(center: ICoordinates, otherPressureSystems: PressureSystem[]) {
-    center.lat = Math.max(minLat, center.lat);
-    const step = config.minPressureSystemDistance / 100;
-    const minDistRes = minDistToOtherSystems(center, otherPressureSystems);
-    const heading = minDistRes.heading || 0; // Provide default heading if null
-    let minDist = minDistRes.minDist;
-    // Why is an iterative approach used instead of a single calculation based on the minPressureSystemDistance
-    // and heading? Note this single calculation could result in new center being to close to another pressure system.
-    // Iterative calculations ensure that we'll always end up away from *all* the pressure systems. Initial heading
-    // is used, so the interaction feels a bit more natural for user.
-    while (minDist < config.minPressureSystemDistance) {
-      const newPos = moveTo(
-        {lat: center.lat, lon: center.lng},
-        {distance: step, heading: heading + 180}
-      );
-      center = {lat: newPos.lat, lng: newPos.lon};
-      minDist = minDistToOtherSystems(center, otherPressureSystems).minDist;
+    center.lat = Math.max(this.minLat, center.lat);
+
+    if (this.keepDistanceFromOtherSystems) {
+      const step = config.minPressureSystemDistance / 100;
+      const minDistRes = minDistToOtherSystems(center, otherPressureSystems);
+      const heading = minDistRes.heading || 0; // Provide default heading if null
+      let minDist = minDistRes.minDist;
+      // Why is an iterative approach used instead of a single calculation based on the minPressureSystemDistance
+      // and heading? Note this single calculation could result in new center being to close to another pressure system.
+      // Iterative calculations ensure that we'll always end up away from *all* the pressure systems. Initial heading
+      // is used, so the interaction feels a bit more natural for user.
+      while (minDist < config.minPressureSystemDistance) {
+        const newPos = moveTo(
+          {lat: center.lat, lon: center.lng},
+          {distance: step, heading: heading + 180}
+        );
+        center = {lat: newPos.lat, lng: newPos.lon};
+        minDist = minDistToOtherSystems(center, otherPressureSystems).minDist;
+      }
     }
+
     this.center = center;
   }
 

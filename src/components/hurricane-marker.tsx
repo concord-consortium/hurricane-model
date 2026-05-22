@@ -1,10 +1,15 @@
+import { clsx } from "clsx";
 import * as React from "react";
+import * as Leaflet from "leaflet";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import HurricaneIconSVG from "../assets/hurricane.svg";
 import config from "../config";
 import { CategoryNumber } from "./category-number";
+import { clampToRegion } from "../utils/region";
+import { stormPlacementRegion } from "../utils/storm-placement-region";
+import { log } from "../log";
 
 import HurricaneImageSrc from "../assets/hurricane-image.png";
 import css from "./hurricane-marker.scss";
@@ -20,12 +25,37 @@ const HURRICANE_IMG_SCALE_FACTOR = 0.05;
 @observer
 export class HurricaneMarker extends BaseComponent<IProps, IState> {
   public render() {
-    const hurricane = this.stores.simulation.hurricane;
+    const { ui, simulation } = this.stores;
+    const { hurricane, simulationStarted } = simulation;
+    const draggable = ui.setupMode === "stormLocation" && !simulationStarted;
     return (
-      <LeafletCustomMarker position={hurricane.center} draggable={false}>
+      <LeafletCustomMarker
+        position={hurricane.center}
+        draggable={draggable}
+        onDrag={this.handleDrag}
+        onDragEnd={this.handleDragEnd}
+      >
         <HurricaneIcon />
       </LeafletCustomMarker>
     );
+  }
+
+  private handleDrag = (e: Leaflet.LeafletEvent) => {
+    const { hurricane, pressureSystems } = this.stores.simulation;
+    const marker = e.target as Leaflet.Marker;
+    const raw = marker.getLatLng();
+    const clamped = clampToRegion({ lat: raw.lat, lng: raw.lng }, stormPlacementRegion);
+    hurricane.setCenter(clamped, pressureSystems);
+    if (clamped.lat !== raw.lat || clamped.lng !== raw.lng) {
+      marker.setLatLng(clamped);
+    }
+  }
+
+  private handleDragEnd = (e: Leaflet.DragEndEvent) => {
+    const { lat, lng } = (e.target as Leaflet.Marker).getLatLng();
+    const startLocation = { lat, lng };
+    this.stores.simulation.setStartLocation(startLocation);
+    log("StartLocationChanged", { startLocation });
   }
 }
 
@@ -50,14 +80,16 @@ export class HurricaneIcon extends BaseComponent<IProps, IState> {
     const temp = this.stores.simulation.seaSurfaceTempAt(hurricane.center);
     const opacity = hurrStrengthToOpacity(hurricane.strength);
 
-    const hurricaneImage = this.stores.ui.hurricaneImage;
-    const mapZoom = this.stores.ui.mapZoom;
+    const { hurricaneImage, mapZoom, setupMode } = this.stores.ui;
+    const dimmed = !!setupMode && setupMode !== "stormLocation";
+    const draggable = setupMode === "stormLocation";
+
     // Note that the realistic hurricane image should scale with the map. This is simplified scaling that only uses
     // the map zoom. The real one should also take into account the map projection. But since it's a simplified view
     // anyway, I don't think we want distract users with hurricane changing its size only because it moved on the map.
     const hurricaneImageScale = Math.pow(2, mapZoom) * HURRICANE_IMG_SCALE_FACTOR;
     return (
-      <div className={`${css.hurricaneIcon}`}>
+      <div className={clsx(css.hurricaneIcon, { [css.dimmed]: dimmed, [css.draggable]: draggable })}>
         <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
           {
             hurricaneImage ?
