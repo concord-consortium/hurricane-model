@@ -1,9 +1,10 @@
-import { IVector } from "../types";
 import { computed, override } from "mobx";
-import { latLngPlusVector } from "../math-utils";
-import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 import config from "../config";
+import { latLngPlusVector } from "../math-utils";
 import { random } from "../seedrandom";
+import { IVector } from "../types";
+import { hurricaneMaxWindSpeedByCategory, maxHurricaneSpeed, minHurricaneSpeed, maxWindSpeed } from "./constants";
+import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 
 // Sea surface temperature 28.25*C is an important value. Sea needs to be warmer than that so the hurricane
 // can get stronger than category 3. Based on following the research:
@@ -15,20 +16,6 @@ const cat1SSTThreshold = 26;
 // https://earthscience.stackexchange.com/questions/239/impossible-or-improbable-hurricane-crossing-the-equator
 // It gets activated when the hurricane crosses equatorPushLatThreshold.
 const equatorPushLatThreshold = 10;
-
-const maxHurricaneSpeed = 20000;
-const minHurricaneSpeed = 500;
-
-// Based on: https://www.nhc.noaa.gov/aboutsshws.php, but converted to m/s.
-const hurricaneMaxWindSpeedByCategory = [
-  33, // category 0, max speed that doesn't classify as hurricane yet
-  43, // category 1
-  49, // category 2
-  58, // category 3
-  70, // category 4
-  Infinity // category 5
-];
-const maxWindSpeed = 85; // m/s, a
 
 export interface IHurricaneOptions extends IPressureSystemOptions {
   speed?: IVector;
