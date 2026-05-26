@@ -5,6 +5,7 @@ import clsx from "clsx";
 import React from "react";
 
 import { SetupSection } from "./setup-section";
+import { StormCategorySection } from "./storm-category-section";
 
 import css from "./left-panel.scss";
 
@@ -44,13 +45,7 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
           >
             Storm Start Location
           </SetupSection>
-          <SetupSection
-            dataTest="storm-category"
-            setupMode="stormCategory"
-            title="Storm Category"
-          >
-            Storm Category
-          </SetupSection>
+          <StormCategorySection />
           <SetupSection
             dataTest="season"
             setupMode="season"
