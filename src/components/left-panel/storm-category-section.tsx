@@ -8,6 +8,7 @@ import { SetupSection } from "./setup-section";
 
 import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
 
+import categoryCss from "../hurricane-category.scss";
 import css from "./storm-category-section.scss";
 
 const hint = "Drag the slider to set the storm's starting strength. The storm icon updates in real time.";
@@ -30,6 +31,7 @@ export const StormCategorySection = observer(function StormCategorySection() {
       dataTest="storm-category"
       hint={hint}
       Icon={HurricaneIcon}
+      iconClassName={categoryCss["category" + startingCategory]}
       setupMode="stormCategory"
       title="Storm Category"
     >

@@ -12,6 +12,7 @@ import { stormPlacementRegion } from "../utils/storm-placement-region";
 import { log } from "../log";
 
 import HurricaneImageSrc from "../assets/hurricane-image.png";
+import categoryCss from "./hurricane-category.scss";
 import css from "./hurricane-marker.scss";
 
 interface IProps extends IBaseProps { }
@@ -76,7 +77,7 @@ const hurrStrengthToOpacity = (strength: number) => {
 export class HurricaneIcon extends BaseComponent<IProps, IState> {
   public render() {
     const hurricane = this.stores.simulation.hurricane;
-    const categoryCssClass = css["category" + hurricane.category];
+    const categoryCssClass = categoryCss["category" + hurricane.category];
     const temp = this.stores.simulation.seaSurfaceTempAt(hurricane.center);
     const opacity = hurrStrengthToOpacity(hurricane.strength);
 

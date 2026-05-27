@@ -1,0 +1,40 @@
+@use "common" as *;
+
+// Color and spin-speed classes shared by anything that needs to vary by hurricane category.
+// Consumed by HurricaneMarker (SVG swirl), HurricaneCategoryMarker (category circle), and
+// the storm-category-section icon. The SVGs paint with fill="currentColor", so the `color`
+// declaration drives their fill. The --hurricane-spin-duration custom property is read by
+// the spin animations in hurricane-marker.scss and storm-category-section.scss.
+//
+// The selectors are doubled (.categoryN.categoryN) to raise specificity to (0,2,0). MUI's
+// emotion-generated .MuiListItemIcon-root rule sets its own color at specificity (0,1,0) and
+// is injected after our stylesheet, so a single-class rule loses to it.
+.category0.category0 {
+  color: $cat0Color;
+  --hurricane-spin-duration: 5.5s;
+}
+
+.category1.category1 {
+  color: $cat1Color;
+  --hurricane-spin-duration: 4s;
+}
+
+.category2.category2 {
+  color: $cat2Color;
+  --hurricane-spin-duration: 2.75s;
+}
+
+.category3.category3 {
+  color: $cat3Color;
+  --hurricane-spin-duration: 1.75s;
+}
+
+.category4.category4 {
+  color: $cat4Color;
+  --hurricane-spin-duration: 1s;
+}
+
+.category5.category5 {
+  color: $cat5Color;
+  --hurricane-spin-duration: 0.5s;
+}
