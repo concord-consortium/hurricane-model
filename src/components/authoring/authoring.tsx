@@ -5,6 +5,7 @@ import { IChangeEvent } from "@rjsf/core";
 import { RJSFSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import config from "../../config";
+import { hurricaneCategoryInfo } from "../../models/constants";
 import css from "./authoring.scss";
 
 interface IProps extends IBaseProps {}
@@ -22,6 +23,14 @@ const keyTitleFormatter = ((key: string) => {
 });
 
 const customProperties: any = {
+  mode: {
+    title: "Application Mode",
+    type: "string",
+    enum: [
+      "hurricane",
+      "storm"
+    ]
+  },
   initialHurricanePosition: {
     title: "Start Position",
     type: "string",
@@ -71,6 +80,11 @@ const customProperties: any = {
       enum: config.availableOverlays
     },
     uniqueItems: true
+  },
+  startingCategory: {
+    title: "Starting Category",
+    type: "number",
+    enum: Array.from(hurricaneCategoryInfo.keys())
   }
 };
 
