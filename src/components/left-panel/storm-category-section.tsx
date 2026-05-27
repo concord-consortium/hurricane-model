@@ -6,8 +6,11 @@ import { hurricaneCategoryInfo } from "../../models/constants";
 import { useStores } from "../../stores-context";
 import { SetupSection } from "./setup-section";
 
-import sectionCss from "./setup-section.scss";
+import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
+
 import css from "./storm-category-section.scss";
+
+const hint = "Drag the slider to set the storm's starting strength. The storm icon updates in real time.";
 
 const marks = hurricaneCategoryInfo.map((info, idx) => ({ value: idx, label: info.nameShort }));
 const maxCategory = hurricaneCategoryInfo.length - 1;
@@ -25,35 +28,32 @@ export const StormCategorySection = observer(function StormCategorySection() {
   return (
     <SetupSection
       dataTest="storm-category"
+      hint={hint}
+      Icon={HurricaneIcon}
       setupMode="stormCategory"
       title="Storm Category"
     >
-      <div className={css.stormCategorySection} data-test="storm-category-section">
-        <p className={sectionCss.hint}>
-          Drag the slider to set the storm's starting strength. The storm icon updates in real time.
-        </p>
-        <div className={css.sliderContainer}>
-          <Slider
-            classes={{
-              rail: css.rail,
-              track: css.track,
-              mark: css.mark,
-              markLabel: css.markLabel,
-              thumb: css.thumb
-            }}
-            min={0}
-            max={maxCategory}
-            step={1}
-            track={false}
-            marks={marks}
-            value={startingCategory}
-            onChange={handleChange}
-            data-test="storm-category-slider"
-          />
-        </div>
-        <div className={css.categoryName} data-test="storm-category-name">
-          {hurricaneCategoryInfo[startingCategory].name}
-        </div>
+      <div className={css.sliderContainer}>
+        <Slider
+          classes={{
+            rail: css.rail,
+            track: css.track,
+            mark: css.mark,
+            markLabel: css.markLabel,
+            thumb: css.thumb
+          }}
+          min={0}
+          max={maxCategory}
+          step={1}
+          track={false}
+          marks={marks}
+          value={startingCategory}
+          onChange={handleChange}
+          data-test="storm-category-slider"
+        />
+      </div>
+      <div className={css.categoryName} data-test="storm-category-name">
+        {hurricaneCategoryInfo[startingCategory].name}
       </div>
     </SetupSection>
   );

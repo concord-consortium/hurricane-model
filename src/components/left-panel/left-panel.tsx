@@ -4,8 +4,11 @@ import ListSubheader from "@mui/material/ListSubheader";
 import clsx from "clsx";
 import React from "react";
 
-import { SetupSection } from "./setup-section";
+import { PressureSystemsSection } from "./pressure-systems-section";
+import { SeasonSection } from "./season-section";
+import { SeaSurfaceTemperaturesSection } from "./sea-surface-temperatures-section";
 import { StormCategorySection } from "./storm-category-section";
+import { StormLocationSection } from "./storm-location-section";
 
 import css from "./left-panel.scss";
 
@@ -38,35 +41,11 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
             </ListSubheader>
           }
         >
-          <SetupSection
-            dataTest="storm-location"
-            setupMode="stormLocation"
-            title="Storm Start Location"
-          >
-            Storm Start Location
-          </SetupSection>
+          <StormLocationSection />
           <StormCategorySection />
-          <SetupSection
-            dataTest="season"
-            setupMode="season"
-            title="Starting Season"
-          >
-            Season
-          </SetupSection>
-          <SetupSection
-            dataTest="sea-surface-temperatures"
-            setupMode="seaSurfaceTemperatures"
-            title="Sea Surface Temp Anomalies"
-          >
-            Sea Surface Temperature Anomalies
-          </SetupSection>
-          <SetupSection
-            dataTest="pressure-systems"
-            setupMode="pressureSystems"
-            title="Pressure Systems"
-          >
-            Pressure Systems
-          </SetupSection>
+          <SeasonSection />
+          <SeaSurfaceTemperaturesSection />
+          <PressureSystemsSection />
         </List>
       </div>
     </div>
