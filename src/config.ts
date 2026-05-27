@@ -95,6 +95,10 @@ const DEFAULT_CONFIG: any = {
   lowPressureSysAngleOffset: 23, // deg
   highPressureSysAngleOffset: 8, // deg
   hurricaneStrength: startStrengths[DEFAULT_START_LOCATION], // max wind speed, m/s
+  // Optional index to hurricaneCategoryInfo in constants.ts. When set, overrides hurricaneStrength for the
+  // hurricane's initial wind speed (using the matching startingWindSpeed).
+  // SimulationModel forces it to 0 in storm mode.
+  startingCategory: undefined,
   // Land temperature controls how fast the hurricane dies when it hits the land.
   // The smaller the number, the quicker it happens.
   landTemperature: 22,

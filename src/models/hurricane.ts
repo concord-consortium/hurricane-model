@@ -1,9 +1,11 @@
-import { computed, override } from "mobx";
+import { action, computed, observable, override } from "mobx";
 import config from "../config";
 import { latLngPlusVector } from "../math-utils";
 import { random } from "../seedrandom";
 import { IVector } from "../types";
-import { hurricaneMaxWindSpeedByCategory, maxHurricaneSpeed, minHurricaneSpeed, maxWindSpeed } from "./constants";
+import {
+  hurricaneCategoryInfo, hurricaneMaxWindSpeedByCategory, maxHurricaneSpeed, minHurricaneSpeed, maxWindSpeed
+} from "./constants";
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 
 // Sea surface temperature 28.25*C is an important value. Sea needs to be warmer than that so the hurricane
@@ -19,12 +21,14 @@ const equatorPushLatThreshold = 10;
 
 export interface IHurricaneOptions extends IPressureSystemOptions {
   speed?: IVector;
+  startingCategory?: number;
 }
 
 export class Hurricane extends PressureSystem {
   public speed: IVector = Object.assign({}, config.initialHurricaneSpeed);
   public strengthChange = 0;
   public cat3SSTThresholdReached = false;
+  @observable public startingCategory: number | undefined;
   protected initialState: Hurricane;
 
   constructor(props: IHurricaneOptions) {
@@ -35,7 +39,16 @@ export class Hurricane extends PressureSystem {
     if (props.speed !== undefined) {
       this.speed = Object.assign({}, props.speed);
     }
+    if (props.startingCategory !== undefined) {
+      this.setStartingCategory(props.startingCategory);
+    }
     this.initialState = JSON.parse(JSON.stringify(this));
+  }
+
+  @action.bound public setStartingCategory(category: number) {
+    const clamped = Math.max(0, Math.min(hurricaneCategoryInfo.length - 1, Math.floor(category)));
+    this.startingCategory = clamped;
+    this.setStrength(hurricaneCategoryInfo[clamped].startingWindSpeed);
   }
 
   @override public get range() {
