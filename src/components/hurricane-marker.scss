@@ -71,15 +71,10 @@
   }
 }
 
-// The path/circle fill rules below are based on the structure of hurricane.svg and
-// category-marker.svg. Both are processed by SVGR, which strips class names from inside the
-// SVGs -- if we disabled SVGR optimization, the cls-* names would collide across files.
-// category-marker.svg's circle uses fill="currentColor", so the `color` declarations color it.
+// Both hurricane.svg's swirl and category-marker.svg's circle use fill="currentColor",
+// so setting `color` on the .categoryN wrapper drives their fill via CSS inheritance.
 .category0 {
   color: $cat0Color;
-  svg path:first-of-type {
-    fill: $cat0Color;
-  }
   .svgContainer {
     animation-duration: 5.5s;
   }
@@ -87,9 +82,6 @@
 
 .category1 {
   color: $cat1Color;
-  svg path:first-of-type {
-    fill: $cat1Color;
-  }
   .svgContainer {
     animation-duration: 4s;
   }
@@ -97,9 +89,6 @@
 
 .category2 {
   color: $cat2Color;
-  svg path:first-of-type {
-    fill: $cat2Color;
-  }
   .svgContainer {
     animation-duration: 2.75s;
   }
@@ -107,9 +96,6 @@
 
 .category3 {
   color: $cat3Color;
-  svg path:first-of-type {
-    fill: $cat3Color;
-  }
   .svgContainer {
     animation-duration: 1.75s;
   }
@@ -117,9 +103,6 @@
 
 .category4 {
   color: $cat4Color;
-  svg path:first-of-type {
-    fill: $cat4Color;
-  }
   .svgContainer {
     animation-duration: 1s;
   }
@@ -127,9 +110,6 @@
 
 .category5 {
   color: $cat5Color;
-  svg path:first-of-type {
-    fill: $cat5Color;
-  }
   .svgContainer {
     animation-duration: 0.5s;
   }
