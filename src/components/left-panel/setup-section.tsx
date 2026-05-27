@@ -41,7 +41,10 @@ export const SetupSection = observer(function SetupSection({
     <>
       <ListItemButton data-test={`${dt}-button`} onClick={handleClick}>
         {Icon && <ListItemIcon className={iconClassName}><Icon /></ListItemIcon>}
-        <ListItemText primary={title} />
+        <ListItemText
+          primary={title}
+          slotProps={{ primary: { className: css.sectionTitle } }}
+        />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       <Collapse data-test={`${dt}-content`} in={open} unmountOnExit>
