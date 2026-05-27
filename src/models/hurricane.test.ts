@@ -1,3 +1,4 @@
+import { autorun } from "mobx";
 import { Hurricane } from "./hurricane";
 
 describe("Hurricane store", () => {
@@ -103,6 +104,52 @@ describe("Hurricane store", () => {
       hurricane.cat3SSTThresholdReached = false;
       hurricane.updateStrength();
       expect(hurricane.strength).toEqual(70);
+    });
+  });
+
+  describe("startingCategory", () => {
+    it("is undefined by default", () => {
+      const hurricane = new Hurricane(options);
+      expect(hurricane.startingCategory).toBeUndefined();
+    });
+
+    it("initializes from constructor and overrides strength with the matching startingWindSpeed", () => {
+      const hurricane = new Hurricane({ ...options, strength: 12, startingCategory: 3 });
+      expect(hurricane.startingCategory).toEqual(3);
+      // hurricaneCategoryInfo[3].startingWindSpeed === hurricaneMaxWindSpeedByCategory[2] + 1 === 50
+      expect(hurricane.strength).toEqual(50);
+    });
+
+    it("setStartingCategory updates strength to startingWindSpeed for the new category", () => {
+      const hurricane = new Hurricane(options);
+      hurricane.setStartingCategory(0);
+      expect(hurricane.startingCategory).toEqual(0);
+      expect(hurricane.strength).toEqual(24); // tropical storm starting wind speed
+
+      hurricane.setStartingCategory(5);
+      expect(hurricane.startingCategory).toEqual(5);
+      expect(hurricane.strength).toEqual(71); // hurricaneMaxWindSpeedByCategory[4] + 1
+    });
+
+    it("clamps out-of-range values", () => {
+      const hurricane = new Hurricane(options);
+      hurricane.setStartingCategory(-2);
+      expect(hurricane.startingCategory).toEqual(0);
+      hurricane.setStartingCategory(99);
+      expect(hurricane.startingCategory).toEqual(5);
+      // Fractional values floor.
+      hurricane.setStartingCategory(2.9);
+      expect(hurricane.startingCategory).toEqual(2);
+    });
+
+    it("is reactive — observers see updates", () => {
+      const hurricane = new Hurricane(options);
+      const seen: (number | undefined)[] = [];
+      const dispose = autorun(() => seen.push(hurricane.startingCategory));
+      hurricane.setStartingCategory(2);
+      hurricane.setStartingCategory(4);
+      dispose();
+      expect(seen).toEqual([undefined, 2, 4]);
     });
   });
 
