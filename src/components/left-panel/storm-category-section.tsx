@@ -6,6 +6,7 @@ import { hurricaneCategoryInfo } from "../../models/constants";
 import { useStores } from "../../stores-context";
 import { SetupSection } from "./setup-section";
 
+import sectionCss from "./setup-section.scss";
 import css from "./storm-category-section.scss";
 
 const marks = hurricaneCategoryInfo.map((info, idx) => ({ value: idx, label: info.nameShort }));
@@ -28,6 +29,9 @@ export const StormCategorySection = observer(function StormCategorySection() {
       title="Storm Category"
     >
       <div className={css.stormCategorySection} data-test="storm-category-section">
+        <p className={sectionCss.hint}>
+          Drag the slider to set the storm's starting strength. The storm icon updates in real time.
+        </p>
         <div className={css.sliderContainer}>
           <Slider
             classes={{
