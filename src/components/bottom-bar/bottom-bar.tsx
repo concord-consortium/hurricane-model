@@ -80,19 +80,19 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public render() {
-    const sim = this.stores.simulation;
-    const ui = this.stores.ui;
+    const { ready, simulationRunning, simulationStarted } = this.stores.simulation;
+    const { isReportMode, leftPanelOpen, overlay, thermometerActive } = this.stores.ui;
     const { isSeasonMenuOpen, isStartLocationMenuOpen } = this.state;
     const startLocationButtonHoveredClass = isStartLocationMenuOpen ? css.hovered : "";
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
-    const tempButtonDisabled = ui.overlay !== "sst";
+    const tempButtonDisabled = overlay !== "sst";
     const isStormMode = config.mode === "storm";
-    const isReportMode = ui.isReportMode;
+    const stormSetupButtonDisabled = simulationStarted;
     const startLocationButtonDisabled = isReportMode ||
-      (config.lockSimulationWhileRunning && sim.simulationStarted);
+      (config.lockSimulationWhileRunning && simulationStarted);
     const seasonButtonDisabled = isReportMode ||
-      (config.lockSimulationWhileRunning && sim.simulationStarted);
-    const simulationControlsDisabled = isReportMode;
+      (config.lockSimulationWhileRunning && simulationStarted);
+    const simulationControlsDisabled = isReportMode || leftPanelOpen;
     const startLocationButtonClasses = clsx(
       css.widgetGroup,
       startLocationButtonHoveredClass,
@@ -111,6 +111,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               <BottomBarButton
                 buttonText="Storm Setup"
                 dataTest="storm-setup-button"
+                disabled={stormSetupButtonDisabled}
                 onClick={() => this.props.toggleLeftPanelOpen()}
               />
             </div>
@@ -154,7 +155,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <div className={`${css.widgetGroup} ${tempButtonDisabled ? "" : "hoverable"}`}>
               <IconButton
                 disabled={tempButtonDisabled}
-                active={ui.thermometerActive}
+                active={thermometerActive}
                 buttonText="Temp"
                 dataTest="temp-button"
                 icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
@@ -184,12 +185,12 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <div className={`${css.widgetGroup} ${css.stopStart}`}>
             <Button
               onClick={this.handleStartStop}
-              disabled={simulationControlsDisabled || !sim.ready}
+              disabled={simulationControlsDisabled || !ready}
               className={css.playbackButton}
               data-test="start-button"
               disableRipple={true}
             >
-              { sim.simulationRunning ? <span><PauseIcon/> Stop</span> : <span><StartIcon /> Start</span> }
+              { simulationRunning ? <span><PauseIcon/> Stop</span> : <span><StartIcon /> Start</span> }
             </Button>
           </div>
           <div className={css.widgetGroup}>

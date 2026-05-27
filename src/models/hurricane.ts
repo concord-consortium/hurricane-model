@@ -1,4 +1,4 @@
-import { action, computed, observable, override } from "mobx";
+import { action, computed, extendObservable, override } from "mobx";
 import config from "../config";
 import { latLngPlusVector } from "../math-utils";
 import { random } from "../seedrandom";
@@ -28,7 +28,10 @@ export class Hurricane extends PressureSystem {
   public speed: IVector = Object.assign({}, config.initialHurricaneSpeed);
   public strengthChange = 0;
   public cat3SSTThresholdReached = false;
-  @observable public startingCategory: number | undefined;
+  // Declared here for typing; the actual observable is installed via extendObservable in the
+  // constructor. The PressureSystem base already calls makeObservable, and MobX 6's class-field
+  // @observable annotation on a subclass instance field does not get picked up by the base call.
+  public declare startingCategory: number | undefined;
   protected initialState: Hurricane;
 
   constructor(props: IHurricaneOptions) {
@@ -39,6 +42,7 @@ export class Hurricane extends PressureSystem {
     if (props.speed !== undefined) {
       this.speed = Object.assign({}, props.speed);
     }
+    extendObservable(this, { startingCategory: undefined as number | undefined });
     if (props.startingCategory !== undefined) {
       this.setStartingCategory(props.startingCategory);
     }

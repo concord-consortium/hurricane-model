@@ -1,11 +1,11 @@
 @use "../common" as *;
 
 // Six equal-width category segments mirroring the hurricane scale image in the bottom bar.
-$catStop1: 16.6667%;
-$catStop2: 33.3333%;
+$catStop1: 10%;
+$catStop2: 30%;
 $catStop3: 50%;
-$catStop4: 66.6667%;
-$catStop5: 83.3333%;
+$catStop4: 70%;
+$catStop5: 90%;
 
 .stormCategorySection {
   padding: 8px 16px 12px;
@@ -34,6 +34,11 @@ $catStop5: 83.3333%;
   .thumb {
     background-color: white;
     border: 2px solid #797979;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
   }
 
   .mark {
@@ -44,13 +49,12 @@ $catStop5: 83.3333%;
     font-family: $scaleFont;
     font-size: 12px;
     font-weight: bold;
-    top: 22px;
+    top: 26px;
   }
+}
 
-  .categoryName {
-    font-family: $scaleFont;
-    font-size: 14px;
-    margin-top: 12px;
-    text-align: center;
-  }
+.categoryName {
+  font-family: $scaleFont;
+  font-size: 14px;
+  text-align: center;
 }
