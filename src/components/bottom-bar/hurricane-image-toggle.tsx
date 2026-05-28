@@ -17,7 +17,7 @@ export class HurricaneImageToggle extends BaseComponent<IProps, IState> {
       <div className={css.hurricaneImageToggle}>
         <div className={css.label}>Hurricane Image</div>
         <div className={css.toggleContainer}>
-          <Switch disableRipple={true} checked={checked} onChange={this.handleChange} />
+          <Switch disableRipple={true} color="secondary" checked={checked} onChange={this.handleChange} />
         </div>
       </div>
     );
