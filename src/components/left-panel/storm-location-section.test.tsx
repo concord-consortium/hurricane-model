@@ -1,6 +1,5 @@
 import * as React from "react";
 import { act, render, screen, fireEvent } from "@testing-library/react";
-import { Provider } from "mobx-react";
 
 import { createStores, IStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
@@ -10,11 +9,9 @@ import { StormLocationSection } from "./storm-location-section";
 
 const renderSection = (stores: IStores) =>
   render(
-    <Provider stores={stores}>
-      <StoresContext value={stores}>
-        <StormLocationSection />
-      </StoresContext>
-    </Provider>
+    <StoresContext value={stores}>
+      <StormLocationSection />
+    </StoresContext>
   );
 
 const openSection = () => {

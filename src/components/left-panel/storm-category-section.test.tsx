@@ -1,6 +1,5 @@
 import * as React from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { Provider } from "mobx-react";
 
 import { hurricaneCategoryInfo } from "../../models/constants";
 import { createStores, IStores } from "../../models/stores";
@@ -9,11 +8,9 @@ import { StormCategorySection } from "./storm-category-section";
 
 const renderSection = (stores: IStores) =>
   render(
-    <Provider stores={stores}>
-      <StoresContext value={stores}>
-        <StormCategorySection />
-      </StoresContext>
-    </Provider>
+    <StoresContext value={stores}>
+      <StormCategorySection />
+    </StoresContext>
   );
 
 const openSection = () => {
