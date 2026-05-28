@@ -87,28 +87,34 @@ export const StormLocationSection = observer(function StormLocationSection() {
       title="Storm Start Location"
     >
       <div className={css.coordinates}>
-        <label className={css.label} htmlFor="storm-location-lat">Latitude</label>
-        <input
-          id="storm-location-lat"
-          className={css.input}
-          type="text"
-          value={latText}
-          onChange={e => setLatText(e.target.value)}
-          onBlur={e => commit("lat", e.target.value)}
-          onKeyDown={handleKeyDown("lat")}
-          data-test="storm-location-lat-input"
-        />
-        <label className={css.label} htmlFor="storm-location-lng">Longitude</label>
-        <input
-          id="storm-location-lng"
-          className={css.input}
-          type="text"
-          value={lngText}
-          onChange={e => setLngText(e.target.value)}
-          onBlur={e => commit("lng", e.target.value)}
-          onKeyDown={handleKeyDown("lng")}
-          data-test="storm-location-lng-input"
-        />
+        <div className={css.coordinate}>
+          <label className={css.label} htmlFor="storm-location-lat">Lat</label>
+          <input
+            id="storm-location-lat"
+            className={css.input}
+            type="text"
+            value={latText}
+            onChange={e => setLatText(e.target.value)}
+            onBlur={e => commit("lat", e.target.value)}
+            onKeyDown={handleKeyDown("lat")}
+            data-test="storm-location-lat-input"
+          />
+          <div>°N</div>
+        </div>
+        <div className={css.coordinate}>
+          <label className={css.label} htmlFor="storm-location-lng">Lon</label>
+          <input
+            id="storm-location-lng"
+            className={css.input}
+            type="text"
+            value={lngText}
+            onChange={e => setLngText(e.target.value)}
+            onBlur={e => commit("lng", e.target.value)}
+            onKeyDown={handleKeyDown("lng")}
+            data-test="storm-location-lng-input"
+          />
+          <div>°W</div>
+        </div>
       </div>
     </SetupSection>
   );
