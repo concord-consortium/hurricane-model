@@ -71,7 +71,7 @@ export function snapToRegionPreservingAxis(
     if (target < a1 || target >= a2) continue;
 
     const t = (target - a1) / (a2 - a1);
-    const [o1, o2] = axis === "lat" ? [lng1, lng2] : [lat1, lat2];
+    const [o1, o2] = axis === "lat" ? [lng1, lng2] : [lat2, lat1];
     const crossing = o1 + t * (o2 - o1);
     const dist = Math.abs(crossing - preferredOther);
     if (dist < bestDist) {
