@@ -4,7 +4,7 @@
 
 **Goal:** Fill out `StormLocationSection` with two text inputs that read and write `simulation.startLocation.lat` / `.lng`, staying live-synced with the hurricane marker during drag and snapping out-of-region values into the legal placement region while preserving the user's entered coordinate when possible.
 
-**Architecture:** Add a pure-geometry helper `snapToRegionPreservingAxis` to [src/utils/region.ts](../../src/utils/region.ts). Turn `StormLocationSection` into an `observer` component with two text inputs whose local state syncs from `hurricane.center` on every render. Enter / blur commits via a small pipeline (parse → in-region check → snap-preserving → clampToRegion fallback) that ends in `simulation.setStartLocation`. Escape reverts.
+**Architecture:** Add a pure-geometry helper `snapToRegionPreservingAxis` to [src/utils/region.ts](../../src/utils/region.ts). Turn `StormLocationSection` into an `observer` component with two text inputs whose local state syncs from `hurricane.center` on every render. Enter / blur commits via a small pipeline (parse → snap-preserving → clampToRegion fallback) that ends in `simulation.setStartLocation`. Escape reverts.
 
 **Tech Stack:** React 18, MobX 6 (class-based with decorators, `observer` from `mobx-react`), Jest + `@testing-library/react`, TypeScript, SCSS modules. Existing utilities: `clampToRegion`, `isInsideRegion`, `resolveStartLocation`, `stormPlacementRegion`.
 
@@ -18,7 +18,7 @@
 - Modify: `src/utils/region.ts`
 - Test: `src/utils/region.test.ts`
 
-The helper finds a point in a region with one axis (`lat` or `lng`) fixed at a target value, choosing the other axis as close as possible to a preferred value. Returns `null` if no point on the line `axis = target` lies inside the region.
+The helper takes `coords` and tries to return a legal point with `axis` preserved at `coords[axis]`. If `coords` is already inside the region, it returns `coords` unchanged. Otherwise it finds the legal value on the `axis = coords[axis]` line closest to `coords[other]`. Returns `null` if the line doesn't intersect the region at all.
 
 **Step 1: Write the failing tests**
 
@@ -36,14 +36,14 @@ Then add (just before the closing `});` of the top-level describe):
 
     it("returns null when the target line does not cross the region", () => {
       // lat = 5 is far above the unit square.
-      expect(snapToRegionPreservingAxis(region, "lat", 5, 0.5)).toBeNull();
+      expect(snapToRegionPreservingAxis(region, "lat", { lat: 5, lng: 0.5 })).toBeNull();
       // lng = -3 is far left of the unit square.
-      expect(snapToRegionPreservingAxis(region, "lng", -3, 0.5)).toBeNull();
+      expect(snapToRegionPreservingAxis(region, "lng", { lat: 0.5, lng: -3 })).toBeNull();
     });
 
     it("returns the preferred other axis when it lies inside the valid interval", () => {
       // lat = 0.5 crosses the square; preferred lng = 0.3 is inside [0, 1].
-      const snapped = snapToRegionPreservingAxis(region, "lat", 0.5, 0.3);
+      const snapped = snapToRegionPreservingAxis(region, "lat", { lat: 0.5, lng: 0.3 });
       expect(snapped).not.toBeNull();
       expect(snapped!.lat).toBeCloseTo(0.5, 5);
       expect(snapped!.lng).toBeCloseTo(0.3, 5);
@@ -51,18 +51,18 @@ Then add (just before the closing `});` of the top-level describe):
 
     it("clamps the preferred other axis to the interval edge when outside the valid range", () => {
       // lat = 0.5 crosses the square at lng in [0, 1]. Preferred lng = 2 → clamps to 1.
-      const high = snapToRegionPreservingAxis(region, "lat", 0.5, 2);
+      const high = snapToRegionPreservingAxis(region, "lat", { lat: 0.5, lng: 2 });
       expect(high!.lng).toBeCloseTo(1, 5);
       expect(high!.lat).toBeCloseTo(0.5, 5);
 
       // Preferred lng = -3 → clamps to 0.
-      const low = snapToRegionPreservingAxis(region, "lat", 0.5, -3);
+      const low = snapToRegionPreservingAxis(region, "lat", { lat: 0.5, lng: -3 });
       expect(low!.lng).toBeCloseTo(0, 5);
       expect(low!.lat).toBeCloseTo(0.5, 5);
     });
 
     it("works for fixing the lng axis as well", () => {
-      const snapped = snapToRegionPreservingAxis(region, "lng", 0.25, 0.75);
+      const snapped = snapToRegionPreservingAxis(region, "lng", { lat: 0.75, lng: 0.25 });
       expect(snapped!.lng).toBeCloseTo(0.25, 5);
       expect(snapped!.lat).toBeCloseTo(0.75, 5);
     });
@@ -82,48 +82,46 @@ Add to the end of `src/utils/region.ts`:
 export function snapToRegionPreservingAxis(
   region: Region,
   axis: "lat" | "lng",
-  target: number,
-  preferredOther: number
+  coords: ICoordinates
 ): ICoordinates | null {
+  if (isInsideRegion(coords, region)) return coords;
+
   // Walk the polygon ring and collect "other-axis" values where the ring
-  // crosses the line `axis = target`. Sorted, these crossings form pairs
-  // [lo, hi] that bound valid intervals on that line.
+  // crosses the line `axis = target`. The closest of these is the
+  // nearest legal value on that line, given that `coords` is outside the
+  // region (and therefore `preferredOther` is outside every valid
+  // interval on that line — assuming a simple polygon).
   const ringCoords = region.ring.geometry.coordinates;
   const crossings: number[] = [];
+  const [target, preferredOther] = axis === "lat" ? [coords.lat, coords.lng] : [coords.lng, coords.lat];
 
   for (let i = 0; i < ringCoords.length - 1; i++) {
-    // ring coords are stored as [lng, lat]
     const [lng1, lat1] = ringCoords[i];
     const [lng2, lat2] = ringCoords[i + 1];
-    const a1 = axis === "lat" ? lat1 : lng1;
-    const a2 = axis === "lat" ? lat2 : lng2;
-    const o1 = axis === "lat" ? lng1 : lat1;
-    const o2 = axis === "lat" ? lng2 : lat2;
+    const as = axis === "lat" ? [lat1, lat2] : [lng1, lng2];
+    as.sort((a, b) => a - b);
+    const [a1, a2] = as;
 
-    // Half-open crossing test: include a1 == target, exclude a2 == target.
-    // This avoids double-counting when target lands on a shared vertex.
-    const crosses = (a1 <= target && a2 > target) || (a1 > target && a2 <= target);
-    if (!crosses) continue;
+    // Skip if the target is not within the range of this edge.
+    // Include a1 == target, exclude a2 == target to avoid double-counting when target lands on a shared vertex.
+    if (target < a1 || target >= a2) continue;
 
     const t = (target - a1) / (a2 - a1);
+    const [o1, o2] = axis === "lat" ? [lng1, lng2] : [lat1, lat2];
     crossings.push(o1 + t * (o2 - o1));
   }
 
-  if (crossings.length < 2) return null;
-  crossings.sort((a, b) => a - b);
+  if (crossings.length <= 0) return null;
 
   let best: number | null = null;
   let bestDist = Infinity;
-  for (let i = 0; i + 1 < crossings.length; i += 2) {
-    const lo = crossings[i];
-    const hi = crossings[i + 1];
-    const candidate = Math.max(lo, Math.min(hi, preferredOther));
-    const dist = Math.abs(candidate - preferredOther);
+  crossings.forEach(crossing => {
+    const dist = Math.abs(crossing - preferredOther);
     if (dist < bestDist) {
       bestDist = dist;
-      best = candidate;
+      best = crossing;
     }
-  }
+  });
 
   if (best === null) return null;
   return axis === "lat"
@@ -478,11 +476,7 @@ import React, { useEffect, useState } from "react";
 
 import { ICoordinates } from "../../types";
 import { useStores } from "../../stores-context";
-import {
-  clampToRegion,
-  isInsideRegion,
-  snapToRegionPreservingAxis
-} from "../../utils/region";
+import { clampToRegion, snapToRegionPreservingAxis } from "../../utils/region";
 import { stormPlacementRegion } from "../../utils/storm-placement-region";
 import { SetupSection } from "./setup-section";
 
@@ -506,11 +500,7 @@ const resolveCommit = (
     ? { lat: target, lng: currentOther }
     : { lat: currentOther, lng: target };
 
-  if (isInsideRegion(candidate, stormPlacementRegion)) return candidate;
-
-  const preserved = snapToRegionPreservingAxis(
-    stormPlacementRegion, axis, target, currentOther
-  );
+  const preserved = snapToRegionPreservingAxis(stormPlacementRegion, axis, candidate);
   if (preserved) return preserved;
 
   return clampToRegion(candidate, stormPlacementRegion);

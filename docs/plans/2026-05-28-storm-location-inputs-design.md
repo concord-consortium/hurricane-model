@@ -32,13 +32,11 @@ For the field being committed (lat or lng):
    value.
 2. Build a candidate `ICoordinates` using the parsed value for the edited
    axis and the current resolved model value for the other axis.
-3. If `isInsideRegion(candidate, stormPlacementRegion)` → commit via
-   `simulation.setStartLocation(candidate)`. Done.
-4. Otherwise try to preserve the entered axis: find a point in the region
-   with that axis fixed at the entered value, with the other axis as
-   close as possible to its current value. If one exists → commit it.
-5. Otherwise fall back to `clampToRegion(candidate, stormPlacementRegion)`
-   and commit that.
+3. Call `snapToRegionPreservingAxis(stormPlacementRegion, axis, candidate)`.
+   - If it returns coordinates → commit via `simulation.setStartLocation`.
+   - If it returns `null` (no legal point exists on the
+     `axis = candidate[axis]` line) → fall back to
+     `clampToRegion(candidate, stormPlacementRegion)` and commit that.
 
 `simulation.setStartLocation` is the same path used by drag-end, so the
 existing named-location handling (pressure systems / strength) stays
@@ -52,16 +50,21 @@ Added to [src/utils/region.ts](../../src/utils/region.ts).
 function snapToRegionPreservingAxis(
   region: Region,
   axis: "lat" | "lng",
-  target: number,
-  preferredOther: number
+  coords: ICoordinates
 ): ICoordinates | null
 ```
 
-Walk the polygon ring once. For each segment, check whether the segment
-crosses the line `axis = target`. Each crossing yields an other-axis
-value. Sorted crossings form pairs `[lo, hi]` defining valid intervals on
-that line. Pick the interval-clamped value closest to `preferredOther`.
-Return `null` if there are no crossings.
+If `coords` is already inside the region, return it unchanged. Otherwise
+walk the polygon ring once and collect "other-axis" values where the ring
+crosses the line `axis = coords[axis]`. Pick the crossing closest to
+`coords[other]`. Return that as the snapped point, or `null` if there are
+no crossings.
+
+For a simple polygon (no holes, no self-intersection), this gives the
+closest legal coordinate on the `axis = coords[axis]` line: when `coords`
+is outside the region but the line crosses it, `coords[other]` is
+necessarily outside every valid interval on that line, so the nearest
+legal value lies at an interval endpoint — i.e., one of the crossings.
 
 Pure geometry over `region.ring.geometry.coordinates`. No new
 dependencies.
