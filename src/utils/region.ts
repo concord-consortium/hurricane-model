@@ -45,3 +45,52 @@ export function clampToRegion(coords: ICoordinates, region: Region): ICoordinate
   const [lng, lat] = snapped.geometry.coordinates;
   return { lat, lng };
 }
+
+export function snapToRegionPreservingAxis(
+  region: Region,
+  axis: "lat" | "lng",
+  coords: ICoordinates
+): ICoordinates | null {
+  if (isInsideRegion(coords, region)) return coords;
+
+  // Walk the polygon ring and collect "other-axis" values where the ring
+  // crosses the line `axis = target`. Sorted, these crossings form pairs
+  // [lo, hi] that bound valid intervals on that line.
+  const ringCoords = region.ring.geometry.coordinates;
+  const crossings: number[] = [];
+  const [target, preferredOther] = axis === "lat" ? [coords.lat, coords.lng] : [coords.lng, coords.lat];
+
+  for (let i = 0; i < ringCoords.length - 1; i++) {
+    const [lng1, lat1] = ringCoords[i];
+    const [lng2, lat2] = ringCoords[i + 1];
+    const as = axis === "lat" ? [lat1, lat2] : [lng1, lng2];
+    as.sort((a, b) => a - b);
+    const [a1, a2] = as;
+
+    // Skip if the target is not within the range of this edge.
+    // Include a1 == target, exclude a2 == target to avoid double-counting when target lands on a shared vertex.
+    if (target < a1 || target >= a2) continue;
+
+    const t = (target - a1) / (a2 - a1);
+    const [o1, o2] = axis === "lat" ? [lng1, lng2] : [lat1, lat2];
+    crossings.push(o1 + t * (o2 - o1));
+  }
+
+  if (crossings.length <= 0) return null;
+  crossings.sort((a, b) => a - b);
+
+  let best: number | null = null;
+  let bestDist = Infinity;
+  crossings.forEach(crossing => {
+    const dist = Math.abs(crossing - preferredOther);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = crossing;
+    }
+  });
+
+  if (best === null) return null;
+  return axis === "lat"
+    ? { lat: target, lng: best }
+    : { lat: best, lng: target };
+}
