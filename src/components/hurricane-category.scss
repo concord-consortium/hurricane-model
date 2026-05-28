@@ -4,7 +4,7 @@
 // Consumed by HurricaneMarker (SVG swirl), HurricaneCategoryMarker (category circle), and
 // the storm-category-section icon. The SVGs paint with fill="currentColor", so the `color`
 // declaration drives their fill. The --hurricane-spin-duration custom property is read by
-// the spin animations in hurricane-marker.scss and storm-category-section.scss.
+// the spin animations in hurricane-marker.scss.
 //
 // The selectors are doubled (.categoryN.categoryN) to raise specificity to (0,2,0). MUI's
 // emotion-generated .MuiListItemIcon-root rule sets its own color at specificity (0,1,0) and

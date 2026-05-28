@@ -125,7 +125,8 @@ export class SimulationModel {
     // In storm mode, default the slider to category 0 when no URL param was provided so the
     // slider always has a value to show; in other modes leave it undefined so existing
     // hurricaneStrength / startStrengths logic stays in effect.
-    startingCategory: config.startingCategory ?? (config.mode === "storm" ? 0 : undefined)
+    startingCategory: config.startingCategory != null && isFinite(Number(config.startingCategory))
+      ? config.startingCategory : (config.mode === "storm" ? 0 : undefined)
   });
   @observable public simulationStarted = false;
   @observable public simulationRunning = false;
@@ -468,7 +469,10 @@ export class SimulationModel {
     this.hurricane.reset();
     const coordinates = resolveStartLocation(this.startLocation);
     this.hurricane.setCenter(coordinates, this.pressureSystems);
-    if (this.hurricane.startingCategory !== undefined) {
+    if (
+      this.hurricane.startingCategory !== undefined &&
+      hurricaneCategoryInfo[this.hurricane.startingCategory]?.startingWindSpeed != null
+    ) {
       this.hurricane.setStrength(hurricaneCategoryInfo[this.hurricane.startingCategory].startingWindSpeed);
     } else if (isStartLocationName(this.startLocation)) {
       this.hurricane.setStrength(startStrengths[this.startLocation]);

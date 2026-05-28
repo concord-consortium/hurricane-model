@@ -50,7 +50,10 @@ export class Hurricane extends PressureSystem {
   }
 
   @action.bound public setStartingCategory(category: number) {
-    const clamped = Math.max(0, Math.min(hurricaneCategoryInfo.length - 1, Math.floor(category)));
+    const categoryNum = Number(category);
+    if (!Number.isFinite(categoryNum)) return;
+
+    const clamped = Math.max(0, Math.min(hurricaneCategoryInfo.length - 1, Math.floor(categoryNum)));
     this.startingCategory = clamped;
     this.setStrength(hurricaneCategoryInfo[clamped].startingWindSpeed);
   }

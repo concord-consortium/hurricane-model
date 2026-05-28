@@ -1,4 +1,5 @@
 import { autorun } from "mobx";
+import { hurricaneCategoryInfo } from "./constants";
 import { Hurricane } from "./hurricane";
 
 describe("Hurricane store", () => {
@@ -116,19 +117,18 @@ describe("Hurricane store", () => {
     it("initializes from constructor and overrides strength with the matching startingWindSpeed", () => {
       const hurricane = new Hurricane({ ...options, strength: 12, startingCategory: 3 });
       expect(hurricane.startingCategory).toEqual(3);
-      // hurricaneCategoryInfo[3].startingWindSpeed === hurricaneMaxWindSpeedByCategory[2] + 1 === 50
-      expect(hurricane.strength).toEqual(50);
+      expect(hurricane.strength).toEqual(hurricaneCategoryInfo[3].startingWindSpeed);
     });
 
     it("setStartingCategory updates strength to startingWindSpeed for the new category", () => {
       const hurricane = new Hurricane(options);
       hurricane.setStartingCategory(0);
       expect(hurricane.startingCategory).toEqual(0);
-      expect(hurricane.strength).toEqual(24); // tropical storm starting wind speed
+      expect(hurricane.strength).toEqual(hurricaneCategoryInfo[0].startingWindSpeed);
 
       hurricane.setStartingCategory(5);
       expect(hurricane.startingCategory).toEqual(5);
-      expect(hurricane.strength).toEqual(71); // hurricaneMaxWindSpeedByCategory[4] + 1
+      expect(hurricane.strength).toEqual(hurricaneCategoryInfo[5].startingWindSpeed);
     });
 
     it("clamps out-of-range values", () => {
@@ -140,6 +140,12 @@ describe("Hurricane store", () => {
       // Fractional values floor.
       hurricane.setStartingCategory(2.9);
       expect(hurricane.startingCategory).toEqual(2);
+    });
+
+    it("doesn't crash when given a non-number", () => {
+      const hurricane = new Hurricane(options);
+      hurricane.setStartingCategory("illegal" as any);
+      expect(hurricane.startingCategory).toBeUndefined();
     });
 
     it("is reactive — observers see updates", () => {
