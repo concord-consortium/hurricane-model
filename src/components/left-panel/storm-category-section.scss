@@ -1,0 +1,57 @@
+@use "../common" as *;
+
+// Six equal-width category segments mirroring the hurricane scale image in the bottom bar.
+$catStop1: 10%;
+$catStop2: 30%;
+$catStop3: 50%;
+$catStop4: 70%;
+$catStop5: 90%;
+
+.sliderContainer {
+  // Extra horizontal padding so the leftmost / rightmost tick labels don't get clipped.
+  padding: 0 12px;
+
+  .rail {
+    background: linear-gradient(
+      to right,
+      $cat0Color 0 $catStop1,
+      $cat1Color $catStop1 $catStop2,
+      $cat2Color $catStop2 $catStop3,
+      $cat3Color $catStop3 $catStop4,
+      $cat4Color $catStop4 $catStop5,
+      $cat5Color $catStop5 100%
+    );
+    border: 1px solid #797979;
+    border-radius: 4px;
+    height: 8px;
+    opacity: 1;
+  }
+
+  .thumb {
+    background-color: white;
+    border: 2px solid #797979;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  .mark {
+    opacity: 0;
+  }
+
+  .markLabel {
+    font-family: $scaleFont;
+    font-size: 12px;
+    font-weight: bold;
+    top: 26px;
+  }
+}
+
+.categoryName {
+  font-family: $scaleFont;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}

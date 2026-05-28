@@ -1,10 +1,11 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createStores } from "../../models/stores";
 import { Provider } from "mobx-react";
 import { BottomBar } from "./bottom-bar";
 import { PNG } from "pngjs";
+import config from "../../config";
 import * as logModule from "../../log";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
@@ -209,6 +210,62 @@ describe("BottomBar component", () => {
       expect(params.hurricane).toHaveProperty("center");
       expect(params).toHaveProperty("deterministic");
       expect(params).toHaveProperty("timestep");
+    });
+  });
+
+  describe("storm setup button", () => {
+    let originalMode: string;
+    beforeEach(() => {
+      originalMode = config.mode;
+      config.mode = "storm";
+    });
+    afterEach(() => {
+      config.mode = originalMode;
+    });
+
+    it("is enabled before the simulation has started, disabled after", () => {
+      const { rerender } = render(
+        <Provider stores={stores}>
+          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+        </Provider>
+      );
+      expect(screen.getByTestId("storm-setup-button")).not.toBeDisabled();
+
+      act(() => {
+        stores.simulation.simulationStarted = true;
+      });
+      rerender(
+        <Provider stores={stores}>
+          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+        </Provider>
+      );
+      expect(screen.getByTestId("storm-setup-button")).toBeDisabled();
+    });
+  });
+
+  describe("simulation control buttons (reload / restart / start)", () => {
+    it("are enabled when the setup panel is closed and disabled when the setup panel is open", () => {
+      stores.simulation.seaSurfaceTempData = new PNG();
+      const { rerender } = render(
+        <Provider stores={stores}>
+          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+        </Provider>
+      );
+      expect(screen.getByTestId("reload-button")).not.toBeDisabled();
+      expect(screen.getByTestId("restart-button")).not.toBeDisabled();
+      expect(screen.getByTestId("start-button")).not.toBeDisabled();
+
+      act(() => {
+        stores.ui.setLeftPanelOpen(true);
+      });
+      rerender(
+        <Provider stores={stores}>
+          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+        </Provider>
+      );
+      expect(screen.getByTestId("reload-button")).toBeDisabled();
+      expect(screen.getByTestId("restart-button")).toBeDisabled();
+      expect(screen.getByTestId("start-button")).toBeDisabled();
     });
   });
 

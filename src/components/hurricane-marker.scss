@@ -35,7 +35,9 @@
     top: 50%;
     left: 50%;
     transform-origin: top left;
-    animation: rotation 5.5s infinite linear;
+    // Duration is per-category, set as --hurricane-spin-duration by the .categoryN class
+    // applied to this same element in hurricane-marker.tsx. Falls back to the cat-0 speed.
+    animation: rotation var(--hurricane-spin-duration, 5.5s) infinite linear;
 
     svg {
       width: 124px;
@@ -68,62 +70,5 @@
     justify-content: center;
     text-align: center;
     text-shadow: 0 1px 5px #000;
-  }
-}
-
-.category0 {
-  // This is based on the structure of the hurricane.svg and category-marker.svg files. Note that they're optimized
-  // by SVGR loader, so we cannot use class names. If we disable SVGR optimization, these global class names will
-  // clash with eaach other, so it's not  an option.
-  svg path:first-of-type, circle {
-    fill: $cat0Color;
-  }
-  .svgContainer {
-    animation-duration: 5.5s;
-  }
-}
-
-.category1 {
-  svg path:first-of-type, circle {
-    fill: $cat1Color;
-  }
-  .svgContainer {
-    animation-duration: 4s;
-  }
-}
-
-.category2 {
-  svg path:first-of-type, circle {
-    fill: $cat2Color;
-  }
-  .svgContainer {
-    animation-duration: 2.75s;
-  }
-}
-
-.category3 {
-  svg path:first-of-type, circle {
-    fill: $cat3Color;
-  }
-  .svgContainer {
-    animation-duration: 1.75s;
-  }
-}
-
-.category4 {
-  svg path:first-of-type, circle {
-    fill: $cat4Color;
-  }
-  .svgContainer {
-    animation-duration: 1s;
-  }
-}
-
-.category5 {
-  svg path:first-of-type, circle {
-    fill: $cat5Color;
-  }
-  .svgContainer {
-    animation-duration: 0.5s;
   }
 }

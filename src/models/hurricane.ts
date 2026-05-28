@@ -1,9 +1,12 @@
-import { IVector } from "../types";
-import { computed, override } from "mobx";
-import { latLngPlusVector } from "../math-utils";
-import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
+import { action, computed, extendObservable, override } from "mobx";
 import config from "../config";
+import { latLngPlusVector } from "../math-utils";
 import { random } from "../seedrandom";
+import { IVector } from "../types";
+import {
+  hurricaneCategoryInfo, hurricaneMaxWindSpeedByCategory, maxHurricaneSpeed, minHurricaneSpeed, maxWindSpeed
+} from "./constants";
+import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 
 // Sea surface temperature 28.25*C is an important value. Sea needs to be warmer than that so the hurricane
 // can get stronger than category 3. Based on following the research:
@@ -16,28 +19,19 @@ const cat1SSTThreshold = 26;
 // It gets activated when the hurricane crosses equatorPushLatThreshold.
 const equatorPushLatThreshold = 10;
 
-const maxHurricaneSpeed = 20000;
-const minHurricaneSpeed = 500;
-
-// Based on: https://www.nhc.noaa.gov/aboutsshws.php, but converted to m/s.
-const hurricaneMaxWindSpeedByCategory = [
-  33, // category 0, max speed that doesn't classify as hurricane yet
-  43, // category 1
-  49, // category 2
-  58, // category 3
-  70, // category 4
-  Infinity // category 5
-];
-const maxWindSpeed = 85; // m/s, a
-
 export interface IHurricaneOptions extends IPressureSystemOptions {
   speed?: IVector;
+  startingCategory?: number;
 }
 
 export class Hurricane extends PressureSystem {
   public speed: IVector = Object.assign({}, config.initialHurricaneSpeed);
   public strengthChange = 0;
   public cat3SSTThresholdReached = false;
+  // Declared here for typing; the actual observable is installed via extendObservable in the
+  // constructor. The PressureSystem base already calls makeObservable, and MobX 6's class-field
+  // @observable annotation on a subclass instance field does not get picked up by the base call.
+  public declare startingCategory: number | undefined;
   protected initialState: Hurricane;
 
   constructor(props: IHurricaneOptions) {
@@ -48,7 +42,20 @@ export class Hurricane extends PressureSystem {
     if (props.speed !== undefined) {
       this.speed = Object.assign({}, props.speed);
     }
+    extendObservable(this, { startingCategory: undefined as number | undefined });
+    if (props.startingCategory !== undefined) {
+      this.setStartingCategory(props.startingCategory);
+    }
     this.initialState = JSON.parse(JSON.stringify(this));
+  }
+
+  @action.bound public setStartingCategory(category: number) {
+    const categoryNum = Number(category);
+    if (!Number.isFinite(categoryNum)) return;
+
+    const clamped = Math.max(0, Math.min(hurricaneCategoryInfo.length - 1, Math.floor(categoryNum)));
+    this.startingCategory = clamped;
+    this.setStrength(hurricaneCategoryInfo[clamped].startingWindSpeed);
   }
 
   @override public get range() {

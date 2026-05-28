@@ -1,33 +1,26 @@
 import * as React from "react";
+import { hurricaneCategoryInfo } from "../../models/constants";
 import css from "./hurricane-scale.scss";
 
 interface IProps {}
 interface IState {}
 
-const windSpeeds: { [key: number]: string } = {
-  0: "39-73",
-  1: "74-95",
-  2: "96-110",
-  3: "111-129",
-  4: "130-156",
-  5: "≥157"
-};
-
 const renderCategory = (cat: number) => {
   const barClass = `${css.bar} ${css[`barCategory${cat}`]}`;
+  const { nameShort, windRange } = hurricaneCategoryInfo[cat];
   return (
     <div key={cat} className={css.categoryContainer}>
-      <div className={css.categoryValue}>{ cat === 0 ? "TS" : cat }</div>
+      <div className={css.categoryValue}>{ nameShort }</div>
       <div className={barClass} />
       <div className={css.dot}>.</div>
-      <div className={css.windSpeedRange}>{ windSpeeds[cat] }</div>
+      <div className={css.windSpeedRange}>{ windRange }</div>
     </div>
    );
 };
 
 export class HurricaneScale extends React.PureComponent<IProps, IState> {
   public render() {
-    const categories = [0, 1, 2, 3, 4, 5];
+    const categories = Array.from(hurricaneCategoryInfo.keys());
     return (
       <div className={css.hurricaneScale}>
         <div className={css.header}>Hurricane Scale</div>

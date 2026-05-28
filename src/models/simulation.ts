@@ -20,6 +20,7 @@ import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
+import { hurricaneCategoryInfo } from "./constants";
 import config, { selectPressureSystems, startStrengths } from "../config";
 import { random } from "../seedrandom";
 import { log } from "../log";
@@ -120,7 +121,12 @@ export class SimulationModel {
   @observable public hurricane: Hurricane = new Hurricane({
     center: resolveStartLocation(config.initialHurricanePosition),
     strength: config.hurricaneStrength,
-    speed: config.initialHurricaneSpeed
+    speed: config.initialHurricaneSpeed,
+    // In storm mode, default the slider to category 0 when no URL param was provided so the
+    // slider always has a value to show; in other modes leave it undefined so existing
+    // hurricaneStrength / startStrengths logic stays in effect.
+    startingCategory: config.startingCategory != null && isFinite(Number(config.startingCategory))
+      ? config.startingCategory : (config.mode === "storm" ? 0 : undefined)
   });
   @observable public simulationStarted = false;
   @observable public simulationRunning = false;
@@ -463,7 +469,12 @@ export class SimulationModel {
     this.hurricane.reset();
     const coordinates = resolveStartLocation(this.startLocation);
     this.hurricane.setCenter(coordinates, this.pressureSystems);
-    if (isStartLocationName(this.startLocation)) {
+    if (
+      this.hurricane.startingCategory !== undefined &&
+      hurricaneCategoryInfo[this.hurricane.startingCategory]?.startingWindSpeed != null
+    ) {
+      this.hurricane.setStrength(hurricaneCategoryInfo[this.hurricane.startingCategory].startingWindSpeed);
+    } else if (isStartLocationName(this.startLocation)) {
       this.hurricane.setStrength(startStrengths[this.startLocation]);
     }
     if (this.pressureSystemSettings.length) {
