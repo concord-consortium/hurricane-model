@@ -1,0 +1,24 @@
+@use "../common" as *;
+
+.coordinates {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.label {
+  font-family: $scaleFont;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.input {
+  font-family: $scaleFont;
+  font-size: 13px;
+  padding: 4px 6px;
+  border: 1px solid #797979;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
