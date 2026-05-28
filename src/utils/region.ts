@@ -53,13 +53,12 @@ export function snapToRegionPreservingAxis(
 ): ICoordinates | null {
   if (isInsideRegion(coords, region)) return coords;
 
-  // Walk the polygon ring and collect "other-axis" values where the ring
-  // crosses the line `axis = target`. Sorted, these crossings form pairs
-  // [lo, hi] that bound valid intervals on that line.
-  const ringCoords = region.ring.geometry.coordinates;
-  const crossings: number[] = [];
   const [target, preferredOther] = axis === "lat" ? [coords.lat, coords.lng] : [coords.lng, coords.lat];
+  const ringCoords = region.ring.geometry.coordinates;
 
+  // Check each edge, saving the closest point along an edge that crosses the target line
+  let best: number | null = null;
+  let bestDist = Infinity;
   for (let i = 0; i < ringCoords.length - 1; i++) {
     const [lng1, lat1] = ringCoords[i];
     const [lng2, lat2] = ringCoords[i + 1];
@@ -73,21 +72,13 @@ export function snapToRegionPreservingAxis(
 
     const t = (target - a1) / (a2 - a1);
     const [o1, o2] = axis === "lat" ? [lng1, lng2] : [lat1, lat2];
-    crossings.push(o1 + t * (o2 - o1));
-  }
-
-  if (crossings.length <= 0) return null;
-  crossings.sort((a, b) => a - b);
-
-  let best: number | null = null;
-  let bestDist = Infinity;
-  crossings.forEach(crossing => {
+    const crossing = o1 + t * (o2 - o1);
     const dist = Math.abs(crossing - preferredOther);
     if (dist < bestDist) {
       bestDist = dist;
       best = crossing;
     }
-  });
+  }
 
   if (best === null) return null;
   return axis === "lat"
