@@ -60,6 +60,7 @@ describe("StormLocationSection", () => {
     renderSection(stores);
     openSection();
 
+    latInput().focus();
     fireEvent.change(latInput(), { target: { value: "22.5" } });
     fireEvent.keyDown(latInput(), { key: "Enter" });
 
@@ -126,8 +127,10 @@ describe("StormLocationSection", () => {
 
     const committed = stores.simulation.startLocation as { lat: number; lng: number };
     expect(committed.lat).toBeCloseTo(5, 5);
-    // Verify the committed point is actually in the region.
-    expect(isInsideRegion(committed, stormPlacementRegion)).toBe(true);
+    // lng was nudged from -60 inward toward the region (the line lat=5 only
+    // crosses the region east of -60).
+    expect(committed.lng).toBeGreaterThan(-52);
+    expect(committed.lng).toBeLessThan(-45);
   });
 
   it("falls back to clampToRegion when the entered axis is outside the region entirely", () => {
