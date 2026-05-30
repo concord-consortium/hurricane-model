@@ -60,9 +60,16 @@ const CoordinateInput = observer(function CoordinateInput({ axis }: ICoordinateI
 
   // Update the input when the coordinate changes from another source, like the marker being dragged.
   useEffect(() => {
+    // Skips the initial mount, where text already equals formattedCoord —
+    // without it the reselect flag would stick around and trigger on the first keystroke.
+    if (text === formattedCoord) return;
+
     reselect.current = true;
     setText(formattedCoord);
-  }, [coord, formattedCoord]);
+
+    // Exclude text because we only want to check this when the model changes from under the input field.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formattedCoord]);
 
   const revert = () => setText(formattedCoord);
 
