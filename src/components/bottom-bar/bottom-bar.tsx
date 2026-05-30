@@ -81,18 +81,18 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const { ready, simulationRunning, simulationStarted } = this.stores.simulation;
-    const { isReportMode, leftPanelOpen, overlay, thermometerActive } = this.stores.ui;
+    const { isReportMode, overlay, thermometerActive } = this.stores.ui;
     const { isSeasonMenuOpen, isStartLocationMenuOpen } = this.state;
     const startLocationButtonHoveredClass = isStartLocationMenuOpen ? css.hovered : "";
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     const tempButtonDisabled = overlay !== "sst";
     const isStormMode = config.mode === "storm";
-    const stormSetupButtonDisabled = simulationStarted;
+    const stormSetupButtonDisabled = simulationRunning;
     const startLocationButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && simulationStarted);
     const seasonButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && simulationStarted);
-    const simulationControlsDisabled = isReportMode || leftPanelOpen;
+    const simulationControlsDisabled = isReportMode;
     const startLocationButtonClasses = clsx(
       css.widgetGroup,
       startLocationButtonHoveredClass,
@@ -112,7 +112,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
                 buttonText="Storm Setup"
                 dataTest="storm-setup-button"
                 disabled={stormSetupButtonDisabled}
-                onClick={() => this.props.toggleLeftPanelOpen()}
+                onClick={this.toggleLeftPanel}
               />
             </div>
           }
@@ -239,7 +239,16 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     this.setState({ fullscreen: screenfull && screenfull.isFullscreen });
   }
 
+  public toggleLeftPanel = () => {
+    this.restart();
+    this.props.toggleLeftPanelOpen();
+  }
+
   public handleStartStop = () => {
+    // Close the setup panel
+    this.stores.ui.setSetupMode(undefined);
+    this.stores.ui.setLeftPanelOpen(false);
+
     if (this.stores.simulation.simulationRunning) {
       this.stores.simulation.stop();
       log("SimulationStopped", {
@@ -279,13 +288,17 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     }
   }
 
+  public restart = () => {
+    this.stores.simulation.restart();
+    this.stores.ui.setNorthAtlanticView();
+  }
+
   public handleRestart = () => {
     log("SimulationEnded", {
       reason: "SimulationRestarted",
       outcome: this.stores.simulation.getOutcomeData()
     });
-    this.stores.simulation.restart();
-    this.stores.ui.setNorthAtlanticView();
+    this.restart();
     log("SimulationRestarted");
   }
 
