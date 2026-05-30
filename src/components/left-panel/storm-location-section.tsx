@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { ICoordinates } from "../../types";
 import { useStores } from "../../stores-context";
@@ -13,8 +13,6 @@ import css from "./storm-location-section.scss";
 
 const hint = "Drag the storm to a starting position within the highlighted area on the map, "
   + "or type a latitude and longitude below.";
-
-const formatCoord = (value: number) => value.toFixed(2);
 
 type Axis = "lat" | "lng";
 
@@ -36,48 +34,88 @@ const getClosestPoint = (
   return clampToRegion(candidate, stormPlacementRegion);
 };
 
-export const StormLocationSection = observer(function StormLocationSection() {
+interface ICoordinateInputProps {
+  axis: Axis;
+}
+const CoordinateInput = observer(function CoordinateInput({ axis }: ICoordinateInputProps) {
   const stores = useStores();
   const center = stores?.simulation.hurricane.center;
-  const lat = center?.lat ?? 0;
-  const lng = center?.lng ?? 0;
+  const coord = (axis === "lat" ? center?.lat : center?.lng) ?? 0;
+  const formattedCoord = coord.toFixed(2);
+  const [text, setText] = useState(formattedCoord);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const [latText, setLatText] = useState(formatCoord(lat));
-  const [lngText, setLngText] = useState(formatCoord(lng));
+  // Reselect the text if the input field was focused and the value changed via another source.
+  // This only happens when tabbing between the two inputs, when changes to one triggers a change in the other.
+  const reselect = useRef(false);
+  useLayoutEffect(() => {
+    if (
+      reselect.current &&
+      inputRef.current && document.activeElement === inputRef.current
+    ) {
+      inputRef.current.select();
+    }
+    reselect.current = false;
+  });
 
-  // Keep inputs synced to the model on every model change — including while
-  // focused, so drag updates the focused input live.
-  useEffect(() => setLatText(formatCoord(lat)), [lat]);
-  useEffect(() => setLngText(formatCoord(lng)), [lng]);
+  // Update the input when the coordinate changes from another source, like the marker being dragged.
+  useEffect(() => {
+    reselect.current = true;
+    setText(formattedCoord);
+  }, [coord, formattedCoord]);
 
-  const revert = (axis: Axis) => {
-    if (axis === "lat") setLatText(formatCoord(lat));
-    else setLngText(formatCoord(lng));
-  };
+  const revert = () => setText(formattedCoord);
 
-  const commit = (axis: Axis, text: string) => {
+  const commit = (e: React.FocusEvent<HTMLInputElement>) => {
     if (!stores) return;
-    const parsed = parseFloat(text);
+    const newText = e.target.value;
+    const parsed = parseFloat(newText);
 
     // If the value isn't a legal number, revert and bail.
     if (!isFinite(parsed)) {
-      revert(axis);
+      revert();
       return;
     }
 
-    const currentOther = axis === "lat" ? lng : lat;
-    const next = getClosestPoint(axis, parsed, currentOther);
-    stores.simulation.setStartLocation(next);
+    const currentOther = (axis === "lat" ? center?.lng : center?.lat) ?? 0;
+    const newPoint = getClosestPoint(axis, parsed, currentOther);
+    stores.simulation.setStartLocation(newPoint);
   };
 
-  const handleKeyDown = (axis: Axis) => (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.currentTarget.blur();
     } else if (e.key === "Escape") {
-      revert(axis);
+      revert();
     }
   };
 
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.select();
+  };
+
+  const id = `storm-location-${axis}`;
+  return (
+    <div className={css.coordinate}>
+      <label className={css.label} htmlFor={id}>{axis === "lat" ? "Lat" : "Lon"}</label>
+      <input
+        id={id}
+        ref={inputRef}
+        className={css.input}
+        type="text"
+        value={text}
+        onChange={e => setText(e.target.value)}
+        onFocus={handleFocus}
+        onBlur={commit}
+        onKeyDown={handleKeyDown}
+        data-test={`storm-location-${axis}-input`}
+      />
+      <div>°{axis === "lat" ? "N" : "W"}</div>
+    </div>
+  );
+});
+
+export function StormLocationSection() {
   return (
     <SetupSection
       dataTest="storm-location"
@@ -87,35 +125,9 @@ export const StormLocationSection = observer(function StormLocationSection() {
       title="Storm Start Location"
     >
       <div className={css.coordinates}>
-        <div className={css.coordinate}>
-          <label className={css.label} htmlFor="storm-location-lat">Lat</label>
-          <input
-            id="storm-location-lat"
-            className={css.input}
-            type="text"
-            value={latText}
-            onChange={e => setLatText(e.target.value)}
-            onBlur={e => commit("lat", e.target.value)}
-            onKeyDown={handleKeyDown("lat")}
-            data-test="storm-location-lat-input"
-          />
-          <div>°N</div>
-        </div>
-        <div className={css.coordinate}>
-          <label className={css.label} htmlFor="storm-location-lng">Lon</label>
-          <input
-            id="storm-location-lng"
-            className={css.input}
-            type="text"
-            value={lngText}
-            onChange={e => setLngText(e.target.value)}
-            onBlur={e => commit("lng", e.target.value)}
-            onKeyDown={handleKeyDown("lng")}
-            data-test="storm-location-lng-input"
-          />
-          <div>°W</div>
-        </div>
+        <CoordinateInput axis="lat" />
+        <CoordinateInput axis="lng" />
       </div>
     </SetupSection>
   );
-});
+};
