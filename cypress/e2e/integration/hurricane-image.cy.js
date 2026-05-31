@@ -19,7 +19,6 @@ context("Test the Hurricane Image", () => {
     cy.get('.hurricane-image-toggle--toggleContainer--__hurr-v1__ input[type="checkbox"]').click();
 
     //verify hurricane image displayed
-    cy.get(".hurricane-marker--hurricaneIcon--__hurr-v1__")
-    .find('img').should("be.visible")
-      });
+    cy.get(`[data-test="hurricane-image"]`).should("be.visible")
   });
+});

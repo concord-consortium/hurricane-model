@@ -1,4 +1,3 @@
-// import { clsx } from "clsx";
 import React, { useState } from "react";
 import * as Leaflet from "leaflet";
 import { observer } from "mobx-react";
@@ -105,7 +104,11 @@ export const HurricaneIcon = observer(function HurricaneIcon({ dragging }: IHurr
         <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
           {
             hurricaneImage ?
-              <img src={HurricaneImageSrc} style={{ transform: `scale(${hurricaneImageScale})` }} /> :
+              <img
+                data-test="hurricane-image"
+                src={HurricaneImageSrc}
+                style={{ transform: `scale(${hurricaneImageScale})` }}
+              /> :
               <HurricaneIconSVG />
           }
         </div>
