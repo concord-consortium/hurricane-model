@@ -1,0 +1,55 @@
+@use "common" as *;
+
+.draggableMapIcon {
+  display: inline-block;
+  color: white;
+  width: 120px;
+  height: 120px;
+  border-radius: 60px;
+  text-align: center;
+  margin-left: -60px !important;
+  margin-top: -60px !important;
+  outline: none;
+  transition: background-color 350ms;
+
+  &.dimmed {
+    opacity: .5;
+  }
+
+  &.disabled {
+    cursor: default;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    &.disabled {
+      cursor: default;
+      background-color: rgba(255, 255, 255, 0.0);
+    }
+    .dragIcon {
+      visibility: visible;
+      &.disabled {
+        visibility: hidden;
+      }
+    }
+  }
+
+  .dragIcon {
+    visibility: hidden;
+    margin-top: 8px;
+    svg {
+      height: 12px;
+      circle {
+        fill: #fff;
+      }
+    }
+  }
+
+  .label {
+    margin-top: 5px;
+    color: white;
+    font-family: $scaleFont;
+    font-size: 14px;
+    text-shadow: 0 1px 5px #000;
+  }
+}

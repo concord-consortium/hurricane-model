@@ -6,9 +6,9 @@ import Slider, { SliderThumb } from "@mui/material/Slider";
 import VerticalHandle from "../assets/slider-vertical.svg";
 import High from "../assets/high.svg";
 import Low from "../assets/low.svg";
-import DragIcon from "../assets/drag.svg";
 import config from "../config";
 import { log } from "../log";
+import { DraggableMapIcon } from "./draggable-map-icon";
 import css from "./pressure-system-icon.scss";
 
 export const minStrength = 3;
@@ -56,11 +56,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     const uiDisabled = disabled ?? false;
 
     return (
-      <div
-        className={`${css.pressureSystemIcon} ${uiDisabled ? css.disabled : ""}`}
-        data-test="pressure-system-icon"
-      >
-        <div className={`${css.dragIcon} ${uiDisabled ? css.disabled : ""}`}><DragIcon /></div>
+      <DraggableMapIcon disabled={uiDisabled} label={this.renderLabel()}>
         {
           model.type === "high" ?
             <High className={css.letter} style={letterStyle} /> :
@@ -87,10 +83,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
             />
           </div>
         }
-        <div className={css.label}>
-          { this.renderLabel() }
-        </div>
-      </div>
+      </DraggableMapIcon>
     );
   }
 

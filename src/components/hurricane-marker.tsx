@@ -1,4 +1,4 @@
-import { clsx } from "clsx";
+// import { clsx } from "clsx";
 import React, { useState } from "react";
 import * as Leaflet from "leaflet";
 import { observer } from "mobx-react";
@@ -10,6 +10,7 @@ import { useStores } from "../stores-context";
 import { clampToRegion } from "../utils/region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
 import { CategoryNumber } from "./category-number";
+import { DraggableMapIcon } from "./draggable-map-icon";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 
 import HurricaneImageSrc from "../assets/hurricane-image.png";
@@ -90,31 +91,26 @@ export const HurricaneIcon = observer(function HurricaneIcon({ dragging }: IHurr
   const dimmed = !!setupMode && setupMode !== "stormLocation";
   const draggable = setupMode === "stormLocation";
 
+  const label = dragging
+    ? `${hurricane.center.lat.toFixed(2)}°N, ${hurricane.center.lng.toFixed(2)}°W`
+    : temp !== null ? `Sea Surface Temp: ${temp.toFixed(1)} °C` : "";
+
   // Note that the realistic hurricane image should scale with the map. This is simplified scaling that only uses
   // the map zoom. The real one should also take into account the map projection. But since it's a simplified view
   // anyway, I don't think we want distract users with hurricane changing its size only because it moved on the map.
   const hurricaneImageScale = Math.pow(2, mapZoom) * HURRICANE_IMG_SCALE_FACTOR;
   return (
-    <div className={clsx(css.hurricaneIcon, { [css.dimmed]: dimmed, [css.draggable]: draggable })}>
-      <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
-        {
-          hurricaneImage ?
-            <img src={HurricaneImageSrc} style={{ transform: `scale(${hurricaneImageScale})` }} /> :
-            <HurricaneIconSVG />
-        }
+    <DraggableMapIcon dimmed={dimmed} disabled={!draggable} label={label}>
+      <div className={css.hurricaneMarker}>
+        <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
+          {
+            hurricaneImage ?
+              <img src={HurricaneImageSrc} style={{ transform: `scale(${hurricaneImageScale})` }} /> :
+              <HurricaneIconSVG />
+          }
+        </div>
+        <CategoryNumber className="hurricaneMarker" value={hurricane.category} />
       </div>
-      <CategoryNumber value={hurricane.category} />
-      { dragging && (
-        <div className={css.temp}>
-          {hurricane.center.lat.toFixed(2)}°N, {hurricane.center.lng.toFixed(2)}°W
-        </div>
-      )}
-      {
-        temp !== null && !dragging &&
-        <div className={css.temp}>
-          Sea Surface Temp: { temp.toFixed(1) } °C
-        </div>
-      }
-    </div>
+    </DraggableMapIcon>
   );
 });
