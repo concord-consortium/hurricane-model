@@ -16,7 +16,12 @@
     opacity: .5;
   }
 
+  &.glow {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+
   &.disabled {
+    background-color: rgba(255, 255, 255, 0.0);
     cursor: default;
   }
 
