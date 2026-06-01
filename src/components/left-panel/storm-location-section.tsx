@@ -31,8 +31,9 @@ interface ICoordinateInputProps {
 }
 const CoordinateInput = observer(function CoordinateInput({ axis }: ICoordinateInputProps) {
   const stores = useStores();
-  const center = stores?.simulation.hurricane.center;
-  const coord = (axis === "lat" ? center?.lat : center?.lng) ?? 0;
+  const { center } = stores.simulation.hurricane;
+  // lng is stored as a negative number, but displayed as a positive W value.
+  const coord = axis === "lat" ? center.lat : Math.abs(center.lng);
   const formattedCoord = coord.toFixed(2);
   const [text, setText] = useState(formattedCoord);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -63,7 +64,6 @@ const CoordinateInput = observer(function CoordinateInput({ axis }: ICoordinateI
   const revert = () => setText(formattedCoord);
 
   const commit = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (!stores) return;
     const newText = e.target.value;
     const parsed = parseFloat(newText);
 
@@ -73,8 +73,10 @@ const CoordinateInput = observer(function CoordinateInput({ axis }: ICoordinateI
       return;
     }
 
-    const target = axis === "lat" ? { lat: parsed, lng: center?.lng ?? 0 } : { lat: center?.lat ?? 0, lng: parsed };
-    const newPoint = getClosestPoint(axis, target);
+    const lat = axis === "lat" ? parsed : center.lat;
+    // lng is stored as a negative number, but displayed as a positive W value, so we need to flip the sign.
+    const lng = axis === "lat" ? center.lng : -1 * parsed;
+    const newPoint = getClosestPoint(axis, { lat, lng });
     stores.simulation.setStartLocation(newPoint);
   };
 

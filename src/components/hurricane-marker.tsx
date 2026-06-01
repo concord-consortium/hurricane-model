@@ -6,6 +6,7 @@ import HurricaneIconSVG from "../assets/hurricane.svg";
 import config from "../config";
 import { log } from "../log";
 import { useStores } from "../stores-context";
+import { getDirectionLetter } from "../utils/lat-long";
 import { clampToRegion } from "../utils/region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
 import { CategoryNumber } from "./category-number";
@@ -24,7 +25,6 @@ const HURRICANE_IMG_SCALE_FACTOR = 0.05;
 export const HurricaneMarker = observer(function HurricaneMarker() {
   const [dragging, setDragging] = useState(false);
   const stores = useStores();
-  if (!stores) return null;
 
   const { ui, simulation } = stores;
   const { hurricane, simulationStarted } = simulation;
@@ -79,7 +79,6 @@ interface IHurricaneIconProps {
 }
 export const HurricaneIcon = observer(function HurricaneIcon({ dragging }: IHurricaneIconProps) {
   const stores = useStores();
-  if (!stores) return null;
 
   const hurricane = stores.simulation.hurricane;
   const categoryCssClass = categoryCss["category" + hurricane.category];
@@ -90,9 +89,19 @@ export const HurricaneIcon = observer(function HurricaneIcon({ dragging }: IHurr
   const dimmed = !!setupMode && setupMode !== "stormLocation";
   const draggable = setupMode === "stormLocation";
 
-  const label = dragging
-    ? `${hurricane.center.lat.toFixed(2)}°N, ${hurricane.center.lng.toFixed(2)}°W`
-    : temp !== null ? `Sea Surface Temp: ${temp.toFixed(1)} °C` : "";
+  const getLabel = () => {
+    if (dragging) {
+      const { lat, lng } = hurricane.center;
+      const latL = getDirectionLetter(lat, "lat");
+      const lngL = getDirectionLetter(lng, "lng");
+      return `${Math.abs(lat).toFixed(2)}°${latL}, ${Math.abs(lng).toFixed(2)}°${lngL}`;
+    } else if (temp !== null) {
+      return `Sea Surface Temp: ${temp.toFixed(1)} °C`;
+    }
+
+    return "";
+  };
+  const label = getLabel();
 
   // Note that the realistic hurricane image should scale with the map. This is simplified scaling that only uses
   // the map zoom. The real one should also take into account the map projection. But since it's a simplified view

@@ -26,14 +26,14 @@ export const SetupSection = observer(function SetupSection({
   children, dataTest, hint, Icon, iconClassName, setupMode, title
 }: ISetupSectionProps) {
   const stores = useStores();
-  const open = stores?.ui.setupMode === setupMode;
+  const open = stores.ui.setupMode === setupMode;
   const dt = dataTest || title;
 
   const handleClick = () => {
     if (open) {
-      stores?.ui.setSetupMode(undefined);
+      stores.ui.setSetupMode(undefined);
     } else {
-      stores?.ui.setSetupMode(setupMode);
+      stores.ui.setSetupMode(setupMode);
     }
   };
 
