@@ -7,14 +7,15 @@ import screenfull from "screenfull";
 import config from "../../config";
 import { log } from "../../log";
 import { BaseComponent, IBaseProps } from "../base";
+import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 import { Dialog } from "../dialog";
 import { BottomBarButton } from "./bottom-bar-button";
-import { IconButton } from "./icon-button";
-import { StartLocationButton } from "./start-location-button";
-import { SeasonButton } from "./season-button";
-import { WindArrowsToggle } from "./wind-arrows-toggle";
 import { HurricaneImageToggle } from "./hurricane-image-toggle";
 import { HurricaneScale } from "./hurricane-scale";
+import { IconButton } from "./icon-button";
+import { SeasonButton } from "./season-button";
+import { StartLocationButton } from "./start-location-button";
+import { WindArrowsToggle } from "./wind-arrows-toggle";
 
 import CCLogo from "../../assets/cc-logo.svg";
 import CCLogoSmall from "../../assets/cc-logo-small.svg";
@@ -245,47 +246,58 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public handleStartStop = () => {
-    // Close the setup panel
-    this.stores.ui.setSetupMode(undefined);
-    this.stores.ui.setLeftPanelOpen(false);
-
-    if (this.stores.simulation.simulationRunning) {
-      this.stores.simulation.stop();
+    const { simulation, ui } = this.stores;
+    if (simulation.simulationRunning) {
+      simulation.stop();
       log("SimulationStopped", {
-        outcome: this.stores.simulation.getOutcomeData()
+        outcome: simulation.getOutcomeData()
       });
     } else {
-      const sim = this.stores.simulation;
-      const ui = this.stores.ui;
-      // Log before start() to capture the exact state the student sees before simulation begins,
-      // consistent with SimulationEnded logging before restart/reset.
-      log("SimulationStarted", {
-        startLocation: sim.startLocation,
-        season: sim.season,
-        windArrows: ui.windArrows,
-        hurricaneImage: ui.hurricaneImage,
-        baseMap: ui.baseMap,
-        overlay: ui.overlay,
-        accessibleSSTScale: ui.accessibleSSTScale,
-        thermometerActive: ui.thermometerActive,
-        pressureSystems: sim.pressureSystems.map(ps => ({
-          type: ps.type,
-          center: { lat: ps.center.lat, lng: ps.center.lng },
-          strength: ps.strength
-        })),
-        hurricane: {
-          strength: sim.hurricane.strength,
-          center: { lat: sim.hurricane.center.lat, lng: sim.hurricane.center.lng }
-        },
-        deterministic: config.deterministic,
-        timestep: config.timestep,
-        pressureSystemsLocked: config.pressureSystemsLocked,
-        lockSimulationWhileRunning: config.lockSimulationWhileRunning,
-        seaSurfaceTempOpacity: config.seaSurfaceTempOpacity,
-        markLandfalls: config.markLandfalls
-      });
-      this.stores.simulation.start();
+      if (ui.leftPanelOpen) {
+        // Close the setup panel
+        ui.setSetupMode(undefined);
+        ui.setLeftPanelOpen(false);
+
+        // Start after the panel finishes closing
+        setTimeout(() => this.start(), LEFT_PANEL_TRANSITION_SECONDS * 1000);
+      } else {
+        this.start();
+      }
     }
+  }
+
+  public start = () => {
+    const { simulation: sim, ui } = this.stores;
+    if (sim.simulationRunning) return;
+
+    // Log before start() to capture the exact state the student sees before simulation begins,
+    // consistent with SimulationEnded logging before restart/reset.
+    log("SimulationStarted", {
+      startLocation: sim.startLocation,
+      season: sim.season,
+      windArrows: ui.windArrows,
+      hurricaneImage: ui.hurricaneImage,
+      baseMap: ui.baseMap,
+      overlay: ui.overlay,
+      accessibleSSTScale: ui.accessibleSSTScale,
+      thermometerActive: ui.thermometerActive,
+      pressureSystems: sim.pressureSystems.map(ps => ({
+        type: ps.type,
+        center: { lat: ps.center.lat, lng: ps.center.lng },
+        strength: ps.strength
+      })),
+      hurricane: {
+        strength: sim.hurricane.strength,
+        center: { lat: sim.hurricane.center.lat, lng: sim.hurricane.center.lng }
+      },
+      deterministic: config.deterministic,
+      timestep: config.timestep,
+      pressureSystemsLocked: config.pressureSystemsLocked,
+      lockSimulationWhileRunning: config.lockSimulationWhileRunning,
+      seaSurfaceTempOpacity: config.seaSurfaceTempOpacity,
+      markLandfalls: config.markLandfalls
+    });
+    this.stores.simulation.start();
   }
 
   public restart = () => {
