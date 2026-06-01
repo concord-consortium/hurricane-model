@@ -1,8 +1,8 @@
 import { observer } from "mobx-react";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { ICoordinates } from "../../types";
 import { useStores } from "../../stores-context";
+import { ICoordinates } from "../../types";
 import { clampToRegion, snapToRegionPreservingAxis } from "../../utils/region";
 import { stormPlacementRegion } from "../../utils/storm-placement-region";
 import { SetupSection } from "./setup-section";
@@ -16,22 +16,14 @@ const hint = "Drag the storm to a starting position within the highlighted area 
 
 type Axis = "lat" | "lng";
 
-const getClosestPoint = (
-  axis: Axis,
-  target: number,
-  currentOther: number
-): ICoordinates => {
-  const candidate: ICoordinates = axis === "lat"
-    ? { lat: target, lng: currentOther }
-    : { lat: currentOther, lng: target };
-
+const getClosestPoint = (axis: Axis, target: ICoordinates): ICoordinates => {
   // If there's any legal point that includes the lat/long that just changed, use that.
   // This ensures the number just entered is preserved if possible.
-  const preserved = snapToRegionPreservingAxis(stormPlacementRegion, axis, candidate);
+  const preserved = snapToRegionPreservingAxis(stormPlacementRegion, axis, target);
   if (preserved) return preserved;
 
   // Otherwise, return the closest point.
-  return clampToRegion(candidate, stormPlacementRegion);
+  return clampToRegion(target, stormPlacementRegion);
 };
 
 interface ICoordinateInputProps {
@@ -49,10 +41,7 @@ const CoordinateInput = observer(function CoordinateInput({ axis }: ICoordinateI
   // This only happens when tabbing between the two inputs, when changes to one triggers a change in the other.
   const reselect = useRef(false);
   useLayoutEffect(() => {
-    if (
-      reselect.current &&
-      inputRef.current && document.activeElement === inputRef.current
-    ) {
+    if (reselect.current && inputRef.current && document.activeElement === inputRef.current) {
       inputRef.current.select();
     }
     reselect.current = false;
@@ -61,7 +50,7 @@ const CoordinateInput = observer(function CoordinateInput({ axis }: ICoordinateI
   // Update the input when the coordinate changes from another source, like the marker being dragged.
   useEffect(() => {
     // Skips the initial mount, where text already equals formattedCoord —
-    // without it the reselect flag would stick around and trigger on the first keystroke.
+    // without it the reselect flag sticks around and triggers the above useLayoutEffect on the first keystroke.
     if (text === formattedCoord) return;
 
     reselect.current = true;
@@ -84,8 +73,8 @@ const CoordinateInput = observer(function CoordinateInput({ axis }: ICoordinateI
       return;
     }
 
-    const currentOther = (axis === "lat" ? center?.lng : center?.lat) ?? 0;
-    const newPoint = getClosestPoint(axis, parsed, currentOther);
+    const target = axis === "lat" ? { lat: parsed, lng: center?.lng ?? 0 } : { lat: center?.lat ?? 0, lng: parsed };
+    const newPoint = getClosestPoint(axis, target);
     stores.simulation.setStartLocation(newPoint);
   };
 
@@ -137,4 +126,4 @@ export function StormLocationSection() {
       </div>
     </SetupSection>
   );
-};
+}

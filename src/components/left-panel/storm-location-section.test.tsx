@@ -33,16 +33,11 @@ describe("StormLocationSection", () => {
     stores.simulation.setStartLocation(interiorPoint);
   });
 
-  it("displays the current hurricane center coordinates with 2 decimals", () => {
+  it("displays the current hurricane center coordinates with 2 decimals and updates when the center moves", () => {
     renderSection(stores);
     openSection();
     expect(latInput().value).toBe("20.00");
     expect(lngInput().value).toBe("-60.00");
-  });
-
-  it("updates both inputs live when the hurricane center moves (e.g. drag)", () => {
-    renderSection(stores);
-    openSection();
 
     act(() => {
       // Simulate the drag handler updating just hurricane.center.
@@ -53,61 +48,47 @@ describe("StormLocationSection", () => {
     expect(lngInput().value).toBe("-75.99");
   });
 
-  it("commits a valid in-region value on Enter and updates startLocation", () => {
+  it("commits and reverts properly", () => {
     renderSection(stores);
     openSection();
 
+    // Enter commits
     latInput().focus();
     fireEvent.change(latInput(), { target: { value: "22.5" } });
     fireEvent.keyDown(latInput(), { key: "Enter" });
 
     expect(stores.simulation.startLocation).toEqual({ lat: 22.5, lng: -60 });
     expect(latInput().value).toBe("22.50");
-  });
 
-  it("commits a valid in-region value on blur", () => {
-    renderSection(stores);
-    openSection();
-
+    // Blur commits
     fireEvent.change(lngInput(), { target: { value: "-65" } });
     fireEvent.blur(lngInput());
+    const newPoint = { lat: 22.5, lng: -65 };
 
-    expect(stores.simulation.startLocation).toEqual({ lat: 20, lng: -65 });
+    expect(stores.simulation.startLocation).toEqual(newPoint);
     expect(lngInput().value).toBe("-65.00");
-  });
 
-  it("reverts to the model value on Escape without committing", () => {
-    renderSection(stores);
-    openSection();
-
+    // Escape reverts
     fireEvent.change(latInput(), { target: { value: "99" } });
     expect(latInput().value).toBe("99");
     fireEvent.keyDown(latInput(), { key: "Escape" });
 
-    expect(latInput().value).toBe("20.00");
-    expect(stores.simulation.startLocation).toEqual(interiorPoint);
-  });
+    expect(latInput().value).toBe("22.50");
+    expect(stores.simulation.startLocation).toEqual(newPoint);
 
-  it("reverts silently when the input is non-numeric", () => {
-    renderSection(stores);
-    openSection();
-
+    // Non-numeric values revert
     fireEvent.change(latInput(), { target: { value: "abc" } });
     fireEvent.blur(latInput());
 
-    expect(latInput().value).toBe("20.00");
-    expect(stores.simulation.startLocation).toEqual(interiorPoint);
-  });
+    expect(latInput().value).toBe("22.50");
+    expect(stores.simulation.startLocation).toEqual(newPoint);
 
-  it("reverts silently when the input is empty", () => {
-    renderSection(stores);
-    openSection();
-
+    // Empty input reverts
     fireEvent.change(lngInput(), { target: { value: "" } });
     fireEvent.blur(lngInput());
 
-    expect(lngInput().value).toBe("-60.00");
-    expect(stores.simulation.startLocation).toEqual(interiorPoint);
+    expect(lngInput().value).toBe("-65.00");
+    expect(stores.simulation.startLocation).toEqual(newPoint);
   });
 
   it("preserves the entered lat when (lat, currentLng) is outside the region", () => {
