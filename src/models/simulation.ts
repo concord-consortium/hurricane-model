@@ -716,7 +716,6 @@ export class SimulationModel {
           const png = new PNG();
           png.parse(Buffer.from(buffer), (err, validPng) => {
             if (err) {
-              // eslint-disable-next-line no-console
               console.error("Failed to parse sea surface temperature PNG:", err);
               return;
             }
