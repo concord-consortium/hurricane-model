@@ -54,6 +54,8 @@ function toggleFullscreen() {
 @inject("stores")
 @observer
 export class BottomBar extends BaseComponent<IProps, IState> {
+  private delayedStart: ReturnType<typeof setTimeout> | null = null;
+
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -75,6 +77,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public componentWillUnmount() {
+    this.clearDelayedStart();
     if (screenfull && screenfull.isEnabled) {
       document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
@@ -241,7 +244,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public toggleLeftPanel = () => {
-    this.restart();
+    if (this.stores.simulation.simulationStarted) this.restart();
     this.props.toggleLeftPanelOpen();
   }
 
@@ -259,16 +262,21 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         ui.setLeftPanelOpen(false);
 
         // Start after the panel finishes closing
-        setTimeout(() => this.start(), LEFT_PANEL_TRANSITION_SECONDS * 1000);
+        this.delayedStart = setTimeout(() => this.start(), LEFT_PANEL_TRANSITION_SECONDS * 1000);
       } else {
         this.start();
       }
     }
   }
 
+  private clearDelayedStart = () => {
+    if (this.delayedStart) clearTimeout(this.delayedStart);
+  }
+
   public start = () => {
     const { simulation: sim, ui } = this.stores;
-    if (sim.simulationRunning) return;
+    this.clearDelayedStart();
+    // if (sim.simulationRunning) return;
 
     // Log before start() to capture the exact state the student sees before simulation begins,
     // consistent with SimulationEnded logging before restart/reset.
@@ -301,6 +309,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public restart = () => {
+    this.clearDelayedStart();
     this.stores.simulation.restart();
     this.stores.ui.setNorthAtlanticView();
   }
@@ -323,6 +332,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public confirmReload = () => {
+    this.clearDelayedStart();
     log("SimulationEnded", {
       reason: "SimulationReloaded",
       outcome: this.stores.simulation.getOutcomeData()

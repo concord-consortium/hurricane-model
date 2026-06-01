@@ -60,19 +60,22 @@ export function snapToRegionPreservingAxis(
   let best: number | null = null;
   let bestDist = Infinity;
   for (let i = 0; i < ringCoords.length - 1; i++) {
+    // Sort the coords along the primary axis
     const [lng1, lat1] = ringCoords[i];
     const [lng2, lat2] = ringCoords[i + 1];
-    const as = axis === "lat" ? [lat1, lat2] : [lng1, lng2];
-    as.sort((a, b) => a - b);
-    const [a1, a2] = as;
+    const coords = axis === "lat" ? [[lat1, lng1], [lat2, lng2]] : [[lng1, lat1], [lng2, lat2]];
+    coords.sort((a, b) => a[0] - b[0]);
+    const [[a1, o1], [a2, o2]] = coords;
 
     // Skip if the target is not within the range of this edge.
     // Include a1 == target, exclude a2 == target to avoid double-counting when target lands on a shared vertex.
     if (target < a1 || target >= a2) continue;
 
+    // Find the other value along the edge at the target value
     const t = (target - a1) / (a2 - a1);
-    const [o1, o2] = axis === "lat" ? [lng1, lng2] : [lat2, lat1];
     const crossing = o1 + t * (o2 - o1);
+
+    // Save the other value if it's the closest to the original value
     const dist = Math.abs(crossing - preferredOther);
     if (dist < bestDist) {
       bestDist = dist;

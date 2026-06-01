@@ -24,8 +24,9 @@ interface IProps {
 }
 
 export function CategoryNumber({ className = "trackMarker", value }: IProps) {
+  const classes = clsx(css.categoryNumber, css[className] ?? className);
   return (
-    <div className={clsx(css.categoryNumber, css[className])} data-test="hurricane-category" data-value={value}>
+    <div className={classes} data-test="hurricane-category" data-value={value}>
       { CategorySVG[value] }
     </div>
   );
