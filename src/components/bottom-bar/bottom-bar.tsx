@@ -276,7 +276,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   public start = () => {
     const { simulation: sim, ui } = this.stores;
     this.clearDelayedStart();
-    // if (sim.simulationRunning) return;
 
     // Log before start() to capture the exact state the student sees before simulation begins,
     // consistent with SimulationEnded logging before restart/reset.
