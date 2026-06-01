@@ -1,12 +1,27 @@
 import * as React from "react";
 import { IndexPage } from "./index-page";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { createStores } from "../models/stores";
+import { createStores, IStores } from "../models/stores";
 import { Provider } from "mobx-react";
+import { StoresContext } from "../stores-context";
 import { PNG } from "pngjs";
 import * as logModule from "../log";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
+
+function getIndexPage(stores: IStores) {
+  return (
+    <Provider stores={stores}>
+      <StoresContext value={stores}>
+        <IndexPage />
+      </StoresContext>
+    </Provider>
+  );
+}
+
+function renderIndexPage(stores: IStores) {
+  return render(getIndexPage(stores));
+}
 
 describe("IndexPage component", () => {
   let stores = createStores();
@@ -14,26 +29,14 @@ describe("IndexPage component", () => {
     stores = createStores();
   });
   it("renders without crashing", () => {
-    render(
-      <Provider stores={stores}>
-        <IndexPage />
-      </Provider>
-    );
+    renderIndexPage(stores);
   });
 
   it("shows loading icon", () => {
-    const { rerender, container } = render(
-      <Provider stores={stores}>
-        <IndexPage />
-      </Provider>
-    );
+    const { rerender, container } = renderIndexPage(stores);
     expect(container.querySelector(".MuiCircularProgress-root")).toBeInTheDocument();
     stores.simulation.seaSurfaceTempData = new PNG();
-    rerender(
-      <Provider stores={stores}>
-        <IndexPage />
-      </Provider>
-    );
+    rerender(getIndexPage(stores));
     expect(container.querySelector(".MuiCircularProgress-root")).not.toBeInTheDocument();
   });
 
@@ -51,11 +54,7 @@ describe("IndexPage component", () => {
     it("logs SimulationMouseEnter with position data", () => {
       (logModule.log as jest.Mock).mockClear();
       const restore = withRect(500, 400);
-      render(
-        <Provider stores={stores}>
-          <IndexPage />
-        </Provider>
-      );
+      renderIndexPage(stores);
       fireEvent.mouseEnter(screen.getByTestId("index-page"), { clientX: 150, clientY: 200 });
       restore();
 
@@ -69,11 +68,7 @@ describe("IndexPage component", () => {
     it("logs SimulationMouseLeave with position data", () => {
       (logModule.log as jest.Mock).mockClear();
       const restore = withRect(500, 400);
-      render(
-        <Provider stores={stores}>
-          <IndexPage />
-        </Provider>
-      );
+      renderIndexPage(stores);
       fireEvent.mouseLeave(screen.getByTestId("index-page"), { clientX: 500, clientY: 400 });
       restore();
 
@@ -87,11 +82,7 @@ describe("IndexPage component", () => {
     it("rounds percentX and percentY to integers", () => {
       (logModule.log as jest.Mock).mockClear();
       const restore = withRect(200, 300);
-      render(
-        <Provider stores={stores}>
-          <IndexPage />
-        </Provider>
-      );
+      renderIndexPage(stores);
       // (33/200)*100 = 16.5 → 17, (77/300)*100 ≈ 25.667 → 26
       fireEvent.mouseEnter(screen.getByTestId("index-page"), { clientX: 33, clientY: 77 });
       restore();

@@ -7,12 +7,13 @@ import { isInsideRegion } from "../../utils/region";
 import { stormPlacementRegion } from "../../utils/storm-placement-region";
 import { StormLocationSection } from "./storm-location-section";
 
-const renderSection = (stores: IStores) =>
-  render(
+const renderSection = (stores: IStores) => {
+  return render(
     <StoresContext value={stores}>
       <StormLocationSection />
     </StoresContext>
   );
+};
 
 const openSection = () => {
   fireEvent.click(screen.getByTestId("storm-location-button"));
@@ -37,7 +38,8 @@ describe("StormLocationSection", () => {
     renderSection(stores);
     openSection();
     expect(latInput().value).toBe("20.00");
-    expect(lngInput().value).toBe("-60.00");
+    // lng is stored as a negative number but displayed as a positive °W value.
+    expect(lngInput().value).toBe("60.00");
 
     act(() => {
       // Simulate the drag handler updating just hurricane.center.
@@ -45,7 +47,7 @@ describe("StormLocationSection", () => {
     });
 
     expect(latInput().value).toBe("25.12");
-    expect(lngInput().value).toBe("-75.99");
+    expect(lngInput().value).toBe("75.99");
   });
 
   it("commits and reverts properly", () => {
@@ -60,13 +62,13 @@ describe("StormLocationSection", () => {
     expect(stores.simulation.startLocation).toEqual({ lat: 22.5, lng: -60 });
     expect(latInput().value).toBe("22.50");
 
-    // Blur commits
-    fireEvent.change(lngInput(), { target: { value: "-65" } });
+    // Blur commits. lng input takes a positive °W value, stored as negative.
+    fireEvent.change(lngInput(), { target: { value: "65" } });
     fireEvent.blur(lngInput());
     const newPoint = { lat: 22.5, lng: -65 };
 
     expect(stores.simulation.startLocation).toEqual(newPoint);
-    expect(lngInput().value).toBe("-65.00");
+    expect(lngInput().value).toBe("65.00");
 
     // Escape reverts
     fireEvent.change(latInput(), { target: { value: "99" } });
@@ -87,7 +89,7 @@ describe("StormLocationSection", () => {
     fireEvent.change(lngInput(), { target: { value: "" } });
     fireEvent.blur(lngInput());
 
-    expect(lngInput().value).toBe("-65.00");
+    expect(lngInput().value).toBe("65.00");
     expect(stores.simulation.startLocation).toEqual(newPoint);
   });
 
