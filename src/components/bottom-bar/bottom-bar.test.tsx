@@ -7,6 +7,7 @@ import { BottomBar } from "./bottom-bar";
 import { PNG } from "pngjs";
 import config from "../../config";
 import * as logModule from "../../log";
+import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
 
@@ -223,49 +224,62 @@ describe("BottomBar component", () => {
       config.mode = originalMode;
     });
 
-    it("is enabled before the simulation has started, disabled after", () => {
-      const { rerender } = render(
+    it("restarts the simulation when clicked after the simulation has started", async () => {
+      const user = userEvent.setup();
+      const toggleLeftPanelOpenMock = jest.fn();
+      jest.spyOn(stores.simulation, "restart");
+      render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpenMock} />
         </Provider>
       );
-      expect(screen.getByTestId("storm-setup-button")).not.toBeDisabled();
-
       act(() => {
         stores.simulation.simulationStarted = true;
       });
-      rerender(
-        <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
-        </Provider>
-      );
-      // expect(screen.getByTestId("storm-setup-button")).toBeDisabled();
+
+      await user.click(screen.getByTestId("storm-setup-button"));
+      expect(stores.simulation.restart).toHaveBeenCalled();
+      expect(toggleLeftPanelOpenMock).toHaveBeenCalled();
     });
   });
 
-  describe("simulation control buttons (reload / restart / start)", () => {
-    it("are enabled when the setup panel is closed and disabled when the setup panel is open", () => {
+  describe("start button while the setup panel is open", () => {
+    it("closes the setup panel and starts the simulation after the panel animation finishes", async () => {
+      jest.useFakeTimers();
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime.bind(jest) });
       stores.simulation.seaSurfaceTempData = new PNG();
-      const { rerender } = render(
-        <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
-        </Provider>
-      );
-      expect(screen.getByTestId("reload-button")).not.toBeDisabled();
-      expect(screen.getByTestId("restart-button")).not.toBeDisabled();
-      expect(screen.getByTestId("start-button")).not.toBeDisabled();
+      jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
+        this.simulationRunning = true;
+        this.simulationStarted = true;
+      });
 
       act(() => {
         stores.ui.setLeftPanelOpen(true);
       });
-      rerender(
+
+      jest.spyOn(stores.ui, "setLeftPanelOpen");
+      jest.spyOn(stores.ui, "setSetupMode");
+
+      render(
         <Provider stores={stores}>
           <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
         </Provider>
       );
-      // expect(screen.getByTestId("reload-button")).toBeDisabled();
-      // expect(screen.getByTestId("restart-button")).toBeDisabled();
-      // expect(screen.getByTestId("start-button")).toBeDisabled();
+
+      await user.click(screen.getByTestId("start-button"));
+
+      // Panel is closed immediately, but the simulation hasn't started yet.
+      expect(stores.ui.setSetupMode).toHaveBeenCalledWith(undefined);
+      expect(stores.ui.setLeftPanelOpen).toHaveBeenCalledWith(false);
+      expect(stores.simulation.start).not.toHaveBeenCalled();
+
+      // After the left-panel transition completes, the simulation starts.
+      act(() => {
+        jest.advanceTimersByTime(LEFT_PANEL_TRANSITION_SECONDS * 1000);
+      });
+      expect(stores.simulation.start).toHaveBeenCalled();
+
+      jest.useRealTimers();
     });
   });
 
