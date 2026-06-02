@@ -13,7 +13,7 @@ export function SeasonSection() {
       hint={hint}
       Icon={SeasonIcon}
       setupMode="season"
-      title="Starting Season"
+      title="Season"
     >
     </SetupSection>
   );
