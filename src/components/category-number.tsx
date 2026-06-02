@@ -1,4 +1,5 @@
-import * as React from "react";
+import { clsx } from "clsx";
+import React, { ReactElement } from "react";
 import SVGTS from "../assets/TS.svg";
 import SVG1 from "../assets/1.svg";
 import SVG2 from "../assets/2.svg";
@@ -8,7 +9,7 @@ import SVG5 from "../assets/5.svg";
 
 import css from "./category-number.scss";
 
-const CategorySVG: Record<number, React.ReactElement> = {
+const CategorySVG: Record<number, ReactElement> = {
   0: <SVGTS />,
   1: <SVG1 />,
   2: <SVG2 />,
@@ -18,17 +19,15 @@ const CategorySVG: Record<number, React.ReactElement> = {
 };
 
 interface IProps {
+  className?: string;
   value: number;
 }
-interface IState {}
 
-export class CategoryNumber extends React.Component<IProps, IState> {
-  public render() {
-    const { value } = this.props;
-    return (
-      <div className={css.categoryNumber} data-test="hurricane-category" data-value={value}>
-        { CategorySVG[value] }
-      </div>
-    );
-  }
+export function CategoryNumber({ className = "trackMarker", value }: IProps) {
+  const classes = clsx(css.categoryNumber, css[className] ?? className);
+  return (
+    <div className={classes} data-test="hurricane-category" data-value={value}>
+      { CategorySVG[value] }
+    </div>
+  );
 }

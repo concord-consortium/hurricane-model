@@ -438,6 +438,14 @@ export class SimulationModel {
     this.precipitationPoints.push(...newPoints);
   }
 
+  @action.bound public setSimulationStarted(value: boolean) {
+    this.simulationStarted = value;
+  }
+
+  @action.bound public setSimulationRunning(value: boolean) {
+    this.simulationRunning = value;
+  }
+
   @action.bound public start() {
     this.simulationRunning = true;
     this.pressureSystemSettings = [...this.pressureSystems];

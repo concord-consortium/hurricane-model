@@ -7,14 +7,15 @@ import screenfull from "screenfull";
 import config from "../../config";
 import { log } from "../../log";
 import { BaseComponent, IBaseProps } from "../base";
+import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 import { Dialog } from "../dialog";
 import { BottomBarButton } from "./bottom-bar-button";
-import { IconButton } from "./icon-button";
-import { StartLocationButton } from "./start-location-button";
-import { SeasonButton } from "./season-button";
-import { WindArrowsToggle } from "./wind-arrows-toggle";
 import { HurricaneImageToggle } from "./hurricane-image-toggle";
 import { HurricaneScale } from "./hurricane-scale";
+import { IconButton } from "./icon-button";
+import { SeasonButton } from "./season-button";
+import { StartLocationButton } from "./start-location-button";
+import { WindArrowsToggle } from "./wind-arrows-toggle";
 
 import CCLogo from "../../assets/cc-logo.svg";
 import CCLogoSmall from "../../assets/cc-logo-small.svg";
@@ -53,6 +54,8 @@ function toggleFullscreen() {
 @inject("stores")
 @observer
 export class BottomBar extends BaseComponent<IProps, IState> {
+  private delayedStart: ReturnType<typeof setTimeout> | null = null;
+
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -74,6 +77,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public componentWillUnmount() {
+    this.clearDelayedStart();
     if (screenfull && screenfull.isEnabled) {
       document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
@@ -81,18 +85,18 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const { ready, simulationRunning, simulationStarted } = this.stores.simulation;
-    const { isReportMode, leftPanelOpen, overlay, thermometerActive } = this.stores.ui;
+    const { isReportMode, overlay, thermometerActive } = this.stores.ui;
     const { isSeasonMenuOpen, isStartLocationMenuOpen } = this.state;
     const startLocationButtonHoveredClass = isStartLocationMenuOpen ? css.hovered : "";
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     const tempButtonDisabled = overlay !== "sst";
     const isStormMode = config.mode === "storm";
-    const stormSetupButtonDisabled = simulationStarted;
+    const stormSetupButtonDisabled = simulationRunning;
     const startLocationButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && simulationStarted);
     const seasonButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && simulationStarted);
-    const simulationControlsDisabled = isReportMode || leftPanelOpen;
+    const simulationControlsDisabled = isReportMode;
     const startLocationButtonClasses = clsx(
       css.widgetGroup,
       startLocationButtonHoveredClass,
@@ -112,7 +116,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
                 buttonText="Storm Setup"
                 dataTest="storm-setup-button"
                 disabled={stormSetupButtonDisabled}
-                onClick={() => this.props.toggleLeftPanelOpen()}
+                onClick={this.toggleLeftPanel}
               />
             </div>
           }
@@ -239,44 +243,74 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     this.setState({ fullscreen: screenfull && screenfull.isFullscreen });
   }
 
+  public toggleLeftPanel = () => {
+    if (this.stores.simulation.simulationStarted) this.restart();
+    this.props.toggleLeftPanelOpen();
+  }
+
   public handleStartStop = () => {
-    if (this.stores.simulation.simulationRunning) {
-      this.stores.simulation.stop();
+    const { simulation, ui } = this.stores;
+    if (simulation.simulationRunning) {
+      simulation.stop();
       log("SimulationStopped", {
-        outcome: this.stores.simulation.getOutcomeData()
+        outcome: simulation.getOutcomeData()
       });
     } else {
-      const sim = this.stores.simulation;
-      const ui = this.stores.ui;
-      // Log before start() to capture the exact state the student sees before simulation begins,
-      // consistent with SimulationEnded logging before restart/reset.
-      log("SimulationStarted", {
-        startLocation: sim.startLocation,
-        season: sim.season,
-        windArrows: ui.windArrows,
-        hurricaneImage: ui.hurricaneImage,
-        baseMap: ui.baseMap,
-        overlay: ui.overlay,
-        accessibleSSTScale: ui.accessibleSSTScale,
-        thermometerActive: ui.thermometerActive,
-        pressureSystems: sim.pressureSystems.map(ps => ({
-          type: ps.type,
-          center: { lat: ps.center.lat, lng: ps.center.lng },
-          strength: ps.strength
-        })),
-        hurricane: {
-          strength: sim.hurricane.strength,
-          center: { lat: sim.hurricane.center.lat, lng: sim.hurricane.center.lng }
-        },
-        deterministic: config.deterministic,
-        timestep: config.timestep,
-        pressureSystemsLocked: config.pressureSystemsLocked,
-        lockSimulationWhileRunning: config.lockSimulationWhileRunning,
-        seaSurfaceTempOpacity: config.seaSurfaceTempOpacity,
-        markLandfalls: config.markLandfalls
-      });
-      this.stores.simulation.start();
+      if (ui.leftPanelOpen) {
+        // Close the setup panel
+        ui.setSetupMode(undefined);
+        ui.setLeftPanelOpen(false);
+
+        // Start after the panel finishes closing
+        this.delayedStart = setTimeout(() => this.start(), LEFT_PANEL_TRANSITION_SECONDS * 1000);
+      } else {
+        this.start();
+      }
     }
+  }
+
+  private clearDelayedStart = () => {
+    if (this.delayedStart) clearTimeout(this.delayedStart);
+  }
+
+  public start = () => {
+    const { simulation: sim, ui } = this.stores;
+    this.clearDelayedStart();
+
+    // Log before start() to capture the exact state the student sees before simulation begins,
+    // consistent with SimulationEnded logging before restart/reset.
+    log("SimulationStarted", {
+      startLocation: sim.startLocation,
+      season: sim.season,
+      windArrows: ui.windArrows,
+      hurricaneImage: ui.hurricaneImage,
+      baseMap: ui.baseMap,
+      overlay: ui.overlay,
+      accessibleSSTScale: ui.accessibleSSTScale,
+      thermometerActive: ui.thermometerActive,
+      pressureSystems: sim.pressureSystems.map(ps => ({
+        type: ps.type,
+        center: { lat: ps.center.lat, lng: ps.center.lng },
+        strength: ps.strength
+      })),
+      hurricane: {
+        strength: sim.hurricane.strength,
+        center: { lat: sim.hurricane.center.lat, lng: sim.hurricane.center.lng }
+      },
+      deterministic: config.deterministic,
+      timestep: config.timestep,
+      pressureSystemsLocked: config.pressureSystemsLocked,
+      lockSimulationWhileRunning: config.lockSimulationWhileRunning,
+      seaSurfaceTempOpacity: config.seaSurfaceTempOpacity,
+      markLandfalls: config.markLandfalls
+    });
+    this.stores.simulation.start();
+  }
+
+  public restart = () => {
+    this.clearDelayedStart();
+    this.stores.simulation.restart();
+    this.stores.ui.setNorthAtlanticView();
   }
 
   public handleRestart = () => {
@@ -284,8 +318,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       reason: "SimulationRestarted",
       outcome: this.stores.simulation.getOutcomeData()
     });
-    this.stores.simulation.restart();
-    this.stores.ui.setNorthAtlanticView();
+    this.restart();
     log("SimulationRestarted");
   }
 
@@ -298,6 +331,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public confirmReload = () => {
+    this.clearDelayedStart();
     log("SimulationEnded", {
       reason: "SimulationReloaded",
       outcome: this.stores.simulation.getOutcomeData()

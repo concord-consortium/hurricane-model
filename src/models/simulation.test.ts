@@ -29,8 +29,9 @@ windData.fall = fallWind;
 describe("SimulationModel store", () => {
   beforeEach(() => {
     mockFetch.resetMocks();
-    // SST Image data.
-    mockFetch.mockResponse("123");
+    // Default to a non-ok response so the autorun-triggered SST fetch short-circuits
+    // before PNG parsing.
+    mockFetch.mockResponse("", { status: 404 });
   });
 
   it("can be created without errors", () => {
@@ -177,7 +178,7 @@ describe("SimulationModel store", () => {
       expect(mockFetch.mock.calls.length).toEqual(1);
       expect(mockFetch.mock.calls[0][0]).toEqual(sim.dataSeaSurfaceTempImgUrl);
 
-      sim.season = "summer";
+      sim.setSeason("summer");
       expect(sim.dataSeaSurfaceTempImgUrl).toEqual("summer.png");
       expect(sim.seaSurfaceTempData).toEqual(null); // no time to parse it
       expect(mockFetch.mock.calls.length).toEqual(2);
@@ -204,7 +205,7 @@ describe("SimulationModel store", () => {
 
         // Change season and test again.
         mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/jun-default.png"));
-        sim.season = "summer";
+        sim.setSeason("summer");
         sim._seaSurfaceTempDataParsed = () => {
           expect(sim.seaSurfaceTempData).not.toEqual(null); // real data, should be already parsed
           // Temperature in June at lat 20 lng -20 is 20.73*C (colder than in Sept).
@@ -382,7 +383,7 @@ describe("SimulationModel store", () => {
       sim.numberOfStepsOverLand = 321;
       sim.simulationStarted = true;
       sim.extendedLandfallAreas.length = 1;
-      sim.season = "winter";
+      sim.setSeason("winter");
       sim.restart();
       expect(sim.time).toEqual(0);
       expect(sim.hurricaneTrack.length).toEqual(0);
@@ -405,7 +406,7 @@ describe("SimulationModel store", () => {
         season: "fall"
       });
       jest.spyOn(sim, "restart");
-      sim.season = "winter";
+      sim.setSeason("winter");
       const initialPressureSystems = [...sim.pressureSystems];
       // Modify the pressure systems
       sim.pressureSystems = [

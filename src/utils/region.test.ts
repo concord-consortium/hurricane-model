@@ -1,5 +1,5 @@
 import { FeatureCollection } from "geojson";
-import { createRegion, isInsideRegion, clampToRegion } from "./region";
+import { createRegion, isInsideRegion, clampToRegion, snapToRegionPreservingAxis } from "./region";
 
 // Unit square with corners at (0,0), (1,0), (1,1), (0,1). Coordinates are [lng, lat].
 const unitSquarePolygonFC: FeatureCollection = {
@@ -72,6 +72,43 @@ describe("region", () => {
       const snapped = clampToRegion({ lat: -1, lng: 0.5 }, region);
       expect(snapped.lat).toBeCloseTo(0, 5);
       expect(snapped.lng).toBeCloseTo(0.5, 5);
+    });
+  });
+
+  describe("snapToRegionPreservingAxis", () => {
+    const region = createRegion(unitSquarePolygonFC);
+
+    it("returns null when the target line does not cross the region", () => {
+      // lat = 5 is far above the unit square.
+      expect(snapToRegionPreservingAxis(region, "lat", { lat: 5, lng: 0.5 })).toBeNull();
+      // lng = -3 is far left of the unit square.
+      expect(snapToRegionPreservingAxis(region, "lng", { lat: 0.5, lng: -3 })).toBeNull();
+    });
+
+    it("returns the preferred other axis when it lies inside the valid interval", () => {
+      // lat = 0.5 crosses the square; preferred lng = 0.3 is inside [0, 1].
+      const snapped = snapToRegionPreservingAxis(region, "lat", { lat: 0.5, lng: 0.3 });
+      expect(snapped).not.toBeNull();
+      expect(snapped!.lat).toBeCloseTo(0.5, 5);
+      expect(snapped!.lng).toBeCloseTo(0.3, 5);
+    });
+
+    it("clamps the preferred other axis to the interval edge when outside the valid range", () => {
+      // lat = 0.5 crosses the square at lng in [0, 1]. Preferred lng = 2 → clamps to 1.
+      const high = snapToRegionPreservingAxis(region, "lat", { lat: 0.5, lng: 2 });
+      expect(high!.lng).toBeCloseTo(1, 5);
+      expect(high!.lat).toBeCloseTo(0.5, 5);
+
+      // Preferred lng = -3 → clamps to 0.
+      const low = snapToRegionPreservingAxis(region, "lat", { lat: 0.5, lng: -3 });
+      expect(low!.lng).toBeCloseTo(0, 5);
+      expect(low!.lat).toBeCloseTo(0.5, 5);
+    });
+
+    it("works for fixing the lng axis as well", () => {
+      const snapped = snapToRegionPreservingAxis(region, "lng", { lat: -1, lng: 0.25 });
+      expect(snapped!.lng).toBeCloseTo(0.25, 5);
+      expect(snapped!.lat).toBeCloseTo(0, 5);
     });
   });
 });

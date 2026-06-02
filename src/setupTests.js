@@ -20,7 +20,13 @@ require("@testing-library/jest-dom");
 // The codebase uses `data-test` (not RTL's default `data-testid`); align RTL queries with it.
 require("@testing-library/react").configure({ testIdAttribute: "data-test" });
 
-global.fetch = require("jest-fetch-mock");
+const fetchMock = require("jest-fetch-mock");
+fetchMock.enableMocks();
+// Default to a non-ok response so SimulationModel's autorun-triggered SST fetch
+// short-circuits before PNG parsing (which would otherwise log "Failed to parse
+// sea surface temperature PNG" on every test). Tests that need real-looking
+// fetch data can opt in via fetchMock.mockResponseOnce(...).
+fetchMock.mockResponse("", { status: 404 });
 
 // Initialize seedrandom to deterministic mode, so it's possible to write reasonable tests that use random values.
 seedrandom.initialize(true);

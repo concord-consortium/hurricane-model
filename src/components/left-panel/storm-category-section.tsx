@@ -18,12 +18,12 @@ const maxCategory = hurricaneCategoryInfo.length - 1;
 
 export const StormCategorySection = observer(function StormCategorySection() {
   const stores = useStores();
-  const hurricane = stores?.simulation.hurricane;
-  const startingCategory = hurricane?.startingCategory ?? 0;
+  const { hurricane } = stores.simulation;
+  const startingCategory = hurricane.startingCategory ?? 0;
 
   const handleChange = (_event: Event, value: number | number[]) => {
     const numericValue = Array.isArray(value) ? value[0] : value;
-    hurricane?.setStartingCategory(numericValue);
+    hurricane.setStartingCategory(numericValue);
   };
 
   return (

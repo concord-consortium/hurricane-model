@@ -1,86 +1,36 @@
 @use "common" as *;
 
-.pressureSystemIcon {
-  display: inline-block;
-  color: white;
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
-  text-align: center;
-  margin-left: -60px !important;
-  margin-top: -60px !important;
-  outline: none;
-  transition: background-color 350ms;
-  &.disabled {
-    cursor: default;
-  }
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.25);
-    &.disabled {
-      cursor: default;
-      background-color: rgba(255, 255, 255, 0.0);
-    }
-    .dragIcon {
-      visibility: visible;
-      &.disabled {
-        visibility: hidden;
-      }
-    }
-  }
-
-  .dragIcon {
-    visibility: hidden;
-    margin-top: 8px;
-    svg {
-      height: 12px;
-      circle {
-        fill: #fff;
-      }
-    }
-  }
-
-  .letter {
-    height: 72px;
-    margin: -3px -10px -10px -8px; // new asset has padding
-    vertical-align: middle;
-    transform-origin: center center;
-  }
-
-  .label {
-    margin-top: 5px;
-    color: white;
-    font-family: $scaleFont;
-    font-size: 14px;
-    text-shadow: 0 1px 5px #000;
-  }
-
-  .sliderContainer {
-    display: inline-block;
-    margin-left: 8px;
-    margin-top: 10px;
-    height: 45px;
-    vertical-align: middle;
-
-    .disabled {
-      opacity: 0.25;
-    }
-
-    .thumb {
-      width: 20px;
-      height: 20px;
-      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.65);
-      &:hover, &:active {
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5)
-      }
-    }
-
-    .track, .rail {
-      width: 3px;
-      opacity: 1;
-      background-color: #fff;
-      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.65);
-    }
-  }
+.letter {
+  height: 72px;
+  margin: -3px -10px -10px -8px; // new asset has padding
+  vertical-align: middle;
+  transform-origin: center center;
 }
 
+.sliderContainer {
+  display: inline-block;
+  margin-left: 8px;
+  margin-top: 10px;
+  height: 45px;
+  vertical-align: middle;
+
+  .disabled {
+    opacity: 0.25;
+  }
+
+  .thumb {
+    width: 20px;
+    height: 20px;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.65);
+    &:hover, &:active {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5)
+    }
+  }
+
+  .track, .rail {
+    width: 3px;
+    opacity: 1;
+    background-color: #fff;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.65);
+  }
+}
