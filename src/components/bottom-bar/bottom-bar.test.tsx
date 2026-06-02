@@ -7,6 +7,7 @@ import { BottomBar } from "./bottom-bar";
 import { PNG } from "pngjs";
 import config from "../../config";
 import * as logModule from "../../log";
+import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
 
@@ -149,13 +150,13 @@ describe("BottomBar component", () => {
       // so it just toggles simulationRunning without ticking — the synchronous tick
       // would otherwise crash on uninitialized PNG data, and we're only testing the
       // log call here, not the simulation step.
-      stores.simulation.seaSurfaceTempData = new PNG();
+      stores.simulation.setSeaSurfaceTempData(new PNG());
       jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
-        this.simulationRunning = true;
-        this.simulationStarted = true;
+        stores.simulation.setSimulationRunning(true);
+        stores.simulation.setSimulationStarted(true);
       });
       jest.spyOn(stores.simulation, "stop").mockImplementation(function(this: any) {
-        this.simulationRunning = false;
+        stores.simulation.setSimulationRunning(false);
       });
       render(
         <Provider stores={stores}>
@@ -180,11 +181,11 @@ describe("BottomBar component", () => {
     it("logs SimulationStarted with full parameters before starting", async () => {
       const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
-      stores.simulation.seaSurfaceTempData = new PNG();
+      stores.simulation.setSeaSurfaceTempData(new PNG());
       // Stub start to avoid tick crashing on uninitialized PNG data.
       jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
-        this.simulationRunning = true;
-        this.simulationStarted = true;
+        stores.simulation.setSimulationRunning(true);
+        stores.simulation.setSimulationStarted(true);
       });
       render(
         <Provider stores={stores}>
@@ -223,49 +224,67 @@ describe("BottomBar component", () => {
       config.mode = originalMode;
     });
 
-    it("is enabled before the simulation has started, disabled after", () => {
-      const { rerender } = render(
+    it("restarts the simulation when clicked after the simulation has started", async () => {
+      const user = userEvent.setup();
+      const toggleLeftPanelOpenMock = jest.fn();
+      jest.spyOn(stores.simulation, "restart");
+      render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpenMock} />
         </Provider>
       );
-      expect(screen.getByTestId("storm-setup-button")).not.toBeDisabled();
-
       act(() => {
-        stores.simulation.simulationStarted = true;
+        stores.simulation.setSimulationStarted(true);
       });
-      rerender(
-        <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
-        </Provider>
-      );
-      expect(screen.getByTestId("storm-setup-button")).toBeDisabled();
+
+      await user.click(screen.getByTestId("storm-setup-button"));
+      expect(stores.simulation.restart).toHaveBeenCalled();
+      expect(toggleLeftPanelOpenMock).toHaveBeenCalled();
     });
   });
 
-  describe("simulation control buttons (reload / restart / start)", () => {
-    it("are enabled when the setup panel is closed and disabled when the setup panel is open", () => {
-      stores.simulation.seaSurfaceTempData = new PNG();
-      const { rerender } = render(
-        <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
-        </Provider>
-      );
-      expect(screen.getByTestId("reload-button")).not.toBeDisabled();
-      expect(screen.getByTestId("restart-button")).not.toBeDisabled();
-      expect(screen.getByTestId("start-button")).not.toBeDisabled();
+  describe("start button while the setup panel is open", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("closes the setup panel and starts the simulation after the panel animation finishes", async () => {
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime.bind(jest) });
+      stores.simulation.setSeaSurfaceTempData(new PNG());
+      jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
+        stores.simulation.setSimulationRunning(true);
+        stores.simulation.setSimulationStarted(true);
+      });
 
       act(() => {
         stores.ui.setLeftPanelOpen(true);
       });
-      rerender(
+
+      jest.spyOn(stores.ui, "setLeftPanelOpen");
+      jest.spyOn(stores.ui, "setSetupMode");
+
+      render(
         <Provider stores={stores}>
           <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
         </Provider>
       );
-      expect(screen.getByTestId("reload-button")).toBeDisabled();
-      expect(screen.getByTestId("restart-button")).toBeDisabled();
-      expect(screen.getByTestId("start-button")).toBeDisabled();
+
+      await user.click(screen.getByTestId("start-button"));
+
+      // Panel is closed immediately, but the simulation hasn't started yet.
+      expect(stores.ui.setSetupMode).toHaveBeenCalledWith(undefined);
+      expect(stores.ui.setLeftPanelOpen).toHaveBeenCalledWith(false);
+      expect(stores.simulation.start).not.toHaveBeenCalled();
+
+      // After the left-panel transition completes, the simulation starts.
+      act(() => {
+        jest.advanceTimersByTime(LEFT_PANEL_TRANSITION_SECONDS * 1000);
+      });
+      expect(stores.simulation.start).toHaveBeenCalled();
     });
   });
 
@@ -277,7 +296,7 @@ describe("BottomBar component", () => {
         </Provider>
       );
       expect(screen.getByTestId("temp-button")).not.toBeDisabled();
-      stores.ui.setOverlay("stormSurge");
+      act(() => stores.ui.setOverlay("stormSurge"));
       rerender(
         <Provider stores={stores}>
           <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
@@ -293,7 +312,7 @@ describe("BottomBar component", () => {
         </Provider>
       );
       expect(screen.getByTestId("temp-button")).not.toBeDisabled();
-      stores.simulation.start();
+      act(() => stores.simulation.start());
       rerender(
         <Provider stores={stores}>
           <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />

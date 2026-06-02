@@ -3,4 +3,9 @@ import { IStores } from "./models/stores";
 
 export const StoresContext = createContext<IStores | null>(null);
 
-export const useStores = () => useContext(StoresContext);
+export const useStores = () => {
+  const stores = useContext(StoresContext);
+  if (!stores) throw Error("useStores must be used within a StoresContext.");
+
+  return stores;
+}

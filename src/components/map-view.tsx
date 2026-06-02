@@ -21,8 +21,8 @@ import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
 import { LeafletMouseEvent } from "leaflet";
+import { LEFT_PANEL_TRANSITION_SECONDS, LEFT_PANEL_WIDTH_PX } from "./common";
 import css from "./map-view.scss";
-import commonStyles from "./common.scss";
 import { ThermometerMarker } from "./thermometer-marker";
 import { PolygonRegion } from "./polygon-region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
@@ -32,11 +32,6 @@ interface IProps extends IBaseProps {}
 interface IState {}
 
 const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
-
-// Keep in sync with $leftPanelWidth and $leftPanelTransitionSeconds in common.scss
-// (exported via :export, parsed here to strip the px/s units).
-const LEFT_PANEL_WIDTH_PX = parseInt(commonStyles.leftPanelWidth, 10);
-const LEFT_PANEL_TRANSITION_SECONDS = parseFloat(commonStyles.leftPanelTransitionSeconds);
 
 @inject("stores")
 @observer

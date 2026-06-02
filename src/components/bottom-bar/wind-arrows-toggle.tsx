@@ -17,7 +17,7 @@ export class WindArrowsToggle extends BaseComponent<IProps, IState> {
       <div className={css.windArrowsToggle}>
         <div className={css.label}>Wind Direction and Speed</div>
         <div className={css.toggleContainer}>
-          <Switch disableRipple={true} checked={checked} onChange={this.handleChange} />
+          <Switch disableRipple={true} color="secondary" checked={checked} onChange={this.handleChange} />
         </div>
       </div>
     );

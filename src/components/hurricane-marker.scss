@@ -1,74 +1,42 @@
 @use "common" as *;
 
-.hurricaneIcon {
-  @keyframes rotation {
-    from {
-      transform: rotate(359deg);
-    }
-    to {
-      transform: rotate(0deg);
-    }
+@keyframes rotation {
+  from {
+    transform: rotate(359deg);
   }
-
-  cursor: default;
-  font-family: $scaleFont;
-  font-weight: bold;
-  width: 100px;
-  height: 100px;
-  margin-left: -50px;
-  margin-top: -50px;
-
-  &.dimmed {
-    opacity: .5;
+  to {
+    transform: rotate(0deg);
   }
+}
 
-  &.draggable {
-    cursor: grab;
+// Duration is per-category, set as --hurricane-spin-duration by the .categoryN class
+// applied to this same element in hurricane-marker.tsx. Falls back to the cat-0 speed.
+$rotateAnimation: rotation var(--hurricane-spin-duration, 5.5s) infinite linear;
 
-    &:active {
-      cursor: grabbing;
-    }
-  }
+.hurricaneMarker {
+  margin-bottom: -20px;
+  margin-top: -10px;
 
   .svgContainer {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform-origin: top left;
-    // Duration is per-category, set as --hurricane-spin-duration by the .categoryN class
-    // applied to this same element in hurricane-marker.tsx. Falls back to the cat-0 speed.
-    animation: rotation var(--hurricane-spin-duration, 5.5s) infinite linear;
+    vertical-align: middle;
+    transform-origin: center center;
 
     svg {
+      top: 50%;
+      left: 50%;
       width: 124px;
       height: 92px;
-      margin-left: -62px;
-      margin-top: -46px;
+      animation: $rotateAnimation;
     }
 
     img {
+      top: 50%;
+      left: 50%;
       width: 200px;
       height: 200px;
-      margin-left: -100px;
-      margin-top: -100px;
+      animation: $rotateAnimation;
+      margin-left: -39px;
+      margin-top: -52px;
     }
-  }
-
-  .temp {
-    color: white;
-    font-size: 12px;
-    line-height: 13px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 80px;
-    height: 30px;
-    margin-left: -40px;
-    margin-top: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    text-shadow: 0 1px 5px #000;
   }
 }

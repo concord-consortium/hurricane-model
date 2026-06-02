@@ -23,7 +23,6 @@ jest.mock("../libs/webgl-heatmap", () => {
   Mock.instances = heatmapInstances;
   return { __esModule: true, default: Mock };
 });
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const MockedWebGLHeatmap = require("../libs/webgl-heatmap").default;
 
 describe("PrecipitationLayer component", () => {

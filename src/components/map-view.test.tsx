@@ -1,8 +1,9 @@
 import * as React from "react";
 import { MapView } from "./map-view";
 import { render } from "@testing-library/react";
-import { createStores } from "../models/stores";
+import { createStores, IStores } from "../models/stores";
 import { Provider } from "mobx-react";
+import { StoresContext } from "../stores-context";
 import config from "../config";
 import * as logModule from "../log";
 
@@ -18,6 +19,16 @@ const createMockLeafletMouseEvent = (
   }
 } as any);
 
+function renderMapView(stores: IStores) {
+  return render(
+    <Provider stores={stores}>
+      <StoresContext value={stores}>
+        <MapView />
+      </StoresContext>
+    </Provider>
+  );
+}
+
 describe("MapView component", () => {
   let stores = createStores();
   beforeEach(() => {
@@ -25,11 +36,7 @@ describe("MapView component", () => {
   });
 
   it("renders without crashing", () => {
-    render(
-      <Provider stores={stores}>
-        <MapView />
-      </Provider>
-    );
+    renderMapView(stores);
     // The MapView's outer wrapper has id="mapView". Most map content is rendered by
     // Leaflet outside the React tree (marker panes etc.), so we can't easily assert on
     // it from RTL. Coarse smoke test only — finer-grained map content is exercised by
@@ -43,11 +50,7 @@ describe("MapView component", () => {
   it("applies noTopBar class when topBarVisible is false", () => {
     const oldTopBarVisible = config.topBarVisible;
     config.topBarVisible = false;
-    render(
-      <Provider stores={stores}>
-        <MapView />
-      </Provider>
-    );
+    renderMapView(stores);
     expect(document.querySelector("#mapView")).toHaveClass("noTopBar");
     config.topBarVisible = oldTopBarVisible;
   });
@@ -55,11 +58,7 @@ describe("MapView component", () => {
   it("does not apply noTopBar class when topBarVisible is true", () => {
     const oldTopBarVisible = config.topBarVisible;
     config.topBarVisible = true;
-    render(
-      <Provider stores={stores}>
-        <MapView />
-      </Provider>
-    );
+    renderMapView(stores);
     expect(document.querySelector("#mapView")).not.toHaveClass("noTopBar");
     config.topBarVisible = oldTopBarVisible;
   });
@@ -67,21 +66,13 @@ describe("MapView component", () => {
   describe("storm placement region overlay", () => {
     it("renders the polygon overlay when setupMode is 'stormLocation'", () => {
       stores.ui.setSetupMode("stormLocation");
-      render(
-        <Provider stores={stores}>
-          <MapView />
-        </Provider>
-      );
+      renderMapView(stores);
       expect(document.querySelector("path.leaflet-interactive")).not.toBeNull();
     });
 
     it("does not render the polygon overlay when setupMode is undefined", () => {
       stores.ui.setSetupMode(undefined);
-      render(
-        <Provider stores={stores}>
-          <MapView />
-        </Provider>
-      );
+      renderMapView(stores);
       expect(document.querySelector("path.leaflet-interactive")).toBeNull();
     });
   });
@@ -99,7 +90,9 @@ describe("MapView component", () => {
       // stores as a prop too — BaseComponent.stores reads from this.props.stores.
       render(
         <Provider stores={stores}>
-          <Inner ref={ref} stores={stores} />
+          <StoresContext value={stores}>
+            <Inner ref={ref} stores={stores} />
+          </StoresContext>
         </Provider>
       );
       return ref.current;
@@ -167,7 +160,9 @@ describe("MapView component", () => {
       const Inner = (MapView as any).wrappedComponent;
       render(
         <Provider stores={stores}>
-          <Inner ref={ref} stores={stores} />
+          <StoresContext value={stores}>
+            <Inner ref={ref} stores={stores} />
+          </StoresContext>
         </Provider>
       );
       return ref.current;
