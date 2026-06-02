@@ -29,8 +29,9 @@ windData.fall = fallWind;
 describe("SimulationModel store", () => {
   beforeEach(() => {
     mockFetch.resetMocks();
-    // SST Image data.
-    mockFetch.mockResponse("123");
+    // Default to a non-ok response so the autorun-triggered SST fetch short-circuits
+    // before PNG parsing.
+    mockFetch.mockResponse("", { status: 404 });
   });
 
   it("can be created without errors", () => {

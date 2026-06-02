@@ -1,6 +1,6 @@
 import * as React from "react";
 import { IndexPage } from "./index-page";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import { createStores, IStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { StoresContext } from "../stores-context";
@@ -35,7 +35,9 @@ describe("IndexPage component", () => {
   it("shows loading icon", () => {
     const { rerender, container } = renderIndexPage(stores);
     expect(container.querySelector(".MuiCircularProgress-root")).toBeInTheDocument();
-    stores.simulation.seaSurfaceTempData = new PNG();
+    act(() => {
+      stores.simulation.setSeaSurfaceTempData(new PNG());
+    });
     rerender(getIndexPage(stores));
     expect(container.querySelector(".MuiCircularProgress-root")).not.toBeInTheDocument();
   });

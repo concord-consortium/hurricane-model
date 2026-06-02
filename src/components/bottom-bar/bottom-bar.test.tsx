@@ -150,13 +150,13 @@ describe("BottomBar component", () => {
       // so it just toggles simulationRunning without ticking — the synchronous tick
       // would otherwise crash on uninitialized PNG data, and we're only testing the
       // log call here, not the simulation step.
-      stores.simulation.seaSurfaceTempData = new PNG();
+      stores.simulation.setSeaSurfaceTempData(new PNG());
       jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
-        this.simulationRunning = true;
-        this.simulationStarted = true;
+        stores.simulation.setSimulationRunning(true);
+        stores.simulation.setSimulationStarted(true);
       });
       jest.spyOn(stores.simulation, "stop").mockImplementation(function(this: any) {
-        this.simulationRunning = false;
+        stores.simulation.setSimulationRunning(false);
       });
       render(
         <Provider stores={stores}>
@@ -181,11 +181,11 @@ describe("BottomBar component", () => {
     it("logs SimulationStarted with full parameters before starting", async () => {
       const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
-      stores.simulation.seaSurfaceTempData = new PNG();
+      stores.simulation.setSeaSurfaceTempData(new PNG());
       // Stub start to avoid tick crashing on uninitialized PNG data.
       jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
-        this.simulationRunning = true;
-        this.simulationStarted = true;
+        stores.simulation.setSimulationRunning(true);
+        stores.simulation.setSimulationStarted(true);
       });
       render(
         <Provider stores={stores}>
@@ -234,7 +234,7 @@ describe("BottomBar component", () => {
         </Provider>
       );
       act(() => {
-        stores.simulation.simulationStarted = true;
+        stores.simulation.setSimulationStarted(true);
       });
 
       await user.click(screen.getByTestId("storm-setup-button"));
@@ -247,10 +247,10 @@ describe("BottomBar component", () => {
     it("closes the setup panel and starts the simulation after the panel animation finishes", async () => {
       jest.useFakeTimers();
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime.bind(jest) });
-      stores.simulation.seaSurfaceTempData = new PNG();
+      stores.simulation.setSeaSurfaceTempData(new PNG());
       jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
-        this.simulationRunning = true;
-        this.simulationStarted = true;
+        stores.simulation.setSimulationRunning(true);
+        stores.simulation.setSimulationStarted(true);
       });
 
       act(() => {
@@ -291,7 +291,7 @@ describe("BottomBar component", () => {
         </Provider>
       );
       expect(screen.getByTestId("temp-button")).not.toBeDisabled();
-      stores.ui.setOverlay("stormSurge");
+      act(() => stores.ui.setOverlay("stormSurge"));
       rerender(
         <Provider stores={stores}>
           <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
@@ -307,7 +307,7 @@ describe("BottomBar component", () => {
         </Provider>
       );
       expect(screen.getByTestId("temp-button")).not.toBeDisabled();
-      stores.simulation.start();
+      act(() => stores.simulation.start());
       rerender(
         <Provider stores={stores}>
           <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
