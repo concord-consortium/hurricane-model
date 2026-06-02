@@ -1,6 +1,8 @@
 @use "../common" as *;
+@use "./left-panel-common" as *;
 
 $leftPanelContainerWidth: calc($leftPanelWidth + 2px);
+$leftPanelBorderRadius: 5px;
 
 .leftPanelContainer {
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
@@ -14,9 +16,10 @@ $leftPanelContainerWidth: calc($leftPanelWidth + 2px);
   z-index: 1000;
 
   .leftPanel {
-    background-color: white;
-    border-bottom-right-radius: 5px;
-    border-top-right-radius: 5px;
+    background-color: #fdf5e8;
+    border: $leftPanelBorder;
+    border-bottom-right-radius: $leftPanelBorderRadius;
+    border-top-right-radius: $leftPanelBorderRadius;
     height: 100%;
     left: -$leftPanelWidth;
     pointer-events: all;
@@ -31,12 +34,16 @@ $leftPanelContainerWidth: calc($leftPanelWidth + 2px);
 
     .leftPanelHeader {
       align-items: center;
-      background-color: rgba(0, 0, 0, 0);
+      background-color: $secondaryColor;
+      border-bottom: $leftPanelBorder;
+      border-top-right-radius: $leftPanelBorderRadius;
       display: flex;
-      justify-content: space-between;
+      height: 35px;
+      justify-content: center;
+      position: relative;
 
       .leftPanelTitle {
-        flex: 1;
+        font-weight: bold;
       }
 
       .leftPanelCloseButton {
@@ -47,6 +54,9 @@ $leftPanelContainerWidth: calc($leftPanelWidth + 2px);
         display: inline-flex;
         height: 24px;
         padding: 0;
+        position: absolute;
+        right: 5px;
+        width: 24px;
 
         &:hover {
           color: $controlLabel;

@@ -1,8 +1,30 @@
-.sectionTitle.sectionTitle {
-  font-size: 12.5px;
+@use "./left-panel-common" as *;
+
+.sectionHeader.sectionHeader {
+  background-color: white;
+  border-bottom: $leftPanelBorder;
+
+  &:hover {
+    background-color: #dfdfdf;
+  }
+
+  &.openSectionHeader {
+    background-color: #f0f0f0;
+    border-bottom: none;
+  }
+
+  .sectionTitle.sectionTitle {
+    font-size: 12.5px;
+  }
+}
+
+.sectionContainer {
+  border-bottom: $leftPanelBorder;
 }
 
 .section {
+  background-color: #fafafa;
+  border-bottom: $leftPanelBorder;
   padding: 8px 16px 12px;
 
   .hint {

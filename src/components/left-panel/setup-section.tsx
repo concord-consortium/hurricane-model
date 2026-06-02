@@ -4,6 +4,7 @@ import Collapse from "@mui/material/Collapse";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React, { FunctionComponent, ReactNode } from "react";
 
@@ -37,9 +38,10 @@ export const SetupSection = observer(function SetupSection({
     }
   };
 
+  const headerClasses = clsx(css.sectionHeader, { [css.openSectionHeader]: open })
   return (
     <>
-      <ListItemButton data-test={`${dt}-button`} onClick={handleClick}>
+      <ListItemButton className={headerClasses} data-test={`${dt}-button`} onClick={handleClick}>
         {Icon && <ListItemIcon className={iconClassName}><Icon /></ListItemIcon>}
         <ListItemText
           primary={title}
