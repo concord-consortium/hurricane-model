@@ -8,7 +8,6 @@ import config from "../../config";
 import { log } from "../../log";
 import { BaseComponent, IBaseProps } from "../base";
 import { Dialog } from "../dialog";
-import { BottomBarButton } from "./bottom-bar-button";
 import { IconButton } from "./icon-button";
 import { StartLocationButton } from "./start-location-button";
 import { SeasonButton } from "./season-button";
@@ -16,6 +15,7 @@ import { WindArrowsToggle } from "./wind-arrows-toggle";
 import { HurricaneImageToggle } from "./hurricane-image-toggle";
 import { HurricaneScale } from "./hurricane-scale";
 
+import SetupIcon from "../../assets/bottom-bar/setup-icon.svg";
 import CCLogo from "../../assets/cc-logo.svg";
 import CCLogoSmall from "../../assets/cc-logo-small.svg";
 import PauseIcon from "../../assets/pause.svg";
@@ -108,10 +108,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           {
             isStormMode &&
             <div className={css.widgetGroup}>
-              <BottomBarButton
+              <IconButton
                 buttonText="Storm Setup"
+                className={clsx(css.stormSetupButton, { [css.open]: leftPanelOpen })}
                 dataTest="storm-setup-button"
                 disabled={stormSetupButtonDisabled}
+                highlightIcon={<SetupIcon />}
+                icon={<SetupIcon />}
                 onClick={() => this.props.toggleLeftPanelOpen()}
               />
             </div>
@@ -153,14 +156,14 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             }
           </div>
           <div className={`${css.widgetGroup} ${tempButtonDisabled ? "" : "hoverable"}`}>
-              <IconButton
-                disabled={tempButtonDisabled}
-                active={thermometerActive}
-                buttonText="Temp"
-                dataTest="temp-button"
-                icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
-                onClick={this.handleThermometerToggle}
-              />
+            <IconButton
+              disabled={tempButtonDisabled}
+              active={thermometerActive}
+              buttonText="Temp"
+              dataTest="temp-button"
+              icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
+              onClick={this.handleThermometerToggle}
+            />
           </div>
           <div className={`${css.widgetGroup} ${css.reloadRestart}`}>
             <Button
