@@ -244,8 +244,15 @@ describe("BottomBar component", () => {
   });
 
   describe("start button while the setup panel is open", () => {
-    it("closes the setup panel and starts the simulation after the panel animation finishes", async () => {
+    beforeEach(() => {
       jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("closes the setup panel and starts the simulation after the panel animation finishes", async () => {
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime.bind(jest) });
       stores.simulation.setSeaSurfaceTempData(new PNG());
       jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
@@ -278,8 +285,6 @@ describe("BottomBar component", () => {
         jest.advanceTimersByTime(LEFT_PANEL_TRANSITION_SECONDS * 1000);
       });
       expect(stores.simulation.start).toHaveBeenCalled();
-
-      jest.useRealTimers();
     });
   });
 

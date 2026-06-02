@@ -106,9 +106,9 @@ describe("region", () => {
     });
 
     it("works for fixing the lng axis as well", () => {
-      const snapped = snapToRegionPreservingAxis(region, "lng", { lat: 0.75, lng: 0.25 });
+      const snapped = snapToRegionPreservingAxis(region, "lng", { lat: -1, lng: 0.25 });
       expect(snapped!.lng).toBeCloseTo(0.25, 5);
-      expect(snapped!.lat).toBeCloseTo(0.75, 5);
+      expect(snapped!.lat).toBeCloseTo(0, 5);
     });
   });
 });
