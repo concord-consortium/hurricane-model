@@ -108,15 +108,15 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           {
             isStormMode &&
             <div className={css.widgetGroup}>
-              <IconButton
-                buttonText="Storm Setup"
-                className={clsx(css.stormSetupButton, { [css.open]: leftPanelOpen })}
-                dataTest="storm-setup-button"
-                disabled={stormSetupButtonDisabled}
-                highlightIcon={<SetupIcon />}
-                icon={<SetupIcon />}
+              <Button
                 onClick={() => this.props.toggleLeftPanelOpen()}
-              />
+                disabled={stormSetupButtonDisabled}
+                className={clsx(css.bottomBarButton, css.stormSetupButton, { [css.open]: leftPanelOpen })}
+                data-test="storm-setup-button"
+                disableRipple={true}
+              >
+                <span><SetupIcon/> Storm Setup</span>
+              </Button>
             </div>
           }
           {
@@ -167,7 +167,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           </div>
           <div className={`${css.widgetGroup} ${css.reloadRestart}`}>
             <Button
-              className={css.playbackButton}
+              className={clsx(css.bottomBarButton, css.playbackButton)}
               data-test="reload-button"
               onClick={this.handleReload}
               disabled={simulationControlsDisabled}
@@ -176,7 +176,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               <span><ReloadIcon/> Reload</span>
             </Button>
             <Button
-              className={css.playbackButton}
+              className={clsx(css.bottomBarButton, css.playbackButton)}
               data-test="restart-button"
               onClick={this.handleRestart}
               disabled={simulationControlsDisabled}
@@ -189,7 +189,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             <Button
               onClick={this.handleStartStop}
               disabled={simulationControlsDisabled || !ready}
-              className={css.playbackButton}
+              className={clsx(css.bottomBarButton, css.playbackButton)}
               data-test="start-button"
               disableRipple={true}
             >

@@ -101,8 +101,48 @@ $overflowHeight: 11px;
     }
   }
 
+  .bottomBarButton {
+    min-width: 60px;
+    height: 100%;
+    color: #434343;
+    font-weight: bold;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+
+    &:hover svg {
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.5);
+    }
+    &:active svg {
+      box-shadow: 0 0 0 4px rgba(255,255,255,1);
+    }
+
+    &:first-child {
+      border-top-left-radius: 8px;
+    }
+    &:last-child {
+      border-top-right-radius: 8px;
+    }
+    svg {
+      background: white;
+      display: block;
+      height: 30px;
+      width: 30px;
+      border-radius: 15px;
+      margin: $bottomBarTopPadding auto 0 auto;
+    }
+  }
+
+  .playbackButton {
+    svg {
+      path {
+        fill: #797979;
+      }
+    }
+  }
+
   .stormSetupButton {
-    width: 84px;
+    font-size: 12px;
+    min-width: 84px;
 
     &:hover {
       background-color: #ffdaa3;
@@ -110,10 +150,6 @@ $overflowHeight: 11px;
 
     &.open {
       background-color: #ff9900;
-
-      &:hover {
-        background-color: #ffdaa3;
-      }
     }
   }
 }
@@ -123,40 +159,6 @@ $overflowHeight: 11px;
   justify-content: flex-end;
   gap: 8px;
   margin-top: 1em;
-}
-
-.playbackButton {
-  min-width: 60px;
-  height: 100%;
-  color: #434343;
-  font-weight: bold;
-  border-bottom-left-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-
-  &:hover svg {
-    box-shadow: 0 0 0 4px rgba(255,255,255,0.5);
-  }
-  &:active svg {
-    box-shadow: 0 0 0 4px rgba(255,255,255,1);
-  }
-
-  &:first-child {
-    border-top-left-radius: 10px;
-  }
-  &:last-child {
-    border-top-right-radius: 10px;
-  }
-  svg {
-    background: white;
-    display: block;
-    height: 30px;
-    width: 30px;
-    border-radius: 15px;
-    margin: $bottomBarTopPadding auto 0 auto;
-    path {
-      fill: #797979;
-    }
-  }
 }
 
 @media (max-width: 1200px) {
