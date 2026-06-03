@@ -6,6 +6,7 @@ import { action, observable, computed, autorun, toJS, makeObservable } from "mob
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
 import * as decWind from "../../wind-data-json/dec-simple.json";
+import * as octWind from "../../wind-data-json/oct-simple.json";
 import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
 import * as septWind from "../../wind-data-json/sep-simple.json";
@@ -40,7 +41,7 @@ export const windData: IWindDataset = {
   summer: juneWind.windVectors,
   fall: septWind.windVectors,
   earlyFall: septWind.windVectors,
-  lateFall: decWind.windVectors
+  lateFall: octWind.windVectors
 };
 
 export const sstImages: ISSTImages = {
