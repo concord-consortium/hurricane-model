@@ -1,10 +1,37 @@
+import Button from "@mui/material/Button";
+import { clsx } from "clsx";
 import React from "react";
 
+import { useStores } from "../../stores-context";
+import { Season, seasonLabels } from "../../types";
 import { SetupSection } from "./setup-section";
 
 import SeasonIcon from "../../assets/left-panel/season.svg";
 
+import css from "./season-section.scss";
+
 const hint = "The season determines sea surface temperatures and wind shear across the basin.";
+
+const seasons: Season[] = ["summer", "earlyFall", "lateFall"];
+
+interface ISeasonButtonProps {
+  season: Season;
+}
+function SeasonButton({ season }: ISeasonButtonProps) {
+  const stores = useStores();
+  const isSelected = stores.simulation.season === season;
+  const classes = clsx(css.seasonButton, { [css.selected]: isSelected });
+
+  const handleClick = () => {
+    if (!isSelected) stores.simulation.setSeason(season);
+  }
+
+  return (
+    <Button className={classes} onClick={handleClick} disableRipple={true}>
+      {seasonLabels[season]}
+    </Button>
+  )
+}
 
 export function SeasonSection() {
   return (
@@ -15,6 +42,9 @@ export function SeasonSection() {
       setupMode="season"
       title="Season"
     >
+      <div className={css.buttonArea}>
+        {seasons.map(season => <SeasonButton key={season} season={season} />)}
+      </div>
     </SetupSection>
   );
 }

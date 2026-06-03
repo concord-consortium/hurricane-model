@@ -1,0 +1,22 @@
+@use "../common.scss" as *;
+
+.buttonArea {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  .seasonButton {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+
+    &:hover {
+      background-color: white;
+      border-color: #666;
+    }
+
+    &.selected {
+      background-color: $secondaryColor;
+      border-color: #dd8800;
+    }
+  }
+}
