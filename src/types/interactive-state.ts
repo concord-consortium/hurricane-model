@@ -20,6 +20,7 @@ export interface IHurricaneState {
   center: ICoordinates;
   strength: number;
   speed: IVector;
+  startingCategory: number | undefined;
   cat3SSTThresholdReached?: boolean;
 }
 
