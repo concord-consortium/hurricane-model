@@ -27,9 +27,16 @@
   border-bottom: $leftPanelBorder;
   padding: 8px 16px 12px;
 
-  .hint {
+  .hint, .postscript {
     line-height: 1.55;
     color: #666;
+  }
+
+  .hint {
     margin-bottom: 11px;
+  }
+
+  .postscript {
+    margin-top: 11px;
   }
 }

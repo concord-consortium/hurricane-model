@@ -11,6 +11,7 @@ import SeasonIcon from "../../assets/left-panel/season.svg";
 import css from "./season-section.scss";
 
 const hint = "The season determines sea surface temperatures and wind shear across the basin.";
+const postscript = "Sea surface temperatures peak in Late Fall, giving storms more energy to intensify.";
 
 const seasons: Season[] = ["summer", "earlyFall", "lateFall"];
 
@@ -39,6 +40,7 @@ export function SeasonSection() {
       dataTest="season"
       hint={hint}
       Icon={SeasonIcon}
+      postscript={postscript}
       setupMode="season"
       title="Season"
     >
