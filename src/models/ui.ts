@@ -8,18 +8,22 @@ import decSeaTempDefault from "../../sea-surface-temp-img/dec-default.png";
 import marchSeaTempDefault from "../../sea-surface-temp-img/mar-default.png";
 import juneSeaTempDefault from "../../sea-surface-temp-img/jun-default.png";
 import septSeaTempDefault from "../../sea-surface-temp-img/sep-default.png";
+import octSeaTempDefault from "../../sea-surface-temp-img/oct-default.png";
 import decSeaTempPurple3 from "../../sea-surface-temp-img/dec-purple3.png";
 import marchSeaTempPurple3 from "../../sea-surface-temp-img/mar-purple3.png";
 import juneSeaTempPurple3 from "../../sea-surface-temp-img/jun-purple3.png";
 import septSeaTempPurple3 from "../../sea-surface-temp-img/sep-purple3.png";
+import octSeaTempPurple3 from "../../sea-surface-temp-img/oct-purple3.png";
 import decSeaTempPurpleCC from "../../sea-surface-temp-img/dec-purpleCC.png";
 import marchSeaTempPurpleCC from "../../sea-surface-temp-img/mar-purpleCC.png";
 import juneSeaTempPurpleCC from "../../sea-surface-temp-img/jun-purpleCC.png";
 import septSeaTempPurpleCC from "../../sea-surface-temp-img/sep-purpleCC.png";
+import octSeaTempPurpleCC from "../../sea-surface-temp-img/oct-purpleCC.png";
 import decSeaTempRainbowCC from "../../sea-surface-temp-img/dec-rainbowCC.png";
 import marchSeaTempRainbowCC from "../../sea-surface-temp-img/mar-rainbowCC.png";
 import juneSeaTempRainbowCC from "../../sea-surface-temp-img/jun-rainbowCC.png";
 import septSeaTempRainbowCC from "../../sea-surface-temp-img/sep-rainbowCC.png";
+import octSeaTempRainbowCC from "../../sea-surface-temp-img/oct-rainbowCC.png";
 
 export type InteractiveMode = "runtime" | "authoring" | "report" | "reportItem";
 export type SetupMode = "stormLocation" | "stormCategory" | "season" | "seaSurfaceTemperatures" | "pressureSystems";
@@ -31,7 +35,7 @@ export const sstImages: Record<string, ISSTImages> = {
     summer: juneSeaTempDefault,
     fall: septSeaTempDefault,
     earlyFall: septSeaTempDefault,
-    lateFall: decSeaTempDefault
+    lateFall: octSeaTempDefault
   },
   rainbowCC: {
     winter: decSeaTempRainbowCC,
@@ -39,7 +43,7 @@ export const sstImages: Record<string, ISSTImages> = {
     summer: juneSeaTempRainbowCC,
     fall: septSeaTempRainbowCC,
     earlyFall: septSeaTempRainbowCC,
-    lateFall: decSeaTempRainbowCC
+    lateFall: octSeaTempRainbowCC
   },
   purple3: {
     winter: decSeaTempPurple3,
@@ -47,7 +51,7 @@ export const sstImages: Record<string, ISSTImages> = {
     summer: juneSeaTempPurple3,
     fall: septSeaTempPurple3,
     earlyFall: septSeaTempPurple3,
-    lateFall: decSeaTempPurple3
+    lateFall: octSeaTempPurple3
   },
   purpleCC: {
     winter: decSeaTempPurpleCC,
@@ -55,7 +59,7 @@ export const sstImages: Record<string, ISSTImages> = {
     summer: juneSeaTempPurpleCC,
     fall: septSeaTempPurpleCC,
     earlyFall: septSeaTempPurpleCC,
-    lateFall: decSeaTempPurpleCC
+    lateFall: octSeaTempPurpleCC
   },
 };
 

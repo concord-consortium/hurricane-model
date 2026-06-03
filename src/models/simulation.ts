@@ -14,6 +14,7 @@ import decSeaTemp from "../../sea-surface-temp-img/dec-default.png";
 import marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
 import juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
 import septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
+import octSeaTemp from "../../sea-surface-temp-img/oct-default.png";
 import { kdTree } from "kd-tree-javascript";
 import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
   StartLocation, StartLocationNames, isStartLocationName, isCoordinates} from "../types";
@@ -50,7 +51,7 @@ export const sstImages: ISSTImages = {
   summer: juneSeaTemp,
   fall: septSeaTemp,
   earlyFall: septSeaTemp,
-  lateFall: decSeaTemp
+  lateFall: octSeaTemp
 };
 
 // When hurricane passes through some areas, we should consider that a landfall even if it doesn't hit the land.
