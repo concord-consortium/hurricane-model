@@ -29,25 +29,33 @@ export const sstImages: Record<string, ISSTImages> = {
     winter: decSeaTempDefault,
     spring: marchSeaTempDefault,
     summer: juneSeaTempDefault,
-    fall: septSeaTempDefault
+    fall: septSeaTempDefault,
+    earlyFall: septSeaTempDefault,
+    lateFall: decSeaTempDefault
   },
   rainbowCC: {
     winter: decSeaTempRainbowCC,
     spring: marchSeaTempRainbowCC,
     summer: juneSeaTempRainbowCC,
-    fall: septSeaTempRainbowCC
+    fall: septSeaTempRainbowCC,
+    earlyFall: septSeaTempRainbowCC,
+    lateFall: decSeaTempRainbowCC
   },
   purple3: {
     winter: decSeaTempPurple3,
     spring: marchSeaTempPurple3,
     summer: juneSeaTempPurple3,
-    fall: septSeaTempPurple3
+    fall: septSeaTempPurple3,
+    earlyFall: septSeaTempPurple3,
+    lateFall: decSeaTempPurple3
   },
   purpleCC: {
     winter: decSeaTempPurpleCC,
     spring: marchSeaTempPurpleCC,
     summer: juneSeaTempPurpleCC,
-    fall: septSeaTempPurpleCC
+    fall: septSeaTempPurpleCC,
+    earlyFall: septSeaTempPurpleCC,
+    lateFall: decSeaTempPurpleCC
   },
 };
 

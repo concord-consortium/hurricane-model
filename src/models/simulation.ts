@@ -25,12 +25,7 @@ import config, { selectPressureSystems, startStrengths } from "../config";
 import { random } from "../seedrandom";
 import { log } from "../log";
 
-interface IWindDataset {
-  winter: IWindPoint[];
-  spring: IWindPoint[];
-  summer: IWindPoint[];
-  fall: IWindPoint[];
-}
+type IWindDataset = Record<Season, IWindPoint[]>
 
 export interface ISimulationOptions {
   startLocation?: StartLocation;
@@ -43,14 +38,18 @@ export const windData: IWindDataset = {
   winter: decWind.windVectors,
   spring: marchWind.windVectors,
   summer: juneWind.windVectors,
-  fall: septWind.windVectors
+  fall: septWind.windVectors,
+  earlyFall: septWind.windVectors,
+  lateFall: decWind.windVectors
 };
 
 export const sstImages: ISSTImages = {
   winter: decSeaTemp,
   spring: marchSeaTemp,
   summer: juneSeaTemp,
-  fall: septSeaTemp
+  fall: septSeaTemp,
+  earlyFall: septSeaTemp,
+  lateFall: decSeaTemp
 };
 
 // When hurricane passes through some areas, we should consider that a landfall even if it doesn't hit the land.

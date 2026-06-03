@@ -20,7 +20,7 @@ export const KNOWN_PARAMETERS: IParameterDoc[] = [
   {
     name: "season",
     type: "string",
-    validValues: "fall, winter, spring, summer",
+    validValues: "fall, winter, spring, summer, earlyFall, lateFall",
     description: "Sets wind data patterns"
   },
   {
