@@ -40,6 +40,10 @@ export const seasonLabels: Record<Season, string> = {
   earlyFall: "Early Fall",
   lateFall: "Late Fall"
 };
+export const modeSeasons: Record<string, Season[]> = {
+  "hurricane": ["winter", "spring", "summer", "fall"],
+  "storm": ["summer", "earlyFall", "lateFall"]
+};
 
 export type StartLocationNames = "atlantic" | "gulf";
 export type StartLocation = StartLocationNames | ICoordinates;
