@@ -6,19 +6,17 @@
   width: 100%;
 
   .seasonButton {
-    border: 2px solid #ccc;
+    border: 1px solid #797979;
     font-size: 12px;
     font-weight: bold;
     padding: 5px 15px;
 
     &:hover {
-      background-color: white;
-      border-color: #666;
+      background-color: $secondaryColorHover;
     }
 
     &.selected {
       background-color: $secondaryColor;
-      border-color: #dd8800;
     }
   }
 }
