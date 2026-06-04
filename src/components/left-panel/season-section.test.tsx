@@ -1,5 +1,5 @@
 import * as React from "react";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { createStores, IStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
