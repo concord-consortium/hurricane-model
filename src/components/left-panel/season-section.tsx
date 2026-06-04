@@ -3,7 +3,7 @@ import { clsx } from "clsx";
 import React from "react";
 
 import { useStores } from "../../stores-context";
-import { Season, seasonLabels } from "../../types";
+import { modeSeasons, Season, seasonLabels } from "../../types";
 import { SetupSection } from "./setup-section";
 
 import SeasonIcon from "../../assets/left-panel/season.svg";
@@ -12,8 +12,6 @@ import css from "./season-section.scss";
 
 const hint = "The season determines sea surface temperatures and wind shear across the basin.";
 const postscript = "Sea surface temperatures peak in Late Fall, giving storms more energy to intensify.";
-
-const seasons: Season[] = ["summer", "earlyFall", "lateFall"];
 
 interface ISeasonButtonProps {
   season: Season;
@@ -45,7 +43,7 @@ export function SeasonSection() {
       title="Season"
     >
       <div className={css.buttonArea}>
-        {seasons.map(season => <SeasonButton key={season} season={season} />)}
+        {modeSeasons.storm.map(season => <SeasonButton key={season} season={season} />)}
       </div>
     </SetupSection>
   );

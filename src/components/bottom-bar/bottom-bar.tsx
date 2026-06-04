@@ -6,6 +6,7 @@ import screenfull from "screenfull";
 
 import config from "../../config";
 import { log } from "../../log";
+import { safeStartLocation } from "../../utils/interactive-state";
 import { BaseComponent, IBaseProps } from "../base";
 import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 import { Dialog } from "../dialog";
@@ -284,7 +285,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     // Log before start() to capture the exact state the student sees before simulation begins,
     // consistent with SimulationEnded logging before restart/reset.
     log("SimulationStarted", {
-      startLocation: typeof startLocation === "string" ? startLocation : { ...startLocation },
+      startLocation: safeStartLocation(startLocation),
       season: sim.season,
       windArrows: ui.windArrows,
       hurricaneImage: ui.hurricaneImage,

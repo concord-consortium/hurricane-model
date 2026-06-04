@@ -1,8 +1,9 @@
 import { runInAction, toJS } from "mobx";
-import { IStores } from "./stores";
-import { PressureSystem } from "./pressure-system";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
+import { safeStartLocation } from "../utils/interactive-state";
+import { PressureSystem } from "./pressure-system";
 import { extendedLandfallBounds } from "./simulation";
+import { IStores } from "./stores";
 
 const CURRENT_VERSION = 1;
 
@@ -83,7 +84,7 @@ export function setInteractiveState(
         simulation.season = simState.season;
       }
       if (startLocation) {
-        simulation.startLocation = typeof startLocation === "string" ? startLocation : { ...startLocation };
+        simulation.startLocation = safeStartLocation(startLocation);
       }
 
       // Pressure systems - recreate from serialized state
@@ -199,7 +200,7 @@ export function getInteractiveState(stores: IStores): IHurricaneInteractiveState
     version: 1,
     simulation: {
       season: simulation.season,
-      startLocation: typeof startLocation === "string" ? startLocation : { ...startLocation },
+      startLocation: safeStartLocation(startLocation),
       pressureSystems: simulation.pressureSystems.map(ps => ps.serialize()),
       simulationStarted: simulation.simulationStarted,
       simulationFinished: simulation.simulationFinished,
