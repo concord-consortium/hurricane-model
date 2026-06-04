@@ -120,7 +120,7 @@ export function StormLocationSection() {
       hint={hint}
       Icon={HurricaneIcon}
       setupMode="stormLocation"
-      title="Storm Start Location"
+      title="Storm Location"
     >
       <div className={css.coordinates}>
         <CoordinateInput axis="lat" />

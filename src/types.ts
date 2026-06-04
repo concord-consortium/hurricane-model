@@ -31,12 +31,18 @@ export interface ILandfall {
   category: number;
 }
 
-export type Season = "winter" | "spring" | "summer" | "fall";
+export type Season = "winter" | "spring" | "summer" | "fall" | "earlyFall" | "lateFall";
 export const seasonLabels: Record<Season, string> = {
   winter: "Winter",
   spring: "Spring",
   summer: "Summer",
-  fall: "Fall"
+  fall: "Fall",
+  earlyFall: "Early Fall",
+  lateFall: "Late Fall"
+};
+export const modeSeasons: Record<string, Season[]> = {
+  "hurricane": ["winter", "spring", "summer", "fall"],
+  "storm": ["summer", "earlyFall", "lateFall"]
 };
 
 export type StartLocationNames = "atlantic" | "gulf";
@@ -51,9 +57,4 @@ export const isStartLocationName = (value: unknown): value is StartLocationNames
   return value === "atlantic" || value === "gulf";
 };
 
-export interface ISSTImages {
-  winter: string;
-  spring: string;
-  summer: string;
-  fall: string;
-}
+export type ISSTImages = Record<Season, string>;

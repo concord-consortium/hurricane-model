@@ -46,7 +46,9 @@ const customProperties: any = {
       "spring",
       "summer",
       "fall",
-      "winter"
+      "winter",
+      "earlyFall",
+      "lateFall"
     ]
   },
   map: {

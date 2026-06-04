@@ -1,4 +1,4 @@
-import { StartLocationNames } from "./types";
+import { modeSeasons, StartLocationNames } from "./types";
 
 function getURLParam(name: string) {
   const url = (self || window).location.href;
@@ -198,4 +198,10 @@ Object.keys(DEFAULT_CONFIG).forEach((key) => {
 });
 
 const finalConfig = Object.assign({}, DEFAULT_CONFIG, urlConfig);
+
+// Ensure that the selected season is allowed for the given mode
+if (!modeSeasons[finalConfig.mode].includes(finalConfig.season)) {
+  finalConfig.season = modeSeasons[finalConfig.mode]?.[0] ?? "summer";
+}
+
 export default finalConfig;

@@ -1,8 +1,9 @@
 import { runInAction, toJS } from "mobx";
-import { IStores } from "./stores";
-import { PressureSystem } from "./pressure-system";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
+import { safeStartLocation } from "../utils/interactive-state";
+import { PressureSystem } from "./pressure-system";
 import { extendedLandfallBounds } from "./simulation";
+import { IStores } from "./stores";
 
 const CURRENT_VERSION = 1;
 
@@ -72,6 +73,7 @@ export function setInteractiveState(
 
   const { simulation, ui } = stores;
   const { simulation: simState, ui: uiState } = state;
+  const { hurricane: hurState, startLocation } = simState;
 
   // Restore simulation state
   if (simState) {
@@ -81,8 +83,8 @@ export function setInteractiveState(
       if (simState.season) {
         simulation.season = simState.season;
       }
-      if (simState.startLocation) {
-        simulation.startLocation = simState.startLocation;
+      if (startLocation) {
+        simulation.startLocation = safeStartLocation(startLocation);
       }
 
       // Pressure systems - recreate from serialized state
@@ -105,14 +107,15 @@ export function setInteractiveState(
       }
 
       // Restore hurricane state if simulation was in progress
-      if (simState.hurricane) {
-        simulation.hurricane.center = { ...simState.hurricane.center };
-        simulation.hurricane.strength = simState.hurricane.strength;
-        if (simState.hurricane.speed) {
-          simulation.hurricane.speed = { ...simState.hurricane.speed };
+      if (hurState) {
+        simulation.hurricane.center = { ...hurState.center };
+        simulation.hurricane.strength = hurState.strength;
+        if (hurState.speed) {
+          simulation.hurricane.speed = { ...hurState.speed };
         }
-        if (simState.hurricane.cat3SSTThresholdReached !== undefined) {
-          simulation.hurricane.cat3SSTThresholdReached = simState.hurricane.cat3SSTThresholdReached;
+        simulation.hurricane.startingCategory = hurState.startingCategory;
+        if (hurState.cat3SSTThresholdReached !== undefined) {
+          simulation.hurricane.cat3SSTThresholdReached = hurState.cat3SSTThresholdReached;
         }
       }
 
@@ -191,21 +194,23 @@ export function setInteractiveState(
  */
 export function getInteractiveState(stores: IStores): IHurricaneInteractiveState {
   const { simulation, ui } = stores;
+  const { hurricane, startLocation } = simulation;
 
   return {
     version: 1,
     simulation: {
       season: simulation.season,
-      startLocation: simulation.startLocation,
+      startLocation: safeStartLocation(startLocation),
       pressureSystems: simulation.pressureSystems.map(ps => ps.serialize()),
       simulationStarted: simulation.simulationStarted,
       simulationFinished: simulation.simulationFinished,
       time: simulation.time,
       hurricane: {
-        center: { ...simulation.hurricane.center },
-        strength: simulation.hurricane.strength,
-        speed: { ...simulation.hurricane.speed },
-        cat3SSTThresholdReached: simulation.hurricane.cat3SSTThresholdReached
+        center: { ...hurricane.center },
+        strength: hurricane.strength,
+        speed: { ...hurricane.speed },
+        startingCategory: hurricane.startingCategory,
+        cat3SSTThresholdReached: hurricane.cat3SSTThresholdReached
       },
       // Use toJS() for observable arrays to ensure clean serialization
       hurricaneTrack: toJS(simulation.hurricaneTrack),

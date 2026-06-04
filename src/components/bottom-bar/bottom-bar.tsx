@@ -6,10 +6,10 @@ import screenfull from "screenfull";
 
 import config from "../../config";
 import { log } from "../../log";
+import { safeStartLocation } from "../../utils/interactive-state";
 import { BaseComponent, IBaseProps } from "../base";
 import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 import { Dialog } from "../dialog";
-import { BottomBarButton } from "./bottom-bar-button";
 import { HurricaneImageToggle } from "./hurricane-image-toggle";
 import { HurricaneScale } from "./hurricane-scale";
 import { IconButton } from "./icon-button";
@@ -17,6 +17,7 @@ import { SeasonButton } from "./season-button";
 import { StartLocationButton } from "./start-location-button";
 import { WindArrowsToggle } from "./wind-arrows-toggle";
 
+import SetupIcon from "../../assets/bottom-bar/setup-icon.svg";
 import CCLogo from "../../assets/cc-logo.svg";
 import CCLogoSmall from "../../assets/cc-logo-small.svg";
 import PauseIcon from "../../assets/pause.svg";
@@ -85,7 +86,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const { ready, simulationRunning, simulationStarted } = this.stores.simulation;
-    const { isReportMode, overlay, thermometerActive } = this.stores.ui;
+    const { isReportMode, leftPanelOpen, overlay, thermometerActive } = this.stores.ui;
     const { isSeasonMenuOpen, isStartLocationMenuOpen } = this.state;
     const startLocationButtonHoveredClass = isStartLocationMenuOpen ? css.hovered : "";
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
@@ -112,12 +113,15 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           {
             isStormMode &&
             <div className={css.widgetGroup}>
-              <BottomBarButton
-                buttonText="Storm Setup"
-                dataTest="storm-setup-button"
-                disabled={stormSetupButtonDisabled}
+              <Button
                 onClick={this.toggleLeftPanel}
-              />
+                disabled={stormSetupButtonDisabled}
+                className={clsx(css.bottomBarButton, css.stormSetupButton, { [css.open]: leftPanelOpen })}
+                data-test="storm-setup-button"
+                disableRipple={true}
+              >
+                <span><SetupIcon/>Storm Setup</span>
+              </Button>
             </div>
           }
           {
@@ -157,18 +161,18 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             }
           </div>
           <div className={`${css.widgetGroup} ${tempButtonDisabled ? "" : "hoverable"}`}>
-              <IconButton
-                disabled={tempButtonDisabled}
-                active={thermometerActive}
-                buttonText="Temp"
-                dataTest="temp-button"
-                icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
-                onClick={this.handleThermometerToggle}
-              />
+            <IconButton
+              disabled={tempButtonDisabled}
+              active={thermometerActive}
+              buttonText="Temp"
+              dataTest="temp-button"
+              icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
+              onClick={this.handleThermometerToggle}
+            />
           </div>
           <div className={`${css.widgetGroup} ${css.reloadRestart}`}>
             <Button
-              className={css.playbackButton}
+              className={clsx(css.bottomBarButton, css.playbackButton)}
               data-test="reload-button"
               onClick={this.handleReload}
               disabled={simulationControlsDisabled}
@@ -177,7 +181,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               <span><ReloadIcon/> Reload</span>
             </Button>
             <Button
-              className={css.playbackButton}
+              className={clsx(css.bottomBarButton, css.playbackButton)}
               data-test="restart-button"
               onClick={this.handleRestart}
               disabled={simulationControlsDisabled}
@@ -190,7 +194,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             <Button
               onClick={this.handleStartStop}
               disabled={simulationControlsDisabled || !ready}
-              className={css.playbackButton}
+              className={clsx(css.bottomBarButton, css.playbackButton)}
               data-test="start-button"
               disableRipple={true}
             >
@@ -275,12 +279,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public start = () => {
     const { simulation: sim, ui } = this.stores;
+    const { hurricane, startLocation } = sim;
     this.clearDelayedStart();
 
     // Log before start() to capture the exact state the student sees before simulation begins,
     // consistent with SimulationEnded logging before restart/reset.
     log("SimulationStarted", {
-      startLocation: sim.startLocation,
+      startLocation: safeStartLocation(startLocation),
       season: sim.season,
       windArrows: ui.windArrows,
       hurricaneImage: ui.hurricaneImage,
@@ -294,8 +299,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         strength: ps.strength
       })),
       hurricane: {
-        strength: sim.hurricane.strength,
-        center: { lat: sim.hurricane.center.lat, lng: sim.hurricane.center.lng }
+        strength: hurricane.strength,
+        center: { lat: hurricane.center.lat, lng: hurricane.center.lng }
       },
       deterministic: config.deterministic,
       timestep: config.timestep,

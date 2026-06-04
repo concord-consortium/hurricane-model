@@ -1,25 +1,28 @@
+import { clsx } from "clsx";
 import * as React from "react";
 import Button from "@mui/material/Button";
 import css from "./bottom-bar-button.scss";
 
 export interface IBottomBarButtonProps {
-  icon?: React.JSX.Element;
-  highlightIcon?: React.JSX.Element;
-  buttonText?: string;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  disabled?: boolean;
-  dataTest?: string;
   active?: boolean;
+  buttonText?: string;
+  className?: string;
+  dataTest?: string;
+  disabled?: boolean;
+  highlightIcon?: React.JSX.Element;
+  icon?: React.JSX.Element;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
-export const BottomBarButton =
-  ({ icon, highlightIcon, onClick, disabled, active, buttonText, dataTest }: IBottomBarButtonProps) =>
-{
+export const BottomBarButton = ({
+  className, icon, highlightIcon, onClick, disabled, active, buttonText, dataTest
+}: IBottomBarButtonProps) => {
+  const buttonClass = clsx(css.bottomBarButton, className, { [css.disabled]: disabled, [css.active]: active });
   const textClass = icon ? css.iconButtonText : css.bottomBarButtonText;
   return (
     <Button
       onClick={onClick}
-      className={`${css.bottomBarButton} ${disabled ? css.disabled : ""} ${active ? css.active : ""}`}
+      className={buttonClass}
       disableRipple={true}
       data-test={dataTest ? dataTest : "bottom-bar-button"}
       disableTouchRipple={true}
