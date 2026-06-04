@@ -1,14 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" class="sec-icon" viewBox="0 0 45 72" width="18" height="18">
-  <!--
-    vector-effect="non-scaling-stroke" pins the stroke to 1 actual pixel regardless of how
-    much the viewBox is scaled to fit the rendered width/height.
-  -->
-  <path
-    fill="currentColor"
-    stroke="#666"
-    stroke-width=".5"
-    vector-effect="non-scaling-stroke"
-    d="M45,36.019 L45,36 C45,23.574 34.927,13.5 22.5,13.5 L22.5,0 C22.5,0 1.104,15.572 0.051,34.559 C0.021,35.036 0,35.516 0,36 C0,48.427 10.074,58.5 22.5,58.5 L22.5,72 C22.5,72 43.899,56.426 44.949,37.437 C44.979,36.968 44.999,36.496 45,36.019"
-  />
+<svg width="22" height="22" viewBox="0 0 31 23" xmlns="http://www.w3.org/2000/svg">
+    <path
+        transform="rotate(105 15.5 11.5)"
+        d="m20.737 2.06.263.148.528.35c3.098 2.046 5.45 5.507 7.063 10.215a35.335 35.335 0 0 1 1.253 4.72l.105.563.086.507.07.453.053.394.038.333.101.989-5.41-3.141-.394-.229-.264.371-.122.17c-3.18 4.31-9.088 5.625-13.86 3.032l-.262-.147-.529-.35c-1.579-1.043-2.974-2.47-4.185-4.267-1.678-2.488-2.942-5.567-3.79-9.093a35.174 35.174 0 0 1-.549-2.757L.87 3.896l-.072-.554-.104-1.075 5.403 3.138.392.227.265-.367.122-.17c3.18-4.31 9.09-5.627 13.862-3.034z"
+        stroke="#333"
+        fill="currentColor"
+    />
 </svg>

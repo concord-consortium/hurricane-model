@@ -7,7 +7,7 @@ import { clampToRegion, snapToRegionPreservingAxis } from "../../utils/region";
 import { stormPlacementRegion } from "../../utils/storm-placement-region";
 import { SetupSection } from "./setup-section";
 
-import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
+import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
 
 import css from "./storm-location-section.scss";
 
@@ -118,7 +118,7 @@ export function StormLocationSection() {
     <SetupSection
       dataTest="storm-location"
       hint={hint}
-      Icon={HurricaneIcon}
+      Icon={StormLocationIcon}
       setupMode="stormLocation"
       title="Storm Location"
     >
