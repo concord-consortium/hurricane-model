@@ -22,12 +22,13 @@ accurate data. This model will use averaged, real world data coming from NOAA:
 https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.pressure.html
 
 NOAA provides separate dataset for U and V components of the wind speed vector. `wind-data-netcdf` directory contains 
-monthly mean data (10m level) for four months representing different seasons:
+monthly mean data (10m level) for five months representing different seasons:
 
 - December -> winter
 - March -> spring
 - June -> summer
-- September -> fall
+- September -> fall/earlyFall
+- October -> lateFall
 
 Original data is in NetCDF format (binary). It's been converted to JSON using `scripts/convert-wind-data.js` script:
 
@@ -55,24 +56,37 @@ main advantage is that we can simply visualize it using various online tools.
 
 Sea Surface Temperature (SST) affects intensity of the hurricane. The warmer ocean is, the more likely is the strong hurricane. 
 This model uses data coming from NASA:
-- https://podaac.jpl.nasa.gov/dataset/MODIS_AQUA_L3_SST_MID-IR_MONTHLY_4KM_NIGHTTIME_V2014.0
-- ftp://podaac-ftp.jpl.nasa.gov/allData/modis/L3/aqua/4um/v2014.0/4km/monthly/2018/
+- ~~https://podaac.jpl.nasa.gov/dataset/MODIS_AQUA_L3_SST_MID-IR_MONTHLY_4KM_NIGHTTIME_V2014.0~~
+- ~~ftp://podaac-ftp.jpl.nasa.gov/allData/modis/L3/aqua/4um/v2014.0/4km/monthly/2018/~~
+
+These urls no longer seem to work.
 
 Interactive visualization:
 - https://worldview.earthdata.nasa.gov/?p=geographic&l=MODIS_Aqua_L3_SST_MidIR_4km_Night_Monthly,Reference_Labels(hidden),Reference_Features,Coastlines(hidden)&t=2018-09-19-T00%3A00%3A00Z&z=3&v=-144.11630581918422,-22.21990140009921,35.883694180815795,68.41291109990078
 
-`sea-surface-temp-netcdf` directory contains monthly mean data for four months representing different seasons:
+It's still possible to get data from this link. You'll have to create a profile to do this.
+- Show only SST (turn off coastlines/borders/roads)
+- Choose the start date
+- Switch from day to month in the bottom right
+- Switch to the Data Download tab
+- Select Standard
+- Push the Download Via Earthdata Search button
+- Push the continue button. This will open a new tab
+- You'll want to download the file that looks like AQUA_MODIS.YYYYMMDD_YYYYMMDD.L3m.MO.SST4.sst4.4km.nc
+
+`sea-surface-temp-netcdf` directory contains monthly mean data for five months representing different seasons:
 
 - December -> winter
 - March -> spring
 - June -> summer
-- September -> fall
+- September -> fall/earlyFall
+- October -> lateFall
 
 Original data is in NetCDF format (binary). It's been converted to PNG images using `scripts/convert-sea-surface-temp-to-png.js` script.
 
 ```bash
 node --max-old-space-size=4092 scripts/convert-sea-surface-temp-to-png.js <dataset> <png-file-output>, e.g.:
-node --max-old-space-size=4092 scripts/convert-sea-surface-temp-to-png.js sea-surface-temp-netcdf/dec.nc sea-surface-temp-json/dec.png 
+node --max-old-space-size=4092 scripts/convert-sea-surface-temp-to-png.js sea-surface-temp-netcdf/dec.nc sea-surface-temp-img/dec.png 
 ```
  
 Note that `--max-old-space-size=4092` param is required, as reading converted files takes a lot of memory.

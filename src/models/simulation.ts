@@ -6,6 +6,7 @@ import { action, observable, computed, autorun, toJS, makeObservable } from "mob
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
 import * as decWind from "../../wind-data-json/dec-simple.json";
+import * as octWind from "../../wind-data-json/oct-simple.json";
 import * as marchWind from "../../wind-data-json/mar-simple.json";
 import * as juneWind from "../../wind-data-json/jun-simple.json";
 import * as septWind from "../../wind-data-json/sep-simple.json";
@@ -13,6 +14,7 @@ import decSeaTemp from "../../sea-surface-temp-img/dec-default.png";
 import marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
 import juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
 import septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
+import octSeaTemp from "../../sea-surface-temp-img/oct-default.png";
 import { kdTree } from "kd-tree-javascript";
 import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
   StartLocation, StartLocationNames, isStartLocationName, isCoordinates} from "../types";
@@ -25,12 +27,7 @@ import config, { selectPressureSystems, startStrengths } from "../config";
 import { random } from "../seedrandom";
 import { log } from "../log";
 
-interface IWindDataset {
-  winter: IWindPoint[];
-  spring: IWindPoint[];
-  summer: IWindPoint[];
-  fall: IWindPoint[];
-}
+type IWindDataset = Record<Season, IWindPoint[]>
 
 export interface ISimulationOptions {
   startLocation?: StartLocation;
@@ -43,14 +40,18 @@ export const windData: IWindDataset = {
   winter: decWind.windVectors,
   spring: marchWind.windVectors,
   summer: juneWind.windVectors,
-  fall: septWind.windVectors
+  fall: septWind.windVectors,
+  earlyFall: septWind.windVectors,
+  lateFall: octWind.windVectors
 };
 
 export const sstImages: ISSTImages = {
   winter: decSeaTemp,
   spring: marchSeaTemp,
   summer: juneSeaTemp,
-  fall: septSeaTemp
+  fall: septSeaTemp,
+  earlyFall: septSeaTemp,
+  lateFall: octSeaTemp
 };
 
 // When hurricane passes through some areas, we should consider that a landfall even if it doesn't hit the land.

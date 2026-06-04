@@ -4,6 +4,7 @@ import Collapse from "@mui/material/Collapse";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React, { FunctionComponent, ReactNode } from "react";
 
@@ -18,12 +19,13 @@ interface ISetupSectionProps {
   hint?: string;
   Icon?: FunctionComponent;
   iconClassName?: string;
+  postscript?: string;
   setupMode: SetupMode;
   title: string;
 }
 
 export const SetupSection = observer(function SetupSection({
-  children, dataTest, hint, Icon, iconClassName, setupMode, title
+  children, dataTest, hint, Icon, iconClassName, postscript, setupMode, title
 }: ISetupSectionProps) {
   const stores = useStores();
   const open = stores.ui.setupMode === setupMode;
@@ -37,9 +39,10 @@ export const SetupSection = observer(function SetupSection({
     }
   };
 
+  const headerClasses = clsx(css.sectionHeader, { [css.openSectionHeader]: open })
   return (
     <>
-      <ListItemButton data-test={`${dt}-button`} onClick={handleClick}>
+      <ListItemButton className={headerClasses} data-test={`${dt}-button`} disableRipple={true} onClick={handleClick}>
         {Icon && <ListItemIcon className={iconClassName}><Icon /></ListItemIcon>}
         <ListItemText
           primary={title}
@@ -51,6 +54,7 @@ export const SetupSection = observer(function SetupSection({
         <div className={css.section} data-test={`${dt}-section`}>
           {hint && <div className={css.hint}>{hint}</div>}
           {children}
+          {postscript && <div className={css.postscript}>{postscript}</div>}
         </div>
       </Collapse>
     </>
