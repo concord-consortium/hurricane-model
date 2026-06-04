@@ -278,12 +278,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public start = () => {
     const { simulation: sim, ui } = this.stores;
+    const { hurricane, startLocation } = sim;
     this.clearDelayedStart();
 
     // Log before start() to capture the exact state the student sees before simulation begins,
     // consistent with SimulationEnded logging before restart/reset.
     log("SimulationStarted", {
-      startLocation: sim.startLocation,
+      startLocation: typeof startLocation === "string" ? startLocation : { ...startLocation },
       season: sim.season,
       windArrows: ui.windArrows,
       hurricaneImage: ui.hurricaneImage,
@@ -297,8 +298,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         strength: ps.strength
       })),
       hurricane: {
-        strength: sim.hurricane.strength,
-        center: { lat: sim.hurricane.center.lat, lng: sim.hurricane.center.lng }
+        strength: hurricane.strength,
+        center: { lat: hurricane.center.lat, lng: hurricane.center.lng }
       },
       deterministic: config.deterministic,
       timestep: config.timestep,
