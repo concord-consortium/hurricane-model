@@ -39,4 +39,14 @@
   .postscript {
     margin-top: 11px;
   }
+
+  .tip {
+    background-color: #f4f8e9;
+    color: #435f1f;
+    padding: 8px;
+
+    .bold {
+      font-weight: 900;
+    }
+  }
 }
