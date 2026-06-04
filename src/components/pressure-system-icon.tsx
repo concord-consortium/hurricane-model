@@ -29,6 +29,7 @@ const VerticalThumb = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTM
 
 interface IProps extends IBaseProps {
   model: PressureSystem;
+  dimmed?: boolean;
   disabled?: boolean;
   onSliderDrag?: () => void;
   onSliderDragEnd?: () => void;
@@ -49,14 +50,14 @@ const getPressureLabel = (model: PressureSystem) => {
 export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public render() {
-    const { model, disabled } = this.props;
+    const { model, dimmed, disabled } = this.props;
     const strengthNorm = (model.strength - minStrength) / (maxStrength - minStrength) - 0.5; // [-0.5, 0.5]
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
     const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
     const uiDisabled = disabled ?? false;
 
     return (
-      <DraggableMapIcon disabled={uiDisabled} label={this.renderLabel()}>
+      <DraggableMapIcon dimmed={dimmed} disabled={uiDisabled} label={this.renderLabel()}>
         {
           model.type === "high" ?
             <High className={css.letter} style={letterStyle} /> :
