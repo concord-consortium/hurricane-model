@@ -1,5 +1,6 @@
 import Button from "@mui/material/Button";
 import { clsx } from "clsx";
+import { observer } from "mobx-react";
 import React from "react";
 
 import { useStores } from "../../stores-context";
@@ -16,7 +17,7 @@ const postscript = "Sea surface temperatures peak in Late Fall, giving storms mo
 interface ISeasonButtonProps {
   season: Season;
 }
-function SeasonButton({ season }: ISeasonButtonProps) {
+const SeasonButton = observer(function SeasonButton({ season }: ISeasonButtonProps) {
   const stores = useStores();
   const isSelected = stores.simulation.season === season;
   const classes = clsx(css.seasonButton, { [css.selected]: isSelected });
@@ -30,7 +31,7 @@ function SeasonButton({ season }: ISeasonButtonProps) {
       {seasonLabels[season]}
     </Button>
   )
-}
+});
 
 export function SeasonSection() {
   return (
