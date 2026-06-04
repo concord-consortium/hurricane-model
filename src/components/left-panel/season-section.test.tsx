@@ -50,9 +50,7 @@ describe("SeasonSection", () => {
     expect(stores.simulation.season).toBe("summer");
 
     // Updates the model and ui when another button is clicked
-    act(() => {
-      stores.simulation.setSeason("lateFall");
-    });
+    fireEvent.click(seasonButton(seasonLabels.lateFall));
 
     expect(stores.simulation.season).toBe("lateFall");
     expect(seasonButton(seasonLabels.lateFall)).toHaveClass("selected");
