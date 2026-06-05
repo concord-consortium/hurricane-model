@@ -1,5 +1,3 @@
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from "@mui/material/Collapse";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -10,6 +8,8 @@ import React, { FunctionComponent, ReactNode } from "react";
 
 import { SetupMode } from "../../models/ui";
 import { useStores } from "../../stores-context";
+
+import DropdownArrow from "../../assets/left-panel/dropdown-arrow.svg";
 
 import css from "./setup-section.scss";
 
@@ -49,7 +49,9 @@ export const SetupSection = observer(function SetupSection({
           primary={title}
           slotProps={{ primary: { className: css.sectionTitle } }}
         />
-        {open ? <ExpandLess /> : <ExpandMore />}
+        <div className={clsx(css.dropdownArrow, { [css.open]: open })}>
+          <DropdownArrow />
+        </div>
       </ListItemButton>
       <Collapse data-test={`${dt}-content`} in={open} unmountOnExit>
         <div className={css.section} data-test={`${dt}-section`}>

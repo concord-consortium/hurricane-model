@@ -17,6 +17,16 @@
   .sectionTitle.sectionTitle {
     font-size: 12.5px;
   }
+
+  .dropdownArrow {
+    margin-right: -12px;
+    transform: rotate(-90deg);
+    transition: transform 0.1s;
+
+    &.open {
+      transform: rotate(0deg);
+    }
+  }
 }
 
 .sectionContainer {
