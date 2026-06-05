@@ -51,7 +51,7 @@ describe("PressureSystemIcon component", () => {
         <PressureSystemIcon model={stores.simulation.pressureSystems[0]} disabled={true}/>
       </Provider>
     );
-    expect(screen.getByTestId("draggable-map-icon")).toHaveClass("disabled");
+    expect(screen.getByTestId("pressure-system-icon")).toHaveClass("disabled");
   });
 
   it("icon is enabled when disabled prop is false", () => {
@@ -60,7 +60,7 @@ describe("PressureSystemIcon component", () => {
         <PressureSystemIcon model={stores.simulation.pressureSystems[0]} disabled={false}/>
       </Provider>
     );
-    expect(screen.getByTestId("draggable-map-icon")).not.toHaveClass("disabled");
+    expect(screen.getByTestId("pressure-system-icon")).not.toHaveClass("disabled");
   });
 
   it("icon is enabled by default when disabled prop is not provided", () => {
@@ -69,7 +69,7 @@ describe("PressureSystemIcon component", () => {
         <PressureSystemIcon model={stores.simulation.pressureSystems[0]}/>
       </Provider>
     );
-    expect(screen.getByTestId("draggable-map-icon")).not.toHaveClass("disabled");
+    expect(screen.getByTestId("pressure-system-icon")).not.toHaveClass("disabled");
   });
 
   // Note: previous enzyme tests checked that sliders are enabled by default and

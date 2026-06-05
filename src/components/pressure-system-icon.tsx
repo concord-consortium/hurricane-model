@@ -57,7 +57,12 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     const uiDisabled = disabled ?? false;
 
     return (
-      <DraggableMapIcon dimmed={dimmed} disabled={uiDisabled} label={this.renderLabel()}>
+      <DraggableMapIcon
+        dataTest="pressure-system-icon"
+        dimmed={dimmed}
+        disabled={uiDisabled}
+        label={this.renderLabel()}
+      >
         {
           model.type === "high" ?
             <High className={css.letter} style={letterStyle} /> :
