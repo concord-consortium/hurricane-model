@@ -116,6 +116,10 @@ export class MapView extends BaseComponent<IProps, IState> {
       { [css.leftPanelOpen]: this.stores.ui.leftPanelOpen }
     );
 
+    // Change the TileLayer's key when the base map changes to force an update.
+    // Otherwise, the new layer renders offset to the northwest.
+    const tileLayerKey = ui.baseMap;
+
     return (
       <div className={`${css.mapView} ${!config.topBarVisible ? css.noTopBar : ""}`} id="mapView">
         <MapContainer ref={this.mapRef}
@@ -134,6 +138,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           attributionControl={false}
         >
           <TileLayer
+            key={tileLayerKey}
             url={ui.baseMapTileUrl}
             attribution={ui.baseMapTileAttribution}
           />
@@ -142,6 +147,7 @@ export class MapView extends BaseComponent<IProps, IState> {
             // overlay tiles.
             ui.baseMap === "population" &&
             <TileLayer
+              key="population-overlay"
               attribution={mapLayer("population").attribution}
               url={mapLayer("population").url}
               opacity={0.6}
