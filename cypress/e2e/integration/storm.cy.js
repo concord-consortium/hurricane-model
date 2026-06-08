@@ -1,8 +1,10 @@
 import { BottomBar } from "../../support/elements/bottom-bar";
 import { SetupPanel } from "../../support/elements/setup-panel";
+import { Simulation } from "../../support/elements/simulation";
 
 const bottomBar = new BottomBar;
 const setupPanel = new SetupPanel;
+const simulation = new Simulation;
 
 context("Test the Hurricane Model app", () => {
   beforeEach(() => {
@@ -70,5 +72,35 @@ context("Test the Hurricane Model app", () => {
         bottomBar.startButton().click();
       });
     });
+  });
+
+  it("hurricane marker and pressure systems are enabled, disabled, and dimmed properly", () => {
+    // Disabled but not dimmed by default
+    simulation.hurricaneMarkerIsDisabled();
+    simulation.hurricaneMarkerIsNotDimmed();
+    simulation.pressureSystemIsDisabled(0);
+    simulation.pressureSystemIsNotDimmed(0);
+
+    // HM enabled, not dimmed, PS disabled, dimmed when in storm location setup mode
+    bottomBar.stormSetupButton().click();
+    setupPanel.getSectionButton("storm-location").click();
+    simulation.hurricaneMarkerIsEnabled();
+    simulation.hurricaneMarkerIsNotDimmed();
+    simulation.pressureSystemIsDisabled(0);
+    simulation.pressureSystemIsDimmed(0);
+
+    // HM disabled, dimmed, PS enabled, not dimmed when in pressure system mode
+    setupPanel.getSectionButton("pressure-systems").click();
+    simulation.hurricaneMarkerIsDisabled();
+    simulation.hurricaneMarkerIsDimmed();
+    simulation.pressureSystemIsEnabled(0);
+    simulation.pressureSystemIsNotDimmed(0);
+
+    // Both disabled, dimmed in another setup mode
+    setupPanel.getSectionButton("season").click();
+    simulation.hurricaneMarkerIsDisabled();
+    simulation.hurricaneMarkerIsDimmed();
+    simulation.pressureSystemIsDisabled(0);
+    simulation.pressureSystemIsDimmed(0);
   });
 });

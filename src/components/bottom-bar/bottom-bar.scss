@@ -145,7 +145,7 @@ $overflowHeight: 11px;
     min-width: 84px;
 
     &:hover {
-      background-color: #ffdaa3;
+      background-color: $secondaryColorHover;
     }
 
     &.open {

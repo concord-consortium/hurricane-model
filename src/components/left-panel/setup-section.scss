@@ -3,6 +3,7 @@
 .sectionHeader.sectionHeader {
   background-color: white;
   border-bottom: $leftPanelBorder;
+  height: 40px;
 
   &:hover {
     background-color: #dfdfdf;
@@ -15,6 +16,16 @@
 
   .sectionTitle.sectionTitle {
     font-size: 12.5px;
+  }
+
+  .dropdownArrow {
+    margin-right: -12px;
+    transform: rotate(-90deg);
+    transition: transform 0.1s;
+
+    &.open {
+      transform: rotate(0deg);
+    }
   }
 }
 
@@ -38,5 +49,15 @@
 
   .postscript {
     margin-top: 11px;
+  }
+
+  .tip {
+    background-color: #f4f8e9;
+    color: #435f1f;
+    padding: 8px;
+
+    .bold {
+      font-weight: 900;
+    }
   }
 }
