@@ -1,1 +1,3 @@
-$leftPanelBorder: 1px solid #797979;
+@use "../common.scss" as *;
+
+$leftPanelBorder: 1px solid $controlIconLine;

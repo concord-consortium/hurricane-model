@@ -108,7 +108,7 @@ export const HurricaneIcon = observer(function HurricaneIcon({ dragging }: IHurr
   // anyway, I don't think we want distract users with hurricane changing its size only because it moved on the map.
   const hurricaneImageScale = Math.pow(2, mapZoom) * HURRICANE_IMG_SCALE_FACTOR;
   return (
-    <DraggableMapIcon dimmed={dimmed} disabled={!draggable} label={label}>
+    <DraggableMapIcon dataTest="hurricane-marker" dimmed={dimmed} disabled={!draggable} label={label}>
       <div className={css.hurricaneMarker}>
         <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
           {

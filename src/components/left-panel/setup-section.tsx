@@ -1,5 +1,3 @@
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from "@mui/material/Collapse";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -11,6 +9,8 @@ import React, { FunctionComponent, ReactNode } from "react";
 import { SetupMode } from "../../models/ui";
 import { useStores } from "../../stores-context";
 
+import DropdownArrow from "../../assets/left-panel/dropdown-arrow.svg";
+
 import css from "./setup-section.scss";
 
 interface ISetupSectionProps {
@@ -21,11 +21,12 @@ interface ISetupSectionProps {
   iconClassName?: string;
   postscript?: string;
   setupMode: SetupMode;
+  tip?: string;
   title: string;
 }
 
 export const SetupSection = observer(function SetupSection({
-  children, dataTest, hint, Icon, iconClassName, postscript, setupMode, title
+  children, dataTest, hint, Icon, iconClassName, postscript, setupMode, tip, title
 }: ISetupSectionProps) {
   const stores = useStores();
   const open = stores.ui.setupMode === setupMode;
@@ -48,12 +49,15 @@ export const SetupSection = observer(function SetupSection({
           primary={title}
           slotProps={{ primary: { className: css.sectionTitle } }}
         />
-        {open ? <ExpandLess /> : <ExpandMore />}
+        <div className={clsx(css.dropdownArrow, { [css.open]: open })}>
+          <DropdownArrow />
+        </div>
       </ListItemButton>
       <Collapse data-test={`${dt}-content`} in={open} unmountOnExit>
         <div className={css.section} data-test={`${dt}-section`}>
           {hint && <div className={css.hint}>{hint}</div>}
           {children}
+          {tip && <div className={css.tip}><span className={css.bold}>Tip:</span> {tip}</div>}
           {postscript && <div className={css.postscript}>{postscript}</div>}
         </div>
       </Collapse>
