@@ -1,7 +1,7 @@
 import { lineString } from "@turf/helpers";
 import { Position } from "geojson";
 import lineIntersect from "@turf/line-intersect";
-import { LatLngExpression, CRS, LatLngBounds, latLngBounds } from "leaflet";
+import { LatLngExpression, CRS, LatLngBounds, latLngBounds, latLng } from "leaflet";
 import { action, observable, computed, autorun, toJS, makeObservable, ObservableMap } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
@@ -20,7 +20,8 @@ import {
   ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
   StartLocation, StartLocationNames, isStartLocationName, isCoordinates, NamedRegion, namedRegions
 } from "../types";
-import { TEMP_ANOMALY_MIN, TEMP_ANOMALY_MAX } from "../utils/regions";
+import { TEMP_ANOMALY_MIN, TEMP_ANOMALY_MAX, temperatureAnomalyRegions } from "../utils/regions";
+import { isInsideRegion } from "../utils/region";
 import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
@@ -606,7 +607,20 @@ export class SimulationModel {
     // Format and whitespace are very important. That's how D3 scale returns color value.
     // It needs to match invertedTemperatureScale domain.
     const color = `rgb(${r}, ${g}, ${b})`;
-    return invertedTemperatureScale(color);
+    let temp: number | null = invertedTemperatureScale(color);
+
+    // Apply per-region anomalies.
+    if (temp != null) {
+      const ll = latLng(position);
+      for (const key of namedRegions) {
+        const anomaly = this.temperatureAnomalyAt(key);
+        if (anomaly !== 0 && isInsideRegion(ll, temperatureAnomalyRegions[key].region)) {
+          temp += anomaly;
+        }
+      }
+    }
+
+    return temp;
   }
 
   private seedTemperatureAnomalies() {

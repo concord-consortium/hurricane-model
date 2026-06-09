@@ -1,3 +1,4 @@
+import { temperatureAnomalyRegions } from "../utils/regions";
 import {
   SimulationModel, ISimulationOptions, windData, sstImages, minStepsOverSeaToDetectLandfall, extendedLandfallBounds
 } from "./simulation";
@@ -260,6 +261,26 @@ describe("SimulationModel store", () => {
       expect(sim.temperatureAnomalyAt("gulf")).toBe(3);
       sim.reset();
       expect(sim.temperatureAnomalyAt("gulf")).toBe(0);
+    });
+
+    it("shifts seaSurfaceTempAt by the anomaly of the containing region", done => {
+      jest.setTimeout(20000);
+      mockFetch.mockResponseOnce(fs.readFileSync("./sea-surface-temp-img/sep-default.png"));
+      const sim = new SimulationModel(options);
+      sim._seaSurfaceTempDataParsed = () => {
+        const pos = temperatureAnomalyRegions.coastalAfrica.anchor;
+        const base = sim.seaSurfaceTempAt(pos);
+        expect(base).not.toBeNull();
+
+        // Baseline of a point outside every region, which shouldn't change when an anomaly is applied.
+        const far = { lat: 45, lng: -40 };
+        const farBase = sim.seaSurfaceTempAt(far);
+
+        sim.adjustTemperatureAnomaly("coastalAfrica", 2);
+        expect(sim.seaSurfaceTempAt(pos)).toBeCloseTo((base as number) + 2);
+        expect(sim.seaSurfaceTempAt(far)).toBe(farBase);
+        done();
+      };
     });
   });
 
