@@ -5,7 +5,7 @@ import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapContainer, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
-import { LatLng, Map as LeafletMap, Point, PointTuple, latLngBounds } from "leaflet";
+import { LatLng, Map as LeafletMap, Point, PointTuple, latLngBounds, DomEvent } from "leaflet";
 import Control from "./leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
@@ -45,6 +45,16 @@ export class MapView extends BaseComponent<IProps, IState> {
   private _lastThermometerUpdateTime = 0;
   private _thermometerHoverTimeout: number | null = null;
   private zoomRef = React.createRef<LeafletControl.Zoom>();
+
+  // Stop pointer/scroll events on the in-map temperature controls from reaching the Leaflet map,
+  // so repeatedly clicking the +/- buttons doesn't trigger double-click zoom (or drag/wheel zoom).
+  // Stable method reference so React only invokes it on mount/unmount, not on every re-render.
+  private disableMapInteractions = (el: HTMLDivElement | null) => {
+    if (el) {
+      DomEvent.disableClickPropagation(el);
+      DomEvent.disableScrollPropagation(el);
+    }
+  };
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
@@ -264,7 +274,7 @@ export class MapView extends BaseComponent<IProps, IState> {
                     }}
                   />
                   <LeafletCustomMarker position={anchor}>
-                    <div className={css.temperatureControlMarker}>
+                    <div className={css.temperatureControlMarker} ref={this.disableMapInteractions}>
                       <RegionTemperatureControl regionKey={key} />
                     </div>
                   </LeafletCustomMarker>
