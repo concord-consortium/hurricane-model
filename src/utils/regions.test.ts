@@ -1,7 +1,7 @@
+import { temperatureAnomalyMax, temperatureAnomalyMin } from "../models/constants";
 import { namedRegions } from "../types";
 import { isInsideRegion } from "./region";
-import { temperatureAnomalyRegions, anomalyFillColor,
-  TEMP_ANOMALY_MIN, TEMP_ANOMALY_MAX } from "./regions";
+import { temperatureAnomalyRegions, anomalyFillColor } from "./regions";
 
 describe("temperatureAnomalyRegions", () => {
   it("each region's anchor falls inside its own polygon", () => {
@@ -12,8 +12,8 @@ describe("temperatureAnomalyRegions", () => {
   });
 
   it("exposes a ±3 clamp range", () => {
-    expect(TEMP_ANOMALY_MIN).toBe(-3);
-    expect(TEMP_ANOMALY_MAX).toBe(3);
+    expect(temperatureAnomalyMin).toBe(-3);
+    expect(temperatureAnomalyMax).toBe(3);
   });
 
   it("anomalyFillColor is white at 0 and shifts blue/red at the extremes", () => {

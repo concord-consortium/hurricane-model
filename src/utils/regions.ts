@@ -1,6 +1,7 @@
 import { FeatureCollection } from "geojson";
 import { scaleLinear } from "d3-scale";
 
+import { temperatureAnomalyMax, temperatureAnomalyMin } from "../models/constants";
 import { ICoordinates, NamedRegion } from "../types";
 import { Region, createRegion } from "./region";
 
@@ -8,9 +9,6 @@ import gulfData from "../data/regions/gulf-temp-anomaly-region.json";
 import caribbeanData from "../data/regions/caribbean-temp-anomaly-region.json";
 import centralAtlanticData from "../data/regions/central-atlantic-temp-anomaly-region.json";
 import coastalAfricaData from "../data/regions/coastal-africa-temp-anomaly-region.json";
-
-export const TEMP_ANOMALY_MIN = -3;
-export const TEMP_ANOMALY_MAX = 3;
 
 export interface NamedRegionData {
   label: string;
@@ -45,7 +43,7 @@ export const temperatureAnomalyRegions: Record<NamedRegion, NamedRegionData> = {
 // d3-scale's default interpolator detects hex color strings and interpolates them in
 // RGB, returning an "rgb(r, g, b)" string. clamp(true) keeps values within [-3, 3].
 const colorScale = scaleLinear<string>()
-  .domain([TEMP_ANOMALY_MIN, 0, TEMP_ANOMALY_MAX])
+  .domain([temperatureAnomalyMin, 0, temperatureAnomalyMax])
   .range(["#2255cc", "#ffffff", "#c62828"])
   .clamp(true);
 

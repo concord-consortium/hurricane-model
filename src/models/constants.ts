@@ -65,3 +65,6 @@ export const hurricaneCategoryInfo: CategoryInfo[] = [
 ];
 
 export const maxWindSpeed = 85; // m/s, a
+
+export const temperatureAnomalyMin = -3;
+export const temperatureAnomalyMax = 3;

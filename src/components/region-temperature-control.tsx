@@ -2,9 +2,10 @@ import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React from "react";
 
+import { temperatureAnomalyMax, temperatureAnomalyMin } from "../models/constants";
 import { useStores } from "../stores-context";
 import { NamedRegion } from "../types";
-import { temperatureAnomalyRegions, TEMP_ANOMALY_MIN, TEMP_ANOMALY_MAX } from "../utils/regions";
+import { temperatureAnomalyRegions } from "../utils/regions";
 
 import TempDecreaseIcon from "../assets/left-panel/temp-decrease-button.svg";
 import TempDecreaseHoverIcon from "../assets/left-panel/temp-decrease-button-hover.svg";
@@ -23,7 +24,7 @@ function ChangeButton({ adjustment, anomaly, regionKey }: IChangeButtonProps) {
   const { label } = temperatureAnomalyRegions[regionKey];
 
   const changeWord = adjustment < 0 ? "Decrease" : "Increase";
-  const disabled = adjustment < 0 ? anomaly <= TEMP_ANOMALY_MIN : anomaly >= TEMP_ANOMALY_MAX;
+  const disabled = adjustment < 0 ? anomaly <= temperatureAnomalyMin : anomaly >= temperatureAnomalyMax;
   const TempIcon = adjustment < 0 ? TempDecreaseIcon : TempIncreaseIcon;
   const TempHoverIcon = adjustment < 0 ? TempDecreaseHoverIcon : TempIncreaseHoverIcon;
 

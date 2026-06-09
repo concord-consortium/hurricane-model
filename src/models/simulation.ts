@@ -20,13 +20,13 @@ import {
   ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
   StartLocation, StartLocationNames, isStartLocationName, isCoordinates, NamedRegion, namedRegions
 } from "../types";
-import { TEMP_ANOMALY_MIN, TEMP_ANOMALY_MAX, temperatureAnomalyRegions } from "../utils/regions";
+import { temperatureAnomalyRegions } from "../utils/regions";
 import { isInsideRegion } from "../utils/region";
 import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
-import { hurricaneCategoryInfo } from "./constants";
+import { hurricaneCategoryInfo, temperatureAnomalyMin, temperatureAnomalyMax } from "./constants";
 import config, { selectPressureSystems, startStrengths } from "../config";
 import { random } from "../seedrandom";
 import { log } from "../log";
@@ -634,7 +634,7 @@ export class SimulationModel {
   }
 
   private clampAnomaly(value: number) {
-    return Math.max(TEMP_ANOMALY_MIN, Math.min(TEMP_ANOMALY_MAX, value));
+    return Math.max(temperatureAnomalyMin, Math.min(temperatureAnomalyMax, value));
   }
 
   public temperatureAnomalyAt(key: NamedRegion): number {
