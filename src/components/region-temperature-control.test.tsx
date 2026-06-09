@@ -7,7 +7,7 @@ import { RegionTemperatureControl } from "./region-temperature-control";
 const renderControl = (stores: IStores) =>
   render(
     <StoresContext value={stores}>
-      <RegionTemperatureControl regionKey="gulf" variant="panel" />
+      <RegionTemperatureControl regionKey="gulf" />
     </StoresContext>
   );
 

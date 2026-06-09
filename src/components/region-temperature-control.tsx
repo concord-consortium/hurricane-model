@@ -1,4 +1,3 @@
-import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React from "react";
 
@@ -44,7 +43,6 @@ function ChangeButton({ adjustment, anomaly, regionKey }: IChangeButtonProps) {
 
 interface IProps {
   regionKey: NamedRegion;
-  variant: "panel" | "map";
 }
 
 function statusText(anomaly: number): string {
@@ -52,17 +50,19 @@ function statusText(anomaly: number): string {
   return `${anomaly > 0 ? "+" : ""}${anomaly}°C`;
 }
 
-export const RegionTemperatureControl = observer(function RegionTemperatureControl({ regionKey, variant }: IProps) {
+export const RegionTemperatureControl = observer(function RegionTemperatureControl({ regionKey }: IProps) {
   const { simulation } = useStores();
   const { label } = temperatureAnomalyRegions[regionKey];
   const anomaly = simulation.temperatureAnomalyAt(regionKey);
 
   return (
-    <div className={clsx(css.regionTemperatureControl, css[variant])} data-testid={`region-control-${regionKey}`}>
-      <span className={css.label}>{label}</span>
-      <ChangeButton adjustment={-1} anomaly={anomaly} regionKey={regionKey} />
-      <span className={css.status}>{statusText(anomaly)}</span>
-      <ChangeButton adjustment={1} anomaly={anomaly} regionKey={regionKey} />
-    </div>
+    <React.Fragment data-testid={`region-control-${regionKey}`}>
+      <div className={css.label}>{label}</div>
+      <div className={css.buttonSection}>
+        <ChangeButton adjustment={-1} anomaly={anomaly} regionKey={regionKey} />
+        <span className={css.status}>{statusText(anomaly)}</span>
+        <ChangeButton adjustment={1} anomaly={anomaly} regionKey={regionKey} />
+      </div>
+    </React.Fragment>
   );
 });

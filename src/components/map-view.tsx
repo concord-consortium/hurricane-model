@@ -264,7 +264,9 @@ export class MapView extends BaseComponent<IProps, IState> {
                     }}
                   />
                   <LeafletCustomMarker position={anchor}>
-                    <RegionTemperatureControl regionKey={key} variant="map" />
+                    <div className={css.temperatureControlMarker}>
+                      <RegionTemperatureControl regionKey={key} />
+                    </div>
                   </LeafletCustomMarker>
                 </React.Fragment>
               );

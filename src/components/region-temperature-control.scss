@@ -1,9 +1,13 @@
-.regionTemperatureControl {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.label {
+  font-weight: bold;
+  white-space: nowrap;
+}
 
-  .label { flex: 1 1 auto; }
+.buttonSection {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  width: 120px;
 
   .status {
     min-width: 64px;
@@ -24,13 +28,5 @@
       .hoverIcon { display: inline; }
     }
     &:disabled { opacity: 0.4; cursor: default; }
-  }
-
-  &.map {
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 6px;
-    padding: 4px 8px;
-    white-space: nowrap;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   }
 }
