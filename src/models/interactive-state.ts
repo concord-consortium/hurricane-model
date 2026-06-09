@@ -1,4 +1,5 @@
 import { runInAction, toJS } from "mobx";
+import { namedRegions } from "../types";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
 import { PressureSystem } from "./pressure-system";
@@ -147,6 +148,15 @@ export function setInteractiveState(
           .filter(([key]) => !simState.consumedExtendedLandfallAreas!.includes(key))
           .map(([, bounds]) => bounds);
       }
+
+      if (simState.temperatureAnomalies) {
+        for (const key of namedRegions) {
+          const value = simState.temperatureAnomalies[key];
+          if (typeof value === "number") {
+            simulation.temperatureAnomalies.set(key, value);
+          }
+        }
+      }
     });
   }
 
@@ -222,7 +232,8 @@ export function getInteractiveState(stores: IStores): IHurricaneInteractiveState
       numberOfStepsOverLand: simulation.numberOfStepsOverLand,
       consumedExtendedLandfallAreas: Object.keys(extendedLandfallBounds)
         .filter(key => !simulation.extendedLandfallAreas
-          .some(area => area.equals(extendedLandfallBounds[key])))
+          .some(area => area.equals(extendedLandfallBounds[key]))),
+      temperatureAnomalies: Object.fromEntries(simulation.temperatureAnomalies)
     },
     ui: {
       baseMap: ui.baseMap,
