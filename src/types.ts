@@ -45,6 +45,11 @@ export const modeSeasons: Record<string, Season[]> = {
   "storm": ["summer", "earlyFall", "lateFall"]
 };
 
+// The four ocean regions whose sea surface temperature can be adjusted. This array is the
+// canonical iteration order; the NamedRegion type is derived from it.
+export const namedRegions = ["gulf", "caribbean", "centralAtlantic", "coastalAfrica"] as const;
+export type NamedRegion = typeof namedRegions[number];
+
 export type StartLocationNames = "atlantic" | "gulf";
 export type StartLocation = StartLocationNames | ICoordinates;
 
