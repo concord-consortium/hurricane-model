@@ -382,6 +382,9 @@ describe("interactive-state", () => {
       const stores = createStores();
       const state = getInteractiveState(stores);
       state.simulation.temperatureAnomalies = { gulf: 3, coastalAfrica: -2 };
+      expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(0);
+      expect(stores.simulation.temperatureAnomalyAt("coastalAfrica")).toBe(0);
+      expect(stores.simulation.temperatureAnomalyAt("caribbean")).toBe(0);
       setInteractiveState(stores, state);
       expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(3);
       expect(stores.simulation.temperatureAnomalyAt("coastalAfrica")).toBe(-2);
@@ -393,6 +396,7 @@ describe("interactive-state", () => {
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
       const state = getInteractiveState(stores);
       delete state.simulation.temperatureAnomalies;
+      expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(2);
       setInteractiveState(stores, state);
       // Absent field => no override; model keeps whatever it had (here, the prior value).
       expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(2);
