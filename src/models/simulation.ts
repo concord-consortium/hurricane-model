@@ -2,7 +2,7 @@ import { lineString } from "@turf/helpers";
 import { Position } from "geojson";
 import lineIntersect from "@turf/line-intersect";
 import { LatLngExpression, CRS, LatLngBounds, latLngBounds } from "leaflet";
-import { action, observable, computed, autorun, toJS, makeObservable } from "mobx";
+import { action, observable, computed, autorun, toJS, makeObservable, ObservableMap } from "mobx";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 import { Hurricane } from "./hurricane";
 import * as decWind from "../../wind-data-json/dec-simple.json";
@@ -16,8 +16,11 @@ import juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
 import septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
 import octSeaTemp from "../../sea-surface-temp-img/oct-default.png";
 import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
-  StartLocation, StartLocationNames, isStartLocationName, isCoordinates} from "../types";
+import {
+  ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
+  StartLocation, StartLocationNames, isStartLocationName, isCoordinates, NamedRegion, namedRegions
+} from "../types";
+import { TEMP_ANOMALY_MIN, TEMP_ANOMALY_MAX } from "../utils/regions";
 import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
@@ -114,6 +117,8 @@ export class SimulationModel {
   // Current season, sets wind and sea temperature (in the future).
   @observable public season: Season;
   @observable public seaSurfaceTempData: PNG | null = null;
+  // Per-region sea-surface-temperature anomalies in °C. Every region is always present (seeded to 0).
+  @observable public temperatureAnomalies = new ObservableMap<NamedRegion, number>();
   @observable public precipitationPoints: IPrecipitationPoint[] = [];
   // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
   @observable public simulationFinished = false;
@@ -156,6 +161,7 @@ export class SimulationModel {
       (o: IPressureSystemOptions) => new PressureSystem(o)
     );
     makeObservable(this);
+    this.seedTemperatureAnomalies();
     autorun(() => {
       // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
       // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
@@ -494,6 +500,7 @@ export class SimulationModel {
   // That's a complete reset to the initial state.
   @action.bound public reset() {
     this.restart();
+    this.seedTemperatureAnomalies();
     this.startLocation = this.initialState.startLocation;
     this.season = this.initialState.season;
     const coordinates = resolveStartLocation(this.startLocation);
@@ -600,6 +607,28 @@ export class SimulationModel {
     // It needs to match invertedTemperatureScale domain.
     const color = `rgb(${r}, ${g}, ${b})`;
     return invertedTemperatureScale(color);
+  }
+
+  private seedTemperatureAnomalies() {
+    const fromConfig: Record<string, number> = config.temperatureAnomalies ?? {};
+    const next = new Map<NamedRegion, number>();
+    for (const key of namedRegions) {
+      const raw = Number(fromConfig[key]);
+      next.set(key, isFinite(raw) ? this.clampAnomaly(raw) : 0);
+    }
+    this.temperatureAnomalies.replace(next);
+  }
+
+  private clampAnomaly(value: number) {
+    return Math.max(TEMP_ANOMALY_MIN, Math.min(TEMP_ANOMALY_MAX, value));
+  }
+
+  public temperatureAnomalyAt(key: NamedRegion): number {
+    return this.temperatureAnomalies.get(key) ?? 0;
+  }
+
+  @action.bound public adjustTemperatureAnomaly(key: NamedRegion, delta: number) {
+    this.temperatureAnomalies.set(key, this.clampAnomaly(this.temperatureAnomalyAt(key) + delta));
   }
 
   // Note that the visibility testing here is based on testing hurricane track segment end points.

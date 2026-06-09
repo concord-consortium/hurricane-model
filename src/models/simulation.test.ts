@@ -224,6 +224,45 @@ describe("SimulationModel store", () => {
     });
   });
 
+  describe("temperature anomalies", () => {
+    it("defaults every region to 0", () => {
+      const sim = new SimulationModel(options);
+      expect(sim.temperatureAnomalyAt("gulf")).toBe(0);
+      expect(sim.temperatureAnomalyAt("coastalAfrica")).toBe(0);
+    });
+
+    it("adjusts and clamps to [-3, 3]", () => {
+      const sim = new SimulationModel(options);
+      sim.adjustTemperatureAnomaly("gulf", 2);
+      expect(sim.temperatureAnomalyAt("gulf")).toBe(2);
+      sim.adjustTemperatureAnomaly("gulf", 2);   // would be 4
+      expect(sim.temperatureAnomalyAt("gulf")).toBe(3);
+      sim.adjustTemperatureAnomaly("gulf", -10); // would be -7
+      expect(sim.temperatureAnomalyAt("gulf")).toBe(-3);
+    });
+
+    it("seeds starting values from config and clamps them", () => {
+      const original = config.temperatureAnomalies;
+      config.temperatureAnomalies = { gulf: 2, caribbean: 99 };
+      try {
+        const sim = new SimulationModel(options);
+        expect(sim.temperatureAnomalyAt("gulf")).toBe(2);
+        expect(sim.temperatureAnomalyAt("caribbean")).toBe(3); // clamped
+        expect(sim.temperatureAnomalyAt("centralAtlantic")).toBe(0);
+      } finally {
+        config.temperatureAnomalies = original;
+      }
+    });
+
+    it("reset() restores anomalies to the config-seeded values", () => {
+      const sim = new SimulationModel(options);
+      sim.adjustTemperatureAnomaly("gulf", 3);
+      expect(sim.temperatureAnomalyAt("gulf")).toBe(3);
+      sim.reset();
+      expect(sim.temperatureAnomalyAt("gulf")).toBe(0);
+    });
+  });
+
   describe("categoryMarkerPositions", () => {
     const mapBounds = new Leaflet.LatLngBounds({ lat: -5, lng: -5 }, { lat: 5, lng: 5 });
     it("should show no markers with no hurricane track", () => {
