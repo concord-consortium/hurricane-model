@@ -26,6 +26,10 @@ import css from "./map-view.scss";
 import { ThermometerMarker } from "./thermometer-marker";
 import { PolygonRegion } from "./polygon-region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
+import { LeafletCustomMarker } from "./leaflet-custom-marker";
+import { RegionTemperatureControl } from "./region-temperature-control";
+import { namedRegions } from "../types";
+import { temperatureAnomalyRegions, anomalyFillColor } from "../utils/regions";
 import "leaflet/dist/leaflet.css";
 
 interface IProps extends IBaseProps {}
@@ -243,6 +247,28 @@ export class MapView extends BaseComponent<IProps, IState> {
           {
             ui.setupMode === "stormLocation" &&
             <PolygonRegion region={stormPlacementRegion} />
+          }
+          {
+            ui.setupMode === "seaSurfaceTemperatures" &&
+            namedRegions.map(key => {
+              const { region, anchor } = temperatureAnomalyRegions[key];
+              return (
+                <React.Fragment key={key}>
+                  <PolygonRegion
+                    region={region}
+                    pathOptions={{
+                      color: "#333333",
+                      weight: 1,
+                      fillColor: anomalyFillColor(sim.temperatureAnomalyAt(key)),
+                      fillOpacity: 0.6
+                    }}
+                  />
+                  <LeafletCustomMarker position={anchor}>
+                    <RegionTemperatureControl regionKey={key} variant="map" />
+                  </LeafletCustomMarker>
+                </React.Fragment>
+              );
+            })
           }
           <AttributionControl position="topright" />
         </MapContainer>
