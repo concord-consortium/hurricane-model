@@ -1,6 +1,11 @@
-.temperatureControlRow {
-  align-items: center;
+.temperatureControlRows {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  flex-direction: column;
+  gap: 10px;
+
+  .temperatureControlRow {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
 }

@@ -19,11 +19,13 @@ export function SeaSurfaceTemperaturesSection() {
       setupMode="seaSurfaceTemperatures"
       title="Sea Surface Temp Anomalies"
     >
-      {namedRegions.map(key => (
-        <div className={css.temperatureControlRow} key={key}>
-          <RegionTemperatureControl regionKey={key} />
-        </div>
-      ))}
+      <div className={css.temperatureControlRows}>
+        {namedRegions.map(key => (
+          <div className={css.temperatureControlRow} key={key}>
+            <RegionTemperatureControl regionKey={key} />
+          </div>
+        ))}
+      </div>
     </SetupSection>
   );
 }

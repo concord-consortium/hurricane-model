@@ -262,14 +262,15 @@ export class MapView extends BaseComponent<IProps, IState> {
             ui.setupMode === "seaSurfaceTemperatures" &&
             namedRegions.map(key => {
               const { region, anchor } = temperatureAnomalyRegions[key];
+              const anomalyColor = anomalyFillColor(sim.temperatureAnomalyAt(key));
               return (
                 <React.Fragment key={key}>
                   <PolygonRegion
                     region={region}
                     pathOptions={{
-                      color: "#333333",
-                      weight: 1,
-                      fillColor: anomalyFillColor(sim.temperatureAnomalyAt(key)),
+                      color: anomalyColor,
+                      weight: 1.5,
+                      fillColor: anomalyColor,
                       fillOpacity: 0.6
                     }}
                   />
