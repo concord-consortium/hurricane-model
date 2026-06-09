@@ -38,37 +38,38 @@ to a follow-up task (see "Deferred").
 `src/types.ts` gains the key union:
 
 ```ts
-export type NamedRegion = "gulf" | "caribbean" | "centralAtlantic" | "coastalAfrica";
+export const namedRegions = ["gulf", "caribbean", "centralAtlantic", "coastalAfrica"] as const;
+export type NamedRegion = typeof namedRegions[number];
 ```
 
 New `src/utils/regions.ts`:
 
 ```ts
 import { Region, createRegion } from "./region";
-import { NamedRegion } from "../types";
+import { ICoordinates, NamedRegion } from "../types";
 // + the four src/data/regions/*.json imports
 
 export interface NamedRegionData {
   label: string;              // "Gulf", "Caribbean", "Central Atlantic", "Coastal Africa"
-  anchor: [number, number];   // [lat, lng] where the in-map control is centered
+  anchor: ICoordinates;       // { lat, lng } where the in-map control is centered
   region: Region;             // createRegion(<geojson>)
 }
 
 export const temperatureAnomalyRegions: Record<NamedRegion, NamedRegionData> = {
-  gulf:            { label: "Gulf",             anchor: [/* lat, lng */], region: createRegion(gulfData) },
-  caribbean:       { label: "Caribbean",        anchor: [/* lat, lng */], region: createRegion(caribbeanData) },
-  centralAtlantic: { label: "Central Atlantic", anchor: [/* lat, lng */], region: createRegion(centralAtlanticData) },
-  coastalAfrica:   { label: "Coastal Africa",   anchor: [/* lat, lng */], region: createRegion(coastalAfricaData) },
+  gulf:            { label: "Gulf",             anchor: { lat: ..., lng: ... }, region: createRegion(gulfData) },
+  caribbean:       { label: "Caribbean",        anchor: { lat: ..., lng: ... }, region: createRegion(caribbeanData) },
+  centralAtlantic: { label: "Central Atlantic", anchor: { lat: ..., lng: ... }, region: createRegion(centralAtlanticData) },
+  coastalAfrica:   { label: "Coastal Africa",   anchor: { lat: ..., lng: ... }, region: createRegion(coastalAfricaData) },
 };
 ```
 
 The record key (the `NamedRegion`) is the canonical identifier used by config,
 the model map, and interactive state. The `anchor` is a hand-picked
-`[lat, lng]` inside each (possibly concave) region so the floating control sits
+`{ lat, lng }` inside each (possibly concave) region so the floating control sits
 sensibly — chosen over a computed centroid to avoid the centroid landing outside
 the Caribbean shape and to avoid adding a `@turf/centroid` dependency.
 
-Iteration elsewhere uses `Object.keys(temperatureAnomalyRegions) as NamedRegion[]`.
+Iteration elsewhere uses the `namedRegions` array from `types.ts`.
 
 ## 2. Model — `SimulationModel.temperatureAnomalies`
 
@@ -86,7 +87,7 @@ In `src/models/simulation.ts`:
 
   ```ts
   let temp = invertedTemperatureScale(color); // base
-  for (const key of Object.keys(temperatureAnomalyRegions) as NamedRegion[]) {
+  for (const key of namedRegions) {
     const anomaly = this.temperatureAnomalyAt(key);
     if (anomaly !== 0 && isInsideRegion(position, temperatureAnomalyRegions[key].region)) {
       temp += anomaly;
