@@ -86,7 +86,7 @@ export const HurricaneIcon = observer(function HurricaneIcon({ dragging }: IHurr
   const opacity = hurrStrengthToOpacity(hurricane.strength);
 
   const { hurricaneImage, mapZoom, setupMode } = stores.ui;
-  const dimmed = !!setupMode && !["stormLocation", "stormCategory"].includes(setupMode);
+  const dimmed = !!setupMode && !(setupMode === "stormLocation" || setupMode === "stormCategory");
   const draggable = setupMode === "stormLocation";
 
   const getLabel = () => {
