@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { createStores } from "../models/stores";
 import { MapContainer } from "react-leaflet";
 import { HurricaneMarker, HurricaneIcon } from "./hurricane-marker";
@@ -36,6 +36,32 @@ describe("HurricaneMarker component", () => {
     renderMarker();
     const draggableEl = document.querySelector(".leaflet-marker-draggable");
     expect(draggableEl).not.toBeNull();
+  });
+
+  it("is not dimmed in stormCategory setup mode", async () => {
+    stores.ui.setSetupMode("stormCategory");
+    stores.simulation.simulationStarted = false;
+    renderMarker();
+    const draggableEl = document.querySelector(".leaflet-marker-draggable");
+    expect(draggableEl).toBeNull();
+    await waitFor(() => {
+      const markerEl = document.querySelector(`[data-test="hurricane-marker"]`);
+      expect(markerEl).not.toBeNull();
+      expect(markerEl).not.toHaveClass("dimmed");
+    });
+  });
+
+  it("is dimmed in season setup mode", async () => {
+    stores.ui.setSetupMode("season");
+    stores.simulation.simulationStarted = false;
+    renderMarker();
+    const draggableEl = document.querySelector(".leaflet-marker-draggable");
+    expect(draggableEl).toBeNull();
+    await waitFor(() => {
+      const markerEl = document.querySelector(`[data-test="hurricane-marker"]`);
+      expect(markerEl).not.toBeNull();
+      expect(markerEl).toHaveClass("dimmed");
+    });
   });
 
   it("is not draggable once the simulation has started, even in setup mode", () => {
