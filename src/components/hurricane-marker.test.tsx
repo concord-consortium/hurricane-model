@@ -45,8 +45,9 @@ describe("HurricaneMarker component", () => {
     const draggableEl = document.querySelector(".leaflet-marker-draggable");
     expect(draggableEl).toBeNull();
     await waitFor(() => {
-      const dimmedEl = document.querySelector(`[data-test="hurricane-marker"].dimmed`);
-      expect(dimmedEl).toBeNull();
+      const markerEl = document.querySelector(`[data-test="hurricane-marker"]`);
+      expect(markerEl).not.toBeNull();
+      expect(markerEl).not.toHaveClass("dimmed");
     });
   });
 
@@ -57,8 +58,9 @@ describe("HurricaneMarker component", () => {
     const draggableEl = document.querySelector(".leaflet-marker-draggable");
     expect(draggableEl).toBeNull();
     await waitFor(() => {
-      const dimmedEl = document.querySelector(`[data-test="hurricane-marker"].dimmed`);
-      expect(dimmedEl).not.toBeNull();
+      const markerEl = document.querySelector(`[data-test="hurricane-marker"]`);
+      expect(markerEl).not.toBeNull();
+      expect(markerEl).toHaveClass("dimmed");
     });
   });
 
