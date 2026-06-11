@@ -20,22 +20,22 @@ export interface NamedRegionData {
 export const temperatureAnomalyRegions: Record<NamedRegion, NamedRegionData> = {
   gulf: {
     label: "Gulf",
-    anchor: { lat: 26.7, lng: -90.4 },
+    anchor: { lat: 24.7, lng: -89.7 },
     region: createRegion(gulfData as FeatureCollection)
   },
   caribbean: {
     label: "Caribbean",
-    anchor: { lat: 19, lng: -74 },
+    anchor: { lat: 17, lng: -74 },
     region: createRegion(caribbeanData as FeatureCollection)
   },
   centralAtlantic: {
     label: "Central Atlantic",
-    anchor: { lat: 19, lng: -45 },
+    anchor: { lat: 17, lng: -45 },
     region: createRegion(centralAtlanticData as FeatureCollection)
   },
   coastalAfrica: {
     label: "Coastal Africa",
-    anchor: { lat: 19, lng: -20 },
+    anchor: { lat: 17, lng: -20 },
     region: createRegion(coastalAfricaData as FeatureCollection)
   }
 };
