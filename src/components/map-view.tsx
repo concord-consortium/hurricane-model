@@ -271,7 +271,7 @@ export class MapView extends BaseComponent<IProps, IState> {
                       color: anomalyColor,
                       weight: 1.5,
                       fillColor: anomalyColor,
-                      fillOpacity: 0.6
+                      fillOpacity: 0.2
                     }}
                   />
                   <LeafletCustomMarker position={anchor}>

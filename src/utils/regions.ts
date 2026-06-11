@@ -40,11 +40,13 @@ export const temperatureAnomalyRegions: Record<NamedRegion, NamedRegionData> = {
   }
 };
 
+export const coldColor = "#2255cc";
+export const warmColor = "#c62828";
 // d3-scale's default interpolator detects hex color strings and interpolates them in
 // RGB, returning an "rgb(r, g, b)" string. clamp(true) keeps values within [-3, 3].
 const colorScale = scaleLinear<string>()
   .domain([temperatureAnomalyMin, 0, temperatureAnomalyMax])
-  .range(["#2255cc", "#ffffff", "#c62828"])
+  .range([coldColor, "#ffffff", warmColor])
   .clamp(true);
 
 export function anomalyFillColor(anomaly: number): string {

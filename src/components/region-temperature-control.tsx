@@ -4,7 +4,7 @@ import React from "react";
 import { temperatureAnomalyMax, temperatureAnomalyMin } from "../models/constants";
 import { useStores } from "../stores-context";
 import { NamedRegion } from "../types";
-import { temperatureAnomalyRegions } from "../utils/regions";
+import { coldColor, temperatureAnomalyRegions, warmColor } from "../utils/regions";
 
 import TempDecreaseIcon from "../assets/left-panel/temp-decrease-button.svg";
 import TempDecreaseHoverIcon from "../assets/left-panel/temp-decrease-button-hover.svg";
@@ -54,13 +54,14 @@ export const RegionTemperatureControl = observer(function RegionTemperatureContr
   const { simulation } = useStores();
   const { label } = temperatureAnomalyRegions[regionKey];
   const anomaly = simulation.temperatureAnomalyAt(regionKey);
+  const color = anomaly > 0 ? warmColor : anomaly < 0 ? coldColor : "#000";
 
   return (
     <React.Fragment data-testid={`region-control-${regionKey}`}>
       <div className={css.label}>{label}</div>
       <div className={css.buttonSection}>
         <ChangeButton adjustment={-1} anomaly={anomaly} regionKey={regionKey} />
-        <span className={css.status}>{statusText(anomaly)}</span>
+        <span className={css.status} style={{ color }}>{statusText(anomaly)}</span>
         <ChangeButton adjustment={1} anomaly={anomaly} regionKey={regionKey} />
       </div>
     </React.Fragment>
