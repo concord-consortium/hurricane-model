@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import * as Leaflet from "leaflet";
 import { observer } from "mobx-react";
 
@@ -23,7 +23,6 @@ import css from "./hurricane-marker.scss";
 const HURRICANE_IMG_SCALE_FACTOR = 0.05;
 
 export const HurricaneMarker = observer(function HurricaneMarker() {
-  const [dragging, setDragging] = useState(false);
   const stores = useStores();
 
   const { ui, simulation } = stores;
@@ -39,7 +38,6 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
     if (clamped.lat !== raw.lat || clamped.lng !== raw.lng) {
       marker.setLatLng(clamped);
     }
-    setDragging(true);
   }
 
   const handleDragEnd = (e: Leaflet.DragEndEvent) => {
@@ -47,7 +45,6 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
     const startLocation = { lat, lng };
     stores.simulation.setStartLocation(startLocation);
     log("StartLocationChanged", { startLocation });
-    setDragging(false);
   }
 
   return (
@@ -57,7 +54,7 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
     >
-      <HurricaneIcon dragging={dragging} />
+      <HurricaneIcon />
     </LeafletCustomMarker>
   );
 });
@@ -74,41 +71,35 @@ const hurrStrengthToOpacity = (strength: number) => {
 
 // Keep it as separate class so it's easier to test it.
 // Note that LeafletCustomMarker does rendering in a pretty awkward way, so it's hard to test these components together.
-interface IHurricaneIconProps {
-  dragging?: boolean;
-}
-export const HurricaneIcon = observer(function HurricaneIcon({ dragging }: IHurricaneIconProps) {
+export const HurricaneIcon = observer(function HurricaneIcon() {
   const stores = useStores();
 
-  const hurricane = stores.simulation.hurricane;
+  const { hurricane } = stores.simulation;
   const categoryCssClass = categoryCss["category" + hurricane.category];
   const temp = stores.simulation.seaSurfaceTempAt(hurricane.center);
   const opacity = hurrStrengthToOpacity(hurricane.strength);
 
-  const { hurricaneImage, mapZoom, setupMode } = stores.ui;
+  const { hurricaneImage, mapZoom, setupMode, thermometerActive } = stores.ui;
   const dimmed = !!setupMode && !(setupMode === "stormLocation" || setupMode === "stormCategory");
   const draggable = setupMode === "stormLocation";
 
   const getLabel = () => {
-    if (dragging) {
+    if (thermometerActive && temp !== null) {
+      return `Sea Surface Temp: ${temp.toFixed(1)} °C`;
+    } else {
       const { lat, lng } = hurricane.center;
       const latL = getDirectionLetter(lat, "lat");
       const lngL = getDirectionLetter(lng, "lng");
       return `${Math.abs(lat).toFixed(2)}°${latL}, ${Math.abs(lng).toFixed(2)}°${lngL}`;
-    } else if (temp !== null) {
-      return `Sea Surface Temp: ${temp.toFixed(1)} °C`;
     }
-
-    return "";
   };
-  const label = getLabel();
 
   // Note that the realistic hurricane image should scale with the map. This is simplified scaling that only uses
   // the map zoom. The real one should also take into account the map projection. But since it's a simplified view
   // anyway, I don't think we want distract users with hurricane changing its size only because it moved on the map.
   const hurricaneImageScale = Math.pow(2, mapZoom) * HURRICANE_IMG_SCALE_FACTOR;
   return (
-    <DraggableMapIcon dataTest="hurricane-marker" dimmed={dimmed} disabled={!draggable} label={label}>
+    <DraggableMapIcon dataTest="hurricane-marker" dimmed={dimmed} disabled={!draggable} label={getLabel()}>
       <div className={css.hurricaneMarker}>
         <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
           {
