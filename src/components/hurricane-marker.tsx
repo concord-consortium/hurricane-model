@@ -76,30 +76,23 @@ export const HurricaneIcon = observer(function HurricaneIcon() {
 
   const { hurricane } = stores.simulation;
   const categoryCssClass = categoryCss["category" + hurricane.category];
-  const temp = stores.simulation.seaSurfaceTempAt(hurricane.center);
   const opacity = hurrStrengthToOpacity(hurricane.strength);
 
-  const { hurricaneImage, mapZoom, setupMode, thermometerActive } = stores.ui;
+  const { hurricaneImage, mapZoom, setupMode } = stores.ui;
   const dimmed = !!setupMode && !(setupMode === "stormLocation" || setupMode === "stormCategory");
   const draggable = setupMode === "stormLocation";
 
-  const getLabel = () => {
-    if (thermometerActive && temp !== null) {
-      return `Sea Surface Temp: ${temp.toFixed(1)} °C`;
-    } else {
-      const { lat, lng } = hurricane.center;
-      const latL = getDirectionLetter(lat, "lat");
-      const lngL = getDirectionLetter(lng, "lng");
-      return `${Math.abs(lat).toFixed(2)}°${latL}, ${Math.abs(lng).toFixed(2)}°${lngL}`;
-    }
-  };
+  const { lat, lng } = hurricane.center;
+  const latL = getDirectionLetter(lat, "lat");
+  const lngL = getDirectionLetter(lng, "lng");
+  const label = `${Math.abs(lat).toFixed(2)}°${latL}, ${Math.abs(lng).toFixed(2)}°${lngL}`;
 
   // Note that the realistic hurricane image should scale with the map. This is simplified scaling that only uses
   // the map zoom. The real one should also take into account the map projection. But since it's a simplified view
   // anyway, I don't think we want distract users with hurricane changing its size only because it moved on the map.
   const hurricaneImageScale = Math.pow(2, mapZoom) * HURRICANE_IMG_SCALE_FACTOR;
   return (
-    <DraggableMapIcon dataTest="hurricane-marker" dimmed={dimmed} disabled={!draggable} label={getLabel()}>
+    <DraggableMapIcon dataTest="hurricane-marker" dimmed={dimmed} disabled={!draggable} label={label}>
       <div className={css.hurricaneMarker}>
         <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
           {
