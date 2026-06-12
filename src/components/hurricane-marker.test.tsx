@@ -120,4 +120,16 @@ describe("HurricaneIcon component", () => {
     );
     expect(screen.getByTestId("hurricane-category")).toHaveAttribute("data-value", "5");
   });
+
+  it("renders the hurricane's latitude and longitude", () => {
+    stores.simulation.hurricane.center = { lat: 25.5, lng: -80.25 };
+    render(
+      <StoresContext value={stores}>
+        <MapContainer center={[0, 0]} zoom={10}>
+          <HurricaneIcon />
+        </MapContainer>
+      </StoresContext>
+    );
+    expect(screen.getByText("25.50°N, 80.25°W")).toBeInTheDocument();
+  });
 });
