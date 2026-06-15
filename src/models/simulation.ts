@@ -611,13 +611,7 @@ export class SimulationModel {
 
     // Apply per-region anomalies.
     if (temp != null) {
-      const ll = latLng(position);
-      for (const key of namedRegions) {
-        const anomaly = this.temperatureAnomalyAt(key);
-        if (anomaly !== 0 && isInsideRegion(ll, temperatureAnomalyRegions[key].region)) {
-          temp += anomaly;
-        }
-      }
+      temp += this.totalAnomalyAt(latLng(position));
     }
 
     return temp;
@@ -639,6 +633,21 @@ export class SimulationModel {
 
   public temperatureAnomalyAt(key: NamedRegion): number {
     return this.temperatureAnomalies.get(key) ?? 0;
+  }
+
+  public totalAnomalyAt(coords: ICoordinates): number {
+    let total = 0;
+    for (const key of namedRegions) {
+      const anomaly = this.temperatureAnomalyAt(key);
+      if (anomaly !== 0 && isInsideRegion(coords, temperatureAnomalyRegions[key].region)) {
+        total += anomaly;
+      }
+    }
+    return total;
+  }
+
+  @computed public get anyAnomalyActive(): boolean {
+    return namedRegions.some(key => this.temperatureAnomalyAt(key) !== 0);
   }
 
   @action.bound public adjustTemperatureAnomaly(key: NamedRegion, delta: number) {

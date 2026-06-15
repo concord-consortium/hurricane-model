@@ -284,6 +284,23 @@ describe("SimulationModel store", () => {
     });
   });
 
+  describe("totalAnomalyAt", () => {
+    it("sums anomalies for regions containing the point and ignores zero/outside regions", () => {
+      const sim = new SimulationModel();
+      sim.temperatureAnomalies.set("gulf", 2);
+      expect(sim.totalAnomalyAt(temperatureAnomalyRegions.gulf.anchor)).toBe(2);
+      // A point in the open Pacific — inside no anomaly region.
+      expect(sim.totalAnomalyAt({ lat: 0, lng: -150 })).toBe(0);
+    });
+
+    it("anyAnomalyActive reflects whether any region is nonzero", () => {
+      const sim = new SimulationModel();
+      expect(sim.anyAnomalyActive).toBe(false);
+      sim.temperatureAnomalies.set("caribbean", -1);
+      expect(sim.anyAnomalyActive).toBe(true);
+    });
+  });
+
   describe("categoryMarkerPositions", () => {
     const mapBounds = new Leaflet.LatLngBounds({ lat: -5, lng: -5 }, { lat: 5, lng: 5 });
     it("should show no markers with no hurricane track", () => {
