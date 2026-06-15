@@ -6,7 +6,7 @@
 
 **Architecture:** A single regenerated `ImageOverlay`. When any anomaly is active, recolor the pixels inside anomaly-region bounding boxes of the visible SST PNG — invert each pixel's color to a temperature, add the region anomaly, and re-encode to the same color scale — producing a new data-URL image; otherwise fall back to the static per-season URL. The per-position anomaly value comes from a single shared `totalAnomalyAt()` method used by both the physics (`seaSurfaceTempAt`) and the visual recolor, so future edge-smoothing is a one-place change that keeps them consistent.
 
-**Tech Stack:** TypeScript, MobX (class decorators), pngjs (in-memory PNG read/write — no canvas), Leaflet `CRS.EPSG3857` for pixel↔lat/lng, the bidirectional `temperature-scale.js`, Jest.
+**Tech Stack:** TypeScript, MobX (class decorators), pngjs (in-memory PNG read/write — no canvas), Leaflet `CRS.EPSG3857` for pixel↔lat/lng, the bidirectional `temperature-scale.js`, `d3-color` for color-string parsing, Jest.
 
 ---
 
@@ -107,7 +107,18 @@ git commit -m "Extract shared totalAnomalyAt for SST anomalies"
 - Create: `src/utils/recolor-sst.ts`
 - Test: `src/utils/recolor-sst.test.ts`
 
-**Design:** Pure function. Takes a parsed pngjs `PNG`, a scale name, the active regions (for bounding-box bounds), and a `contributionAt(coords)` callback (which will be `sim.totalAnomalyAt`). Returns a `data:image/png;base64,...` URL. Recolors only pixels inside the union of active-region pixel bounding boxes. Uses `PNG.sync.write` — no canvas, so it runs in jsdom.
+**Design:** Pure function. Takes a parsed pngjs `PNG`, a scale name, the active regions (for bounding-box bounds), and a `contributionAt(coords)` callback (which will be `sim.totalAnomalyAt`). Returns a `data:image/png;base64,...` URL. Recolors only pixels inside the union of active-region pixel bounding boxes. Uses `PNG.sync.write` — no canvas, so it runs in jsdom. Color strings from `temperatureScale` are parsed with `d3-color`'s `rgb()` (already in the dependency tree via `d3-scale`) rather than a hand-rolled parser.
+
+**Step 0: Declare the d3-color dependency**
+
+`d3-color` is currently only a transitive dependency; declare it directly and add its types:
+
+```bash
+npm install --save d3-color@^2
+npm install --save-dev @types/d3-color@^2
+```
+
+Expected: both added to `package.json`. (`rgb()` returns an object whose channels are `NaN` for unparseable input — used for error handling below.)
 
 **Step 1: Write the failing test**
 
@@ -115,6 +126,7 @@ git commit -m "Extract shared totalAnomalyAt for SST anomalies"
 
 ```ts
 import { PNG } from "pngjs";
+import { rgb } from "d3-color";
 import { recolorSSTImage } from "./recolor-sst";
 import { createRegion } from "./region";
 import { temperatureScale, invertedTemperatureScale } from "../temperature-scale";
@@ -136,9 +148,9 @@ const tinyRegionData = {
 // Build a fully-opaque PNG painted with the color for a known base temperature.
 function makePng(width: number, height: number, baseTempColor: string) {
   const png = new PNG({ width, height });
-  const [r, g, b] = baseTempColor.match(/\d+/g)!.map(Number);
+  const c = rgb(baseTempColor);
   for (let i = 0; i < png.data.length; i += 4) {
-    png.data[i] = r; png.data[i + 1] = g; png.data[i + 2] = b; png.data[i + 3] = 255;
+    png.data[i] = c.r; png.data[i + 1] = c.g; png.data[i + 2] = c.b; png.data[i + 3] = 255;
   }
   return png;
 }
@@ -216,6 +228,7 @@ Expected: FAIL — cannot find module `./recolor-sst`.
 ```ts
 import { PNG } from "pngjs";
 import { CRS } from "leaflet";
+import { rgb } from "d3-color";
 import { temperatureScale, invertedTemperatureScale } from "../temperature-scale";
 import { Region } from "./region";
 import { ICoordinates } from "../types";
@@ -256,11 +269,6 @@ function pixelBoundingBox(regions: Region[], zoom: number, width: number, height
   };
 }
 
-function parseRgb(color: string): [number, number, number] {
-  const m = color.match(/\d+/g)!;
-  return [Number(m[0]), Number(m[1]), Number(m[2])];
-}
-
 function toDataUrl(png: PNG): string {
   return "data:image/png;base64," + PNG.sync.write(png).toString("base64");
 }
@@ -285,8 +293,11 @@ export function recolorSSTImage({ png, scaleName, regions, contributionAt }: Rec
       const temp = invertedTemperatureScale(baseColor, scaleName);
       if (temp == null) continue;
       const clamped = Math.max(MIN_TEMP, Math.min(MAX_TEMP, temp + contribution));
-      const [r, g, b] = parseRgb(temperatureScale(clamped, scaleName));
-      out.data[idx] = r; out.data[idx + 1] = g; out.data[idx + 2] = b;
+      const color = rgb(temperatureScale(clamped, scaleName));
+      if (Number.isNaN(color.r)) continue; // unparseable color — leave the base pixel untouched
+      out.data[idx] = Math.round(color.r);
+      out.data[idx + 1] = Math.round(color.g);
+      out.data[idx + 2] = Math.round(color.b);
     }
   }
   return toDataUrl(out);
@@ -324,6 +335,7 @@ git commit -m "Add pure recolorSSTImage utility for anomaly visualization"
 
 ```ts
 import { PNG } from "pngjs";
+import { rgb } from "d3-color";
 import { SimulationModel } from "./simulation";
 import { UIModel } from "./ui";
 import { SSTOverlayModel } from "./sst-overlay";
@@ -331,9 +343,9 @@ import { temperatureScale } from "../temperature-scale";
 
 function makeOpaquePng(width: number, height: number) {
   const png = new PNG({ width, height });
-  const [r, g, b] = temperatureScale(20, "default").match(/\d+/g)!.map(Number);
+  const c = rgb(temperatureScale(20, "default"));
   for (let i = 0; i < png.data.length; i += 4) {
-    png.data[i] = r; png.data[i + 1] = g; png.data[i + 2] = b; png.data[i + 3] = 255;
+    png.data[i] = c.r; png.data[i + 1] = c.g; png.data[i + 2] = c.b; png.data[i + 3] = 255;
   }
   return png;
 }
@@ -445,6 +457,12 @@ export class SSTOverlayModel {
   }
 
   private loadVisiblePng(url: string) {
+    // Clear the old PNG while the new one loads. This intentionally lets the recolor
+    // reaction fire an extra (cheap, early-returning) time on a season/scale change:
+    // it clears the stale recolored image so the map falls back to the freshly-loading
+    // base tile, and it keeps `visiblePng` from being recolored against a newly-changed
+    // scale's lookup table (which would produce garbage). Anomaly-only changes don't
+    // call this, so they fire the recolor reaction exactly once.
     this.setVisiblePng(null);
     fetch(url).then(response => {
       if (!response.ok) return;
