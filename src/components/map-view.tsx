@@ -121,9 +121,8 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public render() {
-    const sim = this.stores.simulation;
-    const ui = this.stores.ui;
-    const sstOverlay = this.stores.sstOverlay;
+    const { simulation: sim, ui } = this.stores;
+    const { sstOverlay } = ui;
     const navigation = !!ui.zoomedInView || config.navigation;
 
     const resetButtonClasses = clsx(
@@ -177,11 +176,11 @@ export class MapView extends BaseComponent<IProps, IState> {
             ui.overlay === "sst" &&
             <ImageOverlay
               // accessible version of sea surface temperature should always use 100% opacity
-              opacity={ui.accessibleSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
+              opacity={sstOverlay.accessibleSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
               url={
                 sim.anyAnomalyActive && sstOverlay.recoloredUrl
                   ? sstOverlay.recoloredUrl
-                  : ui.getVisibleSeaSurfaceTempImgUrl(sim.season)
+                  : sstOverlay.getVisibleSeaSurfaceTempImgUrl(sim.season)
               }
               bounds={imageOverlayBounds}
             />

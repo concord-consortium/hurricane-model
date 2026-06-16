@@ -1,7 +1,6 @@
 import { PNG } from "pngjs";
 import { rgb } from "d3-color";
 import { SimulationModel } from "./simulation";
-import { UIModel } from "./ui";
 import { SSTOverlayModel } from "./sst-overlay";
 import { temperatureScale } from "../temperature-scale";
 
@@ -16,8 +15,7 @@ function makeOpaquePng(width: number, height: number) {
 
 it("produces a data-URL when an anomaly is active", () => {
   const simulation = new SimulationModel();
-  const ui = new UIModel();
-  const overlay = new SSTOverlayModel(simulation, ui);
+  const overlay = new SSTOverlayModel(simulation);
 
   overlay.setVisiblePng(makeOpaquePng(128, 128));
   simulation.adjustTemperatureAnomaly("gulf", 2);
@@ -28,8 +26,7 @@ it("produces a data-URL when an anomaly is active", () => {
 
 it("clears the recolored URL when no anomaly is active", () => {
   const simulation = new SimulationModel();
-  const ui = new UIModel();
-  const overlay = new SSTOverlayModel(simulation, ui);
+  const overlay = new SSTOverlayModel(simulation);
 
   overlay.setVisiblePng(makeOpaquePng(128, 128));
   overlay.recolorNow();

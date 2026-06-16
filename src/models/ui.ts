@@ -2,66 +2,11 @@ import { action, observable, computed, makeObservable } from "mobx";
 import { LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds } from "leaflet";
 import config from "../config";
 import { mapLayer, MapTilesName, mapTilesNames } from "../map-layer-tiles";
-import { Season, ISSTImages } from "../types";
-
-import decSeaTempDefault from "../../sea-surface-temp-img/dec-default.png";
-import marchSeaTempDefault from "../../sea-surface-temp-img/mar-default.png";
-import juneSeaTempDefault from "../../sea-surface-temp-img/jun-default.png";
-import septSeaTempDefault from "../../sea-surface-temp-img/sep-default.png";
-import octSeaTempDefault from "../../sea-surface-temp-img/oct-default.png";
-import decSeaTempPurple3 from "../../sea-surface-temp-img/dec-purple3.png";
-import marchSeaTempPurple3 from "../../sea-surface-temp-img/mar-purple3.png";
-import juneSeaTempPurple3 from "../../sea-surface-temp-img/jun-purple3.png";
-import septSeaTempPurple3 from "../../sea-surface-temp-img/sep-purple3.png";
-import octSeaTempPurple3 from "../../sea-surface-temp-img/oct-purple3.png";
-import decSeaTempPurpleCC from "../../sea-surface-temp-img/dec-purpleCC.png";
-import marchSeaTempPurpleCC from "../../sea-surface-temp-img/mar-purpleCC.png";
-import juneSeaTempPurpleCC from "../../sea-surface-temp-img/jun-purpleCC.png";
-import septSeaTempPurpleCC from "../../sea-surface-temp-img/sep-purpleCC.png";
-import octSeaTempPurpleCC from "../../sea-surface-temp-img/oct-purpleCC.png";
-import decSeaTempRainbowCC from "../../sea-surface-temp-img/dec-rainbowCC.png";
-import marchSeaTempRainbowCC from "../../sea-surface-temp-img/mar-rainbowCC.png";
-import juneSeaTempRainbowCC from "../../sea-surface-temp-img/jun-rainbowCC.png";
-import septSeaTempRainbowCC from "../../sea-surface-temp-img/sep-rainbowCC.png";
-import octSeaTempRainbowCC from "../../sea-surface-temp-img/oct-rainbowCC.png";
+import { SimulationModel } from "./simulation";
+import { SSTOverlayModel } from "./sst-overlay";
 
 export type InteractiveMode = "runtime" | "authoring" | "report" | "reportItem";
 export type SetupMode = "stormLocation" | "stormCategory" | "season" | "seaSurfaceTemperatures" | "pressureSystems";
-
-export const sstImages: Record<string, ISSTImages> = {
-  default: {
-    winter: decSeaTempDefault,
-    spring: marchSeaTempDefault,
-    summer: juneSeaTempDefault,
-    fall: septSeaTempDefault,
-    earlyFall: septSeaTempDefault,
-    lateFall: octSeaTempDefault
-  },
-  rainbowCC: {
-    winter: decSeaTempRainbowCC,
-    spring: marchSeaTempRainbowCC,
-    summer: juneSeaTempRainbowCC,
-    fall: septSeaTempRainbowCC,
-    earlyFall: septSeaTempRainbowCC,
-    lateFall: octSeaTempRainbowCC
-  },
-  purple3: {
-    winter: decSeaTempPurple3,
-    spring: marchSeaTempPurple3,
-    summer: juneSeaTempPurple3,
-    fall: septSeaTempPurple3,
-    earlyFall: septSeaTempPurple3,
-    lateFall: octSeaTempPurple3
-  },
-  purpleCC: {
-    winter: decSeaTempPurpleCC,
-    spring: marchSeaTempPurpleCC,
-    summer: juneSeaTempPurpleCC,
-    fall: septSeaTempPurpleCC,
-    earlyFall: septSeaTempPurpleCC,
-    lateFall: octSeaTempPurpleCC
-  },
-};
 
 // Storm surge data bounds is limited to very specify area (Texas to Maine).
 // See: https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
@@ -71,6 +16,7 @@ export type Overlay = "sst" | "precipitation" | "stormSurge";
 export type ZoomedInViewProps = false | { landfallCategory: number; stormSurgeAvailable: boolean; };
 
 export class UIModel {
+  @observable public sstOverlay: SSTOverlayModel;
   @observable public mode: InteractiveMode = "runtime";
   @observable public setupMode: SetupMode | undefined = undefined;
   @observable public leftPanelOpen = false;
@@ -87,7 +33,6 @@ export class UIModel {
   @observable public mapZoom = 1;
   @observable public baseMap: MapTilesName = config.map;
   @observable public overlay: Overlay | null = config.overlay;
-  @observable public accessibleSSTScale = false;
   @observable public categoryChangeMarkers = config.categoryChangeMarkers;
   @observable public thermometerActive = false;
   @observable public thermometerPositionSaved: LatLngExpression | null = null;
@@ -103,8 +48,9 @@ export class UIModel {
 
   protected initialState: UIModel;
 
-  constructor() {
+  constructor(simulation: SimulationModel) {
     makeObservable(this);
+    this.sstOverlay = new SSTOverlayModel(simulation);
     this.initialState = JSON.parse(JSON.stringify(this));
     if ((this.initialState.baseMap === "population") && !config.enablePopulationMap) {
       this.initialState.baseMap = "street";
@@ -131,10 +77,6 @@ export class UIModel {
     return Math.min(baseMap.maxZoom, overlay && overlay.maxZoom || Infinity);
   }
 
-  @computed public get sstScaleName() {
-    return this.accessibleSSTScale ? config.accessibleSSTScale : config.defaultSSTScale;
-  }
-
   @computed public get isReportMode(): boolean {
     return this.mode === "report" || this.mode === "reportItem";
   }
@@ -149,10 +91,6 @@ export class UIModel {
 
   @action.bound public setLeftPanelOpen(open: boolean) {
     this.leftPanelOpen = open;
-  }
-
-  public getVisibleSeaSurfaceTempImgUrl(season: Season) {
-    return sstImages[this.sstScaleName][season];
   }
 
   @action.bound public mapUpdated(map: Map, programmaticUpdate: boolean) {
@@ -226,10 +164,6 @@ export class UIModel {
     this.thermometerActive = false;
     this.thermometerPositionHover = null;
     this.thermometerPositionSaved = null;
-  }
-
-  @action.bound public setAccessibleSSTScale(enabled: boolean) {
-    this.accessibleSSTScale = enabled;
   }
 
   @action.bound public reset() {

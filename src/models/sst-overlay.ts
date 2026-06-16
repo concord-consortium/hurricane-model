@@ -1,31 +1,86 @@
 import { action, computed, observable, makeObservable, reaction, toJS } from "mobx";
 import { PNG } from "pngjs";
 import { Buffer } from "buffer";
-import { SimulationModel } from "./simulation";
-import { UIModel } from "./ui";
+import config from "../config";
 import { recolorSSTImage } from "../utils/recolor-sst";
 import { temperatureAnomalyRegions } from "../utils/regions";
-import { namedRegions } from "../types";
+import { ISSTImages, namedRegions, Season } from "../types";
+import { SimulationModel } from "./simulation";
+
+import decSeaTempDefault from "../../sea-surface-temp-img/dec-default.png";
+import marchSeaTempDefault from "../../sea-surface-temp-img/mar-default.png";
+import juneSeaTempDefault from "../../sea-surface-temp-img/jun-default.png";
+import septSeaTempDefault from "../../sea-surface-temp-img/sep-default.png";
+import octSeaTempDefault from "../../sea-surface-temp-img/oct-default.png";
+import decSeaTempPurple3 from "../../sea-surface-temp-img/dec-purple3.png";
+import marchSeaTempPurple3 from "../../sea-surface-temp-img/mar-purple3.png";
+import juneSeaTempPurple3 from "../../sea-surface-temp-img/jun-purple3.png";
+import septSeaTempPurple3 from "../../sea-surface-temp-img/sep-purple3.png";
+import octSeaTempPurple3 from "../../sea-surface-temp-img/oct-purple3.png";
+import decSeaTempPurpleCC from "../../sea-surface-temp-img/dec-purpleCC.png";
+import marchSeaTempPurpleCC from "../../sea-surface-temp-img/mar-purpleCC.png";
+import juneSeaTempPurpleCC from "../../sea-surface-temp-img/jun-purpleCC.png";
+import septSeaTempPurpleCC from "../../sea-surface-temp-img/sep-purpleCC.png";
+import octSeaTempPurpleCC from "../../sea-surface-temp-img/oct-purpleCC.png";
+import decSeaTempRainbowCC from "../../sea-surface-temp-img/dec-rainbowCC.png";
+import marchSeaTempRainbowCC from "../../sea-surface-temp-img/mar-rainbowCC.png";
+import juneSeaTempRainbowCC from "../../sea-surface-temp-img/jun-rainbowCC.png";
+import septSeaTempRainbowCC from "../../sea-surface-temp-img/sep-rainbowCC.png";
+import octSeaTempRainbowCC from "../../sea-surface-temp-img/oct-rainbowCC.png";
 
 const RECOLOR_DEBOUNCE_MS = 150;
+
+export const sstImages: Record<string, ISSTImages> = {
+  default: {
+    winter: decSeaTempDefault,
+    spring: marchSeaTempDefault,
+    summer: juneSeaTempDefault,
+    fall: septSeaTempDefault,
+    earlyFall: septSeaTempDefault,
+    lateFall: octSeaTempDefault
+  },
+  rainbowCC: {
+    winter: decSeaTempRainbowCC,
+    spring: marchSeaTempRainbowCC,
+    summer: juneSeaTempRainbowCC,
+    fall: septSeaTempRainbowCC,
+    earlyFall: septSeaTempRainbowCC,
+    lateFall: octSeaTempRainbowCC
+  },
+  purple3: {
+    winter: decSeaTempPurple3,
+    spring: marchSeaTempPurple3,
+    summer: juneSeaTempPurple3,
+    fall: septSeaTempPurple3,
+    earlyFall: septSeaTempPurple3,
+    lateFall: octSeaTempPurple3
+  },
+  purpleCC: {
+    winter: decSeaTempPurpleCC,
+    spring: marchSeaTempPurpleCC,
+    summer: juneSeaTempPurpleCC,
+    fall: septSeaTempPurpleCC,
+    earlyFall: septSeaTempPurpleCC,
+    lateFall: octSeaTempPurpleCC
+  },
+};
 
 export class SSTOverlayModel {
   @observable.ref public visiblePng: PNG | null = null;
   @observable public recoloredUrl: string | null = null;
+  @observable public accessibleSSTScale = false;
 
   private simulation: SimulationModel;
-  private ui: UIModel;
   // Test hook, mirrors simulation._seaSurfaceTempDataParsed.
   public _visiblePngParsed: null | (() => void) = null;
 
-  constructor(simulation: SimulationModel, ui: UIModel) {
+  constructor(simulation: SimulationModel) {
     makeObservable(this);
     this.simulation = simulation;
-    this.ui = ui;
 
     // Re-fetch/parse the visible PNG whenever its URL changes.
     reaction(
-      () => this.ui.getVisibleSeaSurfaceTempImgUrl(this.simulation.season),
+      () => this.getVisibleSeaSurfaceTempImgUrl(this.simulation.season),
       url => this.loadVisiblePng(url),
       { fireImmediately: true }
     );
@@ -35,17 +90,29 @@ export class SSTOverlayModel {
       () => ({
         png: this.visiblePng,
         anomalies: toJS(this.simulation.temperatureAnomalies),
-        scale: this.ui.sstScaleName,
+        scale: this.sstScaleName,
       }),
       () => this.recolorNow(),
       { delay: RECOLOR_DEBOUNCE_MS }
     );
   }
 
+  @computed public get sstScaleName() {
+    return this.accessibleSSTScale ? config.accessibleSSTScale : config.defaultSSTScale;
+  }
+
+  public getVisibleSeaSurfaceTempImgUrl(season: Season) {
+    return sstImages[this.sstScaleName][season];
+  }
+
   @computed public get activeRegions() {
     return namedRegions
       .filter(key => this.simulation.temperatureAnomalyAt(key) !== 0)
       .map(key => temperatureAnomalyRegions[key].region);
+  }
+
+  @action.bound public setAccessibleSSTScale(enabled: boolean) {
+    this.accessibleSSTScale = enabled;
   }
 
   @action.bound public setVisiblePng(png: PNG | null) {
@@ -64,7 +131,7 @@ export class SSTOverlayModel {
     }
     this.setRecoloredUrl(recolorSSTImage({
       png,
-      scaleName: this.ui.sstScaleName,
+      scaleName: this.sstScaleName,
       regions: this.activeRegions,
       getTempDelta: coords => this.simulation.totalAnomalyAt(coords),
     }));

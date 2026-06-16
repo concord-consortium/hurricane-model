@@ -176,7 +176,7 @@ export function setInteractiveState(
         ui.hurricaneImage = uiState.hurricaneImage;
       }
       if (uiState.accessibleSSTScale !== undefined) {
-        ui.accessibleSSTScale = uiState.accessibleSSTScale;
+        ui.sstOverlay.accessibleSSTScale = uiState.accessibleSSTScale;
       }
       if (uiState.categoryChangeMarkers !== undefined) {
         ui.categoryChangeMarkers = uiState.categoryChangeMarkers;
@@ -240,7 +240,7 @@ export function getInteractiveState(stores: IStores): IHurricaneInteractiveState
       overlay: ui.overlay,
       windArrows: ui.windArrows,
       hurricaneImage: ui.hurricaneImage,
-      accessibleSSTScale: ui.accessibleSSTScale,
+      accessibleSSTScale: ui.sstOverlay.accessibleSSTScale,
       categoryChangeMarkers: ui.categoryChangeMarkers,
       thermometerActive: ui.thermometerActive,
       thermometerPositionSaved: ui.thermometerPositionSaved,

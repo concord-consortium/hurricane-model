@@ -1,11 +1,11 @@
 import * as React from "react";
-import { inject, observer } from "mobx-react";
-import { BaseComponent, IBaseProps } from "../base";
+import { observer } from "mobx-react";
 import { temperatureScale } from "../../temperature-scale";
 import { log } from "../../log";
 import Checkbox from "@mui/material/Checkbox";
 import genericKeyCss from "./map-button-key.scss";
 import css from "./sst-key.scss";
+import { useStores } from "../../stores-context";
 
 const getFahrenheit = (celsius: number) => {
   return (celsius * 9 / 5) + 32;
@@ -45,12 +45,13 @@ const renderTemperatureLabels = (increments: number, tempScaleName: string) => {
   </div>;
 };
 
-@inject("stores")
-@observer
-export class SSTKey extends BaseComponent<IBaseProps, {}> {
-  public toggleAccessibleKey = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const newValue = !this.stores.ui.accessibleSSTScale;
-    this.stores.ui.setAccessibleSSTScale(newValue);
+export const SSTKey = observer(function SSTKey() {
+  const stores = useStores();
+  const { sstOverlay } = stores.ui;
+
+  const toggleAccessibleKey = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const newValue = !sstOverlay.accessibleSSTScale;
+    sstOverlay.setAccessibleSSTScale(newValue);
     if (newValue) {
       log("AccessibleSSTScaleEnabled");
     } else {
@@ -60,22 +61,19 @@ export class SSTKey extends BaseComponent<IBaseProps, {}> {
     e.stopPropagation();
   }
 
-  public render() {
-    const ui = this.stores.ui;
-    return (
-      <div>
-        <div className={`${genericKeyCss.keySubheader} ${css.units}`}><span>°C</span><span>°F</span></div>
-        <div className={genericKeyCss.keyContent}>
-          { renderTemperatureLabels(9, ui.sstScaleName) }
-        </div>
-        <div className={css.checkbox}>
-          <Checkbox
-            className={css.checkboxElement}
-            checked={ui.accessibleSSTScale}
-            onClick={this.toggleAccessibleKey}
-          /> Accessible Key
-        </div>
+  return (
+    <div>
+      <div className={`${genericKeyCss.keySubheader} ${css.units}`}><span>°C</span><span>°F</span></div>
+      <div className={genericKeyCss.keyContent}>
+        { renderTemperatureLabels(9, sstOverlay.sstScaleName) }
       </div>
-    );
-  }
-}
+      <div className={css.checkbox}>
+        <Checkbox
+          className={css.checkboxElement}
+          checked={sstOverlay.accessibleSSTScale}
+          onClick={toggleAccessibleKey}
+        /> Accessible Key
+      </div>
+    </div>
+  );
+});

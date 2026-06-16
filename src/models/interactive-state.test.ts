@@ -242,7 +242,7 @@ describe("interactive-state", () => {
       expect(stores.ui.overlay).toBe("precipitation");
       expect(stores.ui.windArrows).toBe(false);
       expect(stores.ui.hurricaneImage).toBe(true);
-      expect(stores.ui.accessibleSSTScale).toBe(true);
+      expect(stores.ui.sstOverlay.accessibleSSTScale).toBe(true);
       expect(stores.ui.thermometerActive).toBe(true);
       expect(stores.ui.categoryChangeMarkers).toBe(false);
       expect(stores.ui.thermometerPositionSaved).toEqual([30, -85]);

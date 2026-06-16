@@ -78,8 +78,7 @@ describe("MapView component", () => {
   });
 
   describe("SST overlay url", () => {
-    const sstImg = () =>
-      document.querySelector("img.leaflet-image-layer") as HTMLImageElement | null;
+    const sstImg = () => document.querySelector("img.leaflet-image-layer") as HTMLImageElement | null;
     // jsdom resolves the relative asset-stub url against the document base when read back
     // via the `src` *property*, so resolve the expected static url the same way to compare.
     const resolved = (url: string) => new URL(url, document.baseURI).href;
@@ -87,7 +86,7 @@ describe("MapView component", () => {
     it("uses the static SST image url when no anomaly is active", () => {
       stores.ui.setOverlay("sst");
       renderMapView(stores);
-      const staticUrl = stores.ui.getVisibleSeaSurfaceTempImgUrl(stores.simulation.season);
+      const staticUrl = stores.ui.sstOverlay.getVisibleSeaSurfaceTempImgUrl(stores.simulation.season);
       const img = sstImg();
       expect(img).not.toBeNull();
       expect(img!.src).toBe(resolved(staticUrl));
@@ -96,7 +95,7 @@ describe("MapView component", () => {
     it("uses the recolored data-url when an anomaly is active and recoloredUrl is set", () => {
       stores.ui.setOverlay("sst");
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
-      stores.sstOverlay.setRecoloredUrl("data:image/png;base64,TESTDATA");
+      stores.ui.sstOverlay.setRecoloredUrl("data:image/png;base64,TESTDATA");
       renderMapView(stores);
       const img = sstImg();
       expect(img).not.toBeNull();
@@ -106,10 +105,10 @@ describe("MapView component", () => {
     it("falls back to the static url when an anomaly is active but recoloredUrl is null", () => {
       stores.ui.setOverlay("sst");
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
-      stores.sstOverlay.setRecoloredUrl(null);
+      stores.ui.sstOverlay.setRecoloredUrl(null);
       expect(stores.simulation.anyAnomalyActive).toBe(true);
       renderMapView(stores);
-      const staticUrl = stores.ui.getVisibleSeaSurfaceTempImgUrl(stores.simulation.season);
+      const staticUrl = stores.ui.sstOverlay.getVisibleSeaSurfaceTempImgUrl(stores.simulation.season);
       const img = sstImg();
       expect(img).not.toBeNull();
       expect(img!.src).toBe(resolved(staticUrl));
