@@ -89,3 +89,42 @@ it("honors a non-default scale name", () => {
   const out = PNG.sync.read(Buffer.from(dataUrl.split(",")[1], "base64"));
   expect(invertedTemperatureScale(pixelColor(out, 32, 32), "purple3")).toBeCloseTo(22, 1);
 });
+
+it("clamps to the max temperature (32C) on a large positive delta", () => {
+  // 25C base everywhere; a +15 delta would reach 40C but must saturate at 32C.
+  const baseColor = temperatureScale(25, "default");
+  const png = makePng(64, 64, baseColor);
+  const region = createRegion(tinyRegionData);
+
+  const dataUrl = recolorSSTImage({
+    png,
+    scaleName: "default",
+    regions: [region],
+    // +15 inside the tiny region, 0 elsewhere.
+    getTempDelta: (c) => (c.lat > min && c.lat < max && c.lng > min && c.lng < max ? 15 : 0),
+  });
+
+  const out = PNG.sync.read(Buffer.from(dataUrl.split(",")[1], "base64"));
+
+  // Center pixel should saturate at 32C, not 40C.
+  const center = pixelColor(out, 32, 32);
+  expect(invertedTemperatureScale(center, "default")).toBeCloseTo(32, 1);
+});
+
+it("returns the unmodified image as a valid data URL when there are no regions", () => {
+  const baseColor = temperatureScale(20, "default");
+  const png = makePng(64, 64, baseColor);
+
+  const dataUrl = recolorSSTImage({
+    // Nonzero delta proves that with no regions nothing is recolored.
+    png, scaleName: "default", regions: [], getTempDelta: () => 5,
+  });
+
+  expect(dataUrl.startsWith("data:image/png;base64,")).toBe(true);
+
+  const out = PNG.sync.read(Buffer.from(dataUrl.split(",")[1], "base64"));
+
+  // Center pixel should be unchanged at 20C.
+  const center = pixelColor(out, 32, 32);
+  expect(invertedTemperatureScale(center, "default")).toBeCloseTo(20, 1);
+});

@@ -9,6 +9,10 @@ interface RecolorParams {
   png: PNG;
   scaleName: string;
   regions: Region[]; // regions whose anomaly is nonzero (used only for bounding-box bounds)
+  // Temperature delta (°C) to apply at a coordinate. MUST return 0 for coordinates
+  // outside any active region: recolorSSTImage iterates the rectangular bounding box
+  // of the regions, so pixels inside the box but outside the (non-rectangular) polygons
+  // rely on this returning 0 to be left unchanged.
   getTempDelta: (coords: ICoordinates) => number;
 }
 
