@@ -3,7 +3,8 @@
 // sea temperature overlay images again. They are used together with this scale to read temperature from image data,
 // in the simulation engine, so they need to stay in sync.
 const { scaleLinear } = require("d3-scale");
-const maxTemp = 32;
+export const minTemp = 0;
+export const maxTemp = 32;
 // Note that all the input values are limited to 2 decimal digits. That lets us limit number of possible output
 // values and create inverted scale. This inverted scale can be used to map color to exact temperature.
 const step = 0.01; // These two values need to stay in sync.
@@ -91,11 +92,11 @@ Object.keys(colorRange).forEach(scaleName => {
   }
 });
 
-exports.temperatureScale = (temperature, scaleName = "default") => {
+export const temperatureScale = (temperature, scaleName = "default") => {
   // Limit value to two decimal digits. There is more about that in general comments at the top of this file.
   return scale[scaleName](Number(temperature.toFixed(decimalDigits)));
 };
 
-exports.invertedTemperatureScale = (color, scaleName = "default") => {
+export const invertedTemperatureScale = (color, scaleName = "default") => {
   return invertedScale[scaleName][color] ? invertedScale[scaleName][color] : null;
 };
