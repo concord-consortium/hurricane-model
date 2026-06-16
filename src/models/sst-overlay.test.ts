@@ -20,7 +20,7 @@ it("produces a data-URL when an anomaly is active", () => {
   const overlay = new SSTOverlayModel(simulation, ui);
 
   overlay.setVisiblePng(makeOpaquePng(128, 128));
-  simulation.temperatureAnomalies.set("gulf", 2);
+  simulation.adjustTemperatureAnomaly("gulf", 2);
   overlay.recolorNow();
 
   expect(overlay.recoloredUrl?.startsWith("data:image/png;base64,")).toBe(true);
