@@ -89,6 +89,33 @@ export function snapToRegionPreservingAxis(
     : { lat: best, lng: target };
 }
 
+// Planar minimum distance from coords to the region ring,
+// in degrees-of-latitude units (lng scaled by cos(lat) for rough isotropy).
+// Signed: positive inside, negative outside. Used for edge feathering — turf's
+// great-circle nearestPointOnLine is ~400x too slow for the per-pixel recolor.
+export function signedDistanceToRegion(coords: ICoordinates, region: Region): number {
+  const cosLat = Math.cos((coords.lat * Math.PI) / 180);
+  const ring = region.latLngs; // [lat, lng][], closed
+  let best = Infinity;
+  for (let i = 0; i < ring.length - 1; i++) {
+    const ax = (ring[i][1] - coords.lng) * cosLat;
+    const ay = ring[i][0] - coords.lat;
+    const bx = (ring[i + 1][1] - coords.lng) * cosLat;
+    const by = ring[i + 1][0] - coords.lat;
+    const dx = bx - ax;
+    const dy = by - ay;
+    const len2 = dx * dx + dy * dy;
+    let t = len2 ? -(ax * dx + ay * dy) / len2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    const px = ax + t * dx;
+    const py = ay + t * dy;
+    const d2 = px * px + py * py;
+    if (d2 < best) best = d2;
+  }
+  const dist = Math.sqrt(best);
+  return isInsideRegion(coords, region) ? dist : -dist;
+}
+
 // Smoothstep feather weight for a band straddling the region boundary.
 // signedDist > 0 inside, < 0 outside (same convention as signedDistanceToRegion).
 // Returns 1 a half-width inside, 0.5 on the edge, 0 a half-width outside.

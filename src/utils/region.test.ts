@@ -1,5 +1,7 @@
 import { FeatureCollection } from "geojson";
-import { createRegion, isInsideRegion, clampToRegion, snapToRegionPreservingAxis, featherWeight } from "./region";
+import {
+  createRegion, isInsideRegion, clampToRegion, snapToRegionPreservingAxis, featherWeight, signedDistanceToRegion
+} from "./region";
 
 // Unit square with corners at (0,0), (1,0), (1,1), (0,1). Coordinates are [lng, lat].
 const unitSquarePolygonFC: FeatureCollection = {
@@ -110,6 +112,33 @@ describe("region", () => {
       expect(snapped!.lng).toBeCloseTo(0.25, 5);
       expect(snapped!.lat).toBeCloseTo(0, 5);
     });
+  });
+});
+
+describe("signedDistanceToRegion", () => {
+  const region = createRegion(unitSquarePolygonFC);
+
+  it("gives correct values", () => {
+    // Center is 0.5deg from every edge; nearest edge is 0.5 (in latitude-degree units).
+    expect(signedDistanceToRegion({ lat: 0.5, lng: 0.5 }, region)).toBeCloseTo(0.5, 1);
+
+    // ~0 on the boundary
+    expect(signedDistanceToRegion({ lat: 1, lng: 0 }, region)).toBeCloseTo(0, 1);
+
+    // negative just outside. 1 degree north of the top edge.
+    expect(signedDistanceToRegion({ lat: 2, lng: 0 }, region)).toBeCloseTo(-1, 1);
+
+    // measures to the nearest corner for a diagonal point
+    // (lng 4, lat 4) sits diagonally outside the (1,1) corner; the nearest point on
+    // the ring is that vertex (both adjacent edges clamp their foot to it). Planar
+    // distance with lng scaled by cos(8deg): sqrt(((4-1)*cos8)^2 + (4-1)^2) ~= 4.22,
+    // negative because it is outside.
+    expect(signedDistanceToRegion({ lat: 4, lng: 4 }, region)).toBeCloseTo(-4.22, 1);
+
+    // grows in magnitude moving away from the edge
+    const near = signedDistanceToRegion({ lat: 2, lng: 0 }, region);
+    const far = signedDistanceToRegion({ lat: 5, lng: 0 }, region);
+    expect(far).toBeLessThan(near); // both negative, far is more negative
   });
 });
 
