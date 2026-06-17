@@ -1,4 +1,5 @@
 import { PNG } from "pngjs";
+import { CRS } from "leaflet";
 import { rgb } from "d3-color";
 import { recolorSSTImage } from "./recolor-sst";
 import { createRegion } from "./region";
@@ -156,4 +157,34 @@ it("returns the unmodified image as a valid data URL when there are no regions",
   // Center pixel should be unchanged at 20C.
   const center = pixelColor(out, 32, 32);
   expect(invertedTemperatureScale(center, "default")).toBeCloseTo(20, 1);
+});
+
+it("pads longitude by the cos(lat) factor so the band isn't clipped at high latitudes", () => {
+  // Square region at ~60N, where cos(lat) ~ 0.5, so a 2deg band reaches ~4deg of
+  // LONGITUDE outside the east/west edges. A raw 2deg pad would clip pixels past lng 4.
+  const width = 720, height = 720; // fine enough that 1deg of lng is distinct pixels
+  const baseColor = temperatureScale(20, "default");
+  const png = makePng(width, height, baseColor);
+  const data: FeatureCollection = {
+    type: "FeatureCollection",
+    features: [{ type: "Feature", properties: {}, geometry: {
+      type: "Polygon", coordinates: [[[-2, 58], [2, 58], [2, 62], [-2, 62], [-2, 58]]]
+    }}]
+  };
+  const region = createRegion(data);
+
+  // Band nonzero for points up to ~4deg outside the east edge (lng in (2, 6)).
+  const dataUrl = recolorSSTImage({
+    png, scaleName: "default", regions: [region], pad: 2,
+    getTempDelta: (c) => (c.lat > 54 && c.lat < 66 && c.lng > 2 && c.lng < 6 ? 3 : 0),
+  });
+  const out = PNG.sync.read(Buffer.from(dataUrl.split(",")[1], "base64"));
+
+  // lng 5 is beyond the raw 2deg pad (edge 2 + 2 = 4) but within the cos-adjusted
+  // band, so it must be recolored. Compute its pixel via the same projection the
+  // recolor uses.
+  const zoom = CRS.EPSG3857.zoom(width);
+  const p = CRS.EPSG3857.latLngToPoint({ lat: 60, lng: 5 }, zoom);
+  const x = Math.round(p.x), y = Math.round(p.y);
+  expect(invertedTemperatureScale(pixelColor(out, x, y), "default")).toBeCloseTo(23, 1);
 });

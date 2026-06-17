@@ -37,11 +37,16 @@ function pixelBoundingBox(
   // Return null if there are no region boundaries
   if (latMin === Infinity) return null;
 
-  // Expand by the feather pad (degrees), clamped to valid lat/lng ranges.
+  // Expand by the feather pad. Latitude pads by the raw degrees; longitude pads by
+  // pad / cos(lat) because signedDistanceToRegion scales longitude by cos(lat), so the
+  // band reaches that many more degrees of longitude outside east/west edges. Use the
+  // largest-magnitude (lat-expanded) latitude — the smallest cosine — for the worst case.
   latMin = Math.max(-85, latMin - pad);
   latMax = Math.min(85, latMax + pad);
-  lngMin = Math.max(-180, lngMin - pad);
-  lngMax = Math.min(180, lngMax + pad);
+  const cosLat = Math.cos((Math.max(Math.abs(latMin), Math.abs(latMax)) * Math.PI) / 180);
+  const lngPad = pad / Math.max(cosLat, 0.01); // guard against div-by-zero near the poles
+  lngMin = Math.max(-180, lngMin - lngPad);
+  lngMax = Math.min(180, lngMax + lngPad);
 
   // Higher latitude projects to a smaller y, so latMax -> top, latMin -> bottom.
   const topLeft = CRS.EPSG3857.latLngToPoint({ lat: latMax, lng: lngMin }, zoom);
