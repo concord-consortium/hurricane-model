@@ -14,11 +14,16 @@ interface RecolorParams {
   // of the regions, so pixels inside the box but outside the (non-rectangular) polygons
   // rely on this returning 0 to be left unchanged.
   getTempDelta: (coords: ICoordinates) => number;
+  // Degrees to expand each region's bounding box, so the outside half of a
+  // straddling feather band is included. Defaults to 0 (no feather).
+  pad?: number;
 }
 
 interface PixelBox { minX: number; minY: number; maxX: number; maxY: number; }
 
-function pixelBoundingBox(regions: Region[], zoom: number, width: number, height: number): PixelBox | null {
+function pixelBoundingBox(
+  regions: Region[], zoom: number, width: number, height: number, pad: number
+): PixelBox | null {
   let latMin = Infinity, latMax = -Infinity, lngMin = Infinity, lngMax = -Infinity;
   for (const region of regions) {
     for (const [lat, lng] of region.latLngs) {
@@ -31,6 +36,12 @@ function pixelBoundingBox(regions: Region[], zoom: number, width: number, height
 
   // Return null if there are no region boundaries
   if (latMin === Infinity) return null;
+
+  // Expand by the feather pad (degrees), clamped to valid lat/lng ranges.
+  latMin = Math.max(-85, latMin - pad);
+  latMax = Math.min(85, latMax + pad);
+  lngMin = Math.max(-180, lngMin - pad);
+  lngMax = Math.min(180, lngMax + pad);
 
   // Higher latitude projects to a smaller y, so latMax -> top, latMin -> bottom.
   const topLeft = CRS.EPSG3857.latLngToPoint({ lat: latMax, lng: lngMin }, zoom);
@@ -47,13 +58,13 @@ function toDataUrl(png: PNG): string {
   return "data:image/png;base64," + PNG.sync.write(png).toString("base64");
 }
 
-export function recolorSSTImage({ png, scaleName, regions, getTempDelta }: RecolorParams): string {
+export function recolorSSTImage({ png, scaleName, regions, getTempDelta, pad = 0 }: RecolorParams): string {
   const { width, height } = png;
   const out = new PNG({ width, height });
   out.data.set(png.data);
 
   const zoom = CRS.EPSG3857.zoom(width);
-  const box = pixelBoundingBox(regions, zoom, width, height);
+  const box = pixelBoundingBox(regions, zoom, width, height, pad);
   if (!box) return toDataUrl(out);
 
   for (let y = box.minY; y <= box.maxY; y++) {

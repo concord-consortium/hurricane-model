@@ -64,6 +64,35 @@ it("recolors pixels inside the region by the anomaly and leaves others unchanged
   expect(invertedTemperatureScale(corner, "default")).toBeCloseTo(20, 1);
 });
 
+it("recolors a pixel just outside the polygon but within the feather band", () => {
+  // 64x64 image spans the whole world; the tiny region is lng/lat in [-5, 5].
+  // A getTempDelta that is nonzero in a band reaching ~2deg OUTSIDE the region
+  // must actually be visited — proving the bbox is padded beyond the polygon.
+  const baseColor = temperatureScale(20, "default");
+  const png = makePng(64, 64, baseColor);
+  const region = createRegion(tinyRegionData);
+
+  const inBand = (c: { lat: number; lng: number }) =>
+    c.lat > -7 && c.lat < 7 && c.lng > -7 && c.lng < 7;
+
+  const dataUrl = recolorSSTImage({
+    png,
+    scaleName: "default",
+    regions: [region],
+    pad: 2, // degrees of padding for the band
+    getTempDelta: (c) => (inBand(c) ? 3 : 0),
+  });
+
+  const out = PNG.sync.read(Buffer.from(dataUrl.split(",")[1], "base64"));
+
+  // World image: lng -> x = (lng + 180) / 360 * 64. lng = 6 (outside the
+  // region's +5 edge, inside the band) -> x = round((186/360)*64) = 33,
+  // and lat 0 -> y = 32. Without padding this column is outside the bbox and
+  // would stay 20C.
+  const justOutside = pixelColor(out, 33, 32);
+  expect(invertedTemperatureScale(justOutside, "default")).toBeCloseTo(23, 1);
+});
+
 it("leaves land (alpha 0) pixels transparent", () => {
   const baseColor = temperatureScale(20, "default");
   const png = makePng(64, 64, baseColor);
