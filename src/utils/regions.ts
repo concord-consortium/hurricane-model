@@ -1,7 +1,7 @@
 import { FeatureCollection } from "geojson";
 import { scaleLinear } from "d3-scale";
 
-import { temperatureAnomalyMax, temperatureAnomalyMin } from "../models/constants";
+import { temperatureAnomalyMax, temperatureAnomalyMin } from "../constants";
 import { ICoordinates, NamedRegion } from "../types";
 import { Region, createRegion } from "./region";
 

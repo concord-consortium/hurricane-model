@@ -1,7 +1,7 @@
 import * as React from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 
-import { hurricaneCategoryInfo } from "../../models/constants";
+import { hurricaneCategoryInfo } from "../../constants";
 import { createStores, IStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
 import { StormCategorySection } from "./storm-category-section";

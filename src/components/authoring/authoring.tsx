@@ -5,7 +5,7 @@ import { IChangeEvent } from "@rjsf/core";
 import { RJSFSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import config from "../../config";
-import { hurricaneCategoryInfo } from "../../models/constants";
+import { hurricaneCategoryInfo } from "../../constants";
 import css from "./authoring.scss";
 
 interface IProps extends IBaseProps {}

@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import React from "react";
 
-import { temperatureAnomalyMax, temperatureAnomalyMin } from "../models/constants";
+import { temperatureAnomalyMax, temperatureAnomalyMin } from "../constants";
 import { useStores } from "../stores-context";
 import { NamedRegion } from "../types";
 import { coldColor, temperatureAnomalyRegions, warmColor } from "../utils/regions";

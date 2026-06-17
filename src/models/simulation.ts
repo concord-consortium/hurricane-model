@@ -28,7 +28,7 @@ import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
 import {
   hurricaneCategoryInfo, temperatureAnomalyMin, temperatureAnomalyMax, temperatureAnomalyFeatherHalfWidth
-} from "./constants";
+} from "../constants";
 import config, { selectPressureSystems, startStrengths } from "../config";
 import { random } from "../seedrandom";
 import { log } from "../log";

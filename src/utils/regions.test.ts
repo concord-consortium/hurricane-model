@@ -1,4 +1,4 @@
-import { temperatureAnomalyMax, temperatureAnomalyMin } from "../models/constants";
+import { temperatureAnomalyMax, temperatureAnomalyMin } from "../constants";
 import { namedRegions } from "../types";
 import { isInsideRegion } from "./region";
 import { temperatureAnomalyRegions, anomalyFillColor } from "./regions";

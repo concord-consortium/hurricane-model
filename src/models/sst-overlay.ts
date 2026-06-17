@@ -5,7 +5,7 @@ import config from "../config";
 import { recolorSSTImage } from "../utils/recolor-sst";
 import { temperatureAnomalyRegions } from "../utils/regions";
 import { ISSTImages, namedRegions, Season } from "../types";
-import { temperatureAnomalyFeatherHalfWidth } from "./constants";
+import { temperatureAnomalyFeatherHalfWidth } from "../constants";
 import { SimulationModel } from "./simulation";
 
 import decSeaTempDefault from "../../sea-surface-temp-img/dec-default.png";

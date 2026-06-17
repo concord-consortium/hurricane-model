@@ -1,4 +1,5 @@
 import { FeatureCollection } from "geojson";
+import { temperatureAnomalyFeatherHalfWidth } from "../constants";
 import {
   createRegion, isInsideRegion, clampToRegion, snapToRegionPreservingAxis, featherWeight, signedDistanceToRegion
 } from "./region";
@@ -143,17 +144,18 @@ describe("signedDistanceToRegion", () => {
 });
 
 describe("featherWeight", () => {
-  const half = 1; // 1 degree half-width
-
   it("gives the correct values based on band", () => {
     // 1 a half-width inside
-    expect(featherWeight(half, half)).toBeCloseTo(1, 5);
+    expect(featherWeight(temperatureAnomalyFeatherHalfWidth, temperatureAnomalyFeatherHalfWidth)).toBeCloseTo(1, 5);
+
     // .5 on the boundary
-    expect(featherWeight(0, half)).toBeCloseTo(0.5, 5);
+    expect(featherWeight(0, temperatureAnomalyFeatherHalfWidth)).toBeCloseTo(0.5, 5);
+
     // 0 a half-width outside
-    expect(featherWeight(-half, half)).toBeCloseTo(0, 5);
+    expect(featherWeight(-temperatureAnomalyFeatherHalfWidth, temperatureAnomalyFeatherHalfWidth)).toBeCloseTo(0, 5);
+
     // saturates beyond the band
-    expect(featherWeight(5, half)).toBe(1);
-    expect(featherWeight(-5, half)).toBe(0);
+    expect(featherWeight(5, temperatureAnomalyFeatherHalfWidth)).toBe(1);
+    expect(featherWeight(-5, temperatureAnomalyFeatherHalfWidth)).toBe(0);
   });
 });

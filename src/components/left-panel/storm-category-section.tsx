@@ -2,7 +2,7 @@ import Slider from "@mui/material/Slider";
 import { observer } from "mobx-react";
 import React from "react";
 
-import { hurricaneCategoryInfo } from "../../models/constants";
+import { hurricaneCategoryInfo } from "../../constants";
 import { useStores } from "../../stores-context";
 import { SetupSection } from "./setup-section";
 

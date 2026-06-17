@@ -1,6 +1,6 @@
 import { isInsideRegion, signedDistanceToRegion } from "../utils/region";
 import { temperatureAnomalyRegions } from "../utils/regions";
-import { temperatureAnomalyFeatherHalfWidth } from "./constants";
+import { temperatureAnomalyFeatherHalfWidth } from "../constants";
 import {
   SimulationModel, ISimulationOptions, windData, sstImages, minStepsOverSeaToDetectLandfall, extendedLandfallBounds
 } from "./simulation";
