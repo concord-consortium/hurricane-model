@@ -1,4 +1,6 @@
+import { isInsideRegion, signedDistanceToRegion } from "../utils/region";
 import { temperatureAnomalyRegions } from "../utils/regions";
+import { temperatureAnomalyFeatherHalfWidth } from "./constants";
 import {
   SimulationModel, ISimulationOptions, windData, sstImages, minStepsOverSeaToDetectLandfall, extendedLandfallBounds
 } from "./simulation";
@@ -291,6 +293,61 @@ describe("SimulationModel store", () => {
       expect(sim.totalAnomalyAt(temperatureAnomalyRegions.gulf.anchor)).toBe(2);
       // A point in the open Pacific — inside no anomaly region.
       expect(sim.totalAnomalyAt({ lat: 0, lng: -150 })).toBe(0);
+    });
+
+    it("feathers the anomaly across the region boundary", () => {
+      const sim = new SimulationModel();
+      const anomaly = 2;
+      sim.temperatureAnomalies.set("gulf", anomaly);
+      const region = temperatureAnomalyRegions.gulf.region;
+
+      // 1. Deep inside (the anchor): full anomaly (weight 1.0).
+      expect(sim.totalAnomalyAt(temperatureAnomalyRegions.gulf.anchor)).toBeCloseTo(anomaly, 5);
+
+      // 2. Fully outside the band and every region (open Pacific): no contribution.
+      expect(sim.totalAnomalyAt({ lat: 0, lng: -150 })).toBe(0);
+
+      // Build band points by stepping along the normal of the LONGEST edge, so a small
+      // step stays clear of corner geometry where two edges meet.
+      const ring = region.latLngs; // [lat, lng][], closed
+      let li = 0, longest = -1;
+      for (let i = 0; i < ring.length - 1; i++) {
+        const cl = Math.cos((((ring[i][0] + ring[i + 1][0]) / 2) * Math.PI) / 180);
+        const len = Math.hypot((ring[i + 1][1] - ring[i][1]) * cl, ring[i + 1][0] - ring[i][0]);
+        if (len > longest) { longest = len; li = i; }
+      }
+      const midLat = (ring[li][0] + ring[li + 1][0]) / 2;
+      const midLng = (ring[li][1] + ring[li + 1][1]) / 2;
+      const cosLat = Math.cos((midLat * Math.PI) / 180);
+      const ex = (ring[li + 1][1] - ring[li][1]) * cosLat;
+      const ey = ring[li + 1][0] - ring[li][0];
+      const elen = Math.hypot(ex, ey);
+      let nx = -ey / elen, ny = ex / elen; // unit normal in cosLat-scaled planar space
+      // Move `deg` degrees-latitude along the normal, converted back to lat/lng.
+      const offset = (deg: number) => ({ lat: midLat + ny * deg, lng: midLng + (nx * deg) / cosLat });
+      // Orient +deg INTO the region.
+      if (!isInsideRegion(offset(0.01), region)) { nx = -nx; ny = -ny; }
+
+      const insideBand = offset(temperatureAnomalyFeatherHalfWidth / 2);   // ~0.5deg inside the edge
+      const outsideBand = offset(-temperatureAnomalyFeatherHalfWidth / 2); // ~0.5deg outside the edge
+
+      // Guards: the constructed points really sit within the band on the intended side.
+      expect(signedDistanceToRegion(insideBand, region)).toBeGreaterThan(0);
+      expect(signedDistanceToRegion(insideBand, region)).toBeLessThan(temperatureAnomalyFeatherHalfWidth);
+      expect(signedDistanceToRegion(outsideBand, region)).toBeLessThan(0);
+      expect(signedDistanceToRegion(outsideBand, region)).toBeGreaterThan(-temperatureAnomalyFeatherHalfWidth);
+
+      const vInside = sim.totalAnomalyAt(insideBand);
+      const vOutside = sim.totalAnomalyAt(outsideBand);
+
+      // 3. Within the band, inside the region: strictly between half-strength and full.
+      expect(vInside).toBeGreaterThan(anomaly / 2);
+      expect(vInside).toBeLessThan(anomaly);
+      // 4. Within the band, outside the region: strictly between zero and half-strength.
+      expect(vOutside).toBeGreaterThan(0);
+      expect(vOutside).toBeLessThan(anomaly / 2);
+      // Monotonic across the boundary.
+      expect(vInside).toBeGreaterThan(vOutside);
     });
 
     it("anyAnomalyActive reflects whether any region is nonzero", () => {

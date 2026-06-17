@@ -21,12 +21,14 @@ import {
   StartLocation, StartLocationNames, isStartLocationName, isCoordinates, NamedRegion, namedRegions
 } from "../types";
 import { temperatureAnomalyRegions } from "../utils/regions";
-import { isInsideRegion } from "../utils/region";
+import { signedDistanceToRegion, featherWeight } from "../utils/region";
 import { vecAverage } from "../math-utils";
 import { distanceTo } from "geolocation-utils";
 import { invertedTemperatureScale } from "../temperature-scale";
 import { PNG } from "pngjs";
-import { hurricaneCategoryInfo, temperatureAnomalyMin, temperatureAnomalyMax } from "./constants";
+import {
+  hurricaneCategoryInfo, temperatureAnomalyMin, temperatureAnomalyMax, temperatureAnomalyFeatherHalfWidth
+} from "./constants";
 import config, { selectPressureSystems, startStrengths } from "../config";
 import { random } from "../seedrandom";
 import { log } from "../log";
@@ -639,9 +641,11 @@ export class SimulationModel {
     let total = 0;
     for (const key of namedRegions) {
       const anomaly = this.temperatureAnomalyAt(key);
-      if (anomaly !== 0 && isInsideRegion(coords, temperatureAnomalyRegions[key].region)) {
-        total += anomaly;
-      }
+      if (anomaly === 0) continue;
+
+      const distance = signedDistanceToRegion(coords, temperatureAnomalyRegions[key].region);
+      const weight = featherWeight(distance, temperatureAnomalyFeatherHalfWidth);
+      if (weight > 0) total += anomaly * weight;
     }
     return total;
   }

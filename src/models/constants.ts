@@ -68,3 +68,8 @@ export const maxWindSpeed = 85; // m/s, a
 
 export const temperatureAnomalyMin = -3;
 export const temperatureAnomalyMax = 3;
+
+// Half-width of the smoothstep band that feathers an anomaly across a region
+// boundary, in degrees (~110 km). Full transition band is twice this. The drawn
+// polygon is the half-strength contour.
+export const temperatureAnomalyFeatherHalfWidth = 1.0;
