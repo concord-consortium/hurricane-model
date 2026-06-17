@@ -131,7 +131,7 @@ describe("signedDistanceToRegion", () => {
     // measures to the nearest corner for a diagonal point
     // (lng 4, lat 4) sits diagonally outside the (1,1) corner; the nearest point on
     // the ring is that vertex (both adjacent edges clamp their foot to it). Planar
-    // distance with lng scaled by cos(8deg): sqrt(((4-1)*cos8)^2 + (4-1)^2) ~= 4.22,
+    // distance with lng scaled by cos(4deg): sqrt(((4-1)*cos4)^2 + (4-1)^2) ~= 4.22,
     // negative because it is outside.
     expect(signedDistanceToRegion({ lat: 4, lng: 4 }, region)).toBeCloseTo(-4.22, 1);
 
