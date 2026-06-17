@@ -88,3 +88,11 @@ export function snapToRegionPreservingAxis(
     ? { lat: target, lng: best }
     : { lat: best, lng: target };
 }
+
+// Smoothstep feather weight for a band straddling the region boundary.
+// signedDist > 0 inside, < 0 outside (same convention as signedDistanceToRegion).
+// Returns 1 a half-width inside, 0.5 on the edge, 0 a half-width outside.
+export function featherWeight(signedDist: number, halfWidth: number): number {
+  const s = Math.max(0, Math.min(1, (signedDist + halfWidth) / (2 * halfWidth)));
+  return s * s * (3 - 2 * s);
+}

@@ -1,5 +1,5 @@
 import { FeatureCollection } from "geojson";
-import { createRegion, isInsideRegion, clampToRegion, snapToRegionPreservingAxis } from "./region";
+import { createRegion, isInsideRegion, clampToRegion, snapToRegionPreservingAxis, featherWeight } from "./region";
 
 // Unit square with corners at (0,0), (1,0), (1,1), (0,1). Coordinates are [lng, lat].
 const unitSquarePolygonFC: FeatureCollection = {
@@ -110,5 +110,21 @@ describe("region", () => {
       expect(snapped!.lng).toBeCloseTo(0.25, 5);
       expect(snapped!.lat).toBeCloseTo(0, 5);
     });
+  });
+});
+
+describe("featherWeight", () => {
+  const half = 1; // 1 degree half-width
+
+  it("gives the correct values based on band", () => {
+    // 1 a half-width inside
+    expect(featherWeight(half, half)).toBeCloseTo(1, 5);
+    // .5 on the boundary
+    expect(featherWeight(0, half)).toBeCloseTo(0.5, 5);
+    // 0 a half-width outside
+    expect(featherWeight(-half, half)).toBeCloseTo(0, 5);
+    // saturates beyond the band
+    expect(featherWeight(5, half)).toBe(1);
+    expect(featherWeight(-5, half)).toBe(0);
   });
 });
