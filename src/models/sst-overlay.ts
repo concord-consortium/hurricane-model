@@ -5,7 +5,7 @@ import { action, computed, observable, makeObservable, reaction, toJS } from "mo
 import { PNG } from "pngjs";
 import config from "../config";
 import { temperatureAnomalyFeatherHalfWidth } from "../constants";
-import { temperatureScale, invertedTemperatureScale, maxTemp, minTemp } from "../temperature-scale";
+import { clampTemp, temperatureScale, invertedTemperatureScale } from "../temperature-scale";
 import { ICoordinates, ISSTImages, namedRegions, Season } from "../types";
 import { pixelBoundingBox, Region } from "../utils/region";
 import { temperatureAnomalyRegions } from "../utils/regions";
@@ -182,7 +182,7 @@ export class SSTOverlayModel {
         const temp = invertedTemperatureScale(baseColor, scaleName);
         if (temp == null) continue;
 
-        const clamped = Math.max(minTemp, Math.min(maxTemp, temp + delta));
+        const clamped = clampTemp(temp + delta);
         const color = rgb(temperatureScale(clamped, scaleName));
         if (Number.isNaN(color.r)) continue; // unparseable color — leave the base pixel untouched
 

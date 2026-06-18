@@ -95,11 +95,15 @@ Object.keys(colorRange).forEach(scaleName => {
 exports.minTemp = minTemp;
 exports.maxTemp = maxTemp;
 
+exports.clampTemp = (temperature) => {
+  return Math.max(minTemp, Math.min(maxTemp, temperature));
+}
+
 exports.temperatureScale = (temperature, scaleName = "default") => {
   // Limit value to two decimal digits. There is more about that in general comments at the top of this file.
   return scale[scaleName](Number(temperature.toFixed(decimalDigits)));
 };
 
 exports.invertedTemperatureScale = (color, scaleName = "default") => {
-  return invertedScale[scaleName][color] ? invertedScale[scaleName][color] : null;
+  return invertedScale[scaleName][color] != null ? invertedScale[scaleName][color] : null;
 };
