@@ -57,7 +57,7 @@ export const RegionTemperatureControl = observer(function RegionTemperatureContr
   const color = anomaly > 0 ? warmColor : anomaly < 0 ? coldColor : "#000";
 
   return (
-    <React.Fragment data-testid={`region-control-${regionKey}`}>
+    <React.Fragment>
       <div className={css.label}>{label}</div>
       <div className={css.buttonSection}>
         <ChangeButton adjustment={-1} anomaly={anomaly} regionKey={regionKey} />
