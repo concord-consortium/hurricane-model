@@ -1,11 +1,14 @@
+import { Buffer } from "buffer";
+import { rgb } from "d3-color";
+import { CRS, Point } from "leaflet";
 import { action, computed, observable, makeObservable, reaction, toJS } from "mobx";
 import { PNG } from "pngjs";
-import { Buffer } from "buffer";
 import config from "../config";
-import { recolorSSTImage } from "../utils/recolor-sst";
-import { temperatureAnomalyRegions } from "../utils/regions";
-import { ISSTImages, namedRegions, Season } from "../types";
 import { temperatureAnomalyFeatherHalfWidth } from "../constants";
+import { temperatureScale, invertedTemperatureScale, maxTemp, minTemp } from "../temperature-scale";
+import { ICoordinates, ISSTImages, namedRegions, Season } from "../types";
+import { pixelBoundingBox, Region } from "../utils/region";
+import { temperatureAnomalyRegions } from "../utils/regions";
 import { SimulationModel } from "./simulation";
 
 import decSeaTempDefault from "../../sea-surface-temp-img/dec-default.png";
@@ -30,6 +33,20 @@ import septSeaTempRainbowCC from "../../sea-surface-temp-img/sep-rainbowCC.png";
 import octSeaTempRainbowCC from "../../sea-surface-temp-img/oct-rainbowCC.png";
 
 const RECOLOR_DEBOUNCE_MS = 150;
+
+interface RecolorParams {
+  png: PNG;
+  scaleName: string;
+  regions: Region[]; // regions whose anomaly is nonzero (used only for bounding-box bounds)
+  // Temperature delta (°C) to apply at a coordinate. MUST return 0 for coordinates
+  // outside any active region: recolorSSTImage iterates the rectangular bounding box
+  // of the regions, so pixels inside the box but outside the (non-rectangular) polygons
+  // rely on this returning 0 to be left unchanged.
+  getTempDelta: (coords: ICoordinates) => number;
+  // Degrees to expand each region's bounding box, so the outside half of a
+  // straddling feather band is included. Defaults to 0 (no feather).
+  pad?: number;
+}
 
 export const sstImages: Record<string, ISSTImages> = {
   default: {
@@ -130,13 +147,51 @@ export class SSTOverlayModel {
       this.setRecoloredUrl(null);
       return;
     }
-    this.setRecoloredUrl(recolorSSTImage({
+    this.setRecoloredUrl(this.recolorSSTImage({
       png,
       scaleName: this.sstScaleName,
       regions: this.activeRegions,
       getTempDelta: coords => this.simulation.totalAnomalyAt(coords),
       pad: temperatureAnomalyFeatherHalfWidth,
     }));
+  }
+
+  private toDataUrl(png: PNG): string {
+    return "data:image/png;base64," + PNG.sync.write(png).toString("base64");
+  }
+
+  public recolorSSTImage({ png, scaleName, regions, getTempDelta, pad = 0 }: RecolorParams): string {
+    const { width, height } = png;
+    const out = new PNG({ width, height });
+    out.data.set(png.data);
+
+    const zoom = CRS.EPSG3857.zoom(width);
+    const box = pixelBoundingBox(regions, zoom, width, height, pad);
+    if (!box) return this.toDataUrl(out);
+
+    for (let y = box.minY; y <= box.maxY; y++) {
+      for (let x = box.minX; x <= box.maxX; x++) {
+        const idx = (width * y + x) << 2;
+        if (out.data[idx + 3] === 0) continue; // land
+
+        const coords = CRS.EPSG3857.pointToLatLng(new Point(x, y), zoom);
+        const delta = getTempDelta(coords);
+        if (delta === 0) continue;
+
+        const baseColor = `rgb(${out.data[idx]}, ${out.data[idx + 1]}, ${out.data[idx + 2]})`;
+        const temp = invertedTemperatureScale(baseColor, scaleName);
+        if (temp == null) continue;
+
+        const clamped = Math.max(minTemp, Math.min(maxTemp, temp + delta));
+        const color = rgb(temperatureScale(clamped, scaleName));
+        if (Number.isNaN(color.r)) continue; // unparseable color — leave the base pixel untouched
+
+        out.data[idx] = Math.round(color.r);
+        out.data[idx + 1] = Math.round(color.g);
+        out.data[idx + 2] = Math.round(color.b);
+      }
+    }
+    return this.toDataUrl(out);
   }
 
   private loadVisiblePng(url: string) {

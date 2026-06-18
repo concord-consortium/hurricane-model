@@ -2,6 +2,7 @@ import { Feature, FeatureCollection, LineString, Polygon } from "geojson";
 import { point, polygon as turfPolygon, lineString } from "@turf/helpers";
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 import nearestPointOnLine from "@turf/nearest-point-on-line";
+import { CRS } from "leaflet";
 import { ICoordinates } from "../types";
 
 export interface Region {
@@ -122,4 +123,44 @@ export function signedDistanceToRegion(coords: ICoordinates, region: Region): nu
 export function featherWeight(signedDist: number, halfWidth: number): number {
   const s = Math.max(0, Math.min(1, (signedDist + halfWidth) / (2 * halfWidth)));
   return s * s * (3 - 2 * s);
+}
+
+interface PixelBox { minX: number; minY: number; maxX: number; maxY: number; }
+
+export function pixelBoundingBox(
+  regions: Region[], zoom: number, width: number, height: number, pad: number
+): PixelBox | null {
+  let latMin = Infinity, latMax = -Infinity, lngMin = Infinity, lngMax = -Infinity;
+  for (const region of regions) {
+    for (const [lat, lng] of region.latLngs) {
+      if (lat < latMin) latMin = lat;
+      if (lat > latMax) latMax = lat;
+      if (lng < lngMin) lngMin = lng;
+      if (lng > lngMax) lngMax = lng;
+    }
+  }
+
+  // Return null if there are no region boundaries
+  if (latMin === Infinity) return null;
+
+  // Expand by the feather pad. Latitude pads by the raw degrees; longitude pads by
+  // pad / cos(lat) because signedDistanceToRegion scales longitude by cos(lat), so the
+  // band reaches that many more degrees of longitude outside east/west edges. Use the
+  // largest-magnitude (lat-expanded) latitude — the smallest cosine — for the worst case.
+  latMin = Math.max(-85, latMin - pad);
+  latMax = Math.min(85, latMax + pad);
+  const cosLat = Math.cos((Math.max(Math.abs(latMin), Math.abs(latMax)) * Math.PI) / 180);
+  const lngPad = pad / Math.max(cosLat, 0.01); // guard against div-by-zero near the poles
+  lngMin = Math.max(-180, lngMin - lngPad);
+  lngMax = Math.min(180, lngMax + lngPad);
+
+  // Higher latitude projects to a smaller y, so latMax -> top, latMin -> bottom.
+  const topLeft = CRS.EPSG3857.latLngToPoint({ lat: latMax, lng: lngMin }, zoom);
+  const bottomRight = CRS.EPSG3857.latLngToPoint({ lat: latMin, lng: lngMax }, zoom);
+  return {
+    minX: Math.max(0, Math.floor(topLeft.x)),
+    minY: Math.max(0, Math.floor(topLeft.y)),
+    maxX: Math.min(width - 1, Math.ceil(bottomRight.x)),
+    maxY: Math.min(height - 1, Math.ceil(bottomRight.y)),
+  };
 }
