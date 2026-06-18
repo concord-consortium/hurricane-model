@@ -279,7 +279,7 @@ describe("SimulationModel store", () => {
         const farBase = sim.seaSurfaceTempAt(far);
 
         sim.adjustTemperatureAnomaly("coastalAfrica", 2);
-        expect(sim.seaSurfaceTempAt(pos)).toBeCloseTo((base as number) + 2);
+        expect(sim.seaSurfaceTempAt(pos)).toBeCloseTo(base! + 2);
         expect(sim.seaSurfaceTempAt(far)).toBe(farBase);
         done();
       };
@@ -328,8 +328,8 @@ describe("SimulationModel store", () => {
       // Orient +deg INTO the region.
       if (!isInsideRegion(offset(0.01), region)) { nx = -nx; ny = -ny; }
 
-      const insideBand = offset(temperatureAnomalyFeatherHalfWidth / 2);   // ~0.5deg inside the edge
-      const outsideBand = offset(-temperatureAnomalyFeatherHalfWidth / 2); // ~0.5deg outside the edge
+      const insideBand = offset(temperatureAnomalyFeatherHalfWidth / 2);   // ~1deg inside the edge
+      const outsideBand = offset(-temperatureAnomalyFeatherHalfWidth / 2); // ~1deg outside the edge
 
       // Guards: the constructed points really sit within the band on the intended side.
       expect(signedDistanceToRegion(insideBand, region)).toBeGreaterThan(0);

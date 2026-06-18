@@ -267,17 +267,10 @@ export class MapView extends BaseComponent<IProps, IState> {
             namedRegions.map(key => {
               const { region, anchor } = temperatureAnomalyRegions[key];
               const anomalyColor = anomalyFillColor(sim.temperatureAnomalyAt(key));
+              const pathOptions = { color: anomalyColor, weight: 1.5, fillColor: anomalyColor, fillOpacity: 0.2 };
               return (
                 <React.Fragment key={key}>
-                  <PolygonRegion
-                    region={region}
-                    pathOptions={{
-                      color: anomalyColor,
-                      weight: 1.5,
-                      fillColor: anomalyColor,
-                      fillOpacity: 0.2
-                    }}
-                  />
+                  <PolygonRegion region={region} pathOptions={pathOptions} />
                   <LeafletCustomMarker position={anchor}>
                     <div className={css.temperatureControlMarker} ref={this.disableMapInteractions}>
                       <RegionTemperatureControl regionKey={key} />

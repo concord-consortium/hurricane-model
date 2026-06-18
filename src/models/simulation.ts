@@ -3,35 +3,35 @@ import { Position } from "geojson";
 import lineIntersect from "@turf/line-intersect";
 import { LatLngExpression, CRS, LatLngBounds, latLngBounds, latLng } from "leaflet";
 import { action, observable, computed, autorun, toJS, makeObservable, ObservableMap } from "mobx";
-import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
+import { kdTree } from "kd-tree-javascript";
+import { distanceTo } from "geolocation-utils";
+import { PNG } from "pngjs";
+
+import { hurricaneCategoryInfo, temperatureAnomalyFeatherHalfWidth } from "../constants";
+import config, { selectPressureSystems, startStrengths } from "../config";
+import { log } from "../log";
+import { vecAverage } from "../math-utils";
+import { random } from "../seedrandom";
+import { invertedTemperatureScale } from "../temperature-scale";
+import {
+  ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
+  StartLocation, StartLocationNames, isStartLocationName, isCoordinates, NamedRegion, namedRegions
+} from "../types";
+import { signedDistanceToRegion, featherWeight } from "../utils/region";
+import { clampAnomaly, temperatureAnomalyRegions } from "../utils/regions";
 import { Hurricane } from "./hurricane";
-import * as decWind from "../../wind-data-json/dec-simple.json";
-import * as octWind from "../../wind-data-json/oct-simple.json";
-import * as marchWind from "../../wind-data-json/mar-simple.json";
-import * as juneWind from "../../wind-data-json/jun-simple.json";
-import * as septWind from "../../wind-data-json/sep-simple.json";
+import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
+
 import decSeaTemp from "../../sea-surface-temp-img/dec-default.png";
 import marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
 import juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
 import septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
 import octSeaTemp from "../../sea-surface-temp-img/oct-default.png";
-import { kdTree } from "kd-tree-javascript";
-import {
-  ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
-  StartLocation, StartLocationNames, isStartLocationName, isCoordinates, NamedRegion, namedRegions
-} from "../types";
-import { temperatureAnomalyRegions } from "../utils/regions";
-import { signedDistanceToRegion, featherWeight } from "../utils/region";
-import { vecAverage } from "../math-utils";
-import { distanceTo } from "geolocation-utils";
-import { invertedTemperatureScale } from "../temperature-scale";
-import { PNG } from "pngjs";
-import {
-  hurricaneCategoryInfo, temperatureAnomalyMin, temperatureAnomalyMax, temperatureAnomalyFeatherHalfWidth
-} from "../constants";
-import config, { selectPressureSystems, startStrengths } from "../config";
-import { random } from "../seedrandom";
-import { log } from "../log";
+import * as decWind from "../../wind-data-json/dec-simple.json";
+import * as octWind from "../../wind-data-json/oct-simple.json";
+import * as marchWind from "../../wind-data-json/mar-simple.json";
+import * as juneWind from "../../wind-data-json/jun-simple.json";
+import * as septWind from "../../wind-data-json/sep-simple.json";
 
 type IWindDataset = Record<Season, IWindPoint[]>
 
@@ -611,7 +611,7 @@ export class SimulationModel {
     const color = `rgb(${r}, ${g}, ${b})`;
     let temp: number | null = invertedTemperatureScale(color);
 
-    // Apply per-region anomalies.
+    // Apply anomalies.
     if (temp != null) {
       temp += this.totalAnomalyAt(latLng(position));
     }
@@ -624,13 +624,9 @@ export class SimulationModel {
     const next = new Map<NamedRegion, number>();
     for (const key of namedRegions) {
       const raw = Number(fromConfig[key]);
-      next.set(key, isFinite(raw) ? this.clampAnomaly(raw) : 0);
+      next.set(key, isFinite(raw) ? clampAnomaly(raw) : 0);
     }
     this.temperatureAnomalies.replace(next);
-  }
-
-  private clampAnomaly(value: number) {
-    return Math.max(temperatureAnomalyMin, Math.min(temperatureAnomalyMax, value));
   }
 
   public temperatureAnomalyAt(key: NamedRegion): number {
@@ -655,7 +651,7 @@ export class SimulationModel {
   }
 
   @action.bound public adjustTemperatureAnomaly(key: NamedRegion, delta: number) {
-    this.temperatureAnomalies.set(key, this.clampAnomaly(this.temperatureAnomalyAt(key) + delta));
+    this.temperatureAnomalies.set(key, clampAnomaly(this.temperatureAnomalyAt(key) + delta));
   }
 
   // Note that the visibility testing here is based on testing hurricane track segment end points.

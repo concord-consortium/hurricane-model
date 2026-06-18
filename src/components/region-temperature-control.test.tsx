@@ -13,33 +13,35 @@ const renderControl = (stores: IStores) =>
 
 describe("RegionTemperatureControl", () => {
   let stores: IStores;
+  const incButton = () => screen.getByRole("button", { name: /increase gulf temperature/i });
+  const inc = () => fireEvent.click(incButton());
+  const decButton = () => screen.getByRole("button", { name: /decrease gulf temperature/i });
+  const dec = () => fireEvent.click(decButton());
+
   beforeEach(() => { stores = createStores(); });
 
   it("shows Baseline at 0 and signed values otherwise", () => {
     renderControl(stores);
     expect(screen.getByText("Baseline")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /increase gulf temperature/i }));
+    inc();
     expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(1);
     expect(screen.getByText("+1°C")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /decrease gulf temperature/i }));
-    fireEvent.click(screen.getByRole("button", { name: /decrease gulf temperature/i }));
+    dec(); dec();
     expect(screen.getByText("-1°C")).toBeInTheDocument();
   });
 
   it("disables the buttons at the clamp limits", () => {
     renderControl(stores);
-    const inc = screen.getByRole("button", { name: /increase gulf temperature/i });
-    const dec = screen.getByRole("button", { name: /decrease gulf temperature/i });
 
-    fireEvent.click(inc); fireEvent.click(inc); fireEvent.click(inc); // +3
-    expect(inc).toBeDisabled();
-    expect(dec).not.toBeDisabled();
+    inc(); inc(); inc(); // +3
+    expect(incButton()).toBeDisabled();
+    expect(decButton()).not.toBeDisabled();
 
-    fireEvent.click(dec); fireEvent.click(dec); fireEvent.click(dec);
-    fireEvent.click(dec); fireEvent.click(dec); fireEvent.click(dec); // -3
-    expect(dec).toBeDisabled();
-    expect(inc).not.toBeDisabled();
+    dec(); dec(); dec();
+    dec(); dec(); dec(); // -3
+    expect(decButton()).toBeDisabled();
+    expect(incButton()).not.toBeDisabled();
   });
 });

@@ -135,8 +135,7 @@ const DEFAULT_CONFIG: any = {
   hurricaneImage: false,
   // The regular version of sea surface temperature overlay (not accessible friendly that always has opacity=1).
   seaSurfaceTempOpacity: 0.8,
-  // Initial per-region sea surface temperature anomalies in °C, keyed by region:
-  // gulf, caribbean, centralAtlantic, coastalAfrica. Each value is clamped to [-3, 3].
+  // Initial per-region sea surface temperature anomalies in °C, keyed by region (see namedRegions in types.ts).
   // URL/authoring form: temperatureAnomalies={"gulf":2,"caribbean":-1}
   temperatureAnomalies: {},
   // Enables steps per second display.

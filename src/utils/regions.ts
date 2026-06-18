@@ -12,8 +12,7 @@ import coastalAfricaData from "../data/regions/coastal-africa-temp-anomaly-regio
 
 export interface NamedRegionData {
   label: string;
-  // Where the centered map control is placed.
-  anchor: ICoordinates;
+  anchor: ICoordinates; // Where the centered map control is placed.
   region: Region;
 }
 
@@ -51,4 +50,8 @@ const colorScale = scaleLinear<string>()
 
 export function anomalyFillColor(anomaly: number): string {
   return colorScale(anomaly);
+}
+
+export function clampAnomaly(value: number) {
+  return Math.max(temperatureAnomalyMin, Math.min(temperatureAnomalyMax, value));
 }

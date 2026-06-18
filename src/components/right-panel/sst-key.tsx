@@ -1,11 +1,12 @@
-import * as React from "react";
-import { observer } from "mobx-react";
-import { temperatureScale } from "../../temperature-scale";
-import { log } from "../../log";
 import Checkbox from "@mui/material/Checkbox";
+import { observer } from "mobx-react";
+import * as React from "react";
+
+import { log } from "../../log";
+import { useStores } from "../../stores-context";
+import { temperatureScale } from "../../temperature-scale";
 import genericKeyCss from "./map-button-key.scss";
 import css from "./sst-key.scss";
-import { useStores } from "../../stores-context";
 
 const getFahrenheit = (celsius: number) => {
   return (celsius * 9 / 5) + 32;

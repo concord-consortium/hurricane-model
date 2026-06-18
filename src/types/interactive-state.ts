@@ -54,7 +54,7 @@ export interface ISimulationState {
   numberOfStepsOverLand?: number;
   consumedExtendedLandfallAreas?: string[];
 
-  // Per-region SST anomalies in °C. Optional for backward compatibility with pre-feature saves.
+  // Per-region SST anomalies in °C.
   temperatureAnomalies?: Partial<Record<NamedRegion, number>>;
 }
 
