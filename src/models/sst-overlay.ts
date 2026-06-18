@@ -32,14 +32,14 @@ import juneSeaTempRainbowCC from "../../sea-surface-temp-img/jun-rainbowCC.png";
 import septSeaTempRainbowCC from "../../sea-surface-temp-img/sep-rainbowCC.png";
 import octSeaTempRainbowCC from "../../sea-surface-temp-img/oct-rainbowCC.png";
 
-const RECOLOR_DEBOUNCE_MS = 150;
+const UPDATE_DEBOUNCE_MS = 150;
 
-interface RecolorParams {
+interface UpdateParams {
   png: PNG;
   scaleName: string;
   regions: Region[]; // regions whose anomaly is nonzero (used only for bounding-box bounds)
   // Temperature delta (°C) to apply at a coordinate. MUST return 0 for coordinates
-  // outside any active region: recolorSSTImage iterates the rectangular bounding box
+  // outside any active region: updateSSTImage iterates the rectangular bounding box
   // of the regions, so pixels inside the box but outside the (non-rectangular) polygons
   // rely on this returning 0 to be left unchanged.
   getTempDelta: (coords: ICoordinates) => number;
@@ -104,7 +104,7 @@ export class SSTOverlayModel {
       { fireImmediately: true }
     );
 
-    // Recompute the recolored overlay (debounced) when inputs change.
+    // Recompute the updated overlay (debounced) when inputs change.
     reaction(
       () => ({
         png: this.visiblePng,
@@ -112,7 +112,7 @@ export class SSTOverlayModel {
         scale: this.sstScaleName,
       }),
       () => this.updateSSTImage(),
-      { delay: RECOLOR_DEBOUNCE_MS }
+      { delay: UPDATE_DEBOUNCE_MS }
     );
   }
 
@@ -161,7 +161,7 @@ export class SSTOverlayModel {
     return "data:image/png;base64," + PNG.sync.write(png).toString("base64");
   }
 
-  public updateSSTImageWithAnomalies({ png, scaleName, regions, getTempDelta, pad = 0 }: RecolorParams): string {
+  public updateSSTImageWithAnomalies({ png, scaleName, regions, getTempDelta, pad = 0 }: UpdateParams): string {
     const { width, height } = png;
     const out = new PNG({ width, height });
     out.data.set(png.data);
@@ -196,12 +196,12 @@ export class SSTOverlayModel {
   }
 
   private loadVisiblePng(url: string) {
-    // Clear the old PNG while the new one loads. This intentionally lets the recolor
+    // Clear the old PNG while the new one loads. This intentionally lets the updateSSTImage
     // reaction fire an extra (cheap, early-returning) time on a season/scale change:
-    // it clears the stale recolored image so the map falls back to the freshly-loading
-    // base tile, and it keeps `visiblePng` from being recolored against a newly-changed
+    // it clears the stale updated image so the map falls back to the freshly-loading
+    // base tile, and it keeps `visiblePng` from being updated against a newly-changed
     // scale's lookup table (which would produce garbage). Anomaly-only changes don't
-    // call this, so they fire the recolor reaction exactly once.
+    // call this, so they fire the updateSSTImage reaction exactly once.
     this.setVisiblePng(null);
     this.targetUrl = url;
     fetch(url).then(response => {
