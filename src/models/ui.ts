@@ -51,7 +51,11 @@ export class UIModel {
   constructor(simulation: SimulationModel) {
     makeObservable(this);
     this.sstOverlay = new SSTOverlayModel(simulation);
-    this.initialState = JSON.parse(JSON.stringify(this));
+
+    // Omit the sstOverlay from the initialState to avoid including the simulation, which could include cycles.
+    const { sstOverlay: _sst, ...rest } = this;
+    this.initialState = JSON.parse(JSON.stringify(rest));
+
     if ((this.initialState.baseMap === "population") && !config.enablePopulationMap) {
       this.initialState.baseMap = "street";
     }
