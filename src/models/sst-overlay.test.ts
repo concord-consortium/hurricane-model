@@ -26,18 +26,18 @@ it("produces a data-URL when an anomaly is active", () => {
 
   overlay.setVisiblePng(makePng(128, 128));
   simulation.adjustTemperatureAnomaly("gulf", 2);
-  overlay.recolorNow();
+  overlay.updateSSTImage();
 
-  expect(overlay.recoloredUrl?.startsWith("data:image/png;base64,")).toBe(true);
+  expect(overlay.updatedUrl?.startsWith("data:image/png;base64,")).toBe(true);
 });
 
-it("clears the recolored URL when no anomaly is active", () => {
+it("clears the updated URL when no anomaly is active", () => {
   const { overlay } = makeSSTOverlay();
 
   overlay.setVisiblePng(makePng(128, 128));
-  overlay.recolorNow();
+  overlay.updateSSTImage();
 
-  expect(overlay.recoloredUrl).toBeNull();
+  expect(overlay.updatedUrl).toBeNull();
 });
 
 describe("update SST overlay with temperature anomalies", () => {
@@ -69,7 +69,7 @@ describe("update SST overlay with temperature anomalies", () => {
     const png = makePng(64, 64, baseColor);
     const region = createRegion(tinyRegionData);
 
-    const dataUrl = overlay.recolorSSTImage({
+    const dataUrl = overlay.updateSSTImageWithAnomalies({
       png,
       scaleName: "default",
       regions: [region],
@@ -105,7 +105,7 @@ describe("update SST overlay with temperature anomalies", () => {
     const inBand = (c: { lat: number; lng: number }) =>
       c.lat > -7 && c.lat < 7 && c.lng > -7 && c.lng < 7;
 
-    const dataUrl = overlay.recolorSSTImage({
+    const dataUrl = overlay.updateSSTImageWithAnomalies({
       png,
       scaleName: "default",
       regions: [region],
@@ -133,7 +133,7 @@ describe("update SST overlay with temperature anomalies", () => {
     png.data[centerIdx + 3] = 0;
     const region = createRegion(tinyRegionData);
 
-    const dataUrl = overlay.recolorSSTImage({
+    const dataUrl = overlay.updateSSTImageWithAnomalies({
       png, scaleName: "default", regions: [region], getTempDelta: () => 3,
     });
     const out = PNG.sync.read(Buffer.from(dataUrl.split(",")[1], "base64"));
@@ -145,7 +145,7 @@ describe("update SST overlay with temperature anomalies", () => {
     const baseColor = temperatureScale(20, "purple3");
     const png = makePng(64, 64, baseColor);
     const region = createRegion(tinyRegionData);
-    const dataUrl = overlay.recolorSSTImage({
+    const dataUrl = overlay.updateSSTImageWithAnomalies({
       png, scaleName: "purple3", regions: [region], getTempDelta: () => 2,
     });
     const out = PNG.sync.read(Buffer.from(dataUrl.split(",")[1], "base64"));
@@ -160,7 +160,7 @@ describe("update SST overlay with temperature anomalies", () => {
     const png = makePng(64, 64, baseColor);
     const region = createRegion(tinyRegionData);
 
-    const dataUrl = overlay.recolorSSTImage({
+    const dataUrl = overlay.updateSSTImageWithAnomalies({
       png,
       scaleName: "default",
       regions: [region],
@@ -180,7 +180,7 @@ describe("update SST overlay with temperature anomalies", () => {
     const baseColor = temperatureScale(20, "default");
     const png = makePng(64, 64, baseColor);
 
-    const dataUrl = overlay.recolorSSTImage({
+    const dataUrl = overlay.updateSSTImageWithAnomalies({
       // Nonzero delta proves that with no regions nothing is recolored.
       png, scaleName: "default", regions: [], getTempDelta: () => 5,
     });
@@ -211,7 +211,7 @@ describe("update SST overlay with temperature anomalies", () => {
     const region = createRegion(data);
 
     // Band nonzero for points up to ~4deg outside the east edge (lng in (2, 6)).
-    const dataUrl = overlay.recolorSSTImage({
+    const dataUrl = overlay.updateSSTImageWithAnomalies({
       png, scaleName: "default", regions: [region], pad: 2,
       getTempDelta: (c) => (c.lat > 54 && c.lat < 66 && c.lng > 2 && c.lng < 6 ? 3 : 0),
     });

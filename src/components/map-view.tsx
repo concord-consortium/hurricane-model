@@ -178,8 +178,8 @@ export class MapView extends BaseComponent<IProps, IState> {
               // accessible version of sea surface temperature should always use 100% opacity
               opacity={sstOverlay.accessibleSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
               url={
-                sim.anyAnomalyActive && sstOverlay.recoloredUrl
-                  ? sstOverlay.recoloredUrl
+                sim.anyAnomalyActive && sstOverlay.updatedUrl
+                  ? sstOverlay.updatedUrl
                   : sstOverlay.getVisibleSeaSurfaceTempImgUrl(sim.season)
               }
               bounds={imageOverlayBounds}

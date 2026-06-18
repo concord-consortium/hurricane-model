@@ -95,7 +95,7 @@ describe("MapView component", () => {
     it("uses the recolored data-url when an anomaly is active and recoloredUrl is set", () => {
       stores.ui.setOverlay("sst");
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
-      stores.ui.sstOverlay.setRecoloredUrl("data:image/png;base64,TESTDATA");
+      stores.ui.sstOverlay.setUpdatedUrl("data:image/png;base64,TESTDATA");
       renderMapView(stores);
       const img = sstImg();
       expect(img).not.toBeNull();
@@ -105,7 +105,7 @@ describe("MapView component", () => {
     it("falls back to the static url when an anomaly is active but recoloredUrl is null", () => {
       stores.ui.setOverlay("sst");
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
-      stores.ui.sstOverlay.setRecoloredUrl(null);
+      stores.ui.sstOverlay.setUpdatedUrl(null);
       expect(stores.simulation.anyAnomalyActive).toBe(true);
       renderMapView(stores);
       const staticUrl = stores.ui.sstOverlay.getVisibleSeaSurfaceTempImgUrl(stores.simulation.season);

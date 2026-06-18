@@ -85,7 +85,7 @@ export const sstImages: Record<string, ISSTImages> = {
 
 export class SSTOverlayModel {
   @observable.ref public visiblePng: PNG | null = null;
-  @observable public recoloredUrl: string | null = null;
+  @observable public updatedUrl: string | null = null;
   @observable public accessibleSSTScale = false;
 
   private simulation: SimulationModel;
@@ -110,7 +110,7 @@ export class SSTOverlayModel {
         anomalies: toJS(this.simulation.temperatureAnomalies),
         scale: this.sstScaleName,
       }),
-      () => this.recolorNow(),
+      () => this.updateSSTImage(),
       { delay: RECOLOR_DEBOUNCE_MS }
     );
   }
@@ -137,17 +137,17 @@ export class SSTOverlayModel {
     this.visiblePng = png;
   }
 
-  @action.bound public setRecoloredUrl(url: string | null) {
-    this.recoloredUrl = url;
+  @action.bound public setUpdatedUrl(url: string | null) {
+    this.updatedUrl = url;
   }
 
-  @action.bound public recolorNow() {
+  @action.bound public updateSSTImage() {
     const png = this.visiblePng;
     if (!png || !this.simulation.anyAnomalyActive) {
-      this.setRecoloredUrl(null);
+      this.setUpdatedUrl(null);
       return;
     }
-    this.setRecoloredUrl(this.recolorSSTImage({
+    this.setUpdatedUrl(this.updateSSTImageWithAnomalies({
       png,
       scaleName: this.sstScaleName,
       regions: this.activeRegions,
@@ -160,7 +160,7 @@ export class SSTOverlayModel {
     return "data:image/png;base64," + PNG.sync.write(png).toString("base64");
   }
 
-  public recolorSSTImage({ png, scaleName, regions, getTempDelta, pad = 0 }: RecolorParams): string {
+  public updateSSTImageWithAnomalies({ png, scaleName, regions, getTempDelta, pad = 0 }: RecolorParams): string {
     const { width, height } = png;
     const out = new PNG({ width, height });
     out.data.set(png.data);
