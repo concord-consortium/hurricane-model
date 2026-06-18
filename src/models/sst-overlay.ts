@@ -87,6 +87,7 @@ export class SSTOverlayModel {
   @observable.ref public visiblePng: PNG | null = null;
   @observable public updatedUrl: string | null = null;
   @observable public accessibleSSTScale = false;
+  private targetUrl: string | null = null;
 
   private simulation: SimulationModel;
   // Test hook, mirrors simulation._seaSurfaceTempDataParsed.
@@ -202,8 +203,12 @@ export class SSTOverlayModel {
     // scale's lookup table (which would produce garbage). Anomaly-only changes don't
     // call this, so they fire the recolor reaction exactly once.
     this.setVisiblePng(null);
+    this.targetUrl = url;
     fetch(url).then(response => {
-      if (!response.ok) return;
+      // Only continue if the response url is the same file as the last requested url, which prevents older but slower
+      // fetches from overriding a faster but newer one.
+      if (!response.ok || (new URL(response.url)).pathname.split("/").pop() !== this.targetUrl) return;
+
       response.arrayBuffer().then(buffer => {
         new PNG().parse(Buffer.from(buffer), (err, png) => {
           if (err) {
