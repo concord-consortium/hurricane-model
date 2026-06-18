@@ -92,7 +92,7 @@ describe("MapView component", () => {
       expect(img!.src).toBe(resolved(staticUrl));
     });
 
-    it("uses the recolored data-url when an anomaly is active and recoloredUrl is set", () => {
+    it("uses the updated data-url when an anomaly is active and updatedUrl is set", () => {
       stores.ui.setOverlay("sst");
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
       stores.ui.sstOverlay.setUpdatedUrl("data:image/png;base64,TESTDATA");
@@ -102,7 +102,7 @@ describe("MapView component", () => {
       expect(img!.src).toBe("data:image/png;base64,TESTDATA");
     });
 
-    it("falls back to the static url when an anomaly is active but recoloredUrl is null", () => {
+    it("falls back to the static url when an anomaly is active but updatedUrl is null", () => {
       stores.ui.setOverlay("sst");
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
       stores.ui.sstOverlay.setUpdatedUrl(null);
