@@ -650,8 +650,12 @@ export class SimulationModel {
     return namedRegions.some(key => this.temperatureAnomalyAt(key) !== 0);
   }
 
+  @action.bound public setTemperatureAnomaly(key: NamedRegion, value: number) {
+    this.temperatureAnomalies.set(key, clampAnomaly(value));
+  }
+
   @action.bound public adjustTemperatureAnomaly(key: NamedRegion, delta: number) {
-    this.temperatureAnomalies.set(key, clampAnomaly(this.temperatureAnomalyAt(key) + delta));
+    this.setTemperatureAnomaly(key, this.temperatureAnomalyAt(key) + delta);
   }
 
   // Note that the visibility testing here is based on testing hurricane track segment end points.

@@ -153,7 +153,7 @@ export function setInteractiveState(
         for (const key of namedRegions) {
           const value = simState.temperatureAnomalies[key];
           if (typeof value === "number") {
-            simulation.temperatureAnomalies.set(key, value);
+            simulation.setTemperatureAnomaly(key, value);
           }
         }
       }
