@@ -391,7 +391,7 @@ describe("interactive-state", () => {
       expect(stores.simulation.temperatureAnomalyAt("caribbean")).toBe(0);
     });
 
-    it("restores defaults when the field is absent (legacy state)", () => {
+    it("does not override current state when the field is absent (legacy state)", () => {
       const stores = createStores();
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
       const state = getInteractiveState(stores);
