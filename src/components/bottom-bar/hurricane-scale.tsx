@@ -1,5 +1,5 @@
 import * as React from "react";
-import { hurricaneCategoryInfo } from "../../models/constants";
+import { hurricaneCategoryInfo } from "../../constants";
 import css from "./hurricane-scale.scss";
 
 interface IProps {}

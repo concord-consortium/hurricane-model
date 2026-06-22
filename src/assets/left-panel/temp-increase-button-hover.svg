@@ -1,0 +1,9 @@
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <path d="M0 0h24v24H0V0z" id="rli6cdy1ha"/>
+    </defs>
+    <g fill="none" xlink:href="#rli6cdy1ha" fill-rule="evenodd">
+        <circle stroke="#c62828" fill="#ffebee" cx="12" cy="12" r="11.5"/>
+        <path fill-rule="nonzero" d="M12.882 7.443v3.69h3.501v1.647h-3.501v3.708h-1.8V12.78H7.599v-1.647h3.483v-3.69z" fill="#c62828"/>
+    </g>
+</svg>

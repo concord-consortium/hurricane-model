@@ -4,9 +4,9 @@ import { SetupSection } from "./setup-section";
 
 import PressureSystemIcon from "../../assets/left-panel/pressure-system.svg";
 
-const hint = "Drag the H and L markers on the map to reposition pressure systems. " +
+const hint = "Drag the H and L markers on the map to re-position pressure systems. " +
   "Use the vertical slider on each to adjust strength.";
-const tip = "High pressure systems (H) steer the storm. Move them to change the projected path.";
+const tip = "High (H) and Low (L) pressure systems steer the storm. Move them to change the storm’s path.";
 
 export function PressureSystemsSection() {
   return (

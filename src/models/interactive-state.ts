@@ -1,4 +1,5 @@
 import { runInAction, toJS } from "mobx";
+import { namedRegions } from "../types";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
 import { PressureSystem } from "./pressure-system";
@@ -147,6 +148,15 @@ export function setInteractiveState(
           .filter(([key]) => !simState.consumedExtendedLandfallAreas!.includes(key))
           .map(([, bounds]) => bounds);
       }
+
+      if (simState.temperatureAnomalies) {
+        for (const key of namedRegions) {
+          const value = simState.temperatureAnomalies[key];
+          if (typeof value === "number") {
+            simulation.setTemperatureAnomaly(key, value);
+          }
+        }
+      }
     });
   }
 
@@ -166,7 +176,7 @@ export function setInteractiveState(
         ui.hurricaneImage = uiState.hurricaneImage;
       }
       if (uiState.accessibleSSTScale !== undefined) {
-        ui.accessibleSSTScale = uiState.accessibleSSTScale;
+        ui.sstOverlay.accessibleSSTScale = uiState.accessibleSSTScale;
       }
       if (uiState.categoryChangeMarkers !== undefined) {
         ui.categoryChangeMarkers = uiState.categoryChangeMarkers;
@@ -222,14 +232,15 @@ export function getInteractiveState(stores: IStores): IHurricaneInteractiveState
       numberOfStepsOverLand: simulation.numberOfStepsOverLand,
       consumedExtendedLandfallAreas: Object.keys(extendedLandfallBounds)
         .filter(key => !simulation.extendedLandfallAreas
-          .some(area => area.equals(extendedLandfallBounds[key])))
+          .some(area => area.equals(extendedLandfallBounds[key]))),
+      temperatureAnomalies: Object.fromEntries(simulation.temperatureAnomalies)
     },
     ui: {
       baseMap: ui.baseMap,
       overlay: ui.overlay,
       windArrows: ui.windArrows,
       hurricaneImage: ui.hurricaneImage,
-      accessibleSSTScale: ui.accessibleSSTScale,
+      accessibleSSTScale: ui.sstOverlay.accessibleSSTScale,
       categoryChangeMarkers: ui.categoryChangeMarkers,
       thermometerActive: ui.thermometerActive,
       thermometerPositionSaved: ui.thermometerPositionSaved,

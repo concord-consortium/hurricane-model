@@ -1,5 +1,7 @@
 import { LatLngExpression } from "leaflet";
-import { ICoordinates, IVector, ITrackPoint, ILandfall, IPrecipitationPoint, Season, StartLocation } from "../types";
+import {
+  ICoordinates, IVector, ITrackPoint, ILandfall, IPrecipitationPoint, Season, StartLocation, NamedRegion
+} from "../types";
 import { PressureSystemType } from "../models/pressure-system";
 import { MapTilesName } from "../map-layer-tiles";
 import { Overlay, ZoomedInViewProps } from "../models/ui";
@@ -51,6 +53,9 @@ export interface ISimulationState {
   numberOfStepsOverSea?: number;
   numberOfStepsOverLand?: number;
   consumedExtendedLandfallAreas?: string[];
+
+  // Per-region SST anomalies in °C.
+  temperatureAnomalies?: Partial<Record<NamedRegion, number>>;
 }
 
 /**

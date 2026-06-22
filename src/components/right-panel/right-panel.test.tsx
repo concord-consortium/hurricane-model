@@ -1,23 +1,28 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { createStores } from "../../models/stores";
 import { Provider } from "mobx-react";
-import { RightPanel } from "./right-panel";
 import config from "../../config";
+import { createStores } from "../../models/stores";
+import { StoresContext } from "../../stores-context";
+import { RightPanel } from "./right-panel";
 
 describe("Right Panel component", () => {
   let stores = createStores();
+  const renderPanel = () => render(
+    <StoresContext value={stores}>
+      <Provider stores={stores}>
+        <RightPanel />
+      </Provider>
+    </StoresContext>
+  );
+
   beforeEach(() => {
     stores = createStores();
   });
 
   it("renders basic components", () => {
-    const { container } = render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    const { container } = renderPanel();
     expect(container.querySelectorAll("ul")).toHaveLength(1);
     expect(container.querySelectorAll("li")).toHaveLength(2);
     // default is the base maps panel
@@ -28,11 +33,7 @@ describe("Right Panel component", () => {
 
   it("opens when a tab is clicked", async () => {
     const user = userEvent.setup();
-    render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    renderPanel();
     // right panel hidden by default
     expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
     await user.click(screen.getByTestId("tab-base"));
@@ -44,11 +45,7 @@ describe("Right Panel component", () => {
 
   it("remains open when a different tab is clicked", async () => {
     const user = userEvent.setup();
-    render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    renderPanel();
     expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
     await user.click(screen.getByTestId("tab-base"));
     expect(screen.getByTestId("right-panel")).toHaveClass("open");
@@ -58,11 +55,7 @@ describe("Right Panel component", () => {
 
   it("closes when the same tab is clicked", async () => {
     const user = userEvent.setup();
-    render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    renderPanel();
     expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
     await user.click(screen.getByTestId("tab-base"));
     expect(screen.getByTestId("right-panel")).toHaveClass("open");
@@ -75,22 +68,14 @@ describe("Right Panel component", () => {
     const defaultValue = config.enablePopulationMap;
 
     config.enablePopulationMap = true;
-    const { unmount } = render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    const { unmount } = renderPanel();
     await user.click(screen.getByTestId("tab-base"));
     expect(screen.queryByTestId("base-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("map-button-population")).toBeInTheDocument();
     unmount();
 
     config.enablePopulationMap = false;
-    render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    renderPanel();
     await user.click(screen.getByTestId("tab-base"));
     expect(screen.queryByTestId("base-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("map-button-population")).not.toBeInTheDocument();
@@ -100,11 +85,7 @@ describe("Right Panel component", () => {
 
   it("renders the overlay panel when the overlay tab is clicked", async () => {
     const user = userEvent.setup();
-    render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    renderPanel();
     expect(screen.getByTestId("right-panel")).not.toHaveClass("open");
     await user.click(screen.getByTestId("tab-overlay"));
     expect(screen.getByTestId("right-panel")).toHaveClass("open");
@@ -118,11 +99,7 @@ describe("Right Panel component", () => {
     const defValue = config.availableOverlays;
 
     config.availableOverlays = ["sst", "precipitation", "stormSurge"];
-    let result = render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    let result = renderPanel();
     expect(screen.queryByTestId("tab-overlay")).toBeInTheDocument();
     await user.click(screen.getByTestId("tab-overlay"));
     expect(screen.queryByTestId("map-button-sst")).toBeInTheDocument();
@@ -131,11 +108,7 @@ describe("Right Panel component", () => {
     result.unmount();
 
     config.availableOverlays = ["sst", "stormSurge"];
-    result = render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    result = renderPanel();
     expect(screen.queryByTestId("tab-overlay")).toBeInTheDocument();
     await user.click(screen.getByTestId("tab-overlay"));
     expect(screen.queryByTestId("map-button-sst")).toBeInTheDocument();
@@ -144,11 +117,7 @@ describe("Right Panel component", () => {
     result.unmount();
 
     config.availableOverlays = ["sst"];
-    result = render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    result = renderPanel();
     expect(screen.queryByTestId("tab-overlay")).toBeInTheDocument();
     await user.click(screen.getByTestId("tab-overlay"));
     expect(screen.queryByTestId("map-button-sst")).toBeInTheDocument();
@@ -157,11 +126,7 @@ describe("Right Panel component", () => {
     result.unmount();
 
     config.availableOverlays = [];
-    render(
-      <Provider stores={stores}>
-        <RightPanel />
-      </Provider>
-    );
+    renderPanel();
     expect(screen.queryByTestId("tab-overlay")).not.toBeInTheDocument();
 
     config.availableOverlays = defValue;

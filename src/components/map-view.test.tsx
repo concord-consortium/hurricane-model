@@ -77,6 +77,44 @@ describe("MapView component", () => {
     });
   });
 
+  describe("SST overlay url", () => {
+    const sstImg = () => document.querySelector("img.leaflet-image-layer") as HTMLImageElement | null;
+    // jsdom resolves the relative asset-stub url against the document base when read back
+    // via the `src` *property*, so resolve the expected static url the same way to compare.
+    const resolved = (url: string) => new URL(url, document.baseURI).href;
+
+    it("uses the static SST image url when no anomaly is active", () => {
+      stores.ui.setOverlay("sst");
+      renderMapView(stores);
+      const staticUrl = stores.ui.sstOverlay.getVisibleSeaSurfaceTempImgUrl(stores.simulation.season);
+      const img = sstImg();
+      expect(img).not.toBeNull();
+      expect(img!.src).toBe(resolved(staticUrl));
+    });
+
+    it("uses the updated data-url when an anomaly is active and updatedUrl is set", () => {
+      stores.ui.setOverlay("sst");
+      stores.simulation.adjustTemperatureAnomaly("gulf", 2);
+      stores.ui.sstOverlay.setUpdatedUrl("data:image/png;base64,TESTDATA");
+      renderMapView(stores);
+      const img = sstImg();
+      expect(img).not.toBeNull();
+      expect(img!.src).toBe("data:image/png;base64,TESTDATA");
+    });
+
+    it("falls back to the static url when an anomaly is active but updatedUrl is null", () => {
+      stores.ui.setOverlay("sst");
+      stores.simulation.adjustTemperatureAnomaly("gulf", 2);
+      stores.ui.sstOverlay.setUpdatedUrl(null);
+      expect(stores.simulation.anyAnomalyActive).toBe(true);
+      renderMapView(stores);
+      const staticUrl = stores.ui.sstOverlay.getVisibleSeaSurfaceTempImgUrl(stores.simulation.season);
+      const img = sstImg();
+      expect(img).not.toBeNull();
+      expect(img!.src).toBe(resolved(staticUrl));
+    });
+  });
+
   describe("map click logging via instance handler", () => {
     // The map click and thermometer-move handlers attach to Leaflet via react-leaflet 2's
     // onClick/onMouseMove props. Leaflet events aren't React synthetic events, so RTL

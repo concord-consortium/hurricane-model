@@ -291,7 +291,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       hurricaneImage: ui.hurricaneImage,
       baseMap: ui.baseMap,
       overlay: ui.overlay,
-      accessibleSSTScale: ui.accessibleSSTScale,
+      accessibleSSTScale: ui.sstOverlay.accessibleSSTScale,
       thermometerActive: ui.thermometerActive,
       pressureSystems: sim.pressureSystems.map(ps => ({
         type: ps.type,

@@ -242,7 +242,7 @@ describe("interactive-state", () => {
       expect(stores.ui.overlay).toBe("precipitation");
       expect(stores.ui.windArrows).toBe(false);
       expect(stores.ui.hurricaneImage).toBe(true);
-      expect(stores.ui.accessibleSSTScale).toBe(true);
+      expect(stores.ui.sstOverlay.accessibleSSTScale).toBe(true);
       expect(stores.ui.thermometerActive).toBe(true);
       expect(stores.ui.categoryChangeMarkers).toBe(false);
       expect(stores.ui.thermometerPositionSaved).toEqual([30, -85]);
@@ -366,6 +366,40 @@ describe("interactive-state", () => {
       setInteractiveState(stores, state);
       // Should have 2 fewer areas after restoration
       expect(stores.simulation.extendedLandfallAreas.length).toBe(initialAreaCount - 2);
+    });
+  });
+
+  describe("temperatureAnomalies round-trip", () => {
+    it("serializes anomalies as a plain object", () => {
+      const stores = createStores();
+      stores.simulation.adjustTemperatureAnomaly("gulf", 2);
+      stores.simulation.adjustTemperatureAnomaly("caribbean", -1);
+      const state = getInteractiveState(stores);
+      expect(state.simulation.temperatureAnomalies).toMatchObject({ gulf: 2, caribbean: -1 });
+    });
+
+    it("restores anomalies into the model", () => {
+      const stores = createStores();
+      const state = getInteractiveState(stores);
+      state.simulation.temperatureAnomalies = { gulf: 3, coastalAfrica: -2 };
+      expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(0);
+      expect(stores.simulation.temperatureAnomalyAt("coastalAfrica")).toBe(0);
+      expect(stores.simulation.temperatureAnomalyAt("caribbean")).toBe(0);
+      setInteractiveState(stores, state);
+      expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(3);
+      expect(stores.simulation.temperatureAnomalyAt("coastalAfrica")).toBe(-2);
+      expect(stores.simulation.temperatureAnomalyAt("caribbean")).toBe(0);
+    });
+
+    it("does not override current state when the field is absent (legacy state)", () => {
+      const stores = createStores();
+      stores.simulation.adjustTemperatureAnomaly("gulf", 2);
+      const state = getInteractiveState(stores);
+      delete state.simulation.temperatureAnomalies;
+      expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(2);
+      setInteractiveState(stores, state);
+      // Absent field => no override; model keeps whatever it had (here, the prior value).
+      expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(2);
     });
   });
 });

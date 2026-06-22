@@ -160,6 +160,13 @@ export const KNOWN_PARAMETERS: IParameterDoc[] = [
     description: "SST overlay opacity"
   },
   {
+    name: "temperatureAnomalies",
+    type: "string",
+    validValues: "JSON object mapping region to a number from -3 to 3",
+    description: "Initial sea surface temperature anomalies per region in °C, " +
+      "e.g. {\"gulf\": 2, \"caribbean\": -1}"
+  },
+  {
     name: "defaultSSTScale",
     type: "string",
     validValues: "default, rainbowCC",

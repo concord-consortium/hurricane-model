@@ -5,7 +5,7 @@ import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { MapContainer, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
-import { LatLng, Map as LeafletMap, Point, PointTuple, latLngBounds } from "leaflet";
+import { LatLng, Map as LeafletMap, Point, PointTuple, latLngBounds, DomEvent } from "leaflet";
 import Control from "./leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
@@ -26,6 +26,10 @@ import css from "./map-view.scss";
 import { ThermometerMarker } from "./thermometer-marker";
 import { PolygonRegion } from "./polygon-region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
+import { LeafletCustomMarker } from "./leaflet-custom-marker";
+import { RegionTemperatureControl } from "./region-temperature-control";
+import { namedRegions } from "../types";
+import { temperatureAnomalyRegions, anomalyFillColor } from "../utils/regions";
 import "leaflet/dist/leaflet.css";
 
 interface IProps extends IBaseProps {}
@@ -41,6 +45,16 @@ export class MapView extends BaseComponent<IProps, IState> {
   private _lastThermometerUpdateTime = 0;
   private _thermometerHoverTimeout: number | null = null;
   private zoomRef = React.createRef<LeafletControl.Zoom>();
+
+  // Stop pointer/scroll events on the in-map temperature controls from reaching the Leaflet map,
+  // so repeatedly clicking the +/- buttons doesn't trigger double-click zoom (or drag/wheel zoom).
+  // Stable method reference so React only invokes it on mount/unmount, not on every re-render.
+  private disableMapInteractions = (el: HTMLDivElement | null) => {
+    if (el) {
+      DomEvent.disableClickPropagation(el);
+      DomEvent.disableScrollPropagation(el);
+    }
+  };
 
   public componentDidMount() {
     window.addEventListener("resize", this.handleWindowResize);
@@ -107,8 +121,8 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public render() {
-    const sim = this.stores.simulation;
-    const ui = this.stores.ui;
+    const { simulation: sim, ui } = this.stores;
+    const { sstOverlay } = ui;
     const navigation = !!ui.zoomedInView || config.navigation;
 
     const resetButtonClasses = clsx(
@@ -162,8 +176,12 @@ export class MapView extends BaseComponent<IProps, IState> {
             ui.overlay === "sst" &&
             <ImageOverlay
               // accessible version of sea surface temperature should always use 100% opacity
-              opacity={ui.accessibleSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
-              url={ui.getVisibleSeaSurfaceTempImgUrl(sim.season)}
+              opacity={sstOverlay.accessibleSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
+              url={
+                sim.anyAnomalyActive && sstOverlay.updatedUrl
+                  ? sstOverlay.updatedUrl
+                  : sstOverlay.getVisibleSeaSurfaceTempImgUrl(sim.season)
+              }
               bounds={imageOverlayBounds}
             />
           }
@@ -243,6 +261,24 @@ export class MapView extends BaseComponent<IProps, IState> {
           {
             ui.setupMode === "stormLocation" &&
             <PolygonRegion region={stormPlacementRegion} />
+          }
+          {
+            ui.setupMode === "seaSurfaceTemperatures" &&
+            namedRegions.map(key => {
+              const { region, anchor } = temperatureAnomalyRegions[key];
+              const anomalyColor = anomalyFillColor(sim.temperatureAnomalyAt(key));
+              const pathOptions = { color: anomalyColor, weight: 1.5, fillColor: anomalyColor, fillOpacity: 0.2 };
+              return (
+                <React.Fragment key={key}>
+                  <PolygonRegion region={region} pathOptions={pathOptions} />
+                  <LeafletCustomMarker position={anchor}>
+                    <div className={css.temperatureControlMarker} ref={this.disableMapInteractions}>
+                      <RegionTemperatureControl regionKey={key} />
+                    </div>
+                  </LeafletCustomMarker>
+                </React.Fragment>
+              );
+            })
           }
           <AttributionControl position="topright" />
         </MapContainer>

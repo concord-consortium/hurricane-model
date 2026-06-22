@@ -1,10 +1,11 @@
-import { UIModel } from "./ui";
 import { LatLngBounds, Map } from "leaflet";
 import config from "../config";
+import { SimulationModel } from "./simulation";
+import { UIModel } from "./ui";
 
 describe("UI model", () => {
   it("can be created without errors", () => {
-    const ui = new UIModel();
+    const ui = new UIModel(new SimulationModel());
     expect(ui.initialBounds).toEqual(config.initialBounds);
     expect(ui.zoomedInView).toEqual(false);
     expect(ui.mapModifiedByUser).toEqual(false);
@@ -13,7 +14,7 @@ describe("UI model", () => {
 
   describe("maxZoom", () => {
     it("should consider both base map and overlay tiles (when tiles are used as overlay)", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.setMapTiles("street");
       ui.setOverlay(null);
       expect(ui.maxZoom).toEqual(13);
@@ -25,7 +26,7 @@ describe("UI model", () => {
 
   describe("mapUpdated", () => {
     it("updates latLngToContainerPoint, mapModifiedByUser, and mapZoom", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       const map = new Map(document.createElement("div"));
       // mock bounds
       map.getBounds = () => new LatLngBounds({ lat: -10, lng: -10 }, { lat: 10, lng: 10 });
@@ -44,7 +45,7 @@ describe("UI model", () => {
 
   describe("resetMapView", () => {
     it("updates initialBounds and mapModifiedByUser", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       const oldInitialBounds = ui.initialBounds;
       ui.resetMapView();
       // Bounds should be the same, but it should be a newly craeted object, so view code can detect this change.
@@ -56,7 +57,7 @@ describe("UI model", () => {
 
   describe("setInitialBounds", () => {
     it("updates initialBounds", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.setInitialBounds([[1, 2], [5, 10]]);
       expect(ui.initialBounds).toEqual([[1, 2], [5, 10]]);
     });
@@ -64,7 +65,7 @@ describe("UI model", () => {
 
   describe("setZoomedInView", () => {
     it("updates initialBounds and zoomedInView props", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.setZoomedInView([[30, -85], [35, -80]], 3);
       expect(ui.initialBounds).toEqual([[30, -85], [35, -80]]);
       expect(ui.zoomedInView).toEqual({
@@ -85,7 +86,7 @@ describe("UI model", () => {
 
   describe("setNorthAtlanticView", () => {
     it("updates initialBounds", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.setNorthAtlanticView();
       expect(ui.initialBounds).toEqual(config.initialBounds);
       expect(ui.zoomedInView).toEqual(false);
@@ -94,7 +95,7 @@ describe("UI model", () => {
 
   describe("reset", () => {
     it("resets most of the UI related params", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.initialBounds = [[1, 2], [3, 4]];
       ui.setZoomedInView([[30, -85], [35, -80]], 3);
       ui.mapModifiedByUser = true;
@@ -115,37 +116,37 @@ describe("UI model", () => {
 
   describe("mode and isReportMode", () => {
     it("defaults to runtime mode", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       expect(ui.mode).toBe("runtime");
       expect(ui.isReportMode).toBe(false);
     });
 
     it("setMode updates the mode", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.setMode("authoring");
       expect(ui.mode).toBe("authoring");
     });
 
     it("isReportMode returns true for report mode", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.setMode("report");
       expect(ui.isReportMode).toBe(true);
     });
 
     it("isReportMode returns true for reportItem mode", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.setMode("reportItem");
       expect(ui.isReportMode).toBe(true);
     });
 
     it("isReportMode returns false for runtime mode", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.setMode("runtime");
       expect(ui.isReportMode).toBe(false);
     });
 
     it("isReportMode returns false for authoring mode", () => {
-      const ui = new UIModel();
+      const ui = new UIModel(new SimulationModel());
       ui.setMode("authoring");
       expect(ui.isReportMode).toBe(false);
     });

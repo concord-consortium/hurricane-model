@@ -5,7 +5,7 @@ import { random } from "../seedrandom";
 import { IVector } from "../types";
 import {
   hurricaneCategoryInfo, hurricaneMaxWindSpeedByCategory, maxHurricaneSpeed, minHurricaneSpeed, maxWindSpeed
-} from "./constants";
+} from "../constants";
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 
 // Sea surface temperature 28.25*C is an important value. Sea needs to be warmer than that so the hurricane

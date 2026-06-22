@@ -1,5 +1,5 @@
 import { autorun } from "mobx";
-import { hurricaneCategoryInfo } from "./constants";
+import { hurricaneCategoryInfo } from "../constants";
 import { Hurricane } from "./hurricane";
 
 describe("Hurricane store", () => {

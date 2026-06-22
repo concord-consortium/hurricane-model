@@ -7,9 +7,7 @@ export interface IStores {
 }
 
 export function createStores(): IStores {
-  const stores = {
-    ui: new UIModel(),
-    simulation: new SimulationModel()
-  };
-  return stores;
+  const simulation = new SimulationModel();
+  const ui = new UIModel(simulation);
+  return { ui, simulation };
 }

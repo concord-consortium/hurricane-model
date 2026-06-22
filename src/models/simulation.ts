@@ -1,31 +1,37 @@
 import { lineString } from "@turf/helpers";
 import { Position } from "geojson";
 import lineIntersect from "@turf/line-intersect";
-import { LatLngExpression, CRS, LatLngBounds, latLngBounds } from "leaflet";
-import { action, observable, computed, autorun, toJS, makeObservable } from "mobx";
-import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
+import { LatLngExpression, CRS, LatLngBounds, latLngBounds, latLng } from "leaflet";
+import { action, observable, computed, autorun, toJS, makeObservable, ObservableMap } from "mobx";
+import { kdTree } from "kd-tree-javascript";
+import { distanceTo } from "geolocation-utils";
+import { PNG } from "pngjs";
+
+import { hurricaneCategoryInfo, temperatureAnomalyFeatherHalfWidth } from "../constants";
+import config, { selectPressureSystems, startStrengths } from "../config";
+import { log } from "../log";
+import { vecAverage } from "../math-utils";
+import { random } from "../seedrandom";
+import { invertedTemperatureScale } from "../temperature-scale";
+import {
+  ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
+  StartLocation, StartLocationNames, isStartLocationName, isCoordinates, NamedRegion, namedRegions
+} from "../types";
+import { signedDistanceToRegion, featherWeight } from "../utils/region";
+import { clampAnomaly, temperatureAnomalyRegions } from "../utils/regions";
 import { Hurricane } from "./hurricane";
-import * as decWind from "../../wind-data-json/dec-simple.json";
-import * as octWind from "../../wind-data-json/oct-simple.json";
-import * as marchWind from "../../wind-data-json/mar-simple.json";
-import * as juneWind from "../../wind-data-json/jun-simple.json";
-import * as septWind from "../../wind-data-json/sep-simple.json";
+import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
+
 import decSeaTemp from "../../sea-surface-temp-img/dec-default.png";
 import marchSeaTemp from "../../sea-surface-temp-img/mar-default.png";
 import juneSeaTemp from "../../sea-surface-temp-img/jun-default.png";
 import septSeaTemp from "../../sea-surface-temp-img/sep-default.png";
 import octSeaTemp from "../../sea-surface-temp-img/oct-default.png";
-import { kdTree } from "kd-tree-javascript";
-import { ICoordinates, IWindPoint, ITrackPoint, IVector, Season, ILandfall, IPrecipitationPoint, ISSTImages,
-  StartLocation, StartLocationNames, isStartLocationName, isCoordinates} from "../types";
-import { vecAverage } from "../math-utils";
-import { distanceTo } from "geolocation-utils";
-import { invertedTemperatureScale } from "../temperature-scale";
-import { PNG } from "pngjs";
-import { hurricaneCategoryInfo } from "./constants";
-import config, { selectPressureSystems, startStrengths } from "../config";
-import { random } from "../seedrandom";
-import { log } from "../log";
+import * as decWind from "../../wind-data-json/dec-simple.json";
+import * as octWind from "../../wind-data-json/oct-simple.json";
+import * as marchWind from "../../wind-data-json/mar-simple.json";
+import * as juneWind from "../../wind-data-json/jun-simple.json";
+import * as septWind from "../../wind-data-json/sep-simple.json";
 
 type IWindDataset = Record<Season, IWindPoint[]>
 
@@ -114,6 +120,8 @@ export class SimulationModel {
   // Current season, sets wind and sea temperature (in the future).
   @observable public season: Season;
   @observable public seaSurfaceTempData: PNG | null = null;
+  // Per-region sea-surface-temperature anomalies in °C. Every region is always present (seeded to 0).
+  @observable public temperatureAnomalies = new ObservableMap<NamedRegion, number>();
   @observable public precipitationPoints: IPrecipitationPoint[] = [];
   // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
   @observable public simulationFinished = false;
@@ -156,6 +164,7 @@ export class SimulationModel {
       (o: IPressureSystemOptions) => new PressureSystem(o)
     );
     makeObservable(this);
+    this.seedTemperatureAnomalies();
     autorun(() => {
       // MobX autorun will re-run this block if any property used inside is updated. It's a bit of MobX magic
       // and one of its core features (more info can be found in MobX docs). That ensures that sea surface temperature
@@ -494,6 +503,7 @@ export class SimulationModel {
   // That's a complete reset to the initial state.
   @action.bound public reset() {
     this.restart();
+    this.seedTemperatureAnomalies();
     this.startLocation = this.initialState.startLocation;
     this.season = this.initialState.season;
     const coordinates = resolveStartLocation(this.startLocation);
@@ -599,7 +609,53 @@ export class SimulationModel {
     // Format and whitespace are very important. That's how D3 scale returns color value.
     // It needs to match invertedTemperatureScale domain.
     const color = `rgb(${r}, ${g}, ${b})`;
-    return invertedTemperatureScale(color);
+    let temp: number | null = invertedTemperatureScale(color);
+
+    // Apply anomalies.
+    if (temp != null) {
+      temp += this.totalAnomalyAt(latLng(position));
+    }
+
+    return temp;
+  }
+
+  private seedTemperatureAnomalies() {
+    const fromConfig: Record<string, number> = config.temperatureAnomalies ?? {};
+    const next = new Map<NamedRegion, number>();
+    for (const key of namedRegions) {
+      const raw = Number(fromConfig[key]);
+      next.set(key, isFinite(raw) ? clampAnomaly(raw) : 0);
+    }
+    this.temperatureAnomalies.replace(next);
+  }
+
+  public temperatureAnomalyAt(key: NamedRegion): number {
+    return this.temperatureAnomalies.get(key) ?? 0;
+  }
+
+  public totalAnomalyAt(coords: ICoordinates): number {
+    let total = 0;
+    for (const key of namedRegions) {
+      const anomaly = this.temperatureAnomalyAt(key);
+      if (anomaly === 0) continue;
+
+      const distance = signedDistanceToRegion(coords, temperatureAnomalyRegions[key].region);
+      const weight = featherWeight(distance, temperatureAnomalyFeatherHalfWidth);
+      if (weight > 0) total += anomaly * weight;
+    }
+    return total;
+  }
+
+  @computed public get anyAnomalyActive(): boolean {
+    return namedRegions.some(key => this.temperatureAnomalyAt(key) !== 0);
+  }
+
+  @action.bound public setTemperatureAnomaly(key: NamedRegion, value: number) {
+    this.temperatureAnomalies.set(key, clampAnomaly(value));
+  }
+
+  @action.bound public adjustTemperatureAnomaly(key: NamedRegion, delta: number) {
+    this.setTemperatureAnomaly(key, this.temperatureAnomalyAt(key) + delta);
   }
 
   // Note that the visibility testing here is based on testing hurricane track segment end points.

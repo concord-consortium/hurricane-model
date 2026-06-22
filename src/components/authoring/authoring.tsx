@@ -5,7 +5,7 @@ import { IChangeEvent } from "@rjsf/core";
 import { RJSFSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import config from "../../config";
-import { hurricaneCategoryInfo } from "../../models/constants";
+import { hurricaneCategoryInfo } from "../../constants";
 import css from "./authoring.scss";
 
 interface IProps extends IBaseProps {}
@@ -87,6 +87,10 @@ const customProperties: any = {
     title: "Starting Category",
     type: "number",
     enum: Array.from(hurricaneCategoryInfo.keys())
+  },
+  temperatureAnomalies: {
+    title: "Temperature Anomalies (JSON, e.g. {\"gulf\": 2, \"caribbean\": -1})",
+    type: "string"
   }
 };
 
@@ -118,6 +122,7 @@ export const defaultAuthoring = {
 };
 
 defaultAuthoring.initialBounds = JSON.stringify(config.initialBounds);
+defaultAuthoring.temperatureAnomalies = JSON.stringify(config.temperatureAnomalies);
 
 const uiSchema = {
   availableOverlays: {
@@ -154,7 +159,7 @@ export class Authoring extends BaseComponent<IProps, IState> {
     const params = Object.keys(formData)
       .filter(key => {
         let defValue = config[key];
-        if (Array.isArray(defValue)) {
+        if (defValue !== null && typeof defValue === "object") {
           defValue = JSON.stringify(defValue);
         }
         return formValues[key] !== defValue;

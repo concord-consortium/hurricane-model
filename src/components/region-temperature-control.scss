@@ -1,0 +1,32 @@
+.label {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.buttonSection {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  width: 120px;
+
+  .status {
+    min-width: 64px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    line-height: 0;
+
+    .hoverIcon { display: none; }
+    &:hover:not(:disabled) {
+      .baseIcon { display: none; }
+      .hoverIcon { display: inline; }
+    }
+    &:disabled { opacity: 0.4; cursor: default; }
+  }
+}
