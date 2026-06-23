@@ -72,7 +72,7 @@ It's still possible to get data from this link. You'll have to create a profile 
 - Select Standard
 - Push the Download Via Earthdata Search button
 - Push the continue button. This will open a new tab
-- You'll want to download the file that looks like AQUA_MODIS.YYYYMMDD_YYYYMMDD.L3m.MO.SST4.sst4.4km.nc
+- You'll want to download the file that looks like AQUA_MODIS.YYYYMMDD_YYYYMMDD.L3m.MO.SST4.sst4.4km.ncs
 
 `sea-surface-temp-netcdf` directory contains monthly mean data for five months representing different seasons:
 
@@ -101,6 +101,8 @@ JSON data. It's compressed and lets us cover area way more precisely than JSON d
 **IMPORTANT**
 If you ever change anything in `src/temperature-scale.js`, remember to run all the conversion scripts and generate
 sea surface temperature images again. They need to stay in sync with temperature scale.
+
+**Note:** Maps downloaded for October in 2026 included temperature data in many inland areas, such as the Mississippi delta, the Amazon, and throughout Florida. This was inconsistent with older maps, which essentiailly had no data on continents. To address this issue, I opened `sept-rainbowCC.png`, selected all transparent pixels, then deleted those pixels in `oct-default.png`, `oct-purple3.png`, etc. The original oct files have been preserved in the `sea-surface-temp-img-source` directory.
 
 ## Sea Surface Temperature impact on the hurricane intensity
 
