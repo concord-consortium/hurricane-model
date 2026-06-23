@@ -72,7 +72,7 @@ It's still possible to get data from this link. You'll have to create a profile 
 - Select Standard
 - Push the Download Via Earthdata Search button
 - Push the continue button. This will open a new tab
-- You'll want to download the file that looks like AQUA_MODIS.YYYYMMDD_YYYYMMDD.L3m.MO.SST4.sst4.4km.ncs
+- You'll want to download the file that looks like AQUA_MODIS.YYYYMMDD_YYYYMMDD.L3m.MO.SST4.sst4.4km.nc
 
 `sea-surface-temp-netcdf` directory contains monthly mean data for five months representing different seasons:
 
