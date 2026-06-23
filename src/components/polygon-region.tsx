@@ -4,10 +4,10 @@ import { PathOptions } from "leaflet";
 import { Region } from "../utils/region";
 
 const defaultPathOptions = {
-  color: "#0072B2",
-  weight: 2,
-  fillColor: "#0072B2",
-  fillOpacity: 0.1,
+  color: "#fff",
+  weight: 1.5,
+  fillColor: "#fff",
+  fillOpacity: 0.2
 };
 
 interface IProps {
