@@ -22,7 +22,7 @@ $leftPanelBorderRadius: 5px;
     border-top-right-radius: $leftPanelBorderRadius;
     color: $fontColor;
     height: 100%;
-    left: -$leftPanelWidth;
+    left: -$leftPanelContainerWidth;
     pointer-events: all;
     position: absolute;
     top: 0;
