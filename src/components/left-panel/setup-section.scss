@@ -1,8 +1,10 @@
+@use "../common" as *;
 @use "./left-panel-common" as *;
 
 .sectionHeader.sectionHeader {
   background-color: white;
   border-bottom: $leftPanelBorder;
+  color: $fontColor;
   height: 40px;
 
   &:hover {
@@ -40,7 +42,6 @@
 
   .hint, .postscript {
     line-height: 1.55;
-    color: #666;
   }
 
   .hint {
@@ -53,7 +54,6 @@
 
   .tip {
     background-color: #f4f8e9;
-    color: #435f1f;
     padding: 8px;
 
     .bold {

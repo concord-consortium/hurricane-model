@@ -54,7 +54,7 @@ export const RegionTemperatureControl = observer(function RegionTemperatureContr
   const { simulation } = useStores();
   const { label } = temperatureAnomalyRegions[regionKey];
   const anomaly = simulation.temperatureAnomalyAt(regionKey);
-  const color = anomaly > 0 ? warmColor : anomaly < 0 ? coldColor : "#000";
+  const color = anomaly > 0 ? warmColor : anomaly < 0 ? coldColor : "#434343";
 
   return (
     <React.Fragment>

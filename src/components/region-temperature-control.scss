@@ -1,4 +1,7 @@
+@use "common" as *;
+
 .label {
+  color: $fontColor;
   font-weight: bold;
   white-space: nowrap;
 }
