@@ -1,10 +1,11 @@
+import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React from "react";
 
 import { temperatureAnomalyMax, temperatureAnomalyMin } from "../constants";
 import { useStores } from "../stores-context";
 import { NamedRegion } from "../types";
-import { coldColor, temperatureAnomalyRegions, warmColor } from "../utils/regions";
+import { temperatureAnomalyRegions } from "../utils/regions";
 
 import TempDecreaseIcon from "../assets/left-panel/temp-decrease-button.svg";
 import TempDecreaseHoverIcon from "../assets/left-panel/temp-decrease-button-hover.svg";
@@ -54,14 +55,14 @@ export const RegionTemperatureControl = observer(function RegionTemperatureContr
   const { simulation } = useStores();
   const { label } = temperatureAnomalyRegions[regionKey];
   const anomaly = simulation.temperatureAnomalyAt(regionKey);
-  const color = anomaly > 0 ? warmColor : anomaly < 0 ? coldColor : "#434343";
+  const colorClass = anomaly > 0 ? css.warm : anomaly < 0 ? css.cold : undefined;
 
   return (
     <React.Fragment>
       <div className={css.label}>{label}</div>
       <div className={css.buttonSection}>
         <ChangeButton adjustment={-1} anomaly={anomaly} regionKey={regionKey} />
-        <span className={css.status} style={{ color }}>{statusText(anomaly)}</span>
+        <span className={clsx(css.status, colorClass)}>{statusText(anomaly)}</span>
         <ChangeButton adjustment={1} anomaly={anomaly} regionKey={regionKey} />
       </div>
     </React.Fragment>

@@ -1,6 +1,7 @@
 import { FeatureCollection } from "geojson";
 import { scaleLinear } from "d3-scale";
 
+import { coldColor, warmColor } from "../components/common";
 import { temperatureAnomalyMax, temperatureAnomalyMin } from "../constants";
 import { ICoordinates, NamedRegion } from "../types";
 import { Region, createRegion } from "./region";
@@ -39,8 +40,6 @@ export const temperatureAnomalyRegions: Record<NamedRegion, NamedRegionData> = {
   }
 };
 
-export const coldColor = "#2255cc";
-export const warmColor = "#c62828";
 // d3-scale's default interpolator detects hex color strings and interpolates them in
 // RGB, returning an "rgb(r, g, b)" string. clamp(true) keeps values within [-3, 3].
 const colorScale = scaleLinear<string>()

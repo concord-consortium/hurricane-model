@@ -1,4 +1,5 @@
 import { createTheme } from "@mui/material/styles";
+import { fontColor } from "./components/common";
 
 export default createTheme({
   palette: {
@@ -34,7 +35,7 @@ export default createTheme({
           }
         },
         text: {
-          color: "#434343",
+          color: fontColor,
           padding: 0,
         }
       }
