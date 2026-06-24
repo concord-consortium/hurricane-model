@@ -45,6 +45,7 @@ $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.
 // Exported to JS via the :export block below and consumed by map-view.tsx.
 // Renaming a key or removing the :export block silently yields `undefined` in JS.
 :export {
+  fontColor: $fontColor;
   coldColor: $coldColor;
   warmColor: $warmColor;
   leftPanelWidth: $leftPanelWidth;
