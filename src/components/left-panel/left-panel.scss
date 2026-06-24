@@ -51,7 +51,7 @@ $leftPanelBorderRadius: 5px;
       .leftPanelCloseButton {
         background: none;
         border: none;
-        color: #797979;
+        color: $controlLabel;
         cursor: pointer;
         display: inline-flex;
         height: 24px;
@@ -61,7 +61,7 @@ $leftPanelBorderRadius: 5px;
         width: 24px;
 
         &:hover {
-          color: $controlLabel;
+          color: #797979;
         }
 
         &:focus-visible {
