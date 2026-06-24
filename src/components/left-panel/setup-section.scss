@@ -42,7 +42,7 @@
   padding: 8px 16px 12px;
 
   .hint, .postscript {
-    line-height: 1.55;
+    line-height: normal;
   }
 
   .hint {
@@ -50,6 +50,7 @@
   }
 
   .postscript {
+    font-size: 10.5px;
     margin-top: 11px;
   }
 
