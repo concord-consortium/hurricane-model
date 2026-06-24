@@ -150,6 +150,10 @@ $overflowHeight: 11px;
 
     &.open {
       background-color: $secondaryColor;
+
+      svg {
+        box-shadow: 0 0 0 3px rgba(255,255,255,1);
+      }
     }
   }
 }
