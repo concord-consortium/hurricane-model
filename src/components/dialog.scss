@@ -16,20 +16,20 @@
   padding: 0;
   background: none;
   border: none;
-  color: #797979;
+  color: $charcoalMedium;
   cursor: pointer;
   display: inline-flex;
   &:hover {
-    color: $controlLabel;
+    color: $charcoal;
   }
   &:focus-visible {
-    outline: 2px solid $controlLabel;
+    outline: 2px solid $charcoal;
     outline-offset: 2px;
   }
 }
 
 .content {
-  color: $fontColor;
+  color: $charcoal;
   margin-top: 1em;
   p:first-child {
     margin-top: 0;

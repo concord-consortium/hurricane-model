@@ -1,7 +1,10 @@
+$charcoal: #434343;
+$charcoalMedium: #797979;
+
 $topBarHeight: 22px;
 $bottomBarHeight: 65px;
 $bottomBarBorderWidth: 1px;
-$bottomBarBorderStyle: $bottomBarBorderWidth solid #797979;
+$bottomBarBorderStyle: $bottomBarBorderWidth solid $charcoalMedium;
 $bottomBarTopPadding: 7px;
 $bottomBarBorderRadius: 9px;
 
@@ -19,9 +22,6 @@ $cat5Color: #ff6060;
 
 $scaleFont: 'Roboto Condensed', Lato, arial, sans-serif;
 
-$fontColor: #434343;
-$controlLabel: $fontColor;
-$controlIconLine: #797979;
 $tabGeo: #339933;
 $tabGeoTransparent: rgba(51,153,51,0.5);
 $tabGeoLight: #99cc99;
@@ -45,7 +45,7 @@ $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.
 // Exported to JS via the :export block below and consumed by map-view.tsx.
 // Renaming a key or removing the :export block silently yields `undefined` in JS.
 :export {
-  fontColor: $fontColor;
+  fontColor: $charcoal;
   coldColor: $coldColor;
   warmColor: $warmColor;
   leftPanelWidth: $leftPanelWidth;

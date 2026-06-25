@@ -15,7 +15,7 @@ $overflowHeight: 11px;
 
 .bottomBar {
   background: #fff;
-  color: $fontColor;
+  color: $charcoal;
   height: $bottomBarHeight;
   display: flex;
   justify-content: space-between;
@@ -135,7 +135,7 @@ $overflowHeight: 11px;
   .playbackButton {
     svg {
       path {
-        fill: #797979;
+        fill: $charcoalMedium;
       }
     }
   }

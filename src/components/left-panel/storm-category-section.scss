@@ -21,7 +21,7 @@ $catStop5: 90%;
       $cat4Color $catStop4 $catStop5,
       $cat5Color $catStop5 100%
     );
-    border: 1px solid #797979;
+    border: 1px solid $charcoalMedium;
     border-radius: 4px;
     height: 8px;
     opacity: 1;
@@ -29,7 +29,7 @@ $catStop5: 90%;
 
   .thumb {
     background-color: white;
-    border: 2px solid #797979;
+    border: 2px solid $charcoalMedium;
     cursor: grab;
 
     &:active {
