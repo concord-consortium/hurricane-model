@@ -15,7 +15,7 @@ $overflowHeight: 11px;
 
 .bottomBar {
   background: #fff;
-  color: $controlLabel;
+  color: $charcoal;
   height: $bottomBarHeight;
   display: flex;
   justify-content: space-between;
@@ -135,7 +135,7 @@ $overflowHeight: 11px;
   .playbackButton {
     svg {
       path {
-        fill: #797979;
+        fill: $charcoalMedium;
       }
     }
   }
@@ -150,6 +150,10 @@ $overflowHeight: 11px;
 
     &.open {
       background-color: $secondaryColor;
+
+      svg {
+        box-shadow: 0 0 0 3px rgba(255,255,255,1);
+      }
     }
   }
 }

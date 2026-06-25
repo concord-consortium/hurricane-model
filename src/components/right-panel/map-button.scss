@@ -9,7 +9,7 @@
   min-height: 65px;
   border-radius: 10px;
   // Why box-shadow instead of border? Border was affecting inner size and background position, it didn't look good.
-  box-shadow: 0 0 0 1px $controlIconLine;
+  box-shadow: 0 0 0 1px $charcoalMedium;
   margin-bottom: 12px !important;
   background-color: transparent;
 
@@ -50,7 +50,7 @@
     }
 
     .key {
-      color: $controlLabel;
+      color: $charcoal;
       border-bottom-left-radius: 8px;
       border-bottom-right-radius: 8px;
       .keyHeader {

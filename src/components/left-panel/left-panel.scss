@@ -20,8 +20,9 @@ $leftPanelBorderRadius: 5px;
     border: $leftPanelBorder;
     border-bottom-right-radius: $leftPanelBorderRadius;
     border-top-right-radius: $leftPanelBorderRadius;
+    color: $charcoal;
     height: 100%;
-    left: -$leftPanelWidth;
+    left: -$leftPanelContainerWidth;
     pointer-events: all;
     position: absolute;
     top: 0;
@@ -37,6 +38,7 @@ $leftPanelBorderRadius: 5px;
       background-color: $secondaryColor;
       border-bottom: $leftPanelBorder;
       border-top-right-radius: $leftPanelBorderRadius;
+      color: $charcoal;
       display: flex;
       height: 35px;
       justify-content: center;
@@ -49,7 +51,7 @@ $leftPanelBorderRadius: 5px;
       .leftPanelCloseButton {
         background: none;
         border: none;
-        color: #797979;
+        color: $charcoal;
         cursor: pointer;
         display: inline-flex;
         height: 24px;
@@ -59,11 +61,11 @@ $leftPanelBorderRadius: 5px;
         width: 24px;
 
         &:hover {
-          color: $controlLabel;
+          color: $charcoalMedium;
         }
 
         &:focus-visible {
-          outline: 2px solid $controlLabel;
+          outline: 2px solid $charcoal;
           outline-offset: 2px;
         }
       }

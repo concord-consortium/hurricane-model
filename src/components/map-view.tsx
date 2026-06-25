@@ -267,7 +267,7 @@ export class MapView extends BaseComponent<IProps, IState> {
             namedRegions.map(key => {
               const { region, anchor } = temperatureAnomalyRegions[key];
               const anomalyColor = anomalyFillColor(sim.temperatureAnomalyAt(key));
-              const pathOptions = { color: anomalyColor, weight: 1.5, fillColor: anomalyColor, fillOpacity: 0.2 };
+              const pathOptions = { color: anomalyColor, weight: 1.5, fillColor: anomalyColor };
               return (
                 <React.Fragment key={key}>
                   <PolygonRegion region={region} pathOptions={pathOptions} />

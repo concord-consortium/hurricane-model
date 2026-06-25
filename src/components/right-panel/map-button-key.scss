@@ -1,7 +1,7 @@
 @use "../common" as *;
 
 .keyContainer {
-  color: $controlLabel;
+  color: $charcoal;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
 
@@ -37,7 +37,7 @@
         width: 8px;
         height: 13px;
         border-radius: 6.5px;
-        border: solid 1px $controlIconLine;
+        border: solid 1px $charcoalMedium;
         vertical-align: middle;
         margin-right: 5px;
       }

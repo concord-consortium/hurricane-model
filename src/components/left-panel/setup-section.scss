@@ -1,8 +1,10 @@
+@use "../common" as *;
 @use "./left-panel-common" as *;
 
 .sectionHeader.sectionHeader {
   background-color: white;
   border-bottom: $leftPanelBorder;
+  color: $charcoal;
   height: 40px;
 
   &:hover {
@@ -15,7 +17,8 @@
   }
 
   .sectionTitle.sectionTitle {
-    font-size: 12.5px;
+    font-size: 12px;
+    font-weight: bold;
   }
 
   .dropdownArrow {
@@ -39,8 +42,7 @@
   padding: 8px 16px 12px;
 
   .hint, .postscript {
-    line-height: 1.55;
-    color: #666;
+    line-height: normal;
   }
 
   .hint {
@@ -48,12 +50,12 @@
   }
 
   .postscript {
+    font-size: 10.5px;
     margin-top: 11px;
   }
 
   .tip {
     background-color: #f4f8e9;
-    color: #435f1f;
     padding: 8px;
 
     .bold {

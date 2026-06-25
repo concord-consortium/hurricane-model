@@ -15,7 +15,7 @@ $tabPadding: 4px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     position: relative;
-    border: 1px solid $controlIconLine;
+    border: 1px solid $charcoalMedium;
     border-right: 0;
     margin-left: -2px;
     &.geoMaps {
@@ -58,7 +58,7 @@ $tabPadding: 4px;
       line-height: 1;
       letter-spacing: normal;
       text-align: center;
-      color: $controlLabel;
+      color: $charcoal;
       padding-top: 6px;
       pointer-events: none;
     }

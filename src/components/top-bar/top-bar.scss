@@ -7,7 +7,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 17px;
-  color: #797979;
+  color: $charcoalMedium;
 
   .textButton {
     margin-right: 16px;
@@ -16,9 +16,8 @@
     }
     cursor: pointer;
     &:hover {
-      color: $controlLabel;
+      color: $charcoal;
     }
   }
-
 
 }

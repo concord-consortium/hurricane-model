@@ -25,11 +25,11 @@ $mapTabVerticalSpacing: 10px;
     bottom: 0 !important;
     transition: all 0.8s;
     border-left: 0;
-    border-top: 1px solid $controlIconLine;
+    border-top: 1px solid $charcoalMedium;
 
     &.open {
       right: 0;
-      border-left: 1px solid $controlIconLine;
+      border-left: 1px solid $charcoalMedium;
     }
 
     .rightPanelTabs {
@@ -90,7 +90,7 @@ $mapTabVerticalSpacing: 10px;
           line-height: normal;
           letter-spacing: normal;
           text-align: center;
-          color: $controlLabel;
+          color: $charcoal;
         }
       }
     }
