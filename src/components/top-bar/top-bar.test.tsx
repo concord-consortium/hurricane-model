@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import { createStores } from "../../models/stores";
+import { StoresContext } from "../../stores-context";
 import { TopBar } from "./top-bar";
 import * as logModule from "../../log";
 
@@ -14,6 +15,14 @@ describe("TopBar component", () => {
     stores = createStores();
   });
 
+  const renderTopBar = () => render(
+    <Provider stores={stores}>
+      <StoresContext value={stores}>
+        <TopBar />
+      </StoresContext>
+    </Provider>
+  );
+
   describe("Reload button", () => {
     it("reloads the model using window.location.reload", async () => {
       jest.useFakeTimers();
@@ -23,11 +32,7 @@ describe("TopBar component", () => {
       const reloadSpy = jest.spyOn((TopBar as any).wrappedComponent.prototype, "reloadWindow")
         .mockImplementation(() => undefined);
 
-      render(
-        <Provider stores={stores}>
-          <TopBar />
-        </Provider>
-      );
+      renderTopBar();
       await user.click(screen.getByTestId("reload"));
       jest.advanceTimersByTime(150);
       expect(reloadSpy).toHaveBeenCalled();
@@ -42,11 +47,7 @@ describe("TopBar component", () => {
       const reloadSpy = jest.spyOn((TopBar as any).wrappedComponent.prototype, "reloadWindow")
         .mockImplementation(() => undefined);
 
-      render(
-        <Provider stores={stores}>
-          <TopBar />
-        </Provider>
-      );
+      renderTopBar();
       await user.click(screen.getByTestId("reload"));
 
       const endedCall = (logModule.log as jest.Mock).mock.calls.find(
@@ -64,25 +65,24 @@ describe("TopBar component", () => {
   describe("Share button", () => {
     it("opens share dialog", async () => {
       const user = userEvent.setup();
-      render(
-        <Provider stores={stores}>
-          <TopBar />
-        </Provider>
-      );
+      renderTopBar();
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       await user.click(screen.getByTestId("share"));
       expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("shows the Share Model button in the share dialog", async () => {
+      const user = userEvent.setup();
+      renderTopBar();
+      await user.click(screen.getByTestId("share"));
+      expect(screen.getByTestId("share-model-button")).toBeInTheDocument();
     });
   });
 
   describe("About button", () => {
     it("opens about dialog", async () => {
       const user = userEvent.setup();
-      render(
-        <Provider stores={stores}>
-          <TopBar />
-        </Provider>
-      );
+      renderTopBar();
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       await user.click(screen.getByTestId("about"));
       expect(screen.getByRole("dialog")).toBeInTheDocument();

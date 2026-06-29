@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Copyright} from "./copyright";
+import { ShareModelButton } from "./share-model-button";
 
 const getURL = () => {
   return window.location.href;
@@ -14,6 +15,7 @@ export class ShareDialogContent extends React.Component {
   public render() {
     return (
       <div>
+        <ShareModelButton />
         <p>
           Paste this link in email or IM.
           <textarea id="page-url" style={{ width: "100%" }} value={getURL()} readOnly={true} />
