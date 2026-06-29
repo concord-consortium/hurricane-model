@@ -2,6 +2,11 @@ import { render, waitFor } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import * as React from "react";
 
+jest.mock("@concord-consortium/lara-interactive-api", () => ({
+  inIframe: jest.fn(() => false),
+}));
+import { inIframe } from "@concord-consortium/lara-interactive-api";
+
 import * as interactiveState from "../models/interactive-state";
 import { createStores, IStores } from "../models/stores";
 import { StoresContext } from "../stores-context";
@@ -66,5 +71,13 @@ describe("AppComponent model loading", () => {
       .mockRejectedValue(new Error("Model \"abc123\" could not be loaded (404 Not Found)."));
     const { findByText } = renderApp();
     expect(await findByText(/404 Not Found/)).toBeInTheDocument();
+  });
+
+  it("does not load a cloud model when iframed (LARA handles loading)", () => {
+    (inIframe as jest.Mock).mockReturnValueOnce(true);
+    config.modelId = "abc123";
+    const loadSpy = jest.spyOn(cloudStorage, "loadModelFromCloud");
+    renderApp();
+    expect(loadSpy).not.toHaveBeenCalled();
   });
 });

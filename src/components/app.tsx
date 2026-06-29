@@ -1,3 +1,4 @@
+import { inIframe } from "@concord-consortium/lara-interactive-api";
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
 
@@ -16,7 +17,8 @@ export const AppComponent = observer(function AppComponent() {
   const [modelLoadError, setModelLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (config.modelId) {
+    // Standalone only: in LARA, the wrapper handles loading so saved student work wins.
+    if (!inIframe() && config.modelId) {
       (async () => {
         try {
           const state = await loadModelFromCloud(config.modelId);
