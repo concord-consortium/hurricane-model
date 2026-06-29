@@ -4,7 +4,7 @@
 
 **Goal:** Let a user save the current simulation state to the cloud and share it via a `?modelId=<id>` URL that restores that state on load.
 
-**Architecture:** A new `cloud-storage` module uploads the existing `IHurricaneInteractiveState` (gzipped) to S3 through Concord's `token-service` and returns an id; a self-contained `ShareModelButton` (top of the existing Share dialog) drives the save and shows the id + link in its own result dialog; on startup, `?modelId=` is loaded and restored — always in standalone, and as a seed-only fallback in LARA (saved student work wins).
+**Architecture:** A new `cloud-storage` util uploads the existing `IHurricaneInteractiveState` (gzipped) to S3 through Concord's `token-service` and returns an id; a self-contained `ShareModelButton` (top of the existing Share dialog) drives the save and shows the id + link in its own result dialog; on startup, `?modelId=` is loaded and restored — always in standalone, and as a seed-only fallback in LARA (saved student work wins).
 
 **Tech Stack:** TypeScript, React, MobX, `@concord-consortium/token-service`, `aws-sdk`, `pako`, Jest + Testing Library.
 
@@ -55,12 +55,12 @@ git commit -m "chore: add token-service, aws-sdk, pako for model sharing"
 ### Task 2: Cloud-storage module
 
 **Files:**
-- Create: `src/models/cloud-storage.ts`
-- Test: `src/models/cloud-storage.test.ts`
+- Create: `src/utils/cloud-storage.ts`
+- Test: `src/utils/cloud-storage.test.ts`
 
 **Step 1: Write the failing test**
 
-`src/models/cloud-storage.test.ts`:
+`src/utils/cloud-storage.test.ts`:
 ```ts
 import { saveModelToCloud, loadModelFromCloud } from "./cloud-storage";
 import type { IHurricaneInteractiveState } from "../types/interactive-state";
@@ -117,17 +117,22 @@ describe("cloud-storage", () => {
       expect(global.fetch).toHaveBeenCalledWith(
         "https://models-resources.concord.org/hurricane-models/abc123/model.json.gz"
       );
-      expect(state?.version).toBe(1);
+      expect(state.version).toBe(1);
     });
 
-    it("returns null on a non-ok response", async () => {
-      global.fetch = jest.fn().mockResolvedValue({ ok: false }) as any;
-      expect(await loadModelFromCloud("missing")).toBeNull();
+    it("throws a descriptive error on a non-ok response", async () => {
+      global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 404, statusText: "Not Found" }) as any;
+      await expect(loadModelFromCloud("missing")).rejects.toThrow(/missing.*404 Not Found/);
     });
 
-    it("returns null when fetch throws", async () => {
-      global.fetch = jest.fn().mockRejectedValue(new Error("network")) as any;
-      expect(await loadModelFromCloud("abc123")).toBeNull();
+    it("throws an incompatibility error when migrateState returns null", async () => {
+      global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ version: 999 }) }) as any;
+      await expect(loadModelFromCloud("abc123")).rejects.toThrow(/incompatible/i);
+    });
+
+    it("propagates the error when fetch rejects (network failure)", async () => {
+      global.fetch = jest.fn().mockRejectedValue(new Error("network down")) as any;
+      await expect(loadModelFromCloud("abc123")).rejects.toThrow("network down");
     });
   });
 });
@@ -135,18 +140,18 @@ describe("cloud-storage", () => {
 
 **Step 2: Run test to verify it fails**
 
-Run: `npx jest src/models/cloud-storage.test.ts`
+Run: `npx jest src/utils/cloud-storage.test.ts`
 Expected: FAIL — `Cannot find module './cloud-storage'`.
 
 **Step 3: Write the implementation**
 
-`src/models/cloud-storage.ts`:
+`src/utils/cloud-storage.ts`:
 ```ts
 import { TokenServiceClient, S3Resource } from "@concord-consortium/token-service";
 import pako from "pako";
 import S3 from "aws-sdk/clients/s3";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
-import { migrateState } from "./interactive-state";
+import { migrateState } from "../models/interactive-state";
 
 const TOOL_NAME = "hurricane-models";
 const FILENAME = "model.json.gz";
@@ -191,33 +196,34 @@ export async function saveModelToCloud(state: IHurricaneInteractiveState): Promi
 /**
  * Loads a previously saved model by id. The browser decompresses the gzip
  * transparently (it was uploaded with ContentEncoding: gzip), so we just parse
- * JSON. Returns migrated state, or null on any failure.
+ * JSON. Throws a descriptive Error on any failure so callers can surface the
+ * message to the user (a network rejection from fetch propagates as-is).
  */
-export async function loadModelFromCloud(modelId: string): Promise<IHurricaneInteractiveState | null> {
-  const url = `https://models-resources.concord.org/${TOOL_NAME}/${modelId}/model.json.gz`;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      return null;
-    }
-    const data = await response.json();
-    return migrateState(data);
-  } catch {
-    return null;
+export async function loadModelFromCloud(modelId: string): Promise<IHurricaneInteractiveState> {
+  const url = `https://models-resources.concord.org/${TOOL_NAME}/${modelId}/${FILENAME}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Model "${modelId}" could not be loaded (${response.status} ${response.statusText}).`);
   }
+  const data = await response.json();
+  const migrated = migrateState(data);
+  if (!migrated) {
+    throw new Error(`Model "${modelId}" is incompatible with this version of Hurricane Explorer.`);
+  }
+  return migrated;
 }
 ```
 
 **Step 4: Run test to verify it passes**
 
-Run: `npx jest src/models/cloud-storage.test.ts`
-Expected: PASS (4 tests).
+Run: `npx jest src/utils/cloud-storage.test.ts`
+Expected: PASS (5 tests).
 
 **Step 5: Commit**
 
 ```bash
-git add src/models/cloud-storage.ts src/models/cloud-storage.test.ts
-git commit -m "feat: add cloud-storage module for saving/loading model state to S3"
+git add src/utils/cloud-storage.ts src/utils/cloud-storage.test.ts
+git commit -m "feat: add cloud-storage util for saving/loading model state to S3"
 ```
 
 ---
@@ -271,7 +277,7 @@ import userEvent from "@testing-library/user-event";
 import { StoresContext } from "../../stores-context";
 import { createStores } from "../../models/stores";
 import { ShareModelButton } from "./share-model-button";
-import * as cloudStorage from "../../models/cloud-storage";
+import * as cloudStorage from "../../utils/cloud-storage";
 import * as logModule from "../../log";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
@@ -301,14 +307,14 @@ describe("ShareModelButton", () => {
     expect(logModule.log).toHaveBeenCalledWith("ModelShared", expect.objectContaining({ modelId: "abc123" }));
   });
 
-  it("shows an error message when saving fails", async () => {
-    jest.spyOn(cloudStorage, "saveModelToCloud").mockRejectedValue(new Error("nope"));
+  it("shows the actual error message when saving fails", async () => {
+    jest.spyOn(cloudStorage, "saveModelToCloud").mockRejectedValue(new Error("S3 upload failed"));
     const user = userEvent.setup();
     renderButton();
 
     await user.click(screen.getByTestId("share-model-button"));
 
-    await waitFor(() => expect(screen.getByText(/couldn't save/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/S3 upload failed/)).toBeInTheDocument());
     // Button is usable again after failure
     expect(screen.getByTestId("share-model-button")).not.toBeDisabled();
   });
@@ -328,7 +334,7 @@ import * as React from "react";
 import { useState } from "react";
 import { useStores } from "../../stores-context";
 import { getInteractiveState } from "../../models/interactive-state";
-import { saveModelToCloud } from "../../models/cloud-storage";
+import { saveModelToCloud } from "../../utils/cloud-storage";
 import { Dialog } from "../dialog";
 import { log } from "../../log";
 
@@ -339,18 +345,18 @@ export const ShareModelButton: React.FC = () => {
   const stores = useStores();
   const [saving, setSaving] = useState(false);
   const [modelId, setModelId] = useState<string | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleClick = async () => {
     setSaving(true);
-    setError(false);
+    setError(null);
     try {
       const state = getInteractiveState(stores);
       const id = await saveModelToCloud(state);
       setModelId(id);
       log("ModelShared", { modelId: id });
-    } catch {
-      setError(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setSaving(false);
     }
@@ -358,7 +364,7 @@ export const ShareModelButton: React.FC = () => {
 
   const handleClose = () => {
     setModelId(null);
-    setError(false);
+    setError(null);
   };
 
   return (
@@ -373,12 +379,12 @@ export const ShareModelButton: React.FC = () => {
       </button>
 
       <Dialog
-        open={!!modelId || error}
+        open={!!modelId || !!error}
         onClose={handleClose}
         title="Share Model"
       >
         {error &&
-          <p>Sorry, we couldn&apos;t save your model. Please try again.</p>
+          <p>Sorry, we couldn&apos;t save your model: {error}</p>
         }
         {modelId &&
           <div>
@@ -420,20 +426,39 @@ git commit -m "feat: add self-contained ShareModelButton with result dialog"
 
 **Step 1: Write the failing test**
 
-Add to `top-bar.test.tsx` inside `describe("Share button", ...)`:
+`ShareModelButton` reads stores via `useStores()` from `StoresContext`, so any test
+that opens the share dialog must provide `StoresContext` in addition to the mobx-react
+`<Provider>` (the production tree provides both — see [src/index.tsx](../../src/index.tsx)).
+
+First, add the import to `top-bar.test.tsx`:
+```ts
+import { StoresContext } from "../../stores-context";
+```
+
+Then update the existing renders that open the **share** dialog (the "opens share dialog"
+test, plus the new one below) to wrap with both providers. `ShareModelButton` only mounts
+once the dialog opens, so the reload/about tests don't strictly need it — but wrapping them
+too is harmless and keeps the file consistent. A small helper avoids repetition:
+```ts
+  const renderTopBar = () =>
+    render(
+      <Provider stores={stores}>
+        <StoresContext value={stores}>
+          <TopBar />
+        </StoresContext>
+      </Provider>
+    );
+```
+Use `renderTopBar()` in place of the inline `render(<Provider…>)` calls, and add the new test
+inside `describe("Share button", ...)`:
 ```ts
     it("shows the Share Model button in the share dialog", async () => {
       const user = userEvent.setup();
-      render(
-        <Provider stores={stores}>
-          <TopBar />
-        </Provider>
-      );
+      renderTopBar();
       await user.click(screen.getByTestId("share"));
       expect(screen.getByTestId("share-model-button")).toBeInTheDocument();
     });
 ```
-Note: `TopBar`/`ShareDialogContent` is rendered under mobx-react `<Provider>`, but `ShareModelButton` reads `useStores()` from `StoresContext`. Confirm the production tree provides both (it does in [src/index.tsx](../../src/index.tsx)). If this test fails only because `StoresContext` is absent in the test wrapper, wrap the render with `<StoresContext value={stores}>` in addition to `<Provider>`. **Prefer fixing the test wrapper over coupling the button to mobx-react `inject`.**
 
 **Step 2: Run test to verify it fails**
 
@@ -498,7 +523,7 @@ import { render, waitFor } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import { createStores } from "../models/stores";
 import { AppComponent } from "./app";
-import * as cloudStorage from "../models/cloud-storage";
+import * as cloudStorage from "../utils/cloud-storage";
 import * as interactiveState from "../models/interactive-state";
 import config from "../config";
 
@@ -525,6 +550,15 @@ describe("AppComponent model loading", () => {
     render(<Provider stores={stores}><AppComponent /></Provider>);
     expect(loadSpy).not.toHaveBeenCalled();
   });
+
+  it("shows the actual error message when loading fails", async () => {
+    config.modelId = "abc123";
+    jest.spyOn(cloudStorage, "loadModelFromCloud")
+      .mockRejectedValue(new Error("Model \"abc123\" could not be loaded (404 Not Found)."));
+    const stores = createStores();
+    const { findByText } = render(<Provider stores={stores}><AppComponent /></Provider>);
+    expect(await findByText(/404 Not Found/)).toBeInTheDocument();
+  });
 });
 ```
 
@@ -541,29 +575,32 @@ import * as React from "react";
 import { BaseComponent, IBaseProps } from "./base";
 import { Authoring } from "./authoring/authoring";
 import { IndexPage } from "./index-page";
-import { loadModelFromCloud } from "../models/cloud-storage";
+import { loadModelFromCloud } from "../utils/cloud-storage";
 import { setInteractiveState } from "../models/interactive-state";
 import config from "../config";
 import css from "./app.scss";
 
 interface IProps extends IBaseProps {}
-interface IState { modelLoading: boolean; modelLoadError: boolean; }
+interface IState { modelLoading: boolean; modelLoadError: string | null; }
 
 export class AppComponent extends BaseComponent<IProps, IState> {
   constructor(props: IProps) {
     super(props);
-    this.state = { modelLoading: false, modelLoadError: false };
+    this.state = { modelLoading: false, modelLoadError: null };
   }
 
   public async componentDidMount() {
     if (config.modelId) {
       this.setState({ modelLoading: true });
-      const state = await loadModelFromCloud(config.modelId);
-      if (state) {
+      try {
+        const state = await loadModelFromCloud(config.modelId);
         setInteractiveState(this.stores, state);
         this.setState({ modelLoading: false });
-      } else {
-        this.setState({ modelLoading: false, modelLoadError: true });
+      } catch (e) {
+        this.setState({
+          modelLoading: false,
+          modelLoadError: e instanceof Error ? e.message : String(e)
+        });
       }
     }
   }
@@ -572,7 +609,7 @@ export class AppComponent extends BaseComponent<IProps, IState> {
     return (
       <div className={css.app}>
         {this.state.modelLoadError &&
-          <div className={css.modelLoadError}>Couldn&apos;t load the shared model.</div>}
+          <div className={css.modelLoadError}>Couldn&apos;t load the shared model: {this.state.modelLoadError}</div>}
         {
           config.authoring ?
           <Authoring /> : <IndexPage />
@@ -582,12 +619,12 @@ export class AppComponent extends BaseComponent<IProps, IState> {
   }
 }
 ```
-(The `modelLoading` flag is available for a spinner if desired; a minimal implementation may just guard rendering. Keep it simple — a non-blocking error banner is the required behavior.)
+(The `modelLoading` flag is available for a spinner if desired; a minimal implementation may just guard rendering. The non-blocking error banner showing the actual message is the required behavior. Add a `.modelLoadError` rule to `app.scss` for styling.)
 
 **Step 4: Run test to verify it passes**
 
 Run: `npx jest src/components/app.test.tsx`
-Expected: PASS (2 tests).
+Expected: PASS (3 tests).
 
 **Step 5: Commit**
 
@@ -608,7 +645,12 @@ In LARA, a saved student `interactiveState` must win. Only when there is no save
 
 **Step 1: Write the failing test**
 
-Add a test asserting: when `interactiveState` is empty/undefined and `config.modelId` is set, `loadModelFromCloud` is called and its result passed to `setInteractiveState`; and when `interactiveState` exists, `loadModelFromCloud` is NOT called. Mock `cloud-storage` and `interactive-state` the same way as Task 6. (Mirror the existing test structure in the wrapper's test file; if no test file exists, create `lara-app-wrapper.test.tsx` with a minimal harness that provides a fake `interactiveState` via the `lara-interactive-api` mock already used in the repo.)
+Add tests asserting:
+- when `interactiveState` is empty/undefined and `config.modelId` is set, `loadModelFromCloud` is called and its result passed to `setInteractiveState`;
+- when `interactiveState` exists, `loadModelFromCloud` is NOT called;
+- when the seed load fails (mock `loadModelFromCloud` to reject with a message), the error message is rendered in the banner.
+
+Mock `cloud-storage` and `interactive-state` the same way as Task 6. (Mirror the existing test structure in the wrapper's test file; if no test file exists, create `lara-app-wrapper.test.tsx` with a minimal harness that provides a fake `interactiveState` via the `lara-interactive-api` mock already used in the repo.)
 
 **Step 2: Run test to verify it fails**
 
@@ -617,7 +659,11 @@ Expected: FAIL — modelId fallback not wired.
 
 **Step 3: Implement the fallback**
 
-In the restore effect, after the existing `interactiveState` branch, add an `else if (config.modelId)` fallback that loads and restores once (guard with the existing `hasRestoredState` ref):
+Add a `modelLoadError` state near the top of the component:
+```tsx
+  const [modelLoadError, setModelLoadError] = useState<string | null>(null);
+```
+In the restore effect, after the existing `interactiveState` branch, add an `else if (config.modelId)` fallback that loads and restores once (guard with the existing `hasRestoredState` ref). Because `loadModelFromCloud` now throws, catch the error and surface its message; mark restored in `finally` so a failed seed-load doesn't block the save reaction:
 ```tsx
   useEffect(() => {
     if (hasRestoredState.current) return;
@@ -630,17 +676,31 @@ In the restore effect, after the existing `interactiveState` branch, add an `els
       hasRestoredState.current = true;
     } else if (config.modelId) {
       // No saved student work — seed from the shared model.
-      loadModelFromCloud(config.modelId).then((state) => {
-        if (state && !hasRestoredState.current) {
-          setInteractiveState(stores, state);
-        }
-        hasRestoredState.current = true;
-      });
+      loadModelFromCloud(config.modelId)
+        .then((state) => {
+          if (!hasRestoredState.current) {
+            setInteractiveState(stores, state);
+          }
+        })
+        .catch((e) => {
+          setModelLoadError(e instanceof Error ? e.message : String(e));
+        })
+        .finally(() => {
+          // Mark restored so a failed seed-load doesn't block the save reaction.
+          hasRestoredState.current = true;
+        });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- stores is stable
   }, [interactiveState]);
 ```
-Add the imports: `import { loadModelFromCloud } from "../../models/cloud-storage";` and `import config from "../../config";` (if not already imported).
+Render a non-blocking banner in the wrapper's returned JSX when `modelLoadError` is set, e.g.:
+```tsx
+  {modelLoadError &&
+    <div className="model-load-error">Couldn&apos;t load the shared model: {modelLoadError}</div>}
+```
+Add the imports: `import { loadModelFromCloud } from "../../utils/cloud-storage";`,
+`import config from "../../config";` (if not already imported), and ensure `useState` is
+imported from `react`.
 
 Note: `interactiveState` from LARA may be `undefined` until the init message resolves. Preserve existing behavior — only treat a genuinely empty/absent interactiveState as "no saved work". Verify against the current dependency/guard logic before finalizing; do not regress the existing restore path.
 

@@ -99,11 +99,20 @@ untouched.
 
 ## Error handling
 
-- **Save** (token-service / S3 / network): caught in `ShareModelButton`, surfaced
-  as an error in its result dialog; button re-enables. No throw to the app.
-- **Load** (404 / corrupt / incompatible version → `migrateState` returns `null`):
-  app continues with default state and shows a non-blocking notice ("Couldn't
-  load the shared model"). No crash.
+Failures expose the actual error message to the user, not a generic notice.
+
+- **Save** (token-service / S3 / network): `saveModelToCloud` throws; `ShareModelButton`
+  catches, stores the error message, and shows it in its result dialog
+  ("Sorry, we couldn't save your model: &lt;message&gt;"). Button re-enables for retry.
+  No throw escapes to the app.
+- **Load** (404 / network / corrupt / incompatible version): `loadModelFromCloud`
+  **throws a descriptive `Error`** rather than returning `null` — distinct messages for
+  not-found (`<status> <statusText>`), network failure, and incompatible version
+  (`migrateState` returned `null`). Callers catch and surface the message:
+  - **Standalone** (`AppComponent`): app continues with default state and shows a
+    non-blocking banner with the message ("Couldn't load the shared model: &lt;message&gt;").
+  - **LARA** (`lara-app-wrapper`): same — caught, marked restored so save isn't blocked,
+    and the message shown in a non-blocking banner. Never crashes; never overwrites work.
 
 ## Testing
 
