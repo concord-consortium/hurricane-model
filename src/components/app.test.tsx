@@ -10,19 +10,18 @@ import { AppComponent } from "./app";
 
 import config from "../config";
 
-  const renderApp = (_stores?: IStores) => {
-    const stores = _stores ?? createStores();
-    return render(
-      <Provider stores={stores}>
-        <StoresContext value={stores}>
-          <AppComponent />
-        </StoresContext>
-      </Provider>
-    );
-  }
+const renderApp = (_stores?: IStores) => {
+  const stores = _stores ?? createStores();
+  return render(
+    <Provider stores={stores}>
+      <StoresContext value={stores}>
+        <AppComponent />
+      </StoresContext>
+    </Provider>
+  );
+}
 
 describe("App component", () => {
-
   it("shows index page if authoring parameter is not passed in or is false", () => {
     config.authoring = false;
     const { container } = renderApp();
