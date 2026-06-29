@@ -11,6 +11,7 @@ import { IndexPage } from "./index-page";
 import config from "../config";
 
 import css from "./app.scss";
+import commonCss from "./common.scss";
 
 export const AppComponent = observer(function AppComponent() {
   const stores = useStores();
@@ -35,7 +36,7 @@ export const AppComponent = observer(function AppComponent() {
   return (
     <div className={css.app}>
       {modelLoadError &&
-        <div className={css.modelLoadError}>
+        <div className={commonCss.error}>
           Couldn&apos;t load the shared model: {modelLoadError}
         </div>}
       {

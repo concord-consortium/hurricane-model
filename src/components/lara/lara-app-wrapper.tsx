@@ -16,6 +16,7 @@ import { AppComponent } from "../app";
 import { AuthoringInterface } from "./authoring-interface";
 import { LoadingIndicator } from "./loading-indicator";
 
+import commonCss from "../common.scss";
 import css from "./lara-app-wrapper.scss";
 
 setSupportedFeatures({
@@ -71,6 +72,7 @@ const LaraAppContent: React.FC<ILaraAppContentProps> = observer((props) => {
  */
 export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
   const hasRestoredState = useRef(false);
+  const seedLoadStarted = useRef(false);
   const [modelLoadError, setModelLoadError] = useState<string | null>(null);
 
   // LARA API hooks
@@ -125,7 +127,8 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
         setInteractiveState(stores, migratedState);
       }
       hasRestoredState.current = true;
-    } else if (config.modelId) {
+    } else if (config.modelId && stores.ui.mode !== "authoring" && !seedLoadStarted.current) {
+      seedLoadStarted.current = true;
       loadModelFromCloud(config.modelId)
         .then((state) => {
           if (!hasRestoredState.current) {
@@ -177,7 +180,7 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
   return (
     <>
       {modelLoadError &&
-        <div className="model-load-error">Couldn&apos;t load the shared model: {modelLoadError}</div>}
+        <div className={commonCss.error}>Couldn&apos;t load the shared model: {modelLoadError}</div>}
       <LaraAppContent
         stores={stores}
         authoredState={authoredState}

@@ -42,6 +42,13 @@ $leftPanelWidth: 296px;
 $leftPanelTransitionSeconds: 0.35s;
 $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.7, 1.0);
 
+.error {
+  padding: 8px 12px;
+  background: #fff3cd;
+  color: #856404;
+  border-bottom: 1px solid #ffeeba;
+}
+
 // Exported to JS via the :export block below and consumed by map-view.tsx.
 // Renaming a key or removing the :export block silently yields `undefined` in JS.
 :export {

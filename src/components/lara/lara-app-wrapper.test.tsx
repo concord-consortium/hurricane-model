@@ -9,7 +9,6 @@ import config from "../../config";
 jest.mock("../app", () => ({ AppComponent: () => <div data-test="app-component" /> }));
 jest.mock("./authoring-interface", () => ({ AuthoringInterface: () => <div /> }));
 jest.mock("./loading-indicator", () => ({ LoadingIndicator: () => <div data-test="loading" /> }));
-jest.mock("../../utils/apply-authored-state", () => ({ applyAuthoredState: jest.fn() }));
 jest.mock("../../hooks/use-auto-height", () => ({ useAutoHeight: () => () => undefined }));
 
 // Mock the LARA API hooks. Each test sets the return values.
@@ -48,12 +47,14 @@ describe("LaraAppWrapper model seeding", () => {
   it("does NOT load the cloud model when saved interactive state exists", async () => {
     config.modelId = "abc123";
     const loadSpy = jest.spyOn(cloudStorage, "loadModelFromCloud");
-    jest.spyOn(interactiveStateModule, "setInteractiveState").mockImplementation(() => undefined);
+    const setSpy = jest.spyOn(interactiveStateModule, "setInteractiveState").mockImplementation(() => undefined);
     setHooks({ interactiveState: { version: 1, simulation: {}, ui: {} } });
 
     render(<LaraAppWrapper stores={createStores()} />);
     // give effects a tick
     await waitFor(() => expect(loadSpy).not.toHaveBeenCalled());
+    // The saved interactive state should be restored (migrateState returns version-1 state as-is).
+    expect(setSpy).toHaveBeenCalledWith(expect.anything(), { version: 1, simulation: {}, ui: {} });
   });
 
   it("shows the error message when the seed load fails", async () => {
@@ -63,5 +64,25 @@ describe("LaraAppWrapper model seeding", () => {
 
     const { findByText } = render(<LaraAppWrapper stores={createStores()} />);
     expect(await findByText(/404 Not Found/)).toBeInTheDocument();
+  });
+
+  // Integration test guarding the effect-ordering invariant: the authored-state
+  // effect must run (and set config.modelId via the REAL applyAuthoredState) before
+  // the seed effect reads config.modelId. config.modelId is NOT set directly here.
+  it("seeds from a modelId set by applyAuthoredState parsing authored urlParams", async () => {
+    const loadSpy = jest.spyOn(cloudStorage, "loadModelFromCloud")
+      .mockResolvedValue({ version: 1, simulation: {}, ui: {} } as any);
+    jest.spyOn(interactiveStateModule, "setInteractiveState").mockImplementation(() => undefined);
+
+    (useInitMessage as jest.Mock).mockReturnValue({ mode: "runtime" });
+    (useInteractiveState as jest.Mock).mockReturnValue({ interactiveState: undefined, setInteractiveState: jest.fn() });
+    (useAuthoredState as jest.Mock).mockReturnValue({
+      authoredState: { version: 1, urlParams: "modelId=seed999" },
+      setAuthoredState: jest.fn()
+    });
+
+    render(<LaraAppWrapper stores={createStores()} />);
+
+    await waitFor(() => expect(loadSpy).toHaveBeenCalledWith("seed999"));
   });
 });

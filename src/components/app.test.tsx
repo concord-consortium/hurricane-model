@@ -74,7 +74,7 @@ describe("AppComponent model loading", () => {
   });
 
   it("does not load a cloud model when iframed (LARA handles loading)", () => {
-    (inIframe as jest.Mock).mockReturnValueOnce(true);
+    (inIframe as jest.Mock).mockReturnValue(true);
     config.modelId = "abc123";
     const loadSpy = jest.spyOn(cloudStorage, "loadModelFromCloud");
     renderApp();
