@@ -12,6 +12,7 @@ const FILENAME = "model.json.gz";
  * Resolves to the resource id, which is used as the shareable `modelId`.
  */
 export async function saveModelToCloud(state: IHurricaneInteractiveState): Promise<string> {
+  // Always use the production token-service; shared models live in one place regardless of build env.
   const client = new TokenServiceClient({ env: "production" });
   const resource = await client.createResource({
     tool: TOOL_NAME,
@@ -21,7 +22,10 @@ export async function saveModelToCloud(state: IHurricaneInteractiveState): Promi
     accessRuleType: "readWriteToken"
   }) as S3Resource;
 
-  const readWriteToken = client.getReadWriteToken(resource) || "";
+  const readWriteToken = client.getReadWriteToken(resource);
+  if (!readWriteToken) {
+    throw new Error("Could not save model: the storage service did not return a write token.");
+  }
   const credentials = await client.getCredentials(resource.id, readWriteToken);
 
   const { bucket, region } = resource;
@@ -36,6 +40,7 @@ export async function saveModelToCloud(state: IHurricaneInteractiveState): Promi
     Bucket: bucket,
     Key: publicPath,
     Body: blob,
+    // JSON payload stored gzip-encoded; ContentType stays application/json so the browser auto-decompresses on fetch.
     ContentType: "application/json",
     ContentEncoding: "gzip",
     CacheControl: "public, max-age=31536000, immutable" // immutable, cache for a year
@@ -51,6 +56,8 @@ export async function saveModelToCloud(state: IHurricaneInteractiveState): Promi
  * message to the user (a network rejection from fetch propagates as-is).
  */
 export async function loadModelFromCloud(modelId: string): Promise<IHurricaneInteractiveState> {
+  // Must match the upload Key (client.getPublicS3Path => "<TOOL_NAME>/<id>/<FILENAME>"); we only have
+  // the id at load time, so the public URL is reconstructed by convention.
   const url = `https://models-resources.concord.org/${TOOL_NAME}/${modelId}/${FILENAME}`;
   const response = await fetch(url);
   if (!response.ok) {

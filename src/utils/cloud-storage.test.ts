@@ -42,6 +42,22 @@ describe("cloud-storage", () => {
         ContentEncoding: "gzip"
       }));
     });
+
+    it("compresses the JSON-serialized state before upload", async () => {
+      await saveModelToCloud(sampleState);
+      const pako = require("pako");
+      expect(pako.gzip).toHaveBeenCalledWith(JSON.stringify(sampleState));
+    });
+
+    it("propagates the error when the upload fails", async () => {
+      uploadPromise.mockRejectedValueOnce(new Error("S3 upload failed"));
+      await expect(saveModelToCloud(sampleState)).rejects.toThrow("S3 upload failed");
+    });
+
+    it("throws a descriptive error when no write token is returned", async () => {
+      getReadWriteToken.mockReturnValueOnce(undefined);
+      await expect(saveModelToCloud(sampleState)).rejects.toThrow(/write token/i);
+    });
   });
 
   describe("loadModelFromCloud", () => {
