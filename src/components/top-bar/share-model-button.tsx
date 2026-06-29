@@ -1,10 +1,10 @@
-import * as React from "react";
-import { useState } from "react";
-import { useStores } from "../../stores-context";
+import React, { useState } from "react";
+
+import { log } from "../../log";
 import { getInteractiveState } from "../../models/interactive-state";
+import { useStores } from "../../stores-context";
 import { saveModelToCloud } from "../../utils/cloud-storage";
 import { Dialog } from "../dialog";
-import { log } from "../../log";
 
 const buildModelUrl = (modelId: string) =>
   window.location.href.split("?")[0] + "?modelId=" + modelId;
