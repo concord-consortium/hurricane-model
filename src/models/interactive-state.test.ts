@@ -1,6 +1,7 @@
 import { migrateState, getInteractiveState, setInteractiveState } from "./interactive-state";
 import { createStores } from "./stores";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
+import config from "../config";
 
 describe("interactive-state", () => {
   describe("migrateState", () => {
@@ -400,6 +401,40 @@ describe("interactive-state", () => {
       setInteractiveState(stores, state);
       // Absent field => no override; model keeps whatever it had (here, the prior value).
       expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(2);
+    });
+  });
+
+  describe("mode round-trip", () => {
+    // `mode` (hurricane vs storm) is read from / written to the config singleton,
+    // so save and restore it around each test to avoid leaking into other suites.
+    let originalMode: string;
+    beforeEach(() => { originalMode = config.mode; });
+    afterEach(() => { config.mode = originalMode; });
+
+    it("serializes the current config.mode", () => {
+      config.mode = "storm";
+      const state = getInteractiveState(createStores());
+      expect(state.mode).toBe("storm");
+    });
+
+    it("restores config.mode so a modelId load enters the saved mode", () => {
+      const stores = createStores();
+      config.mode = "storm";
+      const state = getInteractiveState(stores);
+      // Simulate loading the saved state into an app running in the default mode.
+      config.mode = "hurricane";
+      setInteractiveState(stores, state);
+      expect(config.mode).toBe("storm");
+    });
+
+    it("does not override the current mode when the field is absent (legacy state)", () => {
+      const stores = createStores();
+      const state = getInteractiveState(stores);
+      delete state.mode;
+      config.mode = "storm";
+      setInteractiveState(stores, state);
+      // Absent field => no override; the app keeps its current mode.
+      expect(config.mode).toBe("storm");
     });
   });
 });
