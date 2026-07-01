@@ -1,5 +1,5 @@
 import { TokenServiceClient, S3Resource } from "@concord-consortium/token-service";
-import S3 from "aws-sdk/clients/s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import pako from "pako";
 import { migrateState } from "../models/interactive-state";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
@@ -30,21 +30,20 @@ export async function saveModelToCloud(state: IHurricaneInteractiveState): Promi
 
   const { bucket, region } = resource;
   const { accessKeyId, secretAccessKey, sessionToken } = credentials;
-  const s3 = new S3({ region, accessKeyId, secretAccessKey, sessionToken });
+  const s3 = new S3Client({ region, credentials: { accessKeyId, secretAccessKey, sessionToken } });
   const publicPath = client.getPublicS3Path(resource, FILENAME);
 
   const compressed = pako.gzip(JSON.stringify(state));
-  const blob = new Blob([compressed as BlobPart], { type: "application/gzip" });
 
-  await s3.upload({
+  await s3.send(new PutObjectCommand({
     Bucket: bucket,
     Key: publicPath,
-    Body: blob,
+    Body: compressed,
     // JSON payload stored gzip-encoded; ContentType stays application/json so the browser auto-decompresses on fetch.
     ContentType: "application/json",
     ContentEncoding: "gzip",
     CacheControl: "public, max-age=31536000, immutable" // immutable, cache for a year
-  }).promise();
+  }));
 
   return resource.id;
 }

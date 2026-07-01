@@ -32,7 +32,8 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
       "common\\.scss$": "<rootDir>/__mocks__/common-scss-mock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy",
-      "^pixi\\.js$": "<rootDir>/__mocks__/pixi.js.js"
+      "^pixi\\.js$": "<rootDir>/__mocks__/pixi.js.js",
+      "^@aws-sdk/client-s3$": "<rootDir>/__mocks__/aws-sdk-client-s3.js"
     },
     "moduleFileExtensions": [
       "ts",
@@ -138,6 +139,7 @@
     "webpack-dev-server": "^5.2.4"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1078.0",
     "@concord-consortium/lara-interactive-api": "^1.13.0",
     "@concord-consortium/log-monitor": "^1.0.0",
     "@concord-consortium/token-service": "^2.1.0",
@@ -153,7 +155,6 @@
     "@turf/helpers": "^7.3.5",
     "@turf/line-intersect": "^7.3.5",
     "@turf/nearest-point-on-line": "^7.3.5",
-    "aws-sdk": "^2.1693.0",
     "clsx": "^2.1.1",
     "d3-color": "^2.0.0",
     "d3-scale": "^3.3.0",
