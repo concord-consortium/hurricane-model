@@ -73,4 +73,4 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 |-------|-----------|------|
 | `ShareDialogOpened` | — | User opens the Share dialog |
 | `AboutDialogOpened` | — | User opens the About dialog |
-| `ModelShared` | `{ modelId }` | User clicks "Share Model" and the simulation state is successfully saved to the cloud (`modelId` is the shareable id) |
+| `ModelShared` | `{ modelId }` | The Share dialog is opened and the simulation state is successfully saved to the cloud (`modelId` is the shareable id) |
