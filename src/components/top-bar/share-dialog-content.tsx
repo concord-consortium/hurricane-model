@@ -45,11 +45,11 @@ export const ShareDialogContent: React.FC = () => {
   return (
     <div className={css.shareDialog}>
       <p>
-        Paste this link in email or IM.
+        To share the Storm Explorer simulation in email or IM, copy this link:
         <textarea id="page-url" value={getURL()} readOnly={true} />
       </p>
       <p>
-        Paste HTML to embed in website or blog.
+        To embed the Storm Explorer simulation in a website or blog, copy this link:
         <textarea id="iframe-string" value={getIframeString()} readOnly={true} />
       </p>
       <p>
