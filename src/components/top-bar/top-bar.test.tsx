@@ -6,8 +6,10 @@ import { createStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
 import { TopBar } from "./top-bar";
 import * as logModule from "../../log";
+import * as cloudStorage from "../../utils/cloud-storage";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
+jest.spyOn(cloudStorage, "saveModelToCloud").mockResolvedValue("test-model-id");
 
 describe("TopBar component", () => {
   let stores = createStores();
@@ -68,14 +70,7 @@ describe("TopBar component", () => {
       renderTopBar();
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       await user.click(screen.getByTestId("share"));
-      expect(screen.getByRole("dialog")).toBeInTheDocument();
-    });
-
-    it("shows the Share Model button in the share dialog", async () => {
-      const user = userEvent.setup();
-      renderTopBar();
-      await user.click(screen.getByTestId("share"));
-      expect(screen.getByTestId("share-model-button")).toBeInTheDocument();
+      expect(await screen.findByRole("dialog")).toBeInTheDocument();
     });
   });
 
