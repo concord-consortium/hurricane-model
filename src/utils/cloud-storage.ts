@@ -30,6 +30,9 @@ export async function saveModelToCloud(state: IHurricaneInteractiveState): Promi
 
   const { bucket, region } = resource;
   const { accessKeyId, secretAccessKey, sessionToken } = credentials;
+  // Recent @aws-sdk/client-s3 v3 sends default request-checksum headers (x-amz-checksum-*,
+  // x-amz-sdk-checksum-algorithm). If browser PUTs start failing with opaque CORS errors,
+  // the bucket's CORS config must allow those headers (or set requestChecksumCalculation).
   const s3 = new S3Client({ region, credentials: { accessKeyId, secretAccessKey, sessionToken } });
   const publicPath = client.getPublicS3Path(resource, FILENAME);
 
