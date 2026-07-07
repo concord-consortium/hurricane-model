@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { log } from "../../log";
 import { getInteractiveState } from "../../models/interactive-state";
 import { useStores } from "../../stores-context";
+import { getAppName } from "../../utils/app";
 import { saveModelToCloud } from "../../utils/cloud-storage";
 import { Copyright } from "./copyright";
 
@@ -45,11 +46,11 @@ export const ShareDialogContent: React.FC = () => {
   return (
     <div className={css.shareDialog}>
       <p>
-        To share the Storm Explorer simulation in email or IM, copy this link:
+        To share the {getAppName()} simulation in email or IM, copy this link:
         <textarea id="page-url" value={getURL()} readOnly={true} />
       </p>
       <p>
-        To embed the Storm Explorer simulation in a website or blog, copy this link:
+        To embed the {getAppName()} simulation in a website or blog, copy this link:
         <textarea id="iframe-string" value={getIframeString()} readOnly={true} />
       </p>
       <p>
