@@ -56,7 +56,7 @@ export const ShareDialogContent: React.FC = () => {
         <textarea id="page-url" value={getURL()} readOnly={true} />
       </p>
       <p>
-        To embed the {getAppName()} simulation in a website or blog, copy this link:
+        To embed the {getAppName()} simulation in a website or blog, copy this html:
         <textarea id="iframe-string" value={getIframeString()} readOnly={true} />
       </p>
       <p>
