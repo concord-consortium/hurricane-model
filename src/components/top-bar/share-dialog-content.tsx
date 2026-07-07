@@ -16,7 +16,13 @@ const getIframeString = () => {
          `allowfullscreen='true' src='${getURL()}'></iframe>`;
 };
 
-const getModelUrl = (modelId: string) => window.location.href.split("?")[0] + "?modelId=" + modelId;
+const getModelUrl = (modelId: string) => {
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.hash = "";
+  url.searchParams.set("modelId", modelId);
+  return url.toString();
+};
 
 export const ShareDialogContent: React.FC = () => {
   const stores = useStores();

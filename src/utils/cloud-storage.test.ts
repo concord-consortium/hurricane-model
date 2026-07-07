@@ -28,9 +28,15 @@ jest.mock("pako", () => ({ gzip: jest.fn((_s: string) => new Uint8Array([1, 2, 3
 const sampleState = { version: 1, simulation: {}, ui: {} } as unknown as IHurricaneInteractiveState;
 
 describe("cloud-storage", () => {
+  const originalFetch = global.fetch;
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockSend.mockResolvedValue({});
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
   });
 
   describe("saveModelToCloud", () => {

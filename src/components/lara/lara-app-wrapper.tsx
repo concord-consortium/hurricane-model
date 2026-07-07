@@ -121,6 +121,8 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
   useEffect(() => {
     if (!initMessage || hasRestoredState.current) return;
 
+    let canUpdate = true;
+
     if (interactiveState) {
       const migratedState = migrateState(interactiveState);
       if (migratedState) {
@@ -132,17 +134,22 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
       loadModelFromCloud(config.modelId)
         .then((state) => {
           if (!hasRestoredState.current) {
-            setInteractiveState(stores, state);
+            if (canUpdate) setInteractiveState(stores, state);
           }
         })
         .catch((e) => {
-          setModelLoadError(e instanceof Error ? e.message : String(e));
+          if (canUpdate) setModelLoadError(e instanceof Error ? e.message : String(e));
         })
         .finally(() => {
           // Mark restored so a failed seed-load doesn't block the save reaction.
           hasRestoredState.current = true;
         });
     }
+
+    return () => {
+      // Prevent updates on unmount.
+      canUpdate = false;
+    };
   }, [interactiveState, initMessage, stores]);
 
   // Save state whenever simulation changes (debounced via MobX reaction)

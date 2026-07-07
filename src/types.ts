@@ -1,3 +1,6 @@
+export const appModes = ["hurricane", "storm"] as const;
+export type AppMode = typeof appModes[number];
+
 export interface IVector {
   u: number;
   v: number;

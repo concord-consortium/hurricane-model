@@ -3,6 +3,7 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import pako from "pako";
 import { migrateState } from "../models/interactive-state";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
+import { getAppName } from "./app";
 
 const TOOL_NAME = "hurricane-models";
 const FILENAME = "model.json.gz";
@@ -18,7 +19,7 @@ export async function saveModelToCloud(state: IHurricaneInteractiveState): Promi
     tool: TOOL_NAME,
     type: "s3Folder",
     name: FILENAME,
-    description: "Created by Hurricane Explorer",
+    description: `Created by ${getAppName()}`,
     accessRuleType: "readWriteToken"
   }) as S3Resource;
 
@@ -67,7 +68,7 @@ export async function loadModelFromCloud(modelId: string): Promise<IHurricaneInt
   const data = await response.json();
   const migrated = migrateState(data);
   if (!migrated) {
-    throw new Error(`Model "${modelId}" is incompatible with this version of Hurricane Explorer.`);
+    throw new Error(`Model "${modelId}" is incompatible with this version of ${getAppName()}.`);
   }
   return migrated;
 }

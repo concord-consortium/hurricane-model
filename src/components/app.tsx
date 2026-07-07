@@ -20,16 +20,23 @@ export const AppComponent = observer(function AppComponent() {
   // Load the saved model using the modelId url param.
   // Standalone only: in LARA, the wrapper handles loading so saved student work wins.
   useEffect(() => {
+    let canUpdate = true;
+
     if (!inIframe() && config.modelId) {
       (async () => {
         try {
           const state = await loadModelFromCloud(config.modelId);
-          setInteractiveState(stores, state);
+          if (canUpdate) setInteractiveState(stores, state);
         } catch (e) {
-          setModelLoadError(e instanceof Error ? e.message : String(e));
+          if (canUpdate) setModelLoadError(e instanceof Error ? e.message : String(e));
         }
       })();
     }
+
+    return () => {
+      // Prevent updates if the component unmounts.
+      canUpdate = false;
+    };
   }, [stores]);
 
   return (

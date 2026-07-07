@@ -43,7 +43,12 @@ describe("App component in authoring mode", () => {
 });
 
 describe("AppComponent model loading", () => {
-  afterEach(() => { config.modelId = ""; config.authoring = false; jest.restoreAllMocks(); });
+  afterEach(() => {
+    config.modelId = "";
+    config.authoring = false;
+    (inIframe as jest.Mock).mockReturnValue(false);
+    jest.restoreAllMocks();
+  });
 
   it("loads and restores a cloud model when config.modelId is set", async () => {
     config.modelId = "abc123";
