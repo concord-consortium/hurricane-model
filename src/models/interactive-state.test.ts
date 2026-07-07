@@ -429,8 +429,11 @@ describe("interactive-state", () => {
 
     it("does not override the current mode when the field is absent (legacy state)", () => {
       const stores = createStores();
+      expect(config.mode).toBe("hurricane");
       const state = getInteractiveState(stores);
+      expect(state.mode).toBe("hurricane");
       delete state.mode;
+      expect(state.mode).toBeUndefined();
       config.mode = "storm";
       setInteractiveState(stores, state);
       // Absent field => no override; the app keeps its current mode.

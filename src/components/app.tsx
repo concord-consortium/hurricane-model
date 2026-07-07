@@ -17,8 +17,9 @@ export const AppComponent = observer(function AppComponent() {
   const stores = useStores();
   const [modelLoadError, setModelLoadError] = useState<string | null>(null);
 
+  // Load the saved model using the modelId url param.
+  // Standalone only: in LARA, the wrapper handles loading so saved student work wins.
   useEffect(() => {
-    // Standalone only: in LARA, the wrapper handles loading so saved student work wins.
     if (!inIframe() && config.modelId) {
       (async () => {
         try {
@@ -29,9 +30,7 @@ export const AppComponent = observer(function AppComponent() {
         }
       })();
     }
-    // Run once on mount; modelId is the only standalone state source.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [stores]);
 
   return (
     <div className={css.app}>
@@ -39,10 +38,7 @@ export const AppComponent = observer(function AppComponent() {
         <div className={commonCss.error}>
           Couldn&apos;t load the shared model: {modelLoadError}
         </div>}
-      {
-        config.authoring ?
-        <Authoring /> : <IndexPage />
-      }
+      {config.authoring ? <Authoring /> : <IndexPage />}
     </div>
   );
 });

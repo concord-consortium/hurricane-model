@@ -143,9 +143,7 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
           hasRestoredState.current = true;
         });
     }
-    // stores is stable; config.modelId is a non-reactive singleton set by the authored-state effect above
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interactiveState, initMessage]);
+  }, [interactiveState, initMessage, stores]);
 
   // Save state whenever simulation changes (debounced via MobX reaction)
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { render, waitFor } from "@testing-library/react";
 import { Provider } from "mobx-react";
-import * as React from "react";
+import React from "react";
 
 jest.mock("@concord-consortium/lara-interactive-api", () => ({
   inIframe: jest.fn(() => false),
