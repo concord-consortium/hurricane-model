@@ -42,7 +42,7 @@ export const AppComponent = observer(function AppComponent() {
   return (
     <div className={css.app}>
       {modelLoadError &&
-        <div className={commonCss.error}>
+        <div className={commonCss.error} role="alert">
           Couldn&apos;t load the shared model: {modelLoadError}
         </div>}
       {config.authoring ? <Authoring /> : <IndexPage />}

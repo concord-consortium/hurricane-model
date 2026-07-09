@@ -185,7 +185,7 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
   return (
     <>
       {modelLoadError &&
-        <div className={commonCss.error}>Couldn&apos;t load the shared model: {modelLoadError}</div>}
+        <div className={commonCss.error} role="alert">Couldn&apos;t load the shared model: {modelLoadError}</div>}
       <LaraAppContent
         stores={stores}
         authoredState={authoredState}
