@@ -136,7 +136,7 @@
     "wait-on": "^9.0.10",
     "webpack": "^5.107.2",
     "webpack-cli": "^7.0.3",
-    "webpack-dev-server": "^5.2.4"
+    "webpack-dev-server": "^5.2.6"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1078.0",
