@@ -70,8 +70,12 @@ const DEFAULT_START_LOCATION = "atlantic";
 
 const DEFAULT_CONFIG: any = {
   authoring: false,
+  // Identifier of a model saved to the cloud (hurricane-models S3 tool).
+  // When set via ?modelId=..., the saved state is loaded on startup.
+  modelId: "",
   // Sets base wind data (and sea temperature in the future). "fall", "winter", "spring", or "summer".
   season: "fall",
+  // App mode - "hurricane" for simple original version or "storm" for newer more complex variant
   mode: "hurricane",
   // One of the available maps: "satellite", "relief", "street" or "population".
   map: "satellite",

@@ -1,18 +1,22 @@
-import * as React from "react";
-import { useRef, useEffect } from "react";
-import { observer } from "mobx-react";
-import { reaction } from "mobx";
 import {
   useInitMessage, useInteractiveState, useAuthoredState, setSupportedFeatures
 } from "@concord-consortium/lara-interactive-api";
+import { reaction } from "mobx";
+import { observer } from "mobx-react";
+import React, { useRef, useEffect, useState } from "react";
+
+import config from "../../config";
 import { useAutoHeight } from "../../hooks/use-auto-height";
 import { migrateState, setInteractiveState, getInteractiveState } from "../../models/interactive-state";
-import { applyAuthoredState } from "../../utils/apply-authored-state";
-import { IHurricaneInteractiveState, IHurricaneAuthoredState } from "../../types/interactive-state";
 import { IStores } from "../../models/stores";
+import { IHurricaneInteractiveState, IHurricaneAuthoredState } from "../../types/interactive-state";
+import { applyAuthoredState } from "../../utils/apply-authored-state";
+import { loadModelFromCloud } from "../../utils/cloud-storage";
 import { AppComponent } from "../app";
 import { AuthoringInterface } from "./authoring-interface";
 import { LoadingIndicator } from "./loading-indicator";
+
+import commonCss from "../common.scss";
 import css from "./lara-app-wrapper.scss";
 
 setSupportedFeatures({
@@ -68,6 +72,8 @@ const LaraAppContent: React.FC<ILaraAppContentProps> = observer((props) => {
  */
 export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
   const hasRestoredState = useRef(false);
+  const seedLoadStarted = useRef(false);
+  const [modelLoadError, setModelLoadError] = useState<string | null>(null);
 
   // LARA API hooks
   const initMessage = useInitMessage<IHurricaneInteractiveState, IHurricaneAuthoredState>();
@@ -108,20 +114,43 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initMessage]);
 
-  // Restore interactive state once on initial load.
-  // This runs after authored state is applied, so interactive state
-  // overwrites any authored defaults with the student's saved values.
+  // Restore interactive state once, after authored state is applied.
+  // If there is no interactive state, use the modelId url param to seed initial state
+  // with a remote model. Keyed on initMessage so this re-runs once applyAuthoredState
+  // (the effect above) has set config.modelId.
   useEffect(() => {
-    if (interactiveState && !hasRestoredState.current) {
-      // Migrate state to current version before restoring
+    if (!initMessage || hasRestoredState.current) return;
+
+    let canUpdate = true;
+
+    if (interactiveState) {
       const migratedState = migrateState(interactiveState);
       if (migratedState) {
         setInteractiveState(stores, migratedState);
       }
       hasRestoredState.current = true;
+    } else if (config.modelId && stores.ui.mode !== "authoring" && !seedLoadStarted.current) {
+      seedLoadStarted.current = true;
+      loadModelFromCloud(config.modelId)
+        .then((state) => {
+          if (!hasRestoredState.current) {
+            if (canUpdate) setInteractiveState(stores, state);
+          }
+        })
+        .catch((e) => {
+          if (canUpdate) setModelLoadError(e instanceof Error ? e.message : String(e));
+        })
+        .finally(() => {
+          // Mark restored so a failed seed-load doesn't block the save reaction.
+          hasRestoredState.current = true;
+        });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- stores is stable
-  }, [interactiveState]);
+
+    return () => {
+      // Prevent updates on unmount.
+      canUpdate = false;
+    };
+  }, [interactiveState, initMessage, stores]);
 
   // Save state whenever simulation changes (debounced via MobX reaction)
   useEffect(() => {
@@ -154,11 +183,15 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
 
   // Render the observer-wrapped content component
   return (
-    <LaraAppContent
-      stores={stores}
-      authoredState={authoredState}
-      setAuthoredState={setAuthoredState}
-      containerRef={containerRef}
-    />
+    <>
+      {modelLoadError &&
+        <div className={commonCss.error} role="alert">Couldn&apos;t load the shared model: {modelLoadError}</div>}
+      <LaraAppContent
+        stores={stores}
+        authoredState={authoredState}
+        setAuthoredState={setAuthoredState}
+        containerRef={containerRef}
+      />
+    </>
   );
 };

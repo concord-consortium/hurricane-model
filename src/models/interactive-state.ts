@@ -1,5 +1,6 @@
 import { runInAction, toJS } from "mobx";
-import { namedRegions } from "../types";
+import config from "../config";
+import { appModes, namedRegions } from "../types";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
 import { PressureSystem } from "./pressure-system";
@@ -75,6 +76,8 @@ export function setInteractiveState(
   const { simulation, ui } = stores;
   const { simulation: simState, ui: uiState } = state;
   const { hurricane: hurState, startLocation } = simState;
+
+  if (state.mode != null && appModes.includes(state.mode)) config.mode = state.mode;
 
   // Restore simulation state
   if (simState) {
@@ -208,6 +211,7 @@ export function getInteractiveState(stores: IStores): IHurricaneInteractiveState
 
   return {
     version: 1,
+    mode: config.mode,
     simulation: {
       season: simulation.season,
       startLocation: safeStartLocation(startLocation),

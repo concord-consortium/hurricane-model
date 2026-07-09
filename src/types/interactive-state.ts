@@ -1,6 +1,6 @@
 import { LatLngExpression } from "leaflet";
 import {
-  ICoordinates, IVector, ITrackPoint, ILandfall, IPrecipitationPoint, Season, StartLocation, NamedRegion
+  AppMode, ICoordinates, IVector, ITrackPoint, ILandfall, IPrecipitationPoint, Season, StartLocation, NamedRegion
 } from "../types";
 import { PressureSystemType } from "../models/pressure-system";
 import { MapTilesName } from "../map-layer-tiles";
@@ -79,6 +79,7 @@ export interface IUIState {
  */
 export interface IHurricaneInteractiveState {
   version: 1;
+  mode?: AppMode;
   simulation: ISimulationState;
   ui: IUIState;
 }
