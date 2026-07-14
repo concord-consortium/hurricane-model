@@ -82,7 +82,12 @@ context("Test the Hurricane Model app", () => {
         cy.get('.sst-key--checkbox--__hurr-v1__ input[type="checkbox"]')
           .click()
           .then(() => {
-            cy.get('[src="91071a502fa66c0cde3e.png"]').should("be.visible");
+            cy.window().then((win) => {
+              const { ui, simulation } = win.stores;
+              expect(ui.sstOverlay.accessibleSSTScale).to.eq(true);
+              const expectedUrl = ui.sstOverlay.getVisibleSeaSurfaceTempImgUrl(simulation.season);
+              cy.get(`img[src="${expectedUrl}"]`).should("be.visible");
+            });
           });
       });
 

@@ -206,8 +206,11 @@ export class SSTOverlayModel {
     this.targetUrl = url;
     fetch(url).then(response => {
       // Only continue if the response url is the same file as the last requested url, which prevents older but slower
-      // fetches from overriding a faster but newer one.
-      if (!response.ok || (new URL(response.url)).pathname.split("/").pop() !== this.targetUrl) return;
+      // fetches from overriding a faster but newer one. Compare filenames only: with publicPath 'auto' the asset
+      // urls are absolute (and may contain un-normalized segments like "assets/../"), while response.url is
+      // normalized. The content-hashed filenames are unique, so this is sufficient.
+      const targetFilename = this.targetUrl?.split("/").pop();
+      if (!response.ok || (new URL(response.url)).pathname.split("/").pop() !== targetFilename) return;
 
       response.arrayBuffer().then(buffer => {
         new PNG().parse(Buffer.from(buffer), (err, png) => {
