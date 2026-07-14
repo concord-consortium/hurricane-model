@@ -14,7 +14,7 @@ module.exports = (env, argv) => {
     context: __dirname, // to automatically find tsconfig.json
     devtool: 'source-map',
     entry: './src/index.tsx',
-    mode: 'development',
+    mode: devMode ? 'development' : 'production',
     output: {
       filename: 'assets/index.[contenthash].js',
       publicPath: 'auto'
