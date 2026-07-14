@@ -17,7 +17,7 @@ module.exports = (env, argv) => {
     mode: 'development',
     output: {
       filename: 'assets/index.[contenthash].js',
-      publicPath: ''
+      publicPath: 'auto'
     },
     performance: { hints: false },
     module: {
