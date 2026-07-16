@@ -1,5 +1,12 @@
 # Hurricane Model
 
+## Deployment
+
+S3 deployment is handled by GitHub Actions using OIDC for AWS authentication. See
+[deploy-setup.md in starter-projects](https://github.com/concord-consortium/starter-projects/blob/main/doc/deploy-setup.md)
+for how the AWS side is set up, and [doc/deploy.md](doc/deploy.md) for how deploys work
+in this repo.
+
 ## Logged Events
 
 See [LOGGED-EVENTS.md](LOGGED-EVENTS.md) for a complete reference of all logged events, their parameters, and trigger conditions.
