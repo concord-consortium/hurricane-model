@@ -8,6 +8,10 @@ import { ShareDialogContent } from "./share-dialog-content";
 import { log } from "../../log";
 import css from "./top-bar.scss";
 
+// StormExplorer version label shown at the top-left. Bump these when cutting a new version.
+const APP_VERSION_MAIN = "StormExplorer Multi-run · v0.1 · ";
+const APP_VERSION_UPDATED = "updated: 7/28/26";
+
 interface IProps extends IBaseProps {}
 interface IState {
   shareOpen: boolean;
@@ -28,7 +32,12 @@ export class TopBar extends BaseComponent<IProps, IState> {
   public render() {
     return (
       <div className={css.topBar}>
-        <span data-test="reload" className={css.textButton} onClick={this.handleReload}><RefreshIcon /></span>
+        <span className={css.leftGroup}>
+          <span data-test="reload" className={css.textButton} onClick={this.handleReload}><RefreshIcon /></span>
+          <span data-test="version-label" className={css.versionLabel}>
+            <span className={css.versionMain}>{APP_VERSION_MAIN}</span>{APP_VERSION_UPDATED}
+          </span>
+        </span>
         <span>
           <span data-test="share" className={css.textButton} onClick={this.handleShareOpen}>Share</span>
           <span data-test="about" className={css.textButton} onClick={this.handleAboutOpen}>About</span>

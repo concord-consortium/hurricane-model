@@ -20,4 +20,20 @@
     }
   }
 
+  .leftGroup {
+    display: flex;
+    align-items: center;
+  }
+
+  .versionLabel {
+    font-size: 14px;
+    font-weight: normal;
+    color: #0066cc; // bright blue, ~5.6:1 contrast on white (passes WCAG AA)
+    white-space: nowrap;
+
+    .versionMain {
+      font-weight: bold;
+    }
+  }
+
 }
