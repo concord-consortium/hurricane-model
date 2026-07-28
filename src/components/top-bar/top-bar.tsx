@@ -6,6 +6,7 @@ import { Dialog } from "../dialog";
 import { AboutDialogContent } from "./about-dialog-content";
 import { ShareDialogContent } from "./share-dialog-content";
 import { log } from "../../log";
+import { getAppName } from "../../utils/app";
 import css from "./top-bar.scss";
 
 // StormExplorer version label shown at the top-left. Bump these when cutting a new version.
@@ -45,14 +46,14 @@ export class TopBar extends BaseComponent<IProps, IState> {
         <Dialog
           onClose={this.handleAboutClose}
           open={this.state.aboutOpen}
-          title="About: Hurricane Explorer"
+          title={`About: ${getAppName()}`}
         >
           <AboutDialogContent />
         </Dialog>
         <Dialog
           onClose={this.handleShareClose}
           open={this.state.shareOpen}
-          title="Share: Hurricane Explorer"
+          title={`Share: ${getAppName()}`}
         >
           <ShareDialogContent />
         </Dialog>

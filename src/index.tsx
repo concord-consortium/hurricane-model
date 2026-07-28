@@ -3,6 +3,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { inIframe } from "@concord-consortium/lara-interactive-api";
 import config from "./config";
+import { getAppName } from "./utils/app";
 import * as seedrandom from "./seedrandom";
 import { AppComponent } from "./components/app";
 import { LaraAppWrapper } from "./components/lara/lara-app-wrapper";
@@ -13,6 +14,9 @@ import { StoresContext } from "./stores-context";
 
 // Setup seedrandom helper.
 seedrandom.initialize(config.deterministic);
+
+// Set the browser tab title from the mode-aware app name (storm mode -> "Storm Explorer").
+document.title = getAppName();
 
 export const stores = createStores();
 
