@@ -38,12 +38,16 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
 
   const selectMulti = () => {
     if (multiTrack.enabled) return;
-    // Keep the current completed single run (if any) so it's restored on return, then clear the sim
-    // so Multi-track starts fresh with an empty, editable Run 1.
+    // Keep the current completed single run (if any) so it's restored on return, then reset to the
+    // pristine default so Multi-track starts fresh — Single-track edits (Category, season, SST, …)
+    // must not leak into the new, editable Run 1.
     if (simulation.simulationFinished && simulation.hurricaneTrack.length > 0) {
       multiTrack.setSingleRun(getInteractiveState(stores));
     }
     multiTrack.autoCaptureSuppressed = true;
+    if (multiTrack.defaultState) {
+      setInteractiveState(stores, multiTrack.defaultState);
+    }
     simulation.restart(false);
     multiTrack.autoCaptureSuppressed = false;
     multiTrack.setEnabled(true);
