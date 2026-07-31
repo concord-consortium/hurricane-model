@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import React from "react";
 
 import { hurricaneCategoryInfo } from "../../constants";
@@ -6,19 +7,29 @@ import { IHurricaneInteractiveState } from "../../types/interactive-state";
 import { temperatureAnomalyRegions } from "../../utils/regions";
 
 import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
-import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
 import SeasonIcon from "../../assets/left-panel/season.svg";
 import ThermometerIcon from "../../assets/left-panel/thermometer.svg";
 import PressureSystemIcon from "../../assets/left-panel/pressure-system.svg";
 
 import css from "./run-summary.scss";
 
-// Matches the panel's own anomaly display (0 -> Baseline, otherwise ±N°C).
-function anomalyText(v: number): string {
-  if (!v) return "Baseline";
-  return `${v > 0 ? "+" : "−"}${Math.abs(v)}°C`;
+// Saffir–Simpson colors indexed by category (TS..Cat 5), matching common.scss $cat0..$cat5.
+const CATEGORY_COLORS = ["#f2f2f2", "#ffffcc", "#ffe775", "#ffc140", "#ff8f20", "#ff6060"];
+
+// Badge label + color for a saved run's starting category (shown in the card header).
+export function runCategory(state: IHurricaneInteractiveState) {
+  const c = state.simulation.hurricane.startingCategory;
+  const idx = c != null ? Math.max(0, Math.min(5, c)) : 0;
+  return {
+    label: idx === 0 ? "TS" : `Cat ${idx}`,
+    color: CATEGORY_COLORS[idx],
+    name: hurricaneCategoryInfo[idx]?.name
+  };
 }
 
+function anomalyText(v: number): string {
+  return `${v > 0 ? "+" : "−"}${Math.abs(v)}°C`;
+}
 function coords(lat: number, lng: number): string {
   return `${lat.toFixed(1)}°, ${lng.toFixed(1)}°`;
 }
@@ -29,49 +40,43 @@ interface IProps {
 }
 
 /**
- * Compact read-out of a saved run's setup selections (start location, category, season, SST
- * anomalies, pressure systems), shown inside the run's card in the Saved Tracks list. First pass:
- * complete but roomy; spacing gets tightened later.
+ * Compact read-out of a saved run's setup for its card: start location, season, adjusted SST
+ * anomalies (chips), and pressure systems (H/L chips). Category is shown in the card header.
  */
 export function RunSummary({ state }: IProps) {
   const sim = state.simulation;
-  const category = sim.hurricane.startingCategory != null
-    ? hurricaneCategoryInfo[sim.hurricane.startingCategory]?.name ?? "—"
-    : "—";
   const location = isStartLocationName(sim.startLocation)
     ? startLocationNameLabels[sim.startLocation]
     : coords(sim.startLocation.lat, sim.startLocation.lng);
   const season = seasonLabels[sim.season] ?? sim.season;
+  const anomalies = namedRegions
+    .map(r => ({ label: temperatureAnomalyRegions[r].label, v: sim.temperatureAnomalies?.[r] ?? 0 }))
+    .filter(a => a.v !== 0);
+  const pressures = sim.pressureSystems.map(ps => (ps.type === "high" ? "H" : "L"));
 
   return (
     <div className={css.runSummary}>
       <div className={css.row}><StormLocationIcon className={css.icon} /><span>{location}</span></div>
-      <div className={css.row}><HurricaneIcon className={css.icon} /><span>{category}</span></div>
       <div className={css.row}><SeasonIcon className={css.icon} /><span>{season}</span></div>
-
-      <div className={css.groupRow}>
+      <div className={css.row}>
         <ThermometerIcon className={css.icon} />
-        <div className={css.groupValues}>
-          {namedRegions.map(r => (
-            <div key={r} className={css.subValue}>
-              <span className={css.subLabel}>{temperatureAnomalyRegions[r].label}:</span>{" "}
-              {anomalyText(sim.temperatureAnomalies?.[r] ?? 0)}
-            </div>
+        <span className={css.chips}>
+          {anomalies.length === 0 && <span className={css.chip}>Baseline</span>}
+          {anomalies.map(a => (
+            <span key={a.label} className={clsx(css.chip, a.v > 0 ? css.warm : css.cool)}>
+              {a.label} {anomalyText(a.v)}
+            </span>
           ))}
-        </div>
+        </span>
       </div>
-
-      <div className={css.groupRow}>
+      <div className={css.row}>
         <PressureSystemIcon className={css.icon} />
-        <div className={css.groupValues}>
-          {sim.pressureSystems.length === 0 && <div className={css.subValue}>None</div>}
-          {sim.pressureSystems.map((ps, i) => (
-            <div key={i} className={css.subValue}>
-              <span className={css.subLabel}>{ps.type === "high" ? "High" : "Low"}:</span>{" "}
-              {coords(ps.center.lat, ps.center.lng)}
-            </div>
+        <span className={css.chips}>
+          {pressures.length === 0 && <span className={css.chip}>None</span>}
+          {pressures.map((p, i) => (
+            <span key={i} className={clsx(css.chip, p === "H" ? css.high : css.low)}>{p}</span>
           ))}
-        </div>
+        </span>
       </div>
     </div>
   );

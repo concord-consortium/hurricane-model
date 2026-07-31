@@ -1,34 +1,44 @@
 @use "../common" as *;
 
 .runSummary {
-  margin-top: 6px;
-  padding-left: 2px;
+  margin-top: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   font-size: 11px;
   color: $charcoal;
-  line-height: 1.35;
 
-  .row,
-  .groupRow {
+  .row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 7px;
-    margin-bottom: 4px;
+    min-height: 16px;
   }
 
   .icon {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     flex-shrink: 0;
-    margin-top: 1px;
   }
 
-  .groupValues {
+  .chips {
     display: flex;
-    flex-direction: column;
-    gap: 1px;
+    flex-wrap: wrap;
+    gap: 3px;
   }
 
-  .subLabel {
-    color: $charcoalMedium;
+  .chip {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 700;
+    background: #eef1f4;
+    color: #4a5560;
   }
+
+  .warm { background: #fdeede; color: #a35a12; }
+  .cool { background: #e6f0fb; color: #2c6ca8; }
+  .high { background: #e7eefc; color: #2b5a8c; }
+  .low  { background: #f0eaf6; color: #6a4a86; }
 }

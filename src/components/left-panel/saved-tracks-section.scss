@@ -2,12 +2,12 @@
 
 .savedTracks {
   // Flex child of the panel: fills the space between the setup list and the pinned footer.
-  // Internally a column so the run-card list scrolls while the heading / hint / Save button stay put.
+  // Internally a column so the run-card list scrolls while the heading / Save button stay put.
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 10px 16px 14px;
+  padding: 10px 12px 12px;
   background-color: #fafafa;
   border-top: 1px solid $charcoalMedium;
 
@@ -19,102 +19,189 @@
     margin-bottom: 8px;
   }
 
-  .empty {
-    font-size: 11px;
-    color: $charcoalMedium;
-    line-height: normal;
-    margin-bottom: 10px;
-  }
-
-  .nextRunHint {
-    flex-shrink: 0;
-    font-size: 11px;
-    color: $charcoal;
-    line-height: normal;
-    background-color: #f4f8e9;
-    border-radius: 4px;
-    padding: 7px 8px;
-    margin-bottom: 10px;
-  }
-
   .runList {
-    list-style: none;
-    margin: 0 0 10px;
-    padding: 0 2px;
-    // Fill the section's remaining height (down to the Save button) and scroll the cards.
+    // Fill the section's remaining height and scroll the cards; the New Run card is the last item.
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
+    list-style: none;
+    margin: 0 0 10px;
+    padding: 0 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 
-    .runCard {
-      padding: 6px 8px 8px;
-      margin-bottom: 8px;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      background-color: #fff;
+  // ---- saved run card (trial-card style) ----
+  .runCard {
+    position: relative;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px 10px 9px;
+    color: $charcoal;
+    cursor: pointer;
+    transition: background-color 0.12s, border-color 0.12s, box-shadow 0.12s;
+
+    &:hover { background: #fafafa; }
+
+    &.selected {
+      border-color: $secondaryColor;
+      background: #fff6e6;
+      box-shadow: inset 0 0 0 1px $secondaryColor;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $charcoal;
+      outline-offset: 1px;
+    }
+
+    .runCardHeader {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      font-weight: 800;
+      font-size: 12px;
       color: $charcoal;
+      background: #ededed;
+    }
 
-      &.selected {
-        border-color: $secondaryColor;
-        background-color: $secondaryColorHover;
-      }
+    &.selected .badge {
+      background: #111;
+      color: #fff;
+    }
 
-      .runCardHeader {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
+    .runName {
+      font-weight: 800;
+      font-size: 12px;
+    }
 
-      .runSelect {
-        flex: 1;
-        min-width: 0;
-        padding: 2px 0;
-        text-align: left;
-        font-family: inherit;
-        font-size: 12px;
-        font-weight: bold;
-        color: $charcoal;
-        background: none;
-        border: none;
-        cursor: pointer;
+    .catChip {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 800;
+      font-size: 11px;
+      color: $charcoal;
+    }
 
-        &:focus-visible {
-          outline: 2px solid $charcoal;
-          outline-offset: 1px;
-        }
-      }
+    .catDot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0, 0, 0, 0.35);
+      flex-shrink: 0;
+    }
 
-      // Trash icon is revealed on hover / keyboard focus (per spec).
-      .deleteButton {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        padding: 0;
-        border: none;
-        background: none;
-        color: $charcoalMedium;
-        cursor: pointer;
-        opacity: 0;
-        transition: opacity 0.1s, color 0.1s;
+    // Trash target revealed on hover / when selected.
+    .trash {
+      position: absolute;
+      top: 5px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: none;
+      color: $charcoalMedium;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.1s, color 0.1s;
 
-        &:hover {
-          color: #c0392b;
-        }
+      &:hover { color: #c0392b; }
+      &:focus-visible { opacity: 1; outline: 2px solid $charcoal; }
+    }
 
-        &:focus-visible {
-          opacity: 1;
-          outline: 2px solid $charcoal;
-        }
-      }
+    &:hover .trash,
+    &.selected .trash { opacity: 1; }
+  }
 
-      &:hover .deleteButton {
-        opacity: 1;
-      }
+  // ---- New Run card ----
+  .newRunCard {
+    width: 100%;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 12px;
+    border: 2px dashed $secondaryColor;
+    border-radius: 8px;
+    background: #fff;
+    color: $charcoal;
+    cursor: pointer;
+    transition: background-color 0.12s;
+
+    &:hover { background: #fff6e6; }
+
+    &.active {
+      background: #fff6e6;
+      box-shadow: inset 0 0 0 1px $secondaryColor;
+    }
+
+    &.disabled {
+      border-style: solid;
+      border-color: #d8d8d8;
+      background: #f2f2f2;
+      color: $charcoalMedium;
+      cursor: default;
+      &:hover { background: #f2f2f2; }
+    }
+
+    &:focus-visible {
+      outline: 2px solid $charcoal;
+      outline-offset: 1px;
+    }
+
+    .newRunPlus {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: $secondaryColor;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .newRunLabel {
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .newRunSub {
+      font-size: 10px;
+      color: $charcoalMedium;
+    }
+
+    .newRunFull {
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
     }
   }
 
+  // ---- Save button (pinned above the footer) ----
   .saveButton {
     flex-shrink: 0;
     width: 100%;
@@ -129,9 +216,7 @@
     cursor: pointer;
     transition: background-color 0.12s;
 
-    &:hover:not(.disabled) {
-      background-color: $secondaryColorHover;
-    }
+    &:hover:not(.disabled) { background-color: $secondaryColorHover; }
 
     &.disabled {
       background-color: #e0e0e0;

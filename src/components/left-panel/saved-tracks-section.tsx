@@ -6,14 +6,15 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { getInteractiveState, setInteractiveState } from "../../models/interactive-state";
 import { ISavedRun, MAX_SAVED_TRACKS } from "../../models/multi-track";
 import { useStores } from "../../stores-context";
-import { RunSummary } from "./run-summary";
+import { RunSummary, runCategory } from "./run-summary";
 
 import css from "./saved-tracks-section.scss";
 
 /**
- * "Saved Tracks" section shown beneath the setup options when Multi-track mode is active.
- * Lets the user save the just-completed run into their pack (up to MAX_SAVED_TRACKS) and
- * delete runs. The map display of / selection between saved tracks comes in a later phase.
+ * "Saved Tracks" shown beneath the setup options in multi-track mode. Each saved run is a
+ * trial-style card (number badge, category color, compact option read-out) that can be selected
+ * (lighting up its track and restoring its setup) or deleted. A "New Run" card at the bottom starts
+ * configuring the next run; the Save button banks the current finished run.
  */
 export const SavedTracksSection = observer(function SavedTracksSection() {
   const stores = useStores();
@@ -21,26 +22,31 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
 
   if (!multiTrack.enabled) return null;
 
-  // A run can only be saved once it has actually run and finished.
   const runComplete =
     simulation.simulationStarted && !simulation.simulationRunning && simulation.simulationFinished;
   const alreadySaved = runComplete && multiTrack.currentRunSaved;
   const saveDisabled = !multiTrack.canSave(runComplete);
+  const newRunActive = multiTrack.selectedRunId === undefined;
 
   const handleSave = () => {
     if (saveDisabled) return;
-    // saveRun keeps the new run SELECTED (it stays lit up, drawn by the map layer). The storm
-    // resets to its start position (draggable again) for the next run as the sim track clears.
+    // Bank the finished run (it stays selected/lit) and reset the storm to its start for the next.
     multiTrack.saveRun(getInteractiveState(stores));
     simulation.restart(false);
   };
 
   // Selecting a run restores its setup (pressure systems move, panel reflects it) and lights up its
-  // track. The loaded track is cleared from the sim (it's drawn lit-up by the map layer) and the
-  // storm resets to that run's start.
+  // track; the loaded track is cleared from the sim (the map layer draws it) and the storm resets.
   const handleSelect = (run: ISavedRun) => {
     multiTrack.restoreRun(run.id);
     setInteractiveState(stores, run.state);
+    simulation.restart(false);
+  };
+
+  // The "New Run" card: start configuring a fresh run — deselect any saved run (all go grey) and
+  // reset the storm to its start position.
+  const handleNewRun = () => {
+    multiTrack.selectRun(undefined);
     simulation.restart(false);
   };
 
@@ -50,56 +56,73 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
       ? "Saved ✓"
       : "Save this run";
 
-  // While the user has saved runs and is between runs (no current finished run to save), guide them
-  // to the next run: there's no separate "new run" button — adjust the setup and press Start.
-  const showNextRunHint = multiTrack.savedRuns.length > 0 && !runComplete && !multiTrack.isFull;
-
   return (
     <div className={css.savedTracks} data-test="saved-tracks-section">
       <div className={css.heading}>Saved Tracks</div>
 
-      {multiTrack.savedRuns.length === 0 && (
-        <div className={css.empty}>No saved tracks yet. Run a storm, then save it.</div>
-      )}
-
-      {multiTrack.savedRuns.length > 0 && (
-        <ul className={css.runList}>
-          {multiTrack.savedRuns.map((run, i) => (
-            <li
-              key={run.id}
-              className={clsx(css.runCard, { [css.selected]: run.id === multiTrack.selectedRunId })}
-              data-test="saved-run"
-            >
-              <div className={css.runCardHeader}>
+      <ul className={css.runList}>
+        {multiTrack.savedRuns.map((run, i) => {
+          const selected = run.id === multiTrack.selectedRunId;
+          const cat = runCategory(run.state);
+          return (
+            <li key={run.id}>
+              <div
+                className={clsx(css.runCard, { [css.selected]: selected })}
+                role="button"
+                tabIndex={0}
+                aria-pressed={selected}
+                data-test="saved-run"
+                onClick={() => handleSelect(run)}
+                onKeyDown={e => {
+                  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleSelect(run); }
+                }}
+              >
+                <div className={css.runCardHeader}>
+                  <span className={css.badge}>{i + 1}</span>
+                  <span className={css.runName}>Run {i + 1}</span>
+                  <span className={css.catChip}>
+                    <span className={css.catDot} style={{ backgroundColor: cat.color }} />
+                    {cat.label}
+                  </span>
+                </div>
+                <RunSummary state={run.state} />
                 <button
                   type="button"
-                  className={css.runSelect}
-                  data-test="select-run-button"
-                  onClick={() => handleSelect(run)}
-                >
-                  Run {i + 1}
-                </button>
-                <button
-                  type="button"
-                  className={css.deleteButton}
+                  className={css.trash}
                   aria-label={`Delete Run ${i + 1}`}
                   data-test="delete-run-button"
-                  onClick={() => multiTrack.deleteRun(run.id)}
+                  onClick={e => { e.stopPropagation(); multiTrack.deleteRun(run.id); }}
                 >
                   <DeleteIcon fontSize="small" />
                 </button>
               </div>
-              {run.id === multiTrack.selectedRunId && <RunSummary state={run.state} />}
             </li>
-          ))}
-        </ul>
-      )}
+          );
+        })}
 
-      {showNextRunHint && (
-        <div className={css.nextRunHint} data-test="next-run-hint">
-          Adjust the setup and press Start to run another track.
-        </div>
-      )}
+        <li>
+          <button
+            type="button"
+            className={clsx(css.newRunCard, {
+              [css.active]: newRunActive && !multiTrack.isFull,
+              [css.disabled]: multiTrack.isFull
+            })}
+            disabled={multiTrack.isFull}
+            data-test="new-run-card"
+            onClick={handleNewRun}
+          >
+            {multiTrack.isFull ? (
+              <span className={css.newRunFull}>Pack full — delete a run to add another</span>
+            ) : (
+              <>
+                <span className={css.newRunPlus} aria-hidden="true">+</span>
+                <span className={css.newRunLabel}>New Run</span>
+                <span className={css.newRunSub}>Set options &amp; press Start</span>
+              </>
+            )}
+          </button>
+        </li>
+      </ul>
 
       <button
         type="button"
