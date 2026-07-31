@@ -293,7 +293,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     // the last track, and deselect any saved run so the new active run stays distinct from them.
     if (this.stores.multiTrack.enabled) {
       if (sim.simulationStarted) sim.restart(false);
-      this.stores.multiTrack.selectRun(undefined);
+      this.stores.multiTrack.startNewRun();
     }
 
     // Log before start() to capture the exact state the student sees before simulation begins,

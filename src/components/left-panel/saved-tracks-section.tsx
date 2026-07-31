@@ -23,7 +23,8 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
   // A run can only be saved once it has actually run and finished.
   const runComplete =
     simulation.simulationStarted && !simulation.simulationRunning && simulation.simulationFinished;
-  const saveDisabled = !runComplete || multiTrack.isFull;
+  const alreadySaved = runComplete && multiTrack.currentRunSaved;
+  const saveDisabled = !multiTrack.canSave(runComplete);
 
   const handleSave = () => {
     if (saveDisabled) return;
@@ -32,13 +33,19 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
 
   // Selecting a run restores its full setup and makes it the active (colored) track.
   const handleSelect = (run: ISavedRun) => {
-    multiTrack.selectRun(run.id);
+    multiTrack.restoreRun(run.id);
     setInteractiveState(stores, run.state);
   };
 
   const saveLabel = multiTrack.isFull
     ? `Max ${MAX_SAVED_TRACKS} tracks saved`
-    : "Save this run";
+    : alreadySaved
+      ? "Saved ✓"
+      : "Save this run";
+
+  // After saving, guide the user to the next run (there's no separate "new run" button — you just
+  // adjust the setup and press Start, and the saved run greys out on the map).
+  const showNextRunHint = alreadySaved && !multiTrack.isFull;
 
   return (
     <div className={css.savedTracks} data-test="saved-tracks-section">
@@ -76,6 +83,12 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
             </li>
           ))}
         </ul>
+      )}
+
+      {showNextRunHint && (
+        <div className={css.nextRunHint} data-test="next-run-hint">
+          Adjust the setup and press Start to run another track.
+        </div>
       )}
 
       <button

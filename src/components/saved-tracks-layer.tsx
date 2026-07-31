@@ -27,7 +27,7 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
             key={run.id}
             track={track}
             onClick={() => {
-              multiTrack.selectRun(run.id);
+              multiTrack.restoreRun(run.id);
               setInteractiveState(stores, run.state);
             }}
           />
