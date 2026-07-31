@@ -44,8 +44,10 @@ $leftPanelBorderRadius: 5px;
       overflow-y: auto;
     }
 
+    // In multi-track mode the setup list keeps its natural height and does NOT shrink, so adding
+    // runs can't squeeze the setup options off the top — the Runs section below scrolls instead.
     &.multiTrackMode .panelList {
-      flex: 0 1 auto;
+      flex: 0 0 auto;
     }
 
     .leftPanelHeader {

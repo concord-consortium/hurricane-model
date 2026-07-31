@@ -122,7 +122,7 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public render() {
-    const { simulation: sim, ui } = this.stores;
+    const { simulation: sim, ui, multiTrack } = this.stores;
     const { sstOverlay } = ui;
     const navigation = !!ui.zoomedInView || config.navigation;
 
@@ -216,7 +216,9 @@ export class MapView extends BaseComponent<IProps, IState> {
             )
           }
           {
-            sim.hurricane.active && <HurricaneMarker />
+            // Once a run is captured (a completed run is selected/locked), hide the swirling
+            // hurricane symbol — only the track remains — until a new trial is started/edited.
+            sim.hurricane.active && !multiTrack.setupLocked && <HurricaneMarker />
           }
           {
             // ui.mapBounds can be null/undefined before the Leaflet map has finished initializing
