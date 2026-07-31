@@ -288,6 +288,14 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const { hurricane, startLocation } = sim;
     this.clearDelayedStart();
 
+    // In multi-track mode each Start is a NEW run: clear the previous run's track (keeping the
+    // current setup) so the storm re-launches from the configured start instead of appending onto
+    // the last track, and deselect any saved run so the new active run stays distinct from them.
+    if (this.stores.multiTrack.enabled) {
+      if (sim.simulationStarted) sim.restart(false);
+      this.stores.multiTrack.selectRun(undefined);
+    }
+
     // Log before start() to capture the exact state the student sees before simulation begins,
     // consistent with SimulationEnded logging before restart/reset.
     log("SimulationStarted", {

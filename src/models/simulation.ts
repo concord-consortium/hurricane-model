@@ -472,7 +472,9 @@ export class SimulationModel {
   }
 
   // This only restarts simulation without reseting parameters like pressure systems, season, etc.
-  @action.bound public restart() {
+  // revertPressureSystems (default true) restores pressure systems to the snapshot taken at the
+  // last start(); multi-track passes false so a new run keeps the user's current setup edits.
+  @action.bound public restart(revertPressureSystems = true) {
     this.simulationRunning = false;
     this.simulationFinished = false;
     this.simulationStarted = false;
@@ -495,7 +497,7 @@ export class SimulationModel {
     } else if (isStartLocationName(this.startLocation)) {
       this.hurricane.setStrength(startStrengths[this.startLocation]);
     }
-    if (this.pressureSystemSettings.length) {
+    if (revertPressureSystems && this.pressureSystemSettings.length) {
       this.pressureSystems = this.pressureSystemSettings;
     }
   }
