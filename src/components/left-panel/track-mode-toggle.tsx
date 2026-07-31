@@ -24,8 +24,9 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
 
   const selectSingle = () => {
     if (!multiTrack.enabled) return;
-    // Save Multi-track's live work, then restore Single-track's own snapshot.
+    // Save Multi-track's live work + which card was selected, then restore Single-track's snapshot.
     multiTrack.setMultiWorkingState(getInteractiveState(stores));
+    multiTrack.stashMultiSelection();
     multiTrack.setEnabled(false);
     multiTrack.autoCaptureSuppressed = true;
     if (multiTrack.singleWorkingState) {
@@ -45,8 +46,9 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
     if (multiTrack.enabled) return;
     // Save Single-track's live work (pre-run or completed) so it's restored untouched on return.
     multiTrack.setSingleWorkingState(getInteractiveState(stores), multiTrack.singleTrackEditing);
+    const restoringMulti = !!multiTrack.multiWorkingState;
     multiTrack.autoCaptureSuppressed = true;
-    if (multiTrack.multiWorkingState) {
+    if (restoringMulti) {
       setInteractiveState(stores, multiTrack.multiWorkingState);
     } else if (multiTrack.defaultState) {
       // First entry into Multi-track: pristine default so nothing leaks from Single-track.
@@ -59,6 +61,9 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
     multiTrack.setEnabled(true);
     if (multiTrack.runs.length === 0) {
       multiTrack.addRun();
+    } else if (restoringMulti) {
+      // Re-select the card that was active before, so a finished run still auto-captures into it.
+      multiTrack.restoreMultiSelection();
     }
   };
 

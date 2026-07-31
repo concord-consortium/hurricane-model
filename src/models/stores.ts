@@ -28,8 +28,11 @@ export function createStores(): IStores {
     (finished) => {
       if (!finished || multiTrack.autoCaptureSuppressed) return;
       if (multiTrack.enabled) {
-        const selected = multiTrack.selectedRun;
+        // Capture into the selected card; if selection was somehow lost, fall back to the editable
+        // ("Not run yet") card so a finished run is never dropped.
+        const selected = multiTrack.selectedRun ?? multiTrack.runs.find(r => r.state === null);
         if (!selected) return;
+        if (multiTrack.selectedRunId !== selected.id) multiTrack.selectRun(selected.id);
         multiTrack.captureRun(selected.id, getInteractiveState(stores));
         simulation.restart(false);
       } else {

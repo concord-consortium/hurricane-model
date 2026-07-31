@@ -47,6 +47,12 @@ export class MultiTrackModel {
   public singleWorkingState: IHurricaneInteractiveState | null = null;
   public singleWorkingEditing = false;
 
+  // Which run was selected/being-edited in Multi-track, stashed on leave so returning re-selects the
+  // same card. Without this, setEnabled(false) clears the selection and a finished run has no slot to
+  // auto-capture into (it stays "Not run yet"). Not observable.
+  public multiWorkingSelectedId: string | undefined = undefined;
+  public multiWorkingEditingId: string | undefined = undefined;
+
   private nextId = 1;
 
   constructor() {
@@ -142,6 +148,20 @@ export class MultiTrackModel {
     this.selectedRunId = id;
     // Selecting a completed run shows it locked; Edit unlocks it.
     this.editingRunId = undefined;
+  }
+
+  // Stash the current selection before leaving Multi-track (setEnabled(false) will clear it).
+  @action.bound public stashMultiSelection() {
+    this.multiWorkingSelectedId = this.selectedRunId;
+    this.multiWorkingEditingId = this.editingRunId;
+  }
+
+  // Re-select the stashed run when returning to Multi-track, if it still exists.
+  @action.bound public restoreMultiSelection() {
+    if (this.multiWorkingSelectedId && this.runs.some(r => r.id === this.multiWorkingSelectedId)) {
+      this.selectedRunId = this.multiWorkingSelectedId;
+      this.editingRunId = this.multiWorkingEditingId;
+    }
   }
 
   @action.bound public setSingleRun(state: IHurricaneInteractiveState | null) {
