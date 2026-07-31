@@ -21,11 +21,15 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
       {multiTrack.savedRuns.map(run => {
         const track = run.state.simulation.hurricaneTrack;
         if (!track || track.length === 0) return null;
+        const selected = run.id === multiTrack.selectedRunId;
         return (
           <StaticTrack
-            key={run.id}
+            // Include selection in the key so the polylines are re-created when a run's selection
+            // changes: react-leaflet applies pane/className only at layer creation, so without this
+            // a run's color/pane would not update when it becomes selected or deselected.
+            key={`${run.id}-${selected ? "sel" : "ghost"}`}
             track={track}
-            selected={run.id === multiTrack.selectedRunId}
+            selected={selected}
             onClick={() => {
               // Restore the run's setup (pressure systems move to its positions, panel reflects it),
               // then clear the loaded track — it stays drawn (lit up) by this layer as the selected
