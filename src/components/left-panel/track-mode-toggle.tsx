@@ -20,13 +20,16 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
   const selectSingle = () => {
     if (!multiTrack.enabled) return;
     multiTrack.setEnabled(false);
-    // Restore the Single-Track run (locked) so the same run is shown again.
+    multiTrack.autoCaptureSuppressed = true;
     if (multiTrack.singleRun) {
-      multiTrack.autoCaptureSuppressed = true;
+      // Restore the Single-Track run (locked) so the same run is shown again.
       setInteractiveState(stores, multiTrack.singleRun);
-      multiTrack.autoCaptureSuppressed = false;
-      multiTrack.setSingleTrackEditing(false);
+    } else {
+      // No single run: start fresh so single-run mode doesn't carry over the last multi-track run.
+      simulation.reset();
     }
+    multiTrack.autoCaptureSuppressed = false;
+    multiTrack.setSingleTrackEditing(false);
   };
 
   const selectMulti = () => {

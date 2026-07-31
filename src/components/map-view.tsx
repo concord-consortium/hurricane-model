@@ -224,8 +224,9 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             // Once a run is captured (a completed run is selected/locked), hide the swirling
-            // hurricane symbol — only the track remains — until a new trial is started/edited.
-            sim.hurricane.active && !multiTrack.setupLocked && <HurricaneMarker />
+            // hurricane symbol — only the track remains — until a new trial is started/edited. While
+            // a run is actually running (e.g. re-running a saved run), always show it.
+            sim.hurricane.active && (!multiTrack.setupLocked || sim.simulationRunning) && <HurricaneMarker />
           }
           {
             // ui.mapBounds can be null/undefined before the Leaflet map has finished initializing

@@ -3,22 +3,48 @@ import { observer } from "mobx-react";
 import * as React from "react";
 
 import { setInteractiveState } from "../models/interactive-state";
+import { ITrackPoint } from "../types";
 import { runLetter } from "./left-panel/run-summary";
 import { useStores } from "../stores-context";
+import { HurricaneCategoryMarker } from "./hurricane-category-marker";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
 import { StaticTrack } from "./static-track";
 
 import css from "./saved-tracks-layer.scss";
 
+// Category-change markers for a saved run's track: one at the midpoint of each category segment.
+function categoryMarkersForTrack(track: ITrackPoint[], strengthChangePositions: number[]): ITrackPoint[] {
+  const markers: ITrackPoint[] = [];
+  let prev = 0;
+  strengthChangePositions.forEach(idx => {
+    if (idx > 0 && track[prev]) {
+      const mid = Math.min(track.length - 1, Math.max(0, Math.floor((prev + idx) / 2)));
+      if (track[mid]) markers.push({ position: track[mid].position, category: track[prev].category });
+    }
+    prev = idx;
+  });
+  return markers;
+}
+
 /**
  * Renders each run card's track on the map in multi-track mode: the selected run "lit up" in
- * category color (shadowPane), the rest greyed. Each track also gets a letter marker (A–F) offset
- * up-and-right from its end. Clicking a track or its letter selects that run and restores its setup.
+ * category color (shadowPane), the rest greyed. Each track also gets a letter marker (A–F) at its
+ * end. The selected run also shows its category-change markers (TS/1/2…). Clicking a track or its
+ * letter selects that run.
  */
 export const SavedTracksLayer = observer(function SavedTracksLayer() {
   const stores = useStores();
-  const { multiTrack, simulation } = stores;
+  const { multiTrack, simulation, ui } = stores;
   if (!multiTrack.enabled) return null;
+
+  const selected = multiTrack.selectedRun;
+  const showCategoryMarkers = ui.categoryChangeMarkers && !simulation.simulationRunning && selected?.state;
+  const categoryMarkers = showCategoryMarkers
+    ? categoryMarkersForTrack(
+        selected!.state!.simulation.hurricaneTrack,
+        selected!.state!.simulation.strengthChangePositions || []
+      )
+    : [];
 
   return (
     <>
@@ -27,7 +53,7 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
         if (!state) return null; // editable (not run yet) — nothing to draw
         const track = state.simulation.hurricaneTrack;
         if (!track || track.length === 0) return null;
-        const selected = run.id === multiTrack.selectedRunId;
+        const isSelected = run.id === multiTrack.selectedRunId;
         const endPos = track[track.length - 1].position;
         const select = () => {
           multiTrack.selectRun(run.id);
@@ -39,16 +65,19 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
         return (
           // Include selection in the key so the polylines re-create when selection changes:
           // react-leaflet applies pane/className only at layer creation.
-          <React.Fragment key={`${run.id}-${selected ? "sel" : "ghost"}`}>
-            <StaticTrack track={track} selected={selected} onClick={select} />
+          <React.Fragment key={`${run.id}-${isSelected ? "sel" : "ghost"}`}>
+            <StaticTrack track={track} selected={isSelected} onClick={select} />
             <LeafletCustomMarker position={endPos} zIndexOffset={i * 10000}>
-              <div className={clsx(css.trackEndLabel, { [css.selected]: selected })} onClick={select}>
+              <div className={clsx(css.trackEndLabel, { [css.selected]: isSelected })} onClick={select}>
                 {runLetter(i)}
               </div>
             </LeafletCustomMarker>
           </React.Fragment>
         );
       })}
+      {categoryMarkers.map((m, idx) => (
+        <HurricaneCategoryMarker key={`cat-${idx}`} point={m} />
+      ))}
     </>
   );
 });
