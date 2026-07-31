@@ -44,14 +44,15 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
     }
   };
 
-  // Reset a completed run back to editable: load its setup so you can tweak from it, clear its run.
-  const handleReset = (run: IRunSlot) => {
+  // Edit a completed run: load its setup, unlock it for changes, and select it. Changing settings
+  // and pressing Start re-runs it, updating the card.
+  const handleEdit = (run: IRunSlot) => {
     if (!run.state) return;
     multiTrack.autoCaptureSuppressed = true;
     setInteractiveState(stores, run.state);
     simulation.restart(false);
     multiTrack.autoCaptureSuppressed = false;
-    multiTrack.resetRun(run.id);
+    multiTrack.editRun(run.id);
   };
 
   // Add the next empty card and reset the storm to its start for a fresh configuration.
@@ -88,22 +89,26 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
                 <div className={css.runCardHeader}>
                   <span className={css.badge}>{i + 1}</span>
                   <span className={css.runName}>Run {i + 1}</span>
-                  <span className={css.catChip}>
-                    <span className={css.catDot} style={{ backgroundColor: cat.color }} />
-                    {cat.label}
-                  </span>
+                </div>
+                <div className={css.catRow}>
+                  <span className={css.catDot} style={{ backgroundColor: cat.color }} />
+                  <span className={css.catLabel}>{cat.label}</span>
                 </div>
                 <RunSummary sim={sim} />
                 {run.state && (
                   <div className={css.cardActions}>
-                    <button
-                      type="button"
-                      className={css.resetBtn}
-                      data-test="reset-run-button"
-                      onClick={e => { e.stopPropagation(); handleReset(run); }}
-                    >
-                      Reset
-                    </button>
+                    {multiTrack.editingRunId === run.id ? (
+                      <span className={css.editingTag}>Editing…</span>
+                    ) : (
+                      <button
+                        type="button"
+                        className={css.editBtn}
+                        data-test="edit-run-button"
+                        onClick={e => { e.stopPropagation(); handleEdit(run); }}
+                      >
+                        Edit
+                      </button>
+                    )}
                   </div>
                 )}
                 <button

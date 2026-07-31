@@ -30,6 +30,9 @@ export const SetupSection = observer(function SetupSection({
 }: ISetupSectionProps) {
   const stores = useStores();
   const open = stores.ui.setupMode === setupMode;
+  // When a completed run is selected (and not being edited), its setup is locked: the section can
+  // still be opened, but its controls are greyed and non-interactive.
+  const locked = stores.multiTrack.setupLocked;
   const dt = dataTest || title;
 
   const handleClick = () => {
@@ -54,7 +57,7 @@ export const SetupSection = observer(function SetupSection({
         </div>
       </ListItemButton>
       <Collapse data-test={`${dt}-content`} in={open} unmountOnExit>
-        <div className={css.section} data-test={`${dt}-section`}>
+        <div className={clsx(css.section, { [css.locked]: locked })} data-test={`${dt}-section`}>
           {hint && <div className={css.hint}>{hint}</div>}
           {children}
           {tip && <div className={css.tip}><span className={css.bold}>Tip:</span> {tip}</div>}

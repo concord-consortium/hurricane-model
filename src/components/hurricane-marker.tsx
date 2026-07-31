@@ -25,9 +25,9 @@ const HURRICANE_IMG_SCALE_FACTOR = 0.05;
 export const HurricaneMarker = observer(function HurricaneMarker() {
   const stores = useStores();
 
-  const { ui, simulation } = stores;
+  const { ui, simulation, multiTrack } = stores;
   const { hurricane, simulationStarted } = simulation;
-  const draggable = ui.setupMode === "stormLocation" && !simulationStarted;
+  const draggable = ui.setupMode === "stormLocation" && !simulationStarted && !multiTrack.setupLocked;
 
   const handleDrag = (e: Leaflet.LeafletEvent) => {
     const { hurricane, pressureSystems } = stores.simulation;

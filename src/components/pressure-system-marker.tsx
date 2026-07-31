@@ -28,7 +28,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     const uiDisabled = isReportMode || config.pressureSystemsLocked || ui.thermometerActive ||
       (config.lockSimulationWhileRunning && simulation.simulationStarted);
     const isStormDisabled = config.mode === "storm" && setupMode !== "pressureSystems";
-    const disabled = uiDisabled || isStormDisabled;
+    const disabled = uiDisabled || isStormDisabled || this.stores.multiTrack.setupLocked;
     const dimmed = setupMode !== undefined && isStormDisabled;
     return (
       <LeafletCustomMarker

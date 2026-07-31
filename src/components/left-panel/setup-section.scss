@@ -41,6 +41,14 @@
   border-bottom: $leftPanelBorder;
   padding: 8px 16px 12px;
 
+  // Locked (a completed run is selected, view-only): controls greyed and non-interactive. The
+  // section header stays clickable, so it can still be opened to inspect the values.
+  &.locked {
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+  }
+
   .hint, .postscript {
     line-height: normal;
   }

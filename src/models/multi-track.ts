@@ -20,6 +20,9 @@ export class MultiTrackModel {
   @observable public enabled = false;
   @observable public runs: IRunSlot[] = [];
   @observable public selectedRunId: string | undefined = undefined;
+  // The run currently unlocked for editing (via the card's Edit button). A selected completed run
+  // is otherwise locked (its setup is view-only) until Edit is pressed.
+  @observable public editingRunId: string | undefined = undefined;
 
   // Transient guard so restoring/resetting a card (which replays a finished state) isn't mistaken
   // for a natural run completion by the auto-capture reaction. Not observable.
@@ -49,6 +52,12 @@ export class MultiTrackModel {
     return this.runs.find(r => r.id === this.selectedRunId);
   }
 
+  // The setup panel is locked (view-only) when a completed run is selected and not being edited.
+  @computed public get setupLocked(): boolean {
+    const sel = this.selectedRun;
+    return this.enabled && !!sel && sel.state !== null && this.editingRunId !== sel.id;
+  }
+
   public runNumber(id: string): number {
     return this.runs.findIndex(r => r.id === id) + 1;
   }
@@ -57,6 +66,7 @@ export class MultiTrackModel {
     this.enabled = enabled;
     if (!enabled) {
       this.selectedRunId = undefined;
+      this.editingRunId = undefined;
     }
   }
 
@@ -65,15 +75,17 @@ export class MultiTrackModel {
     const run: IRunSlot = { id: `run-${this.nextId++}`, state: null };
     this.runs.push(run);
     this.selectedRunId = run.id;
+    this.editingRunId = undefined;
     return run;
   }
 
-  // Records a finished run into a slot (auto-save on completion).
+  // Records a finished run into a slot (auto-save on completion); a fresh run is locked.
   @action.bound public captureRun(id: string, state: IHurricaneInteractiveState) {
     const run = this.runs.find(r => r.id === id);
     if (run) {
       run.state = state;
     }
+    this.editingRunId = undefined;
   }
 
   // Clears a run back to editable ("Not run yet") and selects it.
@@ -83,6 +95,13 @@ export class MultiTrackModel {
       run.state = null;
       this.selectedRunId = id;
     }
+    this.editingRunId = undefined;
+  }
+
+  // Unlocks a completed run for editing (its setup becomes changeable again).
+  @action.bound public editRun(id: string) {
+    this.selectedRunId = id;
+    this.editingRunId = id;
   }
 
   @action.bound public deleteRun(id: string) {
@@ -97,6 +116,8 @@ export class MultiTrackModel {
 
   @action.bound public selectRun(id: string | undefined) {
     this.selectedRunId = id;
+    // Selecting a completed run shows it locked; Edit unlocks it.
+    this.editingRunId = undefined;
   }
 
   @action.bound public clear() {
