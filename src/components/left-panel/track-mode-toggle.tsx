@@ -24,8 +24,12 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
     if (multiTrack.singleRun) {
       // Restore the Single-Track run (locked) so the same run is shown again.
       setInteractiveState(stores, multiTrack.singleRun);
+    } else if (multiTrack.defaultState) {
+      // No single run: restore the pristine default so Multi-track edits (Category, season, SST, …)
+      // don't carry over. simulation.reset() alone leaves hurricane.startingCategory untouched.
+      setInteractiveState(stores, multiTrack.defaultState);
+      simulation.restart(false);
     } else {
-      // No single run: start fresh so single-run mode doesn't carry over the last multi-track run.
       simulation.reset();
     }
     multiTrack.autoCaptureSuppressed = false;

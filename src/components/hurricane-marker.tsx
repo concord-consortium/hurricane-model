@@ -53,6 +53,8 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
       draggable={draggable}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
+      // Keep the storm above the tracks and their letter labels (which use offsets up to ~50000).
+      zIndexOffset={1000000}
     >
       <HurricaneIcon />
     </LeafletCustomMarker>

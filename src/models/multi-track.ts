@@ -33,6 +33,11 @@ export class MultiTrackModel {
   // for a natural run completion by the auto-capture reaction. Not observable.
   public autoCaptureSuppressed = false;
 
+  // Pristine default setup captured once at startup. Used to fully reset Single-track when leaving
+  // Multi-track with no saved single run, so edits made in Multi-track (Category, season, SST, …)
+  // don't leak across — simulation.reset() alone doesn't restore hurricane.startingCategory. Not observable.
+  public defaultState: IHurricaneInteractiveState | null = null;
+
   private nextId = 1;
 
   constructor() {
@@ -132,6 +137,10 @@ export class MultiTrackModel {
 
   @action.bound public setSingleRun(state: IHurricaneInteractiveState | null) {
     this.singleRun = state;
+  }
+
+  public setDefaultState(state: IHurricaneInteractiveState) {
+    this.defaultState = state;
   }
 
   @action.bound public setSingleTrackEditing(editing: boolean) {

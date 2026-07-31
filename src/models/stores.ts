@@ -16,6 +16,10 @@ export function createStores(): IStores {
   const multiTrack = new MultiTrackModel();
   const stores: IStores = { ui, simulation, multiTrack };
 
+  // Snapshot the pristine default setup so leaving Multi-track (with no saved single run) can fully
+  // restore Single-track to defaults rather than inheriting Multi-track edits like Category.
+  multiTrack.setDefaultState(getInteractiveState(stores));
+
   // Auto-save: when a run finishes in multi-track, capture it into the selected card (no Save
   // button) and reset the sim so the captured track is drawn by the map layer and the storm returns
   // to its start. Suppressed while restoring/resetting a card (which also replays a finished state).
