@@ -35,13 +35,17 @@ $leftPanelBorderRadius: 5px;
       left: 0;
     }
 
-    // Scrollable middle: setup sections + saved tracks scroll, while the RunOptions footer
-    // (rendered as a sibling after this list) stays pinned to the bottom of the panel.
+    // The setup list. In single-run mode it fills the panel (scrolling if tall). In multi-track
+    // mode it takes only its natural height so the Saved Tracks section can flex to fill the rest.
     .panelList {
       flex: 1 1 auto;
       min-height: 0;
       overflow-x: hidden;
       overflow-y: auto;
+    }
+
+    &.multiTrackMode .panelList {
+      flex: 0 1 auto;
     }
 
     .leftPanelHeader {

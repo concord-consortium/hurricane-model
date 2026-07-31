@@ -1,11 +1,18 @@
 @use "../common" as *;
 
 .savedTracks {
+  // Flex child of the panel: fills the space between the setup list and the pinned footer.
+  // Internally a column so the run-card list scrolls while the heading / hint / Save button stay put.
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 10px 16px 14px;
   background-color: #fafafa;
   border-top: 1px solid $charcoalMedium;
 
   .heading {
+    flex-shrink: 0;
     font-size: 12px;
     font-weight: bold;
     color: $charcoal;
@@ -20,6 +27,7 @@
   }
 
   .nextRunHint {
+    flex-shrink: 0;
     font-size: 11px;
     color: $charcoal;
     line-height: normal;
@@ -33,8 +41,9 @@
     list-style: none;
     margin: 0 0 10px;
     padding: 0 2px;
-    // The pack of run cards scrolls within its own bounded area instead of stretching the panel.
-    max-height: 260px;
+    // Fill the section's remaining height (down to the Save button) and scroll the cards.
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
 
     .runCard {
@@ -107,6 +116,7 @@
   }
 
   .saveButton {
+    flex-shrink: 0;
     width: 100%;
     padding: 9px 12px;
     font-family: inherit;

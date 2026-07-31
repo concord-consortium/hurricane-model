@@ -2,8 +2,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import List from "@mui/material/List";
 import ListSubheader from "@mui/material/ListSubheader";
 import clsx from "clsx";
+import { observer } from "mobx-react";
 import React from "react";
 
+import { useStores } from "../../stores-context";
 import { PressureSystemsSection } from "./pressure-systems-section";
 import { RunOptions } from "./run-options";
 import { SavedTracksSection } from "./saved-tracks-section";
@@ -20,8 +22,11 @@ interface ILeftPanelProps {
   toggleOpen?: () => void;
 }
 
-export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
-  const panelClasses = clsx(css.leftPanel, { [css.open]: open });
+export const LeftPanel = observer(function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
+  const { multiTrack } = useStores();
+  // In multi-track mode the Saved Tracks section flexes to fill the panel (down to the footer), so
+  // the setup list takes only its natural height; in single-run mode the setup list fills instead.
+  const panelClasses = clsx(css.leftPanel, { [css.open]: open, [css.multiTrackMode]: multiTrack.enabled });
   return (
     <div className={css.leftPanelContainer}>
       <div className={panelClasses} data-test="left-panel">
@@ -51,10 +56,10 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
           <SeasonSection />
           <SeaSurfaceTemperaturesSection />
           <PressureSystemsSection />
-          <SavedTracksSection />
         </List>
+        <SavedTracksSection />
         <RunOptions />
       </div>
     </div>
   );
-}
+});
