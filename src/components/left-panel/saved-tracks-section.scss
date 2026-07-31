@@ -37,8 +37,27 @@
         background-color: #ececec;
       }
 
-      .runName {
+      &.selected {
+        background-color: $secondaryColorHover;
+      }
+
+      .runSelect {
+        flex: 1;
+        min-width: 0;
+        padding: 2px 0;
+        text-align: left;
+        font-family: inherit;
+        font-size: 12px;
         font-weight: bold;
+        color: $charcoal;
+        background: none;
+        border: none;
+        cursor: pointer;
+
+        &:focus-visible {
+          outline: 2px solid $charcoal;
+          outline-offset: 1px;
+        }
       }
 
       // Trash icon is revealed on hover / keyboard focus (per spec).

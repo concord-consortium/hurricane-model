@@ -1,0 +1,15 @@
+@use "common" as *;
+
+.savedTrackBorder {
+  stroke: #c3c7cc;
+}
+
+.savedTrack {
+  stroke: #868b91;
+  cursor: pointer !important;
+  transition: stroke 0.1s;
+
+  &:hover {
+    stroke: #5f6469;
+  }
+}

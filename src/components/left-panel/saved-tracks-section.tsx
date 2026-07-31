@@ -3,8 +3,8 @@ import { observer } from "mobx-react";
 import React from "react";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 
-import { getInteractiveState } from "../../models/interactive-state";
-import { MAX_SAVED_TRACKS } from "../../models/multi-track";
+import { getInteractiveState, setInteractiveState } from "../../models/interactive-state";
+import { ISavedRun, MAX_SAVED_TRACKS } from "../../models/multi-track";
 import { useStores } from "../../stores-context";
 
 import css from "./saved-tracks-section.scss";
@@ -30,6 +30,12 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
     multiTrack.saveRun(getInteractiveState(stores));
   };
 
+  // Selecting a run restores its full setup and makes it the active (colored) track.
+  const handleSelect = (run: ISavedRun) => {
+    multiTrack.selectRun(run.id);
+    setInteractiveState(stores, run.state);
+  };
+
   const saveLabel = multiTrack.isFull
     ? `Max ${MAX_SAVED_TRACKS} tracks saved`
     : "Save this run";
@@ -45,8 +51,19 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
       {multiTrack.savedRuns.length > 0 && (
         <ul className={css.runList}>
           {multiTrack.savedRuns.map((run, i) => (
-            <li key={run.id} className={css.runItem} data-test="saved-run">
-              <span className={css.runName}>Run {i + 1}</span>
+            <li
+              key={run.id}
+              className={clsx(css.runItem, { [css.selected]: run.id === multiTrack.selectedRunId })}
+              data-test="saved-run"
+            >
+              <button
+                type="button"
+                className={css.runSelect}
+                data-test="select-run-button"
+                onClick={() => handleSelect(run)}
+              >
+                Run {i + 1}
+              </button>
               <button
                 type="button"
                 className={css.deleteButton}
