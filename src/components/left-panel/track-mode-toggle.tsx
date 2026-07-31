@@ -2,7 +2,7 @@ import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React from "react";
 
-import { getInteractiveState } from "../../models/interactive-state";
+import { getInteractiveState, setInteractiveState } from "../../models/interactive-state";
 import { useStores } from "../../stores-context";
 
 import css from "./track-mode-toggle.scss";
@@ -18,22 +18,28 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
   const enabled = multiTrack.enabled;
 
   const selectSingle = () => {
+    if (!multiTrack.enabled) return;
     multiTrack.setEnabled(false);
+    // Restore the stashed Single-Track run so the same run is shown again.
+    if (multiTrack.singleTrackState) {
+      multiTrack.autoCaptureSuppressed = true;
+      setInteractiveState(stores, multiTrack.singleTrackState);
+      multiTrack.autoCaptureSuppressed = false;
+    }
   };
 
   const selectMulti = () => {
     if (multiTrack.enabled) return;
+    // Stash the current Single-Track run (if any) so it's restored on return, then clear the sim so
+    // Multi-track starts fresh with an empty, editable Run 1.
+    const hasRun = simulation.simulationFinished && simulation.hurricaneTrack.length > 0;
+    multiTrack.setSingleTrackState(hasRun ? getInteractiveState(stores) : null);
+    multiTrack.autoCaptureSuppressed = true;
+    simulation.restart(false);
+    multiTrack.autoCaptureSuppressed = false;
     multiTrack.setEnabled(true);
-    // Start with Run 1. If a completed run is already on screen, capture it as Run 1 (pre-seed);
-    // otherwise Run 1 is an empty, editable card.
     if (multiTrack.runs.length === 0) {
-      const run = multiTrack.addRun();
-      if (simulation.simulationFinished && simulation.hurricaneTrack.length > 0) {
-        multiTrack.autoCaptureSuppressed = true;
-        multiTrack.captureRun(run.id, getInteractiveState(stores));
-        simulation.restart(false);
-        multiTrack.autoCaptureSuppressed = false;
-      }
+      multiTrack.addRun();
     }
   };
 

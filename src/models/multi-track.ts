@@ -23,6 +23,8 @@ export class MultiTrackModel {
   // The run currently unlocked for editing (via the card's Edit button). A selected completed run
   // is otherwise locked (its setup is view-only) until Edit is pressed.
   @observable public editingRunId: string | undefined = undefined;
+  // The stashed Single-Track run, preserved across mode toggles so it reappears in single mode.
+  @observable public singleTrackState: IHurricaneInteractiveState | null = null;
 
   // Transient guard so restoring/resetting a card (which replays a finished state) isn't mistaken
   // for a natural run completion by the auto-capture reaction. Not observable.
@@ -118,6 +120,24 @@ export class MultiTrackModel {
     this.selectedRunId = id;
     // Selecting a completed run shows it locked; Edit unlocks it.
     this.editingRunId = undefined;
+  }
+
+  @action.bound public setSingleTrackState(state: IHurricaneInteractiveState | null) {
+    this.singleTrackState = state;
+  }
+
+  // Saves an external (Single-Track) run into the first empty slot, or a new slot if there's room.
+  // Returns the run's 1-based number, or null if all slots are full.
+  @action.bound public saveExternalRun(state: IHurricaneInteractiveState): number | null {
+    let idx = this.runs.findIndex(r => r.state === null);
+    if (idx < 0) {
+      if (this.isFull) return null;
+      this.runs.push({ id: `run-${this.nextId++}`, state: null });
+      idx = this.runs.length - 1;
+    }
+    // Access via the array so we mutate the observable element, not a stale pushed reference.
+    this.runs[idx].state = state;
+    return idx + 1;
   }
 
   @action.bound public clear() {

@@ -11,6 +11,7 @@ import { RunOptions } from "./run-options";
 import { SavedTracksSection } from "./saved-tracks-section";
 import { SeasonSection } from "./season-section";
 import { SeaSurfaceTemperaturesSection } from "./sea-surface-temperatures-section";
+import { SingleTrackCard } from "./single-track-card";
 import { StormCategorySection } from "./storm-category-section";
 import { StormLocationSection } from "./storm-location-section";
 import { TrackModeToggle } from "./track-mode-toggle";
@@ -56,6 +57,7 @@ export const LeftPanel = observer(function LeftPanel({ open, toggleOpen }: ILeft
           <SeasonSection />
           <SeaSurfaceTemperaturesSection />
           <PressureSystemsSection />
+          <SingleTrackCard />
         </List>
         <SavedTracksSection />
         <RunOptions />
