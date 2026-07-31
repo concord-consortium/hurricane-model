@@ -2,7 +2,6 @@
 
 .savedTracks {
   // Flex child of the panel: fills the space between the setup list and the pinned footer.
-  // Internally a column so the run-card list scrolls while the heading / Save button stay put.
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
@@ -20,19 +19,18 @@
   }
 
   .runList {
-    // Fill the section's remaining height and scroll the cards; the New Run card is the last item.
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
     list-style: none;
-    margin: 0 0 10px;
+    margin: 0;
     padding: 0 2px;
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  // ---- saved run card (trial-card style) ----
+  // ---- run card ----
   .runCard {
     position: relative;
     width: 100%;
@@ -53,9 +51,24 @@
       box-shadow: inset 0 0 0 1px $secondaryColor;
     }
 
+    // An editable (not-yet-run) card reads as a form slot.
+    &.editable {
+      border-style: dashed;
+      border-color: $secondaryColor;
+    }
+
     &:focus-visible {
       outline: 2px solid $charcoal;
       outline-offset: 1px;
+    }
+
+    .editableLabel {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: #a35a12;
+      margin-bottom: 5px;
     }
 
     .runCardHeader {
@@ -106,6 +119,26 @@
       flex-shrink: 0;
     }
 
+    .cardActions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .resetBtn {
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      color: $charcoal;
+      background: #ececec;
+      border: 1px solid #d3d3d3;
+      border-radius: 5px;
+      padding: 3px 12px;
+      cursor: pointer;
+      &:hover { background: $hoverColor; }
+      &:focus-visible { outline: 2px solid $charcoal; outline-offset: 1px; }
+    }
+
     // Trash target revealed on hover / when selected.
     .trash {
       position: absolute;
@@ -151,11 +184,6 @@
 
     &:hover { background: #fff6e6; }
 
-    &.active {
-      background: #fff6e6;
-      box-shadow: inset 0 0 0 1px $secondaryColor;
-    }
-
     &.disabled {
       border-style: solid;
       border-color: #d8d8d8;
@@ -189,44 +217,11 @@
       font-size: 12px;
     }
 
-    .newRunSub {
-      font-size: 10px;
-      color: $charcoalMedium;
-    }
-
-    .newRunFull {
+    .newRunNote {
       font-size: 11px;
       font-weight: 700;
       text-align: center;
-    }
-  }
-
-  // ---- Save button (pinned above the footer) ----
-  .saveButton {
-    flex-shrink: 0;
-    width: 100%;
-    padding: 9px 12px;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: bold;
-    color: $charcoal;
-    background-color: $secondaryColor;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.12s;
-
-    &:hover:not(.disabled) { background-color: $secondaryColorHover; }
-
-    &.disabled {
-      background-color: #e0e0e0;
       color: $charcoalMedium;
-      cursor: default;
-    }
-
-    &:focus-visible {
-      outline: 2px solid $charcoal;
-      outline-offset: 1px;
     }
   }
 }

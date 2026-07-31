@@ -1,37 +1,30 @@
 import { action, computed, observable, makeObservable } from "mobx";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
 
-// Maximum number of tracks a user can keep in their "pack".
+// Maximum number of run cards in the pack.
 export const MAX_SAVED_TRACKS = 6;
 
-export interface ISavedRun {
+export interface IRunSlot {
   id: string;
-  // Full run snapshot captured via getInteractiveState() — setup conditions + computed track.
-  // Restoring is just setInteractiveState(stores, state).
-  state: IHurricaneInteractiveState;
+  // The captured run snapshot once this slot has been run; null while it's still editable
+  // ("Not run yet"). Capturing happens automatically when a run finishes — there is no Save button.
+  state: IHurricaneInteractiveState | null;
 }
 
 /**
- * Holds the state for Multi-track mode: whether it's active and the pack of saved runs.
- *
- * Multi-track is NOT a separate app mode — it layers on top of regular single-run storm mode,
- * sharing the same setup panel and simulation engine. This model tracks the on/off flag, the
- * collection of saved runs, and whether the current (finished) run has already been saved;
- * capturing/restoring a run reuses the existing getInteractiveState()/setInteractiveState().
+ * Multi-track state: the on/off flag plus a pack of run cards. Each card is an editable slot that
+ * auto-fills when you run it (state goes from null -> a captured snapshot). Resetting a card clears
+ * it back to editable. Layers on top of single-run storm mode; the map/panel reuse the same engine.
  */
 export class MultiTrackModel {
-  // Whether multi-track mode is active (vs. regular single-run mode).
   @observable public enabled = false;
-  // Saved runs in creation order. A run's display number is its index + 1, so deleting one
-  // automatically renumbers the rest.
-  @observable public savedRuns: ISavedRun[] = [];
-  // The currently selected/highlighted saved run, if any.
+  @observable public runs: IRunSlot[] = [];
   @observable public selectedRunId: string | undefined = undefined;
-  // True once the active finished run has been saved to the pack (or a saved run is being viewed),
-  // so the Save button disables until a new run is started and finished. Prevents duplicate saves.
-  @observable public currentRunSaved = false;
 
-  // Monotonic id source so run identities stay stable as the list is reordered/renumbered.
+  // Transient guard so restoring/resetting a card (which replays a finished state) isn't mistaken
+  // for a natural run completion by the auto-capture reaction. Not observable.
+  public autoCaptureSuppressed = false;
+
   private nextId = 1;
 
   constructor() {
@@ -39,44 +32,66 @@ export class MultiTrackModel {
   }
 
   @computed public get isFull(): boolean {
-    return this.savedRuns.length >= MAX_SAVED_TRACKS;
+    return this.runs.length >= MAX_SAVED_TRACKS;
   }
 
-  // Whether the current finished run can be saved (finished, not already saved, pack has room).
-  public canSave(runComplete: boolean): boolean {
-    return runComplete && !this.currentRunSaved && !this.isFull;
+  // True while a card is still editable (not run yet).
+  @computed public get hasEditableCard(): boolean {
+    return this.runs.some(r => r.state === null);
   }
 
-  // 1-based display number for a run (0 if not found).
+  // A new card can be added only when there's no editable card waiting and there's room.
+  @computed public get canAddRun(): boolean {
+    return !this.hasEditableCard && !this.isFull;
+  }
+
+  @computed public get selectedRun(): IRunSlot | undefined {
+    return this.runs.find(r => r.id === this.selectedRunId);
+  }
+
   public runNumber(id: string): number {
-    return this.savedRuns.findIndex(run => run.id === id) + 1;
+    return this.runs.findIndex(r => r.id === id) + 1;
   }
 
   @action.bound public setEnabled(enabled: boolean) {
     this.enabled = enabled;
     if (!enabled) {
       this.selectedRunId = undefined;
-      this.currentRunSaved = false;
     }
   }
 
-  // Saves a run snapshot to the pack, selects it, and marks the current run as saved.
-  // Returns the new run, or undefined if the pack is full.
-  @action.bound public saveRun(state: IHurricaneInteractiveState): ISavedRun | undefined {
-    if (this.isFull) {
-      return undefined;
-    }
-    const run: ISavedRun = { id: `run-${this.nextId++}`, state };
-    this.savedRuns.push(run);
+  // Adds a fresh editable card and selects it.
+  @action.bound public addRun(): IRunSlot {
+    const run: IRunSlot = { id: `run-${this.nextId++}`, state: null };
+    this.runs.push(run);
     this.selectedRunId = run.id;
-    this.currentRunSaved = true;
     return run;
   }
 
+  // Records a finished run into a slot (auto-save on completion).
+  @action.bound public captureRun(id: string, state: IHurricaneInteractiveState) {
+    const run = this.runs.find(r => r.id === id);
+    if (run) {
+      run.state = state;
+    }
+  }
+
+  // Clears a run back to editable ("Not run yet") and selects it.
+  @action.bound public resetRun(id: string) {
+    const run = this.runs.find(r => r.id === id);
+    if (run) {
+      run.state = null;
+      this.selectedRunId = id;
+    }
+  }
+
   @action.bound public deleteRun(id: string) {
-    this.savedRuns = this.savedRuns.filter(run => run.id !== id);
+    const idx = this.runs.findIndex(r => r.id === id);
+    if (idx < 0) return;
+    this.runs.splice(idx, 1);
     if (this.selectedRunId === id) {
-      this.selectedRunId = undefined;
+      const next = this.runs[idx - 1] || this.runs[this.runs.length - 1];
+      this.selectedRunId = next ? next.id : undefined;
     }
   }
 
@@ -84,21 +99,8 @@ export class MultiTrackModel {
     this.selectedRunId = id;
   }
 
-  // A saved run is being restored/viewed: select it and treat it as already saved (Save disabled).
-  @action.bound public restoreRun(id: string) {
-    this.selectedRunId = id;
-    this.currentRunSaved = true;
-  }
-
-  // A fresh run is beginning (Start in multi-track): it is unsaved and distinct from saved runs.
-  @action.bound public startNewRun() {
-    this.currentRunSaved = false;
-    this.selectedRunId = undefined;
-  }
-
   @action.bound public clear() {
-    this.savedRuns = [];
+    this.runs = [];
     this.selectedRunId = undefined;
-    this.currentRunSaved = false;
   }
 }

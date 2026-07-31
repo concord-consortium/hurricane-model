@@ -290,9 +290,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     // In multi-track mode each Start is a NEW run: clear the previous run's track (keeping the
     // current setup) so the storm re-launches from the configured start instead of appending onto
     // the last track, and deselect any saved run so the new active run stays distinct from them.
-    if (this.stores.multiTrack.enabled) {
-      if (sim.simulationStarted) sim.restart(false);
-      this.stores.multiTrack.startNewRun();
+    if (this.stores.multiTrack.enabled && sim.simulationStarted) {
+      // Ensure a fresh track for this run; the selected editable card stays selected so the run is
+      // auto-captured into it when it finishes.
+      sim.restart(false);
     }
 
     // Log before start() to capture the exact state the student sees before simulation begins,

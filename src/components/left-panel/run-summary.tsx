@@ -2,8 +2,8 @@ import { clsx } from "clsx";
 import React from "react";
 
 import { hurricaneCategoryInfo } from "../../constants";
-import { isStartLocationName, namedRegions, seasonLabels, startLocationNameLabels } from "../../types";
-import { IHurricaneInteractiveState } from "../../types/interactive-state";
+import { isStartLocationName, NamedRegion, namedRegions, Season, seasonLabels, StartLocation, startLocationNameLabels } from "../../types";
+import { IPressureSystemState } from "../../types/interactive-state";
 import { temperatureAnomalyRegions } from "../../utils/regions";
 
 import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
@@ -13,12 +13,22 @@ import PressureSystemIcon from "../../assets/left-panel/pressure-system.svg";
 
 import css from "./run-summary.scss";
 
+// The subset of a run's setup that a card summarizes. Satisfied by a captured run's
+// ISimulationState and by a live snapshot of the current setup (for the editable card).
+export interface IRunSetupSim {
+  season: Season;
+  startLocation: StartLocation;
+  hurricane: { startingCategory?: number };
+  pressureSystems: IPressureSystemState[];
+  temperatureAnomalies?: Partial<Record<NamedRegion, number>>;
+}
+
 // Saffir–Simpson colors indexed by category (TS..Cat 5), matching common.scss $cat0..$cat5.
 const CATEGORY_COLORS = ["#f2f2f2", "#ffffcc", "#ffe775", "#ffc140", "#ff8f20", "#ff6060"];
 
-// Badge label + color for a saved run's starting category (shown in the card header).
-export function runCategory(state: IHurricaneInteractiveState) {
-  const c = state.simulation.hurricane.startingCategory;
+// Badge label + color for a run's starting category (shown in the card header).
+export function runCategory(sim: IRunSetupSim) {
+  const c = sim.hurricane.startingCategory;
   const idx = c != null ? Math.max(0, Math.min(5, c)) : 0;
   return {
     label: idx === 0 ? "TS" : `Cat ${idx}`,
@@ -35,16 +45,14 @@ function coords(lat: number, lng: number): string {
 }
 
 interface IProps {
-  // A plain serialized run snapshot (not observable) — read directly.
-  state: IHurricaneInteractiveState;
+  sim: IRunSetupSim;
 }
 
 /**
- * Compact read-out of a saved run's setup for its card: start location, season, adjusted SST
- * anomalies (chips), and pressure systems (H/L chips). Category is shown in the card header.
+ * Compact read-out of a run's setup for its card: start location, season, adjusted SST anomalies
+ * (chips), and pressure systems (H/L chips). Category is shown in the card header.
  */
-export function RunSummary({ state }: IProps) {
-  const sim = state.simulation;
+export function RunSummary({ sim }: IProps) {
   const location = isStartLocationName(sim.startLocation)
     ? startLocationNameLabels[sim.startLocation]
     : coords(sim.startLocation.lat, sim.startLocation.lng);

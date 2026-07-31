@@ -24,11 +24,16 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
   const selectMulti = () => {
     if (multiTrack.enabled) return;
     multiTrack.setEnabled(true);
-    // Pre-seed: if the user already has a completed run they like, entering multi-track
-    // saves it as Run 1 (per spec use case).
-    const hasCompletedRun = simulation.simulationFinished && simulation.hurricaneTrack.length > 0;
-    if (hasCompletedRun && multiTrack.savedRuns.length === 0) {
-      multiTrack.saveRun(getInteractiveState(stores));
+    // Start with Run 1. If a completed run is already on screen, capture it as Run 1 (pre-seed);
+    // otherwise Run 1 is an empty, editable card.
+    if (multiTrack.runs.length === 0) {
+      const run = multiTrack.addRun();
+      if (simulation.simulationFinished && simulation.hurricaneTrack.length > 0) {
+        multiTrack.autoCaptureSuppressed = true;
+        multiTrack.captureRun(run.id, getInteractiveState(stores));
+        simulation.restart(false);
+        multiTrack.autoCaptureSuppressed = false;
+      }
     }
   };
 
