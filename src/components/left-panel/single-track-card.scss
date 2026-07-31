@@ -24,6 +24,14 @@
         font-weight: 800;
         font-size: 12px;
       }
+
+      .editingTag {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        color: #a35a12;
+      }
     }
 
     .catRow {
@@ -44,22 +52,47 @@
       }
     }
 
-    .saveBtn {
-      width: 100%;
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
       margin-top: 10px;
+    }
+
+    .saveBtn,
+    .secondaryBtn,
+    .deleteBtn {
+      width: 100%;
       padding: 8px 12px;
       font-family: inherit;
       font-size: 12px;
       font-weight: 700;
-      color: $charcoal;
-      background: $secondaryColor;
-      border: none;
       border-radius: 6px;
       cursor: pointer;
       transition: background-color 0.12s;
 
-      &:hover { background: $secondaryColorHover; }
       &:focus-visible { outline: 2px solid $charcoal; outline-offset: 1px; }
+    }
+
+    .saveBtn {
+      color: $charcoal;
+      background: $secondaryColor;
+      border: none;
+      &:hover { background: $secondaryColorHover; }
+    }
+
+    .secondaryBtn {
+      color: $charcoal;
+      background: #ececec;
+      border: 1px solid #d3d3d3;
+      &:hover { background: $hoverColor; }
+    }
+
+    .deleteBtn {
+      color: #c0392b;
+      background: #fff;
+      border: 1px solid #e3b4ae;
+      &:hover { background: #fdecea; }
     }
 
     .message {

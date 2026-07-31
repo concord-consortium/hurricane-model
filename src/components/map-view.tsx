@@ -13,6 +13,7 @@ import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneCategoryMarker } from "./hurricane-category-marker";
 import { HurricaneTrack } from "./hurricane-track";
 import { SavedTracksLayer } from "./saved-tracks-layer";
+import { StaticTrack } from "./static-track";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
 import config from "../config";
@@ -201,6 +202,12 @@ export class MapView extends BaseComponent<IProps, IState> {
             ui.overlay === "precipitation" && <PrecipitationLayer/>
           }
           <SavedTracksLayer />
+          {
+            // While editing a single-track run, show its previous track greyed out (a ghost).
+            !multiTrack.enabled && multiTrack.singleTrackEditing && multiTrack.singleRun &&
+            multiTrack.singleRun.simulation.hurricaneTrack.length > 0 &&
+            <StaticTrack track={multiTrack.singleRun.simulation.hurricaneTrack} />
+          }
           <HurricaneTrack />
           {
             config.markLandfalls && sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>

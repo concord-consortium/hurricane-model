@@ -267,8 +267,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       });
     } else {
       if (ui.leftPanelOpen && !ui.keepPanelOpenOnRun) {
-        // Close the setup panel, then start after it finishes closing.
-        ui.setSetupMode(undefined);
+        // Close the setup panel, then start after it finishes closing. Leave the open category
+        // (setupMode) as-is so it's remembered when the panel reopens.
         ui.setLeftPanelOpen(false);
         this.delayedStart = setTimeout(() => this.start(), LEFT_PANEL_TRANSITION_SECONDS * 1000);
       } else {

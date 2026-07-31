@@ -20,20 +20,22 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
   const selectSingle = () => {
     if (!multiTrack.enabled) return;
     multiTrack.setEnabled(false);
-    // Restore the stashed Single-Track run so the same run is shown again.
-    if (multiTrack.singleTrackState) {
+    // Restore the Single-Track run (locked) so the same run is shown again.
+    if (multiTrack.singleRun) {
       multiTrack.autoCaptureSuppressed = true;
-      setInteractiveState(stores, multiTrack.singleTrackState);
+      setInteractiveState(stores, multiTrack.singleRun);
       multiTrack.autoCaptureSuppressed = false;
+      multiTrack.setSingleTrackEditing(false);
     }
   };
 
   const selectMulti = () => {
     if (multiTrack.enabled) return;
-    // Stash the current Single-Track run (if any) so it's restored on return, then clear the sim so
-    // Multi-track starts fresh with an empty, editable Run 1.
-    const hasRun = simulation.simulationFinished && simulation.hurricaneTrack.length > 0;
-    multiTrack.setSingleTrackState(hasRun ? getInteractiveState(stores) : null);
+    // Keep the current completed single run (if any) so it's restored on return, then clear the sim
+    // so Multi-track starts fresh with an empty, editable Run 1.
+    if (simulation.simulationFinished && simulation.hurricaneTrack.length > 0) {
+      multiTrack.setSingleRun(getInteractiveState(stores));
+    }
     multiTrack.autoCaptureSuppressed = true;
     simulation.restart(false);
     multiTrack.autoCaptureSuppressed = false;

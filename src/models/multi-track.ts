@@ -23,8 +23,11 @@ export class MultiTrackModel {
   // The run currently unlocked for editing (via the card's Edit button). A selected completed run
   // is otherwise locked (its setup is view-only) until Edit is pressed.
   @observable public editingRunId: string | undefined = undefined;
-  // The stashed Single-Track run, preserved across mode toggles so it reappears in single mode.
-  @observable public singleTrackState: IHurricaneInteractiveState | null = null;
+  // The current Single-Track run (captured on completion; persists across mode toggles). null while
+  // no run exists (defaults / configuring the first run).
+  @observable public singleRun: IHurricaneInteractiveState | null = null;
+  // Whether the Single-Track run is unlocked for editing (setup changeable, storm shown).
+  @observable public singleTrackEditing = false;
 
   // Transient guard so restoring/resetting a card (which replays a finished state) isn't mistaken
   // for a natural run completion by the auto-capture reaction. Not observable.
@@ -54,10 +57,15 @@ export class MultiTrackModel {
     return this.runs.find(r => r.id === this.selectedRunId);
   }
 
-  // The setup panel is locked (view-only) when a completed run is selected and not being edited.
+  // The setup is locked (view-only, storm hidden) when viewing a completed run.
   @computed public get setupLocked(): boolean {
-    const sel = this.selectedRun;
-    return this.enabled && !!sel && sel.state !== null && this.editingRunId !== sel.id;
+    if (this.enabled) {
+      // Multi-track: a completed run is selected and not being edited.
+      const sel = this.selectedRun;
+      return !!sel && sel.state !== null && this.editingRunId !== sel.id;
+    }
+    // Single-run: a completed run is showing and it's not being edited.
+    return this.singleRun !== null && !this.singleTrackEditing;
   }
 
   public runNumber(id: string): number {
@@ -122,8 +130,17 @@ export class MultiTrackModel {
     this.editingRunId = undefined;
   }
 
-  @action.bound public setSingleTrackState(state: IHurricaneInteractiveState | null) {
-    this.singleTrackState = state;
+  @action.bound public setSingleRun(state: IHurricaneInteractiveState | null) {
+    this.singleRun = state;
+  }
+
+  @action.bound public setSingleTrackEditing(editing: boolean) {
+    this.singleTrackEditing = editing;
+  }
+
+  @action.bound public deleteSingleRun() {
+    this.singleRun = null;
+    this.singleTrackEditing = false;
   }
 
   // Saves an external (Single-Track) run into the first empty slot, or a new slot if there's room.

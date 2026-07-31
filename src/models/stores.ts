@@ -22,11 +22,17 @@ export function createStores(): IStores {
   reaction(
     () => simulation.simulationFinished,
     (finished) => {
-      if (!finished || !multiTrack.enabled || multiTrack.autoCaptureSuppressed) return;
-      const selected = multiTrack.selectedRun;
-      if (!selected) return;
-      multiTrack.captureRun(selected.id, getInteractiveState(stores));
-      simulation.restart(false);
+      if (!finished || multiTrack.autoCaptureSuppressed) return;
+      if (multiTrack.enabled) {
+        const selected = multiTrack.selectedRun;
+        if (!selected) return;
+        multiTrack.captureRun(selected.id, getInteractiveState(stores));
+        simulation.restart(false);
+      } else {
+        // Single-run mode: capture the completed run and lock it (its track stays on screen).
+        multiTrack.setSingleRun(getInteractiveState(stores));
+        multiTrack.setSingleTrackEditing(false);
+      }
     }
   );
 

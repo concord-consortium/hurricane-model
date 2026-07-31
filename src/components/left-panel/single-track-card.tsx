@@ -10,18 +10,17 @@ import { IRunSetupSim, RunSummary, runCategory } from "./run-summary";
 import css from "./single-track-card.scss";
 
 /**
- * In single-run mode, once a run has completed, this card appears below the setup sections. It looks
- * like a Multi-track run card but is always editable (it mirrors the current run), and adds a
- * "Save to Multi-track" button that copies the run into the first empty Multi-track slot.
+ * In single-run mode, once a run has completed, this card appears below the setup sections. Like a
+ * Multi-track run card, its setup is locked (view-only, storm hidden) until "Edit this track" is
+ * pressed. "Save to Multi-track" copies it into the first empty Multi-track slot; "Delete" resets
+ * everything to defaults.
  */
 export const SingleTrackCard = observer(function SingleTrackCard() {
   const stores = useStores();
   const { multiTrack, simulation } = stores;
   const [message, setMessage] = useState<{ text: string; error: boolean } | null>(null);
 
-  const runComplete =
-    simulation.simulationStarted && !simulation.simulationRunning && simulation.simulationFinished;
-  if (multiTrack.enabled || !runComplete) return null;
+  if (multiTrack.enabled || !multiTrack.singleRun) return null;
 
   const sim: IRunSetupSim = {
     season: simulation.season,
@@ -31,8 +30,9 @@ export const SingleTrackCard = observer(function SingleTrackCard() {
     temperatureAnomalies: Object.fromEntries(namedRegions.map(r => [r, simulation.temperatureAnomalyAt(r)]))
   };
   const cat = runCategory(sim);
+  const editing = multiTrack.singleTrackEditing;
 
-  const handleSave = () => {
+  const handleSaveToMulti = () => {
     const runNumber = multiTrack.saveExternalRun(getInteractiveState(stores));
     if (runNumber == null) {
       setMessage({ text: "All Multi-track runs are taken — delete one to save.", error: true });
@@ -41,25 +41,62 @@ export const SingleTrackCard = observer(function SingleTrackCard() {
     }
   };
 
+  const handleEdit = () => {
+    // Unlock for editing: the storm returns to its start (draggable), the old track greys to a ghost.
+    simulation.restart(false);
+    multiTrack.setSingleTrackEditing(true);
+    setMessage(null);
+  };
+
+  const handleDelete = () => {
+    // Reset everything to defaults; the storm returns to its default place and the card goes away.
+    multiTrack.autoCaptureSuppressed = true;
+    simulation.reset();
+    multiTrack.autoCaptureSuppressed = false;
+    multiTrack.deleteSingleRun();
+    setMessage(null);
+  };
+
   return (
     <div className={css.singleTrackCard} data-test="single-track-card">
       <div className={css.card}>
         <div className={css.cardHeader}>
           <span className={css.label}>Current Run</span>
+          {editing && <span className={css.editingTag}>Editing…</span>}
         </div>
         <div className={css.catRow}>
           <span className={css.catDot} style={{ backgroundColor: cat.color }} />
           <span>{cat.label}</span>
         </div>
         <RunSummary sim={sim} />
-        <button
-          type="button"
-          className={css.saveBtn}
-          data-test="save-to-multitrack-button"
-          onClick={handleSave}
-        >
-          Save to Multi-track
-        </button>
+        <div className={css.actions}>
+          <button
+            type="button"
+            className={css.saveBtn}
+            data-test="save-to-multitrack-button"
+            onClick={handleSaveToMulti}
+          >
+            Save to Multi-track
+          </button>
+          {!editing && (
+            <button
+              type="button"
+              className={css.secondaryBtn}
+              data-test="edit-single-button"
+              onClick={handleEdit}
+            >
+              Edit this track
+            </button>
+          )}
+          <button
+            type="button"
+            className={css.deleteBtn}
+            data-test="delete-single-button"
+            onClick={handleDelete}
+          >
+            Delete
+          </button>
+        </div>
         {message && (
           <div className={clsx(css.message, { [css.error]: message.error })} data-test="save-message">
             {message.text}
