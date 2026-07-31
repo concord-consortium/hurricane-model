@@ -161,7 +161,11 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
     // Capture in locals so TS preserves narrowing inside the forEach closure.
     const lineTex = lineTexture;
     const arrowTex = arrowTexture;
-    const data = this._stores.simulation.windIncHurricane;
+    // While viewing a locked run (storm hidden), drop the storm's own displacement of the arrows —
+    // keep the base wind (which still reflects the pressure systems).
+    const data = this._stores.multiTrack.setupLocked
+      ? this._stores.simulation.windWithinBounds
+      : this._stores.simulation.windIncHurricane;
     const latLngToContainerPoint = this._stores.ui.latLngToContainerPoint;
     data.forEach((w: IWindPoint, idx: number) => {
       // Reuse Pixi arrows when possible.

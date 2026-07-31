@@ -26,7 +26,7 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
   const selectedCardRef = useRef<HTMLLIElement | null>(null);
   useEffect(() => {
     if (multiTrack.enabled && stores.ui.leftPanelOpen && selectedCardRef.current) {
-      selectedCardRef.current.scrollIntoView({ block: "nearest" });
+      selectedCardRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }, [multiTrack.enabled, multiTrack.selectedRunId, stores.ui.leftPanelOpen]);
 
