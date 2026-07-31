@@ -1,22 +1,23 @@
 @use "common" as *;
 
-// Letter label at a track's end, offset up-and-to-the-right of the ending point.
+// Letter label centered on the track's ending point (1.5x size). The -7.5px shift centers the
+// 27px badge given the marker's 12px DivIcon anchors 6px off-center.
 .trackEndLabel {
-  transform: translate(7px, -24px);
-  width: 18px;
-  height: 18px;
+  transform: translate(-7.5px, -7.5px);
+  width: 27px;
+  height: 27px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: Lato, sans-serif;
   font-weight: 800;
-  font-size: 12px;
+  font-size: 18px;
   line-height: 1;
   color: #fff;
   background: #333333;
-  border: 1.5px solid #fff;
+  border: 2px solid #fff;
   border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
   cursor: pointer;
 
   &.selected {
