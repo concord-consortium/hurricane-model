@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { getInteractiveState } from "../../models/interactive-state";
 import { namedRegions } from "../../types";
 import { useStores } from "../../stores-context";
-import { IRunSetupSim, RunSummary, runCategory } from "./run-summary";
+import { IRunSetupSim, RunSummary, runCategory, runLetter } from "./run-summary";
 
 import css from "./single-track-card.scss";
 
@@ -37,7 +37,7 @@ export const SingleTrackCard = observer(function SingleTrackCard() {
     if (runNumber == null) {
       setMessage({ text: "All Multi-track runs are taken — delete one to save.", error: true });
     } else {
-      setMessage({ text: `Saved to Multi-track as Run ${runNumber}.`, error: false });
+      setMessage({ text: `Saved to Multi-track as Run ${runLetter(runNumber - 1)}.`, error: false });
     }
   };
 

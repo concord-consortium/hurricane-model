@@ -1,0 +1,26 @@
+@use "common" as *;
+
+// Letter label at a track's end, offset up-and-to-the-right of the ending point.
+.trackEndLabel {
+  transform: translate(7px, -24px);
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Lato, sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1;
+  color: #fff;
+  background: #333333;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+
+  &.selected {
+    background: $secondaryColor;
+    color: #333333;
+  }
+}

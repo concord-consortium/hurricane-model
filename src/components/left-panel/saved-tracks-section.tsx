@@ -7,7 +7,7 @@ import { setInteractiveState } from "../../models/interactive-state";
 import { IRunSlot } from "../../models/multi-track";
 import { namedRegions } from "../../types";
 import { useStores } from "../../stores-context";
-import { IRunSetupSim, RunSummary, runCategory } from "./run-summary";
+import { IRunSetupSim, RunSummary, runCategory, runLetter } from "./run-summary";
 
 import css from "./saved-tracks-section.scss";
 
@@ -96,8 +96,8 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
               >
                 {editable && <div className={css.editableLabel}>Not run yet — editable</div>}
                 <div className={css.runCardHeader}>
-                  <span className={css.badge}>{i + 1}</span>
-                  <span className={css.runName}>Run {i + 1}</span>
+                  <span className={css.badge}>{runLetter(i)}</span>
+                  <span className={css.runName}>Run {runLetter(i)}</span>
                 </div>
                 <div className={css.catRow}>
                   <span className={css.catDot} style={{ backgroundColor: cat.color }} />
@@ -123,7 +123,7 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
                 <button
                   type="button"
                   className={css.trash}
-                  aria-label={`Delete Run ${i + 1}`}
+                  aria-label={`Delete Run ${runLetter(i)}`}
                   data-test="delete-run-button"
                   onClick={e => { e.stopPropagation(); multiTrack.deleteRun(run.id); }}
                 >

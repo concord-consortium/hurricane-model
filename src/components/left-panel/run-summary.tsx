@@ -24,6 +24,11 @@ export interface IRunSetupSim {
   temperatureAnomalies?: Partial<Record<NamedRegion, number>>;
 }
 
+// Run labels are letters A, B, C… (0-based index -> letter).
+export function runLetter(index0: number): string {
+  return String.fromCharCode(65 + index0);
+}
+
 // Saffir–Simpson colors indexed by category (TS..Cat 5), matching common.scss $cat0..$cat5.
 const CATEGORY_COLORS = ["#f2f2f2", "#ffffcc", "#ffe775", "#ffc140", "#ff8f20", "#ff6060"];
 
