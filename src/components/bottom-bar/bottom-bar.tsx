@@ -266,14 +266,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         outcome: simulation.getOutcomeData()
       });
     } else {
-      if (ui.leftPanelOpen) {
-        // Close the setup panel
+      if (ui.leftPanelOpen && !ui.keepPanelOpenOnRun) {
+        // Close the setup panel, then start after it finishes closing.
         ui.setSetupMode(undefined);
         ui.setLeftPanelOpen(false);
-
-        // Start after the panel finishes closing
         this.delayedStart = setTimeout(() => this.start(), LEFT_PANEL_TRANSITION_SECONDS * 1000);
       } else {
+        // Panel is closed, or the user opted to keep it open during the run.
         this.start();
       }
     }

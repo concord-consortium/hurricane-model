@@ -29,6 +29,10 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
   const handleSave = () => {
     if (saveDisabled) return;
     multiTrack.saveRun(getInteractiveState(stores));
+    // Reset for the next run: the storm returns to its start position (and is draggable again),
+    // the active track clears, and the just-saved run drops into the greyed pack.
+    simulation.restart(false);
+    multiTrack.selectRun(undefined);
   };
 
   // Selecting a run restores its full setup and makes it the active (colored) track.
@@ -43,9 +47,9 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
       ? "Saved ✓"
       : "Save this run";
 
-  // After saving, guide the user to the next run (there's no separate "new run" button — you just
-  // adjust the setup and press Start, and the saved run greys out on the map).
-  const showNextRunHint = alreadySaved && !multiTrack.isFull;
+  // While the user has saved runs and is between runs (no current finished run to save), guide them
+  // to the next run: there's no separate "new run" button — adjust the setup and press Start.
+  const showNextRunHint = multiTrack.savedRuns.length > 0 && !runComplete && !multiTrack.isFull;
 
   return (
     <div className={css.savedTracks} data-test="saved-tracks-section">

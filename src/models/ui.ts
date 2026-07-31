@@ -37,6 +37,9 @@ export class UIModel {
   @observable public thermometerActive = false;
   @observable public thermometerPositionSaved: LatLngExpression | null = null;
   @observable public thermometerPositionHover: LatLngExpression | null = null;
+  // User preference: keep the Storm Setup panel open when a run starts (default on). Applies to
+  // both single-run and multi-track modes.
+  @observable public keepPanelOpenOnRun = true;
 
   // These values are updated when the window size or initial bounds change.
   // They are used to update the map view when the left panel is open and closed.
@@ -154,6 +157,10 @@ export class UIModel {
 
   @action.bound public setThermometerActive(enabled: boolean) {
     this.thermometerActive = enabled;
+  }
+
+  @action.bound public setKeepPanelOpenOnRun(value: boolean) {
+    this.keepPanelOpenOnRun = value;
   }
 
   @action.bound public setThermometerPositionSaved(position: LatLngExpression) {

@@ -5,6 +5,7 @@ import clsx from "clsx";
 import React from "react";
 
 import { PressureSystemsSection } from "./pressure-systems-section";
+import { RunOptions } from "./run-options";
 import { SavedTracksSection } from "./saved-tracks-section";
 import { SeasonSection } from "./season-section";
 import { SeaSurfaceTemperaturesSection } from "./sea-surface-temperatures-section";
@@ -50,6 +51,7 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
           <SeaSurfaceTemperaturesSection />
           <PressureSystemsSection />
           <SavedTracksSection />
+          <RunOptions />
         </List>
       </div>
     </div>
