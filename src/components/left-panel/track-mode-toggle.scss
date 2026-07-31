@@ -1,0 +1,39 @@
+@use "../common" as *;
+
+.trackModeToggle {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  background-color: #fff;
+  border-bottom: 1px solid $charcoalMedium;
+
+  .toggleButton {
+    flex: 1;
+    padding: 7px 8px;
+    font-family: inherit;
+    // Matches the 12px bold convention used by the existing setup-panel controls.
+    font-size: 12px;
+    font-weight: bold;
+    color: $charcoal;
+    background-color: #ececec;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.12s, color 0.12s;
+
+    &:hover:not(.active) {
+      background-color: $hoverColor;
+    }
+
+    &.active {
+      background-color: $secondaryColor;
+      border-color: $secondaryColor;
+      color: $charcoal;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $charcoal;
+      outline-offset: 1px;
+    }
+  }
+}

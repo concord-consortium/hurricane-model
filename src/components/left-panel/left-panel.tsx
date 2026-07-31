@@ -5,10 +5,12 @@ import clsx from "clsx";
 import React from "react";
 
 import { PressureSystemsSection } from "./pressure-systems-section";
+import { SavedTracksSection } from "./saved-tracks-section";
 import { SeasonSection } from "./season-section";
 import { SeaSurfaceTemperaturesSection } from "./sea-surface-temperatures-section";
 import { StormCategorySection } from "./storm-category-section";
 import { StormLocationSection } from "./storm-location-section";
+import { TrackModeToggle } from "./track-mode-toggle";
 
 import css from "./left-panel.scss";
 
@@ -41,11 +43,13 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
             </ListSubheader>
           }
         >
+          <TrackModeToggle />
           <StormLocationSection />
           <StormCategorySection />
           <SeasonSection />
           <SeaSurfaceTemperaturesSection />
           <PressureSystemsSection />
+          <SavedTracksSection />
         </List>
       </div>
     </div>
