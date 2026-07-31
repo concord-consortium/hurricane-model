@@ -38,6 +38,10 @@ export class MultiTrackModel {
   // don't leak across — simulation.reset() alone doesn't restore hurricane.startingCategory. Not observable.
   public defaultState: IHurricaneInteractiveState | null = null;
 
+  // The live Multi-track setup (the in-progress editable card / currently selected run) stashed when
+  // leaving Multi-track, so returning restores that work instead of resetting to default. Not observable.
+  public multiWorkingState: IHurricaneInteractiveState | null = null;
+
   private nextId = 1;
 
   constructor() {
@@ -141,6 +145,10 @@ export class MultiTrackModel {
 
   public setDefaultState(state: IHurricaneInteractiveState) {
     this.defaultState = state;
+  }
+
+  public setMultiWorkingState(state: IHurricaneInteractiveState | null) {
+    this.multiWorkingState = state;
   }
 
   @action.bound public setSingleTrackEditing(editing: boolean) {

@@ -19,6 +19,9 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
 
   const selectSingle = () => {
     if (!multiTrack.enabled) return;
+    // Stash the live Multi-track setup (the in-progress editable card / selected run) so it's
+    // restored intact when we come back — the two modes keep independent state.
+    multiTrack.setMultiWorkingState(getInteractiveState(stores));
     multiTrack.setEnabled(false);
     multiTrack.autoCaptureSuppressed = true;
     if (multiTrack.singleRun) {
@@ -38,17 +41,23 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
 
   const selectMulti = () => {
     if (multiTrack.enabled) return;
-    // Keep the current completed single run (if any) so it's restored on return, then reset to the
-    // pristine default so Multi-track starts fresh — Single-track edits (Category, season, SST, …)
-    // must not leak into the new, editable Run 1.
+    // Keep the current completed single run (if any) so it's restored when returning to Single.
     if (simulation.simulationFinished && simulation.hurricaneTrack.length > 0) {
       multiTrack.setSingleRun(getInteractiveState(stores));
     }
     multiTrack.autoCaptureSuppressed = true;
-    if (multiTrack.defaultState) {
+    if (multiTrack.multiWorkingState) {
+      // Restore the Multi-track work exactly as it was left (in-progress card / selected run) — do
+      // NOT reset to default, or the user's Multi-track setup would be lost on every mode switch.
+      setInteractiveState(stores, multiTrack.multiWorkingState);
+    } else if (multiTrack.defaultState) {
+      // First time entering Multi-track: start from the pristine default so nothing leaks in from
+      // Single-track, then create the initial editable Run 1 below.
       setInteractiveState(stores, multiTrack.defaultState);
+      simulation.restart(false);
+    } else {
+      simulation.restart(false);
     }
-    simulation.restart(false);
     multiTrack.autoCaptureSuppressed = false;
     multiTrack.setEnabled(true);
     if (multiTrack.runs.length === 0) {
