@@ -70,14 +70,16 @@ export const SingleTrackCard = observer(function SingleTrackCard() {
         </div>
         <RunSummary sim={sim} />
         <div className={css.actions}>
-          <button
-            type="button"
-            className={css.saveBtn}
-            data-test="save-to-multitrack-button"
-            onClick={handleSaveToMulti}
-          >
-            Save to Multi-track
-          </button>
+          {!editing && (
+            <button
+              type="button"
+              className={css.saveBtn}
+              data-test="save-to-multitrack-button"
+              onClick={handleSaveToMulti}
+            >
+              Save to Multi-track
+            </button>
+          )}
           {!editing && (
             <button
               type="button"

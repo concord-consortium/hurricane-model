@@ -2,7 +2,8 @@ import { clsx } from "clsx";
 import React from "react";
 
 import { hurricaneCategoryInfo } from "../../constants";
-import { isStartLocationName, NamedRegion, namedRegions, Season, seasonLabels, StartLocation, startLocationNameLabels } from "../../types";
+import { resolveStartLocation } from "../../models/simulation";
+import { NamedRegion, namedRegions, Season, seasonLabels, StartLocation } from "../../types";
 import { IPressureSystemState } from "../../types/interactive-state";
 import { temperatureAnomalyRegions } from "../../utils/regions";
 
@@ -53,9 +54,9 @@ interface IProps {
  * (chips), and pressure systems (H/L chips). Category is shown in the card header.
  */
 export function RunSummary({ sim }: IProps) {
-  const location = isStartLocationName(sim.startLocation)
-    ? startLocationNameLabels[sim.startLocation]
-    : coords(sim.startLocation.lat, sim.startLocation.lng);
+  // Always show the actual lat/lon of the start position (even for a preset like "Atlantic").
+  const start = resolveStartLocation(sim.startLocation);
+  const location = coords(start.lat, start.lng);
   const season = seasonLabels[sim.season] ?? sim.season;
   const anomalies = namedRegions
     .map(r => ({ label: temperatureAnomalyRegions[r].label, v: sim.temperatureAnomalies?.[r] ?? 0 }))
