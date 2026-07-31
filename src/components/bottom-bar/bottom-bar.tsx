@@ -248,7 +248,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public toggleLeftPanel = () => {
-    if (this.stores.simulation.simulationStarted) this.restart();
+    // In single-run mode, reopening Storm Setup after a run has started means "start over", so we
+    // restart (clearing the track). In multi-track mode the finished run must survive so it can be
+    // saved from the panel, so we do NOT restart — opening the panel just reveals the completed
+    // run's settings and the Save control.
+    if (this.stores.simulation.simulationStarted && !this.stores.multiTrack.enabled) {
+      this.restart();
+    }
     this.props.toggleLeftPanelOpen();
   }
 
