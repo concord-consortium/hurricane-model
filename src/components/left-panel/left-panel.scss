@@ -21,6 +21,8 @@ $leftPanelBorderRadius: 5px;
     border-bottom-right-radius: $leftPanelBorderRadius;
     border-top-right-radius: $leftPanelBorderRadius;
     color: $charcoal;
+    display: flex;
+    flex-direction: column;
     height: 100%;
     left: -$leftPanelContainerWidth;
     pointer-events: all;
@@ -31,6 +33,15 @@ $leftPanelBorderRadius: 5px;
 
     &.open {
       left: 0;
+    }
+
+    // Scrollable middle: setup sections + saved tracks scroll, while the RunOptions footer
+    // (rendered as a sibling after this list) stays pinned to the bottom of the panel.
+    .panelList {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     .leftPanelHeader {

@@ -32,7 +32,10 @@
   .runList {
     list-style: none;
     margin: 0 0 10px;
-    padding: 0;
+    padding: 0 2px;
+    // The pack of run cards scrolls within its own bounded area instead of stretching the panel.
+    max-height: 260px;
+    overflow-y: auto;
 
     .runCard {
       padding: 6px 8px 8px;

@@ -26,6 +26,7 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
     <div className={css.leftPanelContainer}>
       <div className={panelClasses} data-test="left-panel">
         <List
+          className={css.panelList}
           aria-labelledby="left-panel-title"
           subheader={
             <ListSubheader component="div" className={css.leftPanelHeader}>
@@ -51,8 +52,8 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
           <SeaSurfaceTemperaturesSection />
           <PressureSystemsSection />
           <SavedTracksSection />
-          <RunOptions />
         </List>
+        <RunOptions />
       </div>
     </div>
   );
