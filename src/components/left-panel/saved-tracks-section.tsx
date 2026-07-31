@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { observer } from "mobx-react";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 
 import { setInteractiveState } from "../../models/interactive-state";
@@ -20,6 +20,15 @@ import css from "./saved-tracks-section.scss";
 export const SavedTracksSection = observer(function SavedTracksSection() {
   const stores = useStores();
   const { multiTrack, simulation } = stores;
+
+  // When the selection changes (e.g. from clicking a track on the map), scroll the selected run's
+  // card into view. block: "nearest" is a no-op when it's already visible.
+  const selectedCardRef = useRef<HTMLLIElement | null>(null);
+  useEffect(() => {
+    if (multiTrack.enabled && stores.ui.leftPanelOpen && selectedCardRef.current) {
+      selectedCardRef.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [multiTrack.enabled, multiTrack.selectedRunId, stores.ui.leftPanelOpen]);
 
   if (!multiTrack.enabled) return null;
 
@@ -73,7 +82,7 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
           const sim = run.state ? run.state.simulation : liveSetup;
           const cat = runCategory(sim);
           return (
-            <li key={run.id}>
+            <li key={run.id} ref={selected ? selectedCardRef : null}>
               <div
                 className={clsx(css.runCard, { [css.selected]: selected, [css.editable]: editable })}
                 role="button"
