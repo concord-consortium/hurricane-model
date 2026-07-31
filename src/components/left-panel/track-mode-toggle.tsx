@@ -17,42 +17,39 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
   const { multiTrack, simulation } = stores;
   const enabled = multiTrack.enabled;
 
+  // Each mode owns its full setup snapshot (all five categories: Storm Location, Storm Category,
+  // Season, SST Anomalies, Pressure Systems — plus any in-progress pre-run edits). Leaving a mode
+  // stashes its live snapshot; entering a mode restores that mode's snapshot (or the pristine default
+  // on the very first entry). Nothing is shared between the two modes.
+
   const selectSingle = () => {
     if (!multiTrack.enabled) return;
-    // Stash the live Multi-track setup (the in-progress editable card / selected run) so it's
-    // restored intact when we come back — the two modes keep independent state.
+    // Save Multi-track's live work, then restore Single-track's own snapshot.
     multiTrack.setMultiWorkingState(getInteractiveState(stores));
     multiTrack.setEnabled(false);
     multiTrack.autoCaptureSuppressed = true;
-    if (multiTrack.singleRun) {
-      // Restore the Single-Track run (locked) so the same run is shown again.
-      setInteractiveState(stores, multiTrack.singleRun);
+    if (multiTrack.singleWorkingState) {
+      setInteractiveState(stores, multiTrack.singleWorkingState);
     } else if (multiTrack.defaultState) {
-      // No single run: restore the pristine default so Multi-track edits (Category, season, SST, …)
-      // don't carry over. simulation.reset() alone leaves hurricane.startingCategory untouched.
       setInteractiveState(stores, multiTrack.defaultState);
       simulation.restart(false);
     } else {
       simulation.reset();
     }
     multiTrack.autoCaptureSuppressed = false;
-    multiTrack.setSingleTrackEditing(false);
+    // Restore Single-track's edit state (only meaningful once a single run exists).
+    multiTrack.setSingleTrackEditing(multiTrack.singleWorkingState ? multiTrack.singleWorkingEditing : false);
   };
 
   const selectMulti = () => {
     if (multiTrack.enabled) return;
-    // Keep the current completed single run (if any) so it's restored when returning to Single.
-    if (simulation.simulationFinished && simulation.hurricaneTrack.length > 0) {
-      multiTrack.setSingleRun(getInteractiveState(stores));
-    }
+    // Save Single-track's live work (pre-run or completed) so it's restored untouched on return.
+    multiTrack.setSingleWorkingState(getInteractiveState(stores), multiTrack.singleTrackEditing);
     multiTrack.autoCaptureSuppressed = true;
     if (multiTrack.multiWorkingState) {
-      // Restore the Multi-track work exactly as it was left (in-progress card / selected run) — do
-      // NOT reset to default, or the user's Multi-track setup would be lost on every mode switch.
       setInteractiveState(stores, multiTrack.multiWorkingState);
     } else if (multiTrack.defaultState) {
-      // First time entering Multi-track: start from the pristine default so nothing leaks in from
-      // Single-track, then create the initial editable Run 1 below.
+      // First entry into Multi-track: pristine default so nothing leaks from Single-track.
       setInteractiveState(stores, multiTrack.defaultState);
       simulation.restart(false);
     } else {

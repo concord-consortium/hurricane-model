@@ -42,6 +42,11 @@ export class MultiTrackModel {
   // leaving Multi-track, so returning restores that work instead of resetting to default. Not observable.
   public multiWorkingState: IHurricaneInteractiveState | null = null;
 
+  // The live Single-track setup (in-progress pre-run config OR a completed run) stashed when leaving
+  // Single-track, plus its editing flag, so returning restores it. Symmetric with multiWorkingState.
+  public singleWorkingState: IHurricaneInteractiveState | null = null;
+  public singleWorkingEditing = false;
+
   private nextId = 1;
 
   constructor() {
@@ -149,6 +154,11 @@ export class MultiTrackModel {
 
   public setMultiWorkingState(state: IHurricaneInteractiveState | null) {
     this.multiWorkingState = state;
+  }
+
+  public setSingleWorkingState(state: IHurricaneInteractiveState | null, editing: boolean) {
+    this.singleWorkingState = state;
+    this.singleWorkingEditing = editing;
   }
 
   @action.bound public setSingleTrackEditing(editing: boolean) {
