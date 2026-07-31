@@ -6,6 +6,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { getInteractiveState, setInteractiveState } from "../../models/interactive-state";
 import { ISavedRun, MAX_SAVED_TRACKS } from "../../models/multi-track";
 import { useStores } from "../../stores-context";
+import { RunSummary } from "./run-summary";
 
 import css from "./saved-tracks-section.scss";
 
@@ -64,26 +65,29 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
           {multiTrack.savedRuns.map((run, i) => (
             <li
               key={run.id}
-              className={clsx(css.runItem, { [css.selected]: run.id === multiTrack.selectedRunId })}
+              className={clsx(css.runCard, { [css.selected]: run.id === multiTrack.selectedRunId })}
               data-test="saved-run"
             >
-              <button
-                type="button"
-                className={css.runSelect}
-                data-test="select-run-button"
-                onClick={() => handleSelect(run)}
-              >
-                Run {i + 1}
-              </button>
-              <button
-                type="button"
-                className={css.deleteButton}
-                aria-label={`Delete Run ${i + 1}`}
-                data-test="delete-run-button"
-                onClick={() => multiTrack.deleteRun(run.id)}
-              >
-                <DeleteIcon fontSize="small" />
-              </button>
+              <div className={css.runCardHeader}>
+                <button
+                  type="button"
+                  className={css.runSelect}
+                  data-test="select-run-button"
+                  onClick={() => handleSelect(run)}
+                >
+                  Run {i + 1}
+                </button>
+                <button
+                  type="button"
+                  className={css.deleteButton}
+                  aria-label={`Delete Run ${i + 1}`}
+                  data-test="delete-run-button"
+                  onClick={() => multiTrack.deleteRun(run.id)}
+                >
+                  <DeleteIcon fontSize="small" />
+                </button>
+              </div>
+              <RunSummary state={run.state} />
             </li>
           ))}
         </ul>

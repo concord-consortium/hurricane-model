@@ -34,21 +34,23 @@
     margin: 0 0 10px;
     padding: 0;
 
-    .runItem {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 4px 6px;
-      border-radius: 4px;
-      font-size: 12px;
+    .runCard {
+      padding: 6px 8px 8px;
+      margin-bottom: 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background-color: #fff;
       color: $charcoal;
 
-      &:hover {
-        background-color: #ececec;
+      &.selected {
+        border-color: $secondaryColor;
+        background-color: $secondaryColorHover;
       }
 
-      &.selected {
-        background-color: $secondaryColorHover;
+      .runCardHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
       }
 
       .runSelect {
