@@ -29,17 +29,19 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
 
   const handleSave = () => {
     if (saveDisabled) return;
+    // saveRun keeps the new run SELECTED (it stays lit up, drawn by the map layer). The storm
+    // resets to its start position (draggable again) for the next run as the sim track clears.
     multiTrack.saveRun(getInteractiveState(stores));
-    // Reset for the next run: the storm returns to its start position (and is draggable again),
-    // the active track clears, and the just-saved run drops into the greyed pack.
     simulation.restart(false);
-    multiTrack.selectRun(undefined);
   };
 
-  // Selecting a run restores its full setup and makes it the active (colored) track.
+  // Selecting a run restores its setup (pressure systems move, panel reflects it) and lights up its
+  // track. The loaded track is cleared from the sim (it's drawn lit-up by the map layer) and the
+  // storm resets to that run's start.
   const handleSelect = (run: ISavedRun) => {
     multiTrack.restoreRun(run.id);
     setInteractiveState(stores, run.state);
+    simulation.restart(false);
   };
 
   const saveLabel = multiTrack.isFull
@@ -87,7 +89,7 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
                   <DeleteIcon fontSize="small" />
                 </button>
               </div>
-              <RunSummary state={run.state} />
+              {run.id === multiTrack.selectedRunId && <RunSummary state={run.state} />}
             </li>
           ))}
         </ul>

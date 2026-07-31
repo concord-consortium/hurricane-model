@@ -13,3 +13,19 @@
     stroke: #5f6469;
   }
 }
+
+// Selected ("lit up") saved track — category colors matching the active track.
+.selectedBorder {
+  stroke: #333333;
+}
+
+.selectedSegment {
+  cursor: pointer !important;
+
+  &.cat0 { stroke: $cat0Color; }
+  &.cat1 { stroke: $cat1Color; }
+  &.cat2 { stroke: $cat2Color; }
+  &.cat3 { stroke: $cat3Color; }
+  &.cat4 { stroke: $cat4Color; }
+  &.cat5 { stroke: $cat5Color; }
+}

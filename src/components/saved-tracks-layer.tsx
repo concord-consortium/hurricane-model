@@ -6,29 +6,33 @@ import { useStores } from "../stores-context";
 import { StaticTrack } from "./static-track";
 
 /**
- * Renders every saved run's track (greyed, clickable) on the map when in multi-track mode.
- * Clicking a saved track restores that run — its full setup (pressure systems, panel settings)
- * comes back and it becomes the active run. The currently selected run is drawn in full color by
- * the active <HurricaneTrack>, so it is skipped here to avoid a double-draw.
+ * Renders every saved run's track on the map when in multi-track mode: the selected run "lit up"
+ * in category color, the rest greyed. All are clickable — clicking one selects it (lights it up,
+ * greys the others) and restores its setup so the pressure systems and panel reflect that run.
+ * The live/in-progress run is drawn separately by <HurricaneTrack> from the simulation's own track.
  */
 export const SavedTracksLayer = observer(function SavedTracksLayer() {
   const stores = useStores();
-  const { multiTrack } = stores;
+  const { multiTrack, simulation } = stores;
   if (!multiTrack.enabled) return null;
 
   return (
     <>
       {multiTrack.savedRuns.map(run => {
-        if (run.id === multiTrack.selectedRunId) return null;
         const track = run.state.simulation.hurricaneTrack;
         if (!track || track.length === 0) return null;
         return (
           <StaticTrack
             key={run.id}
             track={track}
+            selected={run.id === multiTrack.selectedRunId}
             onClick={() => {
+              // Restore the run's setup (pressure systems move to its positions, panel reflects it),
+              // then clear the loaded track — it stays drawn (lit up) by this layer as the selected
+              // run, and the storm resets to its start position.
               multiTrack.restoreRun(run.id);
               setInteractiveState(stores, run.state);
+              simulation.restart(false);
             }}
           />
         );
