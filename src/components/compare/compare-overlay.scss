@@ -1,0 +1,220 @@
+@use "../common" as *;
+
+.overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1200;
+  width: min(560px, calc(100% - 24px));
+  max-height: calc(100% - 96px);
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid $charcoalMedium;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  font-family: Lato, arial, sans-serif;
+  color: $charcoal;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 14px;
+  border-bottom: 1px solid $hoverColor;
+  background: #fafafa;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.legend {
+  margin-left: auto;
+  font-size: 11px;
+  color: $charcoalMedium;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.diffDot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: $secondaryColor;
+}
+
+.sameWord {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 10px;
+}
+
+.close {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  color: $charcoalMedium;
+  border-radius: 4px;
+
+  &:hover { background: $hoverColor; color: $charcoal; }
+}
+
+.scroll {
+  overflow: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+
+  th, td {
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: middle;
+  }
+}
+
+// Row-label column (sticky so it stays visible while scrolling many run columns).
+.rowLabel {
+  position: sticky;
+  left: 0;
+  background: #ffffff;
+  font-weight: 600;
+  white-space: nowrap;
+  border-right: 1px solid $hoverColor;
+  z-index: 1;
+
+  .sameTag {
+    margin-left: 6px;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $charcoalMedium;
+    font-weight: 700;
+  }
+}
+
+.corner {
+  position: sticky;
+  left: 0;
+  background: #fafafa;
+  z-index: 2;
+}
+
+.groupRow th {
+  background: #f0f0f0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $charcoalMedium;
+  padding: 4px 10px;
+}
+
+// Run-column headers.
+.runHead {
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+
+  &:hover { background: #fff6e6; }
+}
+
+.selHead {
+  border-bottom-color: $secondaryColor;
+  background: #fff6e6;
+}
+
+.runBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: $charcoal;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  margin-right: 6px;
+}
+
+// Diff / same treatment.
+.dataRow td { border-top: 1px solid #f0f0f0; }
+
+.diff {
+  .rowLabel { box-shadow: inset 3px 0 0 $secondaryColor; }
+  td { background: #fffaf0; }
+}
+
+.same {
+  .rowLabel, td { color: $charcoalMedium; }
+}
+
+.plain td { color: $charcoal; }
+
+.selCell { background: #fff6e6 !important; }
+
+// Chips + values.
+.catChip {
+  display: inline-block;
+  min-width: 34px;
+  text-align: center;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 12px;
+  color: $charcoal;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.chips { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+
+.chip {
+  padding: 1px 6px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  background: $hoverColor;
+  white-space: nowrap;
+}
+
+.warm { background: #ffe0cc; }
+.cool { background: #cfe5ff; }
+.high { background: #ffe7b3; }
+.low  { background: #d7d7ff; }
+
+.mono { font-variant-numeric: tabular-nums; }
+.muted { color: $charcoalMedium; }
+
+// Lifetime bar.
+.bar {
+  display: inline-block;
+  width: 84px;
+  height: 9px;
+  border-radius: 5px;
+  background: $hoverColor;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  background: $secondaryColor;
+}
+
+.spark { display: block; }
+.noData { color: $charcoalMedium; }

@@ -19,7 +19,8 @@ import css from "./saved-tracks-section.scss";
  */
 export const SavedTracksSection = observer(function SavedTracksSection() {
   const stores = useStores();
-  const { multiTrack, simulation } = stores;
+  const { multiTrack, simulation, ui } = stores;
+  const completedCount = multiTrack.runs.filter(r => r.state).length;
 
   // When the selection changes (e.g. from clicking a track on the map), scroll the selected run's
   // card into view. block: "nearest" is a no-op when it's already visible.
@@ -73,7 +74,20 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
 
   return (
     <div className={css.savedTracks} data-test="saved-tracks-section">
-      <div className={css.heading}>Runs</div>
+      <div className={css.heading}>
+        <span>Runs</span>
+        {completedCount >= 2 && (
+          <button
+            type="button"
+            className={clsx(css.compareBtn, { [css.compareOn]: ui.compareOpen })}
+            data-test="compare-button"
+            aria-pressed={ui.compareOpen}
+            onClick={() => ui.setCompareOpen(!ui.compareOpen)}
+          >
+            {ui.compareOpen ? "Hide compare" : "Compare runs"}
+          </button>
+        )}
+      </div>
 
       <ul className={css.runList}>
         {multiTrack.runs.map((run, i) => {

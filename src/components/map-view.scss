@@ -1,6 +1,7 @@
 @use "common" as *;
 
 .mapView {
+  position: relative; // anchor for the Compare overlay (a floating card over the map)
   width: 100%;
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
 

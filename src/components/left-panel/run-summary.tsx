@@ -30,7 +30,18 @@ export function runLetter(index0: number): string {
 }
 
 // Saffir–Simpson colors indexed by category (TS..Cat 5), matching common.scss $cat0..$cat5.
-const CATEGORY_COLORS = ["#f2f2f2", "#ffffcc", "#ffe775", "#ffc140", "#ff8f20", "#ff6060"];
+export const CATEGORY_COLORS = ["#f2f2f2", "#ffffcc", "#ffe775", "#ffc140", "#ff8f20", "#ff6060"];
+
+// Chip label + color + full name for any category index (TS..Cat 5). Shared by cards and Compare.
+export function categoryChip(category: number | undefined) {
+  const idx = category != null ? Math.max(0, Math.min(5, Math.round(category))) : 0;
+  return {
+    label: idx === 0 ? "TS" : `Cat ${idx}`,
+    color: CATEGORY_COLORS[idx],
+    name: hurricaneCategoryInfo[idx]?.name,
+    index: idx
+  };
+}
 
 // Badge label + color for a run's starting category (shown in the card header).
 export function runCategory(sim: IRunSetupSim) {

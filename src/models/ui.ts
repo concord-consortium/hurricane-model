@@ -41,6 +41,9 @@ export class UIModel {
   // both single-run and multi-track modes.
   @observable public keepPanelOpenOnRun = true;
 
+  // Whether the Multi-track "Compare runs" overlay is open (a floating card on the map).
+  @observable public compareOpen = false;
+
   // These values are updated when the window size or initial bounds change.
   // They are used to update the map view when the left panel is open and closed.
   public maxBounds = this.initialBounds;
@@ -98,6 +101,10 @@ export class UIModel {
 
   @action.bound public setLeftPanelOpen(open: boolean) {
     this.leftPanelOpen = open;
+  }
+
+  @action.bound public setCompareOpen(open: boolean) {
+    this.compareOpen = open;
   }
 
   @action.bound public mapUpdated(map: Map, programmaticUpdate: boolean) {

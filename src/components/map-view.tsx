@@ -13,6 +13,7 @@ import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneCategoryMarker } from "./hurricane-category-marker";
 import { HurricaneTrack } from "./hurricane-track";
 import { SavedTracksLayer } from "./saved-tracks-layer";
+import { CompareOverlay } from "./compare/compare-overlay";
 import { StaticTrack } from "./static-track";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
@@ -294,6 +295,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           <AttributionControl position="topright" />
         </MapContainer>
+        <CompareOverlay />
       </div>
     );
   }
