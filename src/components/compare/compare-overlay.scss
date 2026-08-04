@@ -103,6 +103,7 @@
   overflow: auto;
   padding-right: 10px;
   padding-bottom: 5px;
+  padding-left: 2px; // small gutter so the orange diff-accent bar isn't jammed against the edge
 }
 
 // Wraps the table so the selected-column outline can be positioned over it.
