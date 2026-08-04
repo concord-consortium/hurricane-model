@@ -85,7 +85,7 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
           title={completedCount < 2 ? "Run at least 2 tracks to compare" : undefined}
           onClick={() => ui.setCompareOpen(!ui.compareOpen)}
         >
-          {ui.compareOpen ? "Hide compare" : "Compare runs"}
+          {ui.compareOpen ? "Hide Compare Runs" : "Show Compare Runs"}
         </button>
       </div>
 

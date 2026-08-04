@@ -171,10 +171,10 @@ export const CompareOverlay = observer(function CompareOverlay() {
       style={pos ? { left: pos.left, top: pos.top, right: "auto" } : undefined}
       data-test="compare-overlay"
       role="region"
-      aria-label="Compare runs"
+      aria-label="Compare Runs"
     >
       <header className={css.header} onPointerDown={onHeaderPointerDown}>
-        <span className={css.title}>Compare runs</span>
+        <span className={css.title}>Compare Runs</span>
         {collapsed
           ? <span className={css.legend}>{data.length} run{data.length === 1 ? "" : "s"}</span>
           : <span className={css.legend}><span className={css.diffDot} /> differs · <span className={css.sameWord}>same</span> unchanged</span>}
