@@ -138,24 +138,6 @@
     }
 
     // Category listed below the run name.
-    .catRow {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 6px;
-      font-weight: 800;
-      font-size: 11.5px;
-      color: $charcoal;
-    }
-
-    .catIcon {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-      // The swirl SVG fills with currentColor; the .categoryN class (from hurricane-category.scss)
-      // sets that color per category, matching the Storm Category section icon.
-    }
-
     .cardActions {
       display: flex;
       justify-content: flex-end;

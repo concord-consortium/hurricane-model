@@ -34,24 +34,6 @@
       }
     }
 
-    .catRow {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 6px;
-      font-weight: 800;
-      font-size: 11.5px;
-      color: $charcoal;
-
-      .catDot {
-        width: 13px;
-        height: 13px;
-        border-radius: 50%;
-        border: 1.5px solid rgba(0, 0, 0, 0.35);
-        flex-shrink: 0;
-      }
-    }
-
     .actions {
       display: flex;
       flex-direction: column;

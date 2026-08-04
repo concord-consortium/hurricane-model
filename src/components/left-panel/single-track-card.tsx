@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { getInteractiveState } from "../../models/interactive-state";
 import { namedRegions } from "../../types";
 import { useStores } from "../../stores-context";
-import { IRunSetupSim, RunSummary, runCategory, runLetter } from "./run-summary";
+import { IRunSetupSim, RunSummary, runLetter } from "./run-summary";
 
 import css from "./single-track-card.scss";
 
@@ -29,7 +29,6 @@ export const SingleTrackCard = observer(function SingleTrackCard() {
     pressureSystems: simulation.pressureSystems.map(ps => ps.serialize()),
     temperatureAnomalies: Object.fromEntries(namedRegions.map(r => [r, simulation.temperatureAnomalyAt(r)]))
   };
-  const cat = runCategory(sim);
   const editing = multiTrack.singleTrackEditing;
 
   const handleSaveToMulti = () => {
@@ -63,10 +62,6 @@ export const SingleTrackCard = observer(function SingleTrackCard() {
         <div className={css.cardHeader}>
           <span className={css.label}>Current Run</span>
           {editing && <span className={css.editingTag}>Editing…</span>}
-        </div>
-        <div className={css.catRow}>
-          <span className={css.catDot} style={{ backgroundColor: cat.color }} />
-          <span>{cat.label}</span>
         </div>
         <RunSummary sim={sim} />
         <div className={css.actions}>

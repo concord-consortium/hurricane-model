@@ -21,6 +21,11 @@
     flex-shrink: 0;
   }
 
+  // Keep the storm category prominent (its headline attribute) among the summary rows.
+  .catText {
+    font-weight: 800;
+  }
+
   .chips {
     display: flex;
     flex-wrap: wrap;

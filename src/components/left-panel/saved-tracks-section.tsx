@@ -7,11 +7,8 @@ import { setInteractiveState } from "../../models/interactive-state";
 import { IRunSlot } from "../../models/multi-track";
 import { namedRegions } from "../../types";
 import { useStores } from "../../stores-context";
-import { IRunSetupSim, RunSummary, categoryChip, runLetter } from "./run-summary";
+import { IRunSetupSim, RunSummary, runLetter } from "./run-summary";
 
-import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
-
-import categoryCss from "../hurricane-category.scss";
 import css from "./saved-tracks-section.scss";
 
 /**
@@ -97,7 +94,6 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
           const selected = run.id === multiTrack.selectedRunId;
           const editable = run.state === null;
           const sim = run.state ? run.state.simulation : liveSetup;
-          const cat = categoryChip(sim.hurricane.startingCategory);
           return (
             <li key={run.id} ref={selected ? selectedCardRef : null}>
               <div
@@ -115,10 +111,6 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
                 <div className={css.runCardHeader}>
                   <span className={css.badge}>{runLetter(i)}</span>
                   <span className={css.runName}>Run {runLetter(i)}</span>
-                </div>
-                <div className={css.catRow}>
-                  <HurricaneIcon className={clsx(css.catIcon, categoryCss["category" + cat.index])} />
-                  <span className={css.catLabel}>{cat.label}</span>
                 </div>
                 <RunSummary sim={sim} />
                 {run.state && (

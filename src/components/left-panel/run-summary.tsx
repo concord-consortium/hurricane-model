@@ -8,10 +8,12 @@ import { IPressureSystemState } from "../../types/interactive-state";
 import { temperatureAnomalyRegions } from "../../utils/regions";
 
 import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
+import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
 import SeasonIcon from "../../assets/left-panel/season.svg";
 import ThermometerIcon from "../../assets/left-panel/thermometer.svg";
 import PressureSystemIcon from "../../assets/left-panel/pressure-system.svg";
 
+import categoryCss from "../hurricane-category.scss";
 import css from "./run-summary.scss";
 
 // The subset of a run's setup that a card summarizes. Satisfied by a captured run's
@@ -73,6 +75,7 @@ export function RunSummary({ sim }: IProps) {
   // Always show the actual lat/lon of the start position (even for a preset like "Atlantic").
   const start = resolveStartLocation(sim.startLocation);
   const location = coords(start.lat, start.lng);
+  const cat = categoryChip(sim.hurricane.startingCategory);
   const season = seasonLabels[sim.season] ?? sim.season;
   const anomalies = namedRegions
     .map(r => ({ label: temperatureAnomalyRegions[r].label, v: sim.temperatureAnomalies?.[r] ?? 0 }))
@@ -82,6 +85,10 @@ export function RunSummary({ sim }: IProps) {
   return (
     <div className={css.runSummary}>
       <div className={css.row}><StormLocationIcon className={css.icon} /><span>{location}</span></div>
+      <div className={css.row}>
+        <HurricaneIcon className={clsx(css.icon, categoryCss["category" + cat.index])} />
+        <span className={css.catText}>{cat.label}</span>
+      </div>
       <div className={css.row}><SeasonIcon className={css.icon} /><span>{season}</span></div>
       <div className={css.row}>
         <ThermometerIcon className={css.icon} />
