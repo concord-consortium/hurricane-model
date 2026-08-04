@@ -17,9 +17,10 @@ import css from "./compare-overlay.scss";
 // Simpson fills are too pale to read as a thin line for TS/Cat 1).
 const SPARK_STROKE = ["#9a9a9a", "#c9a400", "#e0a020", "#d97a1e", "#c85a10", "#e03b3b"];
 
-// A category sparkline for one run: the storm's category (0..5) at each track point.
-function Sparkline({ series, color }: { series: number[]; color: string }) {
-  const w = 76, h = 22, pad = 2;
+// A category sparkline for one run: the storm's category (0..5) at each track point. Its width is
+// passed in so it can match the orange Lifetime bar for the same run.
+function Sparkline({ series, color, widthPx }: { series: number[]; color: string; widthPx: number }) {
+  const w = Math.max(8, widthPx), h = 22, pad = 2;
   if (series.length === 0) return <span className={css.noData}>—</span>;
   const n = series.length;
   const x = (i: number) => n <= 1 ? w / 2 : pad + (i / (n - 1)) * (w - 2 * pad);
@@ -130,6 +131,8 @@ export const CompareOverlay = observer(function CompareOverlay() {
   });
 
   const maxDuration = Math.max(1, ...data.map(d => d.duration));
+  const LIFE_W = 84; // full Lifetime bar width (matches .bar in the scss); sparklines share this scale
+  const lifeWidth = (d: { duration: number }) => (d.duration / maxDuration) * LIFE_W;
   const differs = (vals: string[]) => new Set(vals).size > 1;
 
   const selectRun = (id: string, state: IHurricaneInteractiveState) => {
@@ -247,7 +250,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
               {data.map(d => (
                 <td key={d.id} className={css.runCell} onClick={() => selectColumn(d.id)}>
                   <Sparkline series={intensitySeries(multiTrack.runs.find(r => r.id === d.id)!.state!.simulation)}
-                    color={SPARK_STROKE[categoryChip(d.peak).index]} />
+                    color={SPARK_STROKE[categoryChip(d.peak).index]} widthPx={lifeWidth(d)} />
                 </td>
               ))}
             </tr>
