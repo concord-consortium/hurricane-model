@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { observer } from "mobx-react";
-import React from "react";
+import React, { useRef, useState } from "react";
 
 import { setInteractiveState } from "../../models/interactive-state";
 import { namedRegions, seasonLabels } from "../../types";
@@ -50,6 +50,37 @@ function CatChip({ category }: { category: number | undefined }) {
 export const CompareOverlay = observer(function CompareOverlay() {
   const stores = useStores();
   const { multiTrack, simulation, ui } = stores;
+
+  // Hooks must run before any early return.
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
+
+  // Drag the card by its header. Position is kept relative to the map wrapper (the offsetParent)
+  // and clamped so it can't be dragged off the map. offsetWidth is read live so the clamp respects
+  // the card's current (auto-expanded) width.
+  const onHeaderPointerDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest("button")) return; // let header buttons work
+    const el = overlayRef.current;
+    const parent = el?.offsetParent as HTMLElement | null;
+    if (!el || !parent) return;
+    const prect = parent.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    const offX = e.clientX - rect.left;
+    const offY = e.clientY - rect.top;
+    const move = (ev: PointerEvent) => {
+      const left = Math.max(0, Math.min(prect.width - el.offsetWidth, ev.clientX - prect.left - offX));
+      const top = Math.max(0, Math.min(prect.height - el.offsetHeight, ev.clientY - prect.top - offY));
+      setPos({ left, top });
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    e.preventDefault();
+  };
 
   if (!multiTrack.enabled || !ui.compareOpen) return null;
 
@@ -109,17 +140,31 @@ export const CompareOverlay = observer(function CompareOverlay() {
   };
 
   return (
-    <div className={css.overlay} data-test="compare-overlay" role="region" aria-label="Compare runs">
-      <header className={css.header}>
+    <div
+      ref={overlayRef}
+      className={clsx(css.overlay, { [css.collapsed]: collapsed })}
+      style={pos ? { left: pos.left, top: pos.top, right: "auto" } : undefined}
+      data-test="compare-overlay"
+      role="region"
+      aria-label="Compare runs"
+    >
+      <header className={css.header} onPointerDown={onHeaderPointerDown}>
         <span className={css.title}>Compare runs</span>
-        <span className={css.legend}><span className={css.diffDot} /> differs · <span className={css.sameWord}>same</span> unchanged</span>
-        <button type="button" className={css.close} data-test="compare-close"
+        {collapsed
+          ? <span className={css.legend}>{data.length} run{data.length === 1 ? "" : "s"}</span>
+          : <span className={css.legend}><span className={css.diffDot} /> differs · <span className={css.sameWord}>same</span> unchanged</span>}
+        <button type="button" className={css.iconBtn} data-test="compare-collapse"
+          aria-label={collapsed ? "Expand compare" : "Collapse compare"} aria-expanded={!collapsed}
+          onClick={() => setCollapsed(c => !c)}>
+          <span className={clsx(css.chevron, { [css.chevronUp]: !collapsed })}>⌃</span>
+        </button>
+        <button type="button" className={css.iconBtn} data-test="compare-close"
           aria-label="Close compare" onClick={() => ui.setCompareOpen(false)}>
           ×
         </button>
       </header>
 
-      <div className={css.scroll}>
+      {!collapsed && <div className={css.scroll}>
         <table className={css.table}>
           <thead>
             <tr>
@@ -180,7 +225,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
             </tr>
           </tbody>
         </table>
-      </div>
+      </div>}
     </div>
   );
 });
