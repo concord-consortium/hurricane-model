@@ -45,6 +45,17 @@ export function intensitySeries(sim: ISimulationState, max = 40): number[] {
   return out;
 }
 
+// A short plain-English takeaway synthesizing a run's outcome (peak strength + landfall).
+export function runTakeaway(sim: ISimulationState): string {
+  const peak = peakCategory(sim);
+  const lf = landfallSummary(sim);
+  const peakPart = peak === 0 ? "Tropical storm" : `Cat ${peak}`;
+  const lfPart = lf.count === 0
+    ? "stayed offshore"
+    : `made landfall as ${lf.peakCategory <= 0 ? "a tropical storm" : `Cat ${lf.peakCategory}`}`;
+  return `${peakPart}, ${lfPart}`;
+}
+
 // Stable signature of the pressure-system configuration, for detecting whether two runs differ.
 export function pressureSignature(sim: ISimulationState): string {
   return (sim.pressureSystems || [])

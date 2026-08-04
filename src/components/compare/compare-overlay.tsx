@@ -7,7 +7,7 @@ import { namedRegions, seasonLabels } from "../../types";
 import { IHurricaneInteractiveState } from "../../types/interactive-state";
 import { useStores } from "../../stores-context";
 import { temperatureAnomalyRegions } from "../../utils/regions";
-import { durationSteps, intensitySeries, landfallSummary, peakCategory, pressureSignature } from "../../utils/run-outcomes";
+import { durationSteps, intensitySeries, landfallSummary, peakCategory, pressureSignature, runTakeaway } from "../../utils/run-outcomes";
 import { resolveStartLocation } from "../../models/simulation";
 import { categoryChip, runLetter } from "../left-panel/run-summary";
 
@@ -125,7 +125,8 @@ export const CompareOverlay = observer(function CompareOverlay() {
       peak: peakCategory(sim),
       landfall,
       landfallText: landfall.count === 0 ? "None" : `${landfall.count}×, ${categoryChip(landfall.peakCategory).label}`,
-      duration: durationSteps(sim)
+      duration: durationSteps(sim),
+      takeaway: runTakeaway(sim)
     };
   });
 
@@ -251,6 +252,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
                 </td>
               ))}
             </tr>
+            {Row("Takeaway", data.map(d => d.takeaway), i => <span className={css.takeaway}>{data[i].takeaway}</span>)}
           </tbody>
         </table>
         </div>
