@@ -27,9 +27,14 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
 
   const { ui, simulation, multiTrack } = stores;
   const { hurricane, simulationStarted } = simulation;
-  const draggable = ui.setupMode === "stormLocation" && !simulationStarted && !multiTrack.setupLocked;
+  // Draggable whenever the setup is editable — no need to open Storm Location first; dragging the
+  // storm opens that section for you (below).
+  const draggable = !simulationStarted && !multiTrack.setupLocked;
 
   const handleDrag = (e: Leaflet.LeafletEvent) => {
+    // Reveal the Storm Location section as soon as the storm is being moved (no map reflow — only
+    // opening the panel changes the map, which we defer to drag end).
+    if (ui.setupMode !== "stormLocation") ui.setSetupMode("stormLocation");
     const { hurricane, pressureSystems } = stores.simulation;
     const marker = e.target as Leaflet.Marker;
     const raw = marker.getLatLng();
@@ -44,6 +49,9 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
     const { lat, lng } = (e.target as Leaflet.Marker).getLatLng();
     const startLocation = { lat, lng };
     stores.simulation.setStartLocation(startLocation);
+    // Make sure the Storm Location section is visible in the setup panel.
+    ui.setLeftPanelOpen(true);
+    ui.setSetupMode("stormLocation");
     log("StartLocationChanged", { startLocation });
   }
 
@@ -82,7 +90,9 @@ export const HurricaneIcon = observer(function HurricaneIcon() {
 
   const { hurricaneImage, mapZoom, setupMode } = stores.ui;
   const dimmed = !!setupMode && !(setupMode === "stormLocation" || setupMode === "stormCategory");
-  const draggable = setupMode === "stormLocation";
+  // Show the grab affordance whenever the storm can actually be moved (editable), not only when the
+  // Storm Location section happens to be open.
+  const draggable = !stores.simulation.simulationStarted && !stores.multiTrack.setupLocked;
 
   const { lat, lng } = hurricane.center;
   const latL = getDirectionLetter(lat, "lat");
