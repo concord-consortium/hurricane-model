@@ -9,7 +9,7 @@ import { useStores } from "../../stores-context";
 import { temperatureAnomalyRegions } from "../../utils/regions";
 import { durationSteps, intensitySeries, landfallSummary, peakCategory, pressureSignature } from "../../utils/run-outcomes";
 import { resolveStartLocation } from "../../models/simulation";
-import { categoryChip, runLetter } from "../left-panel/run-summary";
+import { CATEGORY_COLORS, categoryChip, runLetter } from "../left-panel/run-summary";
 
 import css from "./compare-overlay.scss";
 
@@ -17,20 +17,35 @@ import css from "./compare-overlay.scss";
 // Simpson fills are too pale to read as a thin line for TS/Cat 1).
 const SPARK_STROKE = ["#9a9a9a", "#c9a400", "#e0a020", "#d97a1e", "#c85a10", "#e03b3b"];
 
-// A category sparkline for one run: the storm's category (0..5) at each track point. Its width is
-// passed in so it can match the orange Lifetime bar for the same run.
-function Sparkline({ series, color, widthPx }: { series: number[]; color: string; widthPx: number }) {
+// A category sparkline for one run: the storm's category (0..5) at each track point. The line and
+// the fill beneath it are colored by category over time (a gradient with a stop per point), so the
+// color shifts as the storm strengthens/weakens. Width matches the run's Lifetime bar (widthPx).
+function Sparkline({ series, uid, widthPx }: { series: number[]; uid: string; widthPx: number }) {
   const w = Math.max(8, widthPx), h = 22, pad = 2;
   if (series.length === 0) return <span className={css.noData}>—</span>;
   const n = series.length;
   const x = (i: number) => n <= 1 ? w / 2 : pad + (i / (n - 1)) * (w - 2 * pad);
   const y = (c: number) => h - pad - (c / 5) * (h - 2 * pad);
+  const ci = (c: number) => Math.max(0, Math.min(5, Math.round(c)));
   const pts = series.map((c, i) => `${x(i).toFixed(1)},${y(c).toFixed(1)}`).join(" ");
   const area = `${pad},${h - pad} ${pts} ${(w - pad)},${h - pad}`;
+  const strokeId = `spk-s-${uid}`, fillId = `spk-f-${uid}`;
+  // userSpaceOnUse so the stroke and fill gradients share the same x-mapping (offset i/(n-1) == x(i)).
+  const grad = (id: string, palette: string[]) => (
+    <linearGradient id={id} gradientUnits="userSpaceOnUse" x1={pad} y1="0" x2={w - pad} y2="0">
+      {series.map((c, i) => (
+        <stop key={i} offset={n <= 1 ? 0 : i / (n - 1)} stopColor={palette[ci(c)]} />
+      ))}
+    </linearGradient>
+  );
   return (
     <svg className={css.spark} width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
-      <polygon points={area} fill={color} opacity={0.18} />
-      <polyline points={pts} fill="none" stroke={color} strokeWidth={1.75}
+      <defs>
+        {grad(strokeId, SPARK_STROKE)}
+        {grad(fillId, CATEGORY_COLORS)}
+      </defs>
+      <polygon points={area} fill={`url(#${fillId})`} opacity={0.5} />
+      <polyline points={pts} fill="none" stroke={`url(#${strokeId})`} strokeWidth={1.75}
         strokeLinejoin="round" strokeLinecap="round" />
     </svg>
   );
@@ -250,7 +265,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
               {data.map(d => (
                 <td key={d.id} className={css.runCell} onClick={() => selectColumn(d.id)}>
                   <Sparkline series={intensitySeries(multiTrack.runs.find(r => r.id === d.id)!.state!.simulation)}
-                    color={SPARK_STROKE[categoryChip(d.peak).index]} widthPx={lifeWidth(d)} />
+                    uid={d.id} widthPx={lifeWidth(d)} />
                 </td>
               ))}
             </tr>
