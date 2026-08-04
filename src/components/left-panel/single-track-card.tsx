@@ -82,7 +82,7 @@ export const SingleTrackCard = observer(function SingleTrackCard() {
               data-test="edit-single-button"
               onClick={handleEdit}
             >
-              Edit this track
+              Restart (edit setup)
             </button>
           )}
           <button

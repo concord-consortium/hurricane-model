@@ -135,7 +135,7 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
                         data-test="edit-run-button"
                         onClick={e => { e.stopPropagation(); handleEdit(run); }}
                       >
-                        Edit
+                        Restart (edit setup)
                       </button>
                     )}
                   </div>
