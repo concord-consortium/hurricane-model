@@ -165,11 +165,18 @@
     }
 
     .resultPlaceholder {
+      // Same footprint as the real RunThumbnail (width + 100/78 aspect).
+      width: 100%;
+      aspect-ratio: 100 / 78;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
       font-size: 10px;
       color: $charcoalMedium;
       border: 1px dashed rgba(0, 0, 0, 0.22);
       border-radius: 4px;
-      padding: 10px 6px;
       text-align: center;
     }
 
