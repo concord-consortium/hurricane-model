@@ -181,6 +181,13 @@
 // Give each run column a comfortable width so the card visibly widens as runs are added.
 .runHead, .dataRow td { min-width: 92px; }
 
+// Every run cell selects its column on click.
+.runCell {
+  cursor: pointer;
+
+  &:hover { background: #fff6e6; }
+}
+
 // Selected run header: the badge goes solid orange as an extra cue; the column outline does the rest.
 .selHead .runBadge {
   background: $secondaryColor;

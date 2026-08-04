@@ -140,6 +140,12 @@ export const CompareOverlay = observer(function CompareOverlay() {
     multiTrack.autoCaptureSuppressed = false;
   };
 
+  // Clicking any cell in a column selects that run (not just the header).
+  const selectColumn = (id: string) => {
+    const state = multiTrack.runs.find(r => r.id === id)?.state;
+    if (state) selectRun(id, state);
+  };
+
   // A diff-aware data row: `cmp` drives same/diff detection, `render` draws each run's cell.
   const Row = (label: string, cmp: string[], render: (i: number) => React.ReactNode) => {
     const diff = differs(cmp);
@@ -150,7 +156,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
           {!diff && <span className={css.sameTag}>same</span>}
         </th>
         {data.map((d, i) => (
-          <td key={d.id}>
+          <td key={d.id} className={css.runCell} onClick={() => selectColumn(d.id)}>
             {render(i)}
           </td>
         ))}
@@ -194,7 +200,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
                 <th key={d.id}
                   className={clsx(css.runHead, { [css.selHead]: d.id === multiTrack.selectedRunId })}
                   data-selhead={d.id === multiTrack.selectedRunId ? "1" : undefined}
-                  onClick={() => selectRun(d.id, multiTrack.runs.find(r => r.id === d.id)!.state!)}
+                  onClick={() => selectColumn(d.id)}
                   title="Select this run on the map">
                   <span className={css.runBadge}>{d.letter}</span>
                   <CatChip category={d.startCat} />
@@ -230,7 +236,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
             <tr className={clsx(css.dataRow, css.plain)}>
               <th scope="row" className={css.rowLabel}><span>Lifetime</span></th>
               {data.map(d => (
-                <td key={d.id}>
+                <td key={d.id} className={css.runCell} onClick={() => selectColumn(d.id)}>
                   <span className={css.bar}><span className={css.barFill}
                     style={{ width: `${Math.round((d.duration / maxDuration) * 100)}%` }} /></span>
                 </td>
@@ -239,7 +245,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
             <tr className={clsx(css.dataRow, css.plain)}>
               <th scope="row" className={css.rowLabel}><span>Intensity over time</span></th>
               {data.map(d => (
-                <td key={d.id}>
+                <td key={d.id} className={css.runCell} onClick={() => selectColumn(d.id)}>
                   <Sparkline series={intensitySeries(multiTrack.runs.find(r => r.id === d.id)!.state!.simulation)}
                     color={SPARK_STROKE[categoryChip(d.peak).index]} />
                 </td>
