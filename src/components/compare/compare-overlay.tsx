@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { observer } from "mobx-react";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { setInteractiveState } from "../../models/interactive-state";
 import { namedRegions, seasonLabels } from "../../types";
@@ -53,8 +53,27 @@ export const CompareOverlay = observer(function CompareOverlay() {
 
   // Hooks must run before any early return.
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [colBox, setColBox] = useState<{ left: number; width: number } | null>(null);
+  const completedCount = multiTrack.runs.filter(r => r.state).length;
+
+  // Outline the whole selected column with one positioned box (rather than tinting every cell, which
+  // reads as disconnected — and a per-cell border would break at the full-width group rows).
+  const measureCol = useCallback(() => {
+    const wrap = wrapRef.current;
+    const sel = wrap?.querySelector<HTMLElement>("[data-selhead='1']");
+    if (!wrap || !sel) { setColBox(null); return; }
+    const wr = wrap.getBoundingClientRect();
+    const sr = sel.getBoundingClientRect();
+    setColBox({ left: sr.left - wr.left, width: sr.width });
+  }, []);
+  useLayoutEffect(measureCol, [measureCol, multiTrack.selectedRunId, completedCount, collapsed, ui.compareOpen]);
+  useEffect(() => {
+    window.addEventListener("resize", measureCol);
+    return () => window.removeEventListener("resize", measureCol);
+  }, [measureCol]);
 
   // Drag the card by its header. Position is kept relative to the map wrapper (the offsetParent)
   // and clamped so it can't be dragged off the map. offsetWidth is read live so the clamp respects
@@ -131,7 +150,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
           {!diff && <span className={css.sameTag}>same</span>}
         </th>
         {data.map((d, i) => (
-          <td key={d.id} className={clsx({ [css.selCell]: d.id === multiTrack.selectedRunId })}>
+          <td key={d.id}>
             {render(i)}
           </td>
         ))}
@@ -165,6 +184,8 @@ export const CompareOverlay = observer(function CompareOverlay() {
       </header>
 
       {!collapsed && <div className={css.scroll}>
+        <div className={css.tableWrap} ref={wrapRef}>
+        {colBox && <div className={css.colOutline} style={{ left: colBox.left, width: colBox.width }} aria-hidden="true" />}
         <table className={css.table}>
           <thead>
             <tr>
@@ -172,6 +193,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
               {data.map(d => (
                 <th key={d.id}
                   className={clsx(css.runHead, { [css.selHead]: d.id === multiTrack.selectedRunId })}
+                  data-selhead={d.id === multiTrack.selectedRunId ? "1" : undefined}
                   onClick={() => selectRun(d.id, multiTrack.runs.find(r => r.id === d.id)!.state!)}
                   title="Select this run on the map">
                   <span className={css.runBadge}>{d.letter}</span>
@@ -208,7 +230,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
             <tr className={clsx(css.dataRow, css.plain)}>
               <th scope="row" className={css.rowLabel}><span>Lifetime</span></th>
               {data.map(d => (
-                <td key={d.id} className={clsx({ [css.selCell]: d.id === multiTrack.selectedRunId })}>
+                <td key={d.id}>
                   <span className={css.bar}><span className={css.barFill}
                     style={{ width: `${Math.round((d.duration / maxDuration) * 100)}%` }} /></span>
                 </td>
@@ -217,7 +239,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
             <tr className={clsx(css.dataRow, css.plain)}>
               <th scope="row" className={css.rowLabel}><span>Intensity over time</span></th>
               {data.map(d => (
-                <td key={d.id} className={clsx({ [css.selCell]: d.id === multiTrack.selectedRunId })}>
+                <td key={d.id}>
                   <Sparkline series={intensitySeries(multiTrack.runs.find(r => r.id === d.id)!.state!.simulation)}
                     color={SPARK_STROKE[categoryChip(d.peak).index]} />
                 </td>
@@ -225,6 +247,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
             </tr>
           </tbody>
         </table>
+        </div>
       </div>}
     </div>
   );

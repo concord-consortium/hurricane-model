@@ -103,6 +103,24 @@
   overflow: auto;
 }
 
+// Wraps the table so the selected-column outline can be positioned over it.
+.tableWrap {
+  position: relative;
+  width: max-content;
+}
+
+// One box outlining the whole selected column (instead of tinting each cell).
+.colOutline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border: 2px solid $secondaryColor;
+  border-radius: 6px;
+  background: rgba(255, 153, 0, 0.07);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .table {
   border-collapse: collapse;
   width: 100%;
@@ -164,9 +182,10 @@
 // Give each run column a comfortable width so the card visibly widens as runs are added.
 .runHead, .dataRow td { min-width: 92px; }
 
-.selHead {
-  border-bottom-color: $secondaryColor;
-  background: #fff6e6;
+// Selected run header: the badge goes solid orange as an extra cue; the column outline does the rest.
+.selHead .runBadge {
+  background: $secondaryColor;
+  color: $charcoal;
 }
 
 .runBadge {
@@ -196,8 +215,6 @@
 }
 
 .plain td { color: $charcoal; }
-
-.selCell { background: #fff6e6 !important; }
 
 // Chips + values.
 .catChip {
