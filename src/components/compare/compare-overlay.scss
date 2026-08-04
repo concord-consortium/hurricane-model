@@ -193,7 +193,7 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  border-radius: 50%;
+  border-radius: 5px; // rounded rectangle, matching the run-thumbnail badge (was a circle)
   background: $charcoal;
   color: #ffffff;
   font-weight: 700;

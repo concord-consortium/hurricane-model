@@ -16,7 +16,7 @@
   color: #fff;
   background: #333333;
   border: 2px solid #fff;
-  border-radius: 50%;
+  border-radius: 5px; // rounded rectangle, matching the run-thumbnail badge (was a circle)
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
   cursor: pointer;
 
