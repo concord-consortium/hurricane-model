@@ -141,14 +141,18 @@ $overflowHeight: 11px;
   }
 
   .stormSetupButton {
-    font-size: 12px;
+    // Match the other bottom-bar labels (14px); the "Storm Setup" / "and Runs" break keeps it to
+    // two tight lines.
+    font-size: 14px;
+    line-height: 1.1;
     min-width: 104px;
 
-    // Smaller icon so the longer "Storm Setup and Runs" label has room.
+    // Smaller icon, moved up, so the two-line label fits within the bar height.
     svg {
       height: 22px;
       width: 22px;
       border-radius: 11px;
+      margin: 2px auto 0 auto;
     }
 
     &:hover {
