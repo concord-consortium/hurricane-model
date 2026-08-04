@@ -142,7 +142,14 @@ $overflowHeight: 11px;
 
   .stormSetupButton {
     font-size: 12px;
-    min-width: 84px;
+    min-width: 104px;
+
+    // Smaller icon so the longer "Storm Setup and Runs" label has room.
+    svg {
+      height: 22px;
+      width: 22px;
+      border-radius: 11px;
+    }
 
     &:hover {
       background-color: $secondaryColorHover;

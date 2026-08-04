@@ -6,6 +6,7 @@ import { observer } from "mobx-react";
 import React from "react";
 
 import { useStores } from "../../stores-context";
+import SetupIcon from "../../assets/bottom-bar/setup-icon.svg";
 import { PressureSystemsSection } from "./pressure-systems-section";
 import { RunOptions } from "./run-options";
 import { SavedTracksSection } from "./saved-tracks-section";
@@ -37,7 +38,8 @@ export const LeftPanel = observer(function LeftPanel({ open, toggleOpen }: ILeft
           subheader={
             <ListSubheader component="div" className={css.leftPanelHeader}>
               <div id="left-panel-title" className={css.leftPanelTitle}>
-                Storm Setup
+                <SetupIcon className={css.titleIcon} />
+                Storm Setup and Runs
               </div>
               <button
                 type="button"

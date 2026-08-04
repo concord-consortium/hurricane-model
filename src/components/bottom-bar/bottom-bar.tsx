@@ -120,7 +120,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
                 data-test="storm-setup-button"
                 disableRipple={true}
               >
-                <span><SetupIcon/>Storm Setup</span>
+                <span><SetupIcon/>Storm Setup and Runs</span>
               </Button>
             </div>
           }

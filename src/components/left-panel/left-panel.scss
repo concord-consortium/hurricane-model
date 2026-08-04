@@ -63,6 +63,15 @@ $leftPanelBorderRadius: 5px;
 
       .leftPanelTitle {
         font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .titleIcon {
+          width: 18px;
+          height: 18px;
+          flex-shrink: 0;
+        }
       }
 
       .leftPanelCloseButton {
