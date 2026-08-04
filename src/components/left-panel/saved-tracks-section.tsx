@@ -76,17 +76,17 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
     <div className={css.savedTracks} data-test="saved-tracks-section">
       <div className={css.heading}>
         <span>Runs</span>
-        {completedCount >= 2 && (
-          <button
-            type="button"
-            className={clsx(css.compareBtn, { [css.compareOn]: ui.compareOpen })}
-            data-test="compare-button"
-            aria-pressed={ui.compareOpen}
-            onClick={() => ui.setCompareOpen(!ui.compareOpen)}
-          >
-            {ui.compareOpen ? "Hide compare" : "Compare runs"}
-          </button>
-        )}
+        <button
+          type="button"
+          className={clsx(css.compareBtn, { [css.compareOn]: ui.compareOpen })}
+          data-test="compare-button"
+          aria-pressed={ui.compareOpen}
+          disabled={completedCount < 2}
+          title={completedCount < 2 ? "Run at least 2 tracks to compare" : undefined}
+          onClick={() => ui.setCompareOpen(!ui.compareOpen)}
+        >
+          {ui.compareOpen ? "Hide compare" : "Compare runs"}
+        </button>
       </div>
 
       <ul className={css.runList}>

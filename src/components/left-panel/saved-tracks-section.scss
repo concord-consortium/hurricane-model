@@ -34,6 +34,15 @@
     color: $charcoal;
 
     &:hover { background: $hoverColor; }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.45;
+      border-color: $hoverColor;
+      color: $charcoalMedium;
+
+      &:hover { background: #ffffff; }
+    }
   }
 
   .compareOn {
