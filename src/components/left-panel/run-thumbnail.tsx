@@ -19,19 +19,24 @@ import css from "./run-thumbnail.scss";
 // semi-transparent overlay when the SST overlay is on (with anomaly hints), the category-colored
 // track, and the H/L pressure systems.
 
-// Thumbnail viewBox and the North Atlantic geographic window it represents. A bit wider in latitude
-// than the app's map bounds so tracks/markers near the edges aren't clipped; H keeps it undistorted.
+// The app map, base maps, and SST PNGs are all Web Mercator (EPSG:3857 — see simulation.ts's
+// seaSurfaceTempAt), so the thumbnail projects everything in Mercator too, over this North Atlantic
+// window (a bit wider than the app's map bounds so edge tracks/markers aren't clipped).
 const LAT_MAX = 54, LAT_MIN = 2, LNG_MIN = -90, LNG_MAX = -10;
-const W = 100, H = Math.round((W * (LAT_MAX - LAT_MIN)) / (LNG_MAX - LNG_MIN)); // ~65
-const px = (lng: number) => ((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * W;
-const py = (lat: number) => ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * H;
+// Normalized Web Mercator (0..1 over the whole world), matching the full-world square SST PNGs.
+const mx = (lng: number) => (lng + 180) / 360;
+const my = (lat: number) => (1 - Math.asinh(Math.tan((lat * Math.PI) / 180)) / Math.PI) / 2;
+const MX0 = mx(LNG_MIN), MX1 = mx(LNG_MAX), MY0 = my(LAT_MAX), MY1 = my(LAT_MIN);
+const W = 100, H = Math.round((W * (MY1 - MY0)) / (MX1 - MX0)); // ~78
+const px = (lng: number) => ((mx(lng) - MX0) / (MX1 - MX0)) * W;
+const py = (lat: number) => ((my(lat) - MY0) / (MY1 - MY0)) * H;
 
-// The base-map images are equirectangular renders of exactly this window, so they fill the viewBox.
-// The SST PNGs are full-world equirectangular; place them so their North Atlantic crop fills it.
-const IMG_W = (W * 360) / (LNG_MAX - LNG_MIN);
-const IMG_H = (H * 180) / (LAT_MAX - LAT_MIN);
-const IMG_X = -((LNG_MIN + 180) / 360) * IMG_W;
-const IMG_Y = -((90 - LAT_MAX) / 180) * IMG_H;
+// The base-map images are Mercator crops of exactly this window (fill the viewBox). The full-world
+// Mercator SST PNGs are placed so their North Atlantic crop fills the same viewBox.
+const IMG_W = W / (MX1 - MX0);
+const IMG_H = H / (MY1 - MY0);
+const IMG_X = -MX0 * IMG_W;
+const IMG_Y = -MY0 * IMG_H;
 
 const BASE_IMAGES: Record<string, string> = {
   satellite: satelliteImg,
