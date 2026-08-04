@@ -68,11 +68,23 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: { sim: ISimu
           preserveAspectRatio="none" opacity={0.72} />
       )}
 
-      {/* SST anomaly hints at each region's anchor (only meaningful with the SST overlay on). */}
-      {showSST && anomalies.map((a, i) => (
-        <circle key={`sst-${i}`} cx={px(a.anchor.lng)} cy={py(a.anchor.lat)} r={5}
-          fill={anomalyFillColor(a.v)} opacity={0.8} stroke="#fff" strokeWidth={0.5} />
-      ))}
+      {/* SST anomaly hints at each region's anchor: colored by the anomaly, labeled with its value
+          (only meaningful with the SST overlay on). */}
+      {showSST && anomalies.map((a, i) => {
+        // Keep the marker fully inside the frame even when a region anchor sits near an edge.
+        const x = Math.max(7.5, Math.min(W - 7.5, px(a.anchor.lng)));
+        const y = Math.max(7.5, Math.min(H - 7.5, py(a.anchor.lat)));
+        return (
+          <g key={`sst-${i}`}>
+            <circle cx={x} cy={y} r={6.6} fill={anomalyFillColor(a.v)} opacity={0.92}
+              stroke="#fff" strokeWidth={0.7} />
+            <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={6}
+              fontWeight={700} fill="#fff" stroke="#1a1a1a" strokeWidth={0.4} paintOrder="stroke">
+              {(a.v > 0 ? "+" : "−") + Math.abs(a.v)}
+            </text>
+          </g>
+        );
+      })}
 
       {/* Track: dark casing under category-colored segments for contrast. */}
       {track.length > 1 && (
