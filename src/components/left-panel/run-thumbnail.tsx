@@ -12,9 +12,10 @@ import css from "./run-thumbnail.scss";
 // North Atlantic (same region the app map shows), with SST-anomaly hints, the category-colored
 // track, and the H/L pressure systems — a thumbnail of "what we saw on the map."
 
-// Thumbnail viewBox and the North Atlantic geographic window it represents (matches config bounds).
-const W = 100, H = 56;
-const LAT_MAX = 50, LAT_MIN = 5, LNG_MIN = -90, LNG_MAX = -10;
+// Thumbnail viewBox and the North Atlantic geographic window it represents. A bit wider in latitude
+// than the app's map bounds so tracks/markers near the edges aren't clipped; H keeps it undistorted.
+const LAT_MAX = 54, LAT_MIN = 2, LNG_MIN = -90, LNG_MAX = -10;
+const W = 100, H = Math.round((W * (LAT_MAX - LAT_MIN)) / (LNG_MAX - LNG_MIN)); // ~65
 const px = (lng: number) => ((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * W;
 const py = (lat: number) => ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * H;
 
@@ -35,6 +36,9 @@ export function RunThumbnail({ sim }: { sim: ISimulationState }) {
   return (
     <svg className={css.thumb} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none"
       role="img" aria-label="Run result map">
+      {/* Land layer: the SST image is transparent over land, so a land-colored rect behind it shows
+          through as the continents while the opaque SST covers the ocean. */}
+      <rect x={0} y={0} width={W} height={H} fill="#d8c7a6" />
       {/* Season sea-surface-temperature base map (cropped to the North Atlantic). */}
       <image href={sstImages[sim.season]} x={IMG_X} y={IMG_Y} width={IMG_W} height={IMG_H}
         preserveAspectRatio="none" />
