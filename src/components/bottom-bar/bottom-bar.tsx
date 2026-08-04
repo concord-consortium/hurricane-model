@@ -363,6 +363,14 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     });
     this.stores.simulation.reset();
     this.stores.ui.reset();
+    // simulation.reset() doesn't restore hurricane.startingCategory — reset it to the captured default.
+    const defCat = this.stores.multiTrack.defaultState?.simulation.hurricane.startingCategory;
+    if (defCat != null) this.stores.simulation.hurricane.setStartingCategory(defCat);
+    // Reload is a clean slate: also wipe all Multi-track runs, the Single-track run, mode/selection,
+    // and close Compare — matching the dialog's "you will lose all of your current settings."
+    this.stores.multiTrack.resetAll();
+    this.stores.ui.setCompareOpen(false);
+    this.stores.ui.setSetupMode(undefined);
     log("SimulationReloaded");
     this.setState({ reloadConfirmOpen: false });
   }

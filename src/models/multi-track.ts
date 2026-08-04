@@ -208,4 +208,20 @@ export class MultiTrackModel {
     this.runs = [];
     this.selectedRunId = undefined;
   }
+
+  // Full wipe back to the initial state — used by Reload (start fresh).
+  @action.bound public resetAll() {
+    this.enabled = false;
+    this.runs = [];
+    this.selectedRunId = undefined;
+    this.editingRunId = undefined;
+    this.singleRun = null;
+    this.singleTrackEditing = false;
+    this.multiWorkingState = null;
+    this.singleWorkingState = null;
+    this.singleWorkingEditing = false;
+    this.multiWorkingSelectedId = undefined;
+    this.multiWorkingEditingId = undefined;
+    this.nextId = 1;
+  }
 }
