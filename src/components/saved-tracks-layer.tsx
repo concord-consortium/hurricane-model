@@ -67,7 +67,9 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
           // react-leaflet applies pane/className only at layer creation.
           <React.Fragment key={`${run.id}-${isSelected ? "sel" : "ghost"}`}>
             <StaticTrack track={track} selected={isSelected} onClick={select} />
-            <LeafletCustomMarker position={endPos} zIndexOffset={i * 10000}>
+            {/* Base order is by run index (A lowest … F highest); the selected run's label jumps
+                above all unselected labels, but stays below the storm marker (offset 1,000,000). */}
+            <LeafletCustomMarker position={endPos} zIndexOffset={(isSelected ? 500000 : 0) + i * 10000}>
               <div className={clsx(css.trackEndLabel, { [css.selected]: isSelected })} onClick={select}>
                 {runLetter(i)}
               </div>
