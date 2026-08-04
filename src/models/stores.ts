@@ -35,6 +35,10 @@ export function createStores(): IStores {
         if (multiTrack.selectedRunId !== selected.id) multiTrack.selectRun(selected.id);
         multiTrack.captureRun(selected.id, getInteractiveState(stores));
         simulation.restart(false);
+        // The moment a comparison becomes possible (2nd run just completed), open the Compare table.
+        if (multiTrack.runs.filter(r => r.state).length === 2) {
+          ui.setCompareOpen(true);
+        }
       } else {
         // Single-run mode: capture the completed run and lock it (its track stays on screen).
         multiTrack.setSingleRun(getInteractiveState(stores));
