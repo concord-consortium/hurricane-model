@@ -152,7 +152,7 @@ $overflowHeight: 11px;
       height: 22px;
       width: 22px;
       border-radius: 11px;
-      margin: 2px auto 0 auto;
+      margin: -2px auto 4px auto; // icon up 4px (2 -> -2), plus 4px gap to the label
     }
 
     &:hover {
