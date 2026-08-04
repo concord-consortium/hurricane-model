@@ -61,9 +61,23 @@ export const TrackModeToggle = observer(function TrackModeToggle() {
     multiTrack.setEnabled(true);
     if (multiTrack.runs.length === 0) {
       multiTrack.addRun();
-    } else if (restoringMulti) {
+    } else {
       // Re-select the card that was active before, so a finished run still auto-captures into it.
-      multiTrack.restoreMultiSelection();
+      if (restoringMulti) multiTrack.restoreMultiSelection();
+      // If runs already exist but nothing's selected (e.g. a run was just saved from Single-track),
+      // select one — a completed run then shows locked (view-only) instead of leaving the setup
+      // editable with no selection.
+      if (!multiTrack.selectedRun) {
+        const editable = multiTrack.runs.find(r => r.state === null);
+        const target = editable || multiTrack.runs[multiTrack.runs.length - 1];
+        multiTrack.selectRun(target.id);
+        if (target.state) {
+          multiTrack.autoCaptureSuppressed = true;
+          setInteractiveState(stores, target.state);
+          simulation.restart(false);
+          multiTrack.autoCaptureSuppressed = false;
+        }
+      }
     }
   };
 
