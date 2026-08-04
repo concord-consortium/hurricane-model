@@ -8,6 +8,7 @@ import { IRunSlot } from "../../models/multi-track";
 import { namedRegions } from "../../types";
 import { useStores } from "../../stores-context";
 import { IRunSetupSim, RunSummary, runLetter } from "./run-summary";
+import { RunThumbnail } from "./run-thumbnail";
 
 import css from "./saved-tracks-section.scss";
 
@@ -112,7 +113,17 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
                   <span className={css.badge}>{runLetter(i)}</span>
                   <span className={css.runName}>Run {runLetter(i)}</span>
                 </div>
-                <RunSummary sim={sim} />
+                <div className={css.splitBody}>
+                  <div className={css.setupCol}>
+                    <RunSummary sim={sim} />
+                  </div>
+                  <div className={css.resultCol}>
+                    <div className={css.resultHeading}>Result</div>
+                    {run.state
+                      ? <RunThumbnail sim={run.state.simulation} />
+                      : <div className={css.resultPlaceholder}>Run to see result</div>}
+                  </div>
+                </div>
                 {run.state && (
                   <div className={css.cardActions}>
                     {multiTrack.editingRunId === run.id ? (

@@ -137,7 +137,42 @@
       font-size: 12px;
     }
 
-    // Category listed below the run name.
+    // Two halves: Setup (left) and Result mini-map (right).
+    .splitBody {
+      display: flex;
+      gap: 8px;
+    }
+
+    .setupCol {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .resultCol {
+      flex: 1 1 0;
+      min-width: 0;
+      // Align the RESULT heading with RunSummary's SETUP heading (RunSummary has margin-top: 7px).
+      margin-top: 7px;
+    }
+
+    .resultHeading {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: $charcoalMedium;
+      margin-bottom: 1px;
+    }
+
+    .resultPlaceholder {
+      font-size: 10px;
+      color: $charcoalMedium;
+      border: 1px dashed rgba(0, 0, 0, 0.22);
+      border-radius: 4px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+
     .cardActions {
       display: flex;
       justify-content: flex-end;
