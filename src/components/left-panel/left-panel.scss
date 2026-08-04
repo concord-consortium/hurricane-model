@@ -71,8 +71,10 @@ $leftPanelBorderRadius: 5px;
           width: 18px;
           height: 18px;
           flex-shrink: 0;
-          background: white;
-          border-radius: 50%; // white circle behind the gear, matching the bottom-bar button icon
+          border-radius: 50%;
+          // The icon SVG is already a grey disc + white gear; add the white outline ring the
+          // bottom-bar button shows when open.
+          box-shadow: 0 0 0 2px #fff;
         }
       }
 
