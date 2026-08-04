@@ -148,12 +148,12 @@
       color: $charcoal;
     }
 
-    .catDot {
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(0, 0, 0, 0.35);
+    .catIcon {
+      width: 18px;
+      height: 18px;
       flex-shrink: 0;
+      // The swirl SVG fills with currentColor; the .categoryN class (from hurricane-category.scss)
+      // sets that color per category, matching the Storm Category section icon.
     }
 
     .cardActions {
