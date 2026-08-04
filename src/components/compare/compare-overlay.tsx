@@ -141,7 +141,8 @@ export const CompareOverlay = observer(function CompareOverlay() {
       peak: peakCategory(sim),
       landfall,
       landfallText: landfall.count === 0 ? "None" : `${landfall.count}×, ${categoryChip(landfall.peakCategory).label}`,
-      duration: durationSteps(sim)
+      duration: durationSteps(sim),
+      series: intensitySeries(sim)
     };
   });
 
@@ -251,24 +252,13 @@ export const CompareOverlay = observer(function CompareOverlay() {
                 ? <span className={css.muted}>None</span>
                 : <span>{data[i].landfall.count}× · <CatChip category={data[i].landfall.peakCategory} /></span>
             ))}
-            <tr className={clsx(css.dataRow, css.plain)}>
-              <th scope="row" className={css.rowLabel}><span>Lifetime</span></th>
-              {data.map(d => (
-                <td key={d.id} className={css.runCell} onClick={() => selectColumn(d.id)}>
-                  <span className={css.bar}><span className={css.barFill}
-                    style={{ width: `${Math.round((d.duration / maxDuration) * 100)}%` }} /></span>
-                </td>
-              ))}
-            </tr>
-            <tr className={clsx(css.dataRow, css.plain)}>
-              <th scope="row" className={css.rowLabel}><span>Intensity over time</span></th>
-              {data.map(d => (
-                <td key={d.id} className={css.runCell} onClick={() => selectColumn(d.id)}>
-                  <Sparkline series={intensitySeries(multiTrack.runs.find(r => r.id === d.id)!.state!.simulation)}
-                    uid={d.id} widthPx={lifeWidth(d)} />
-                </td>
-              ))}
-            </tr>
+            {Row("Lifetime", data.map(d => String(d.duration)), i => (
+              <span className={css.bar}><span className={css.barFill}
+                style={{ width: `${Math.round((data[i].duration / maxDuration) * 100)}%` }} /></span>
+            ))}
+            {Row("Intensity over time", data.map(d => JSON.stringify(d.series)), i => (
+              <Sparkline series={data[i].series} uid={data[i].id} widthPx={lifeWidth(data[i])} />
+            ))}
           </tbody>
         </table>
         </div>
