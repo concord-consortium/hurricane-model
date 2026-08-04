@@ -84,6 +84,7 @@ export function RunSummary({ sim }: IProps) {
 
   return (
     <div className={css.runSummary}>
+      <div className={css.setupHeading}>Setup</div>
       <div className={css.row}><StormLocationIcon className={css.icon} /><span>{location}</span></div>
       <div className={css.row}>
         <HurricaneIcon className={clsx(css.icon, categoryCss["category" + cat.index])} />
