@@ -325,8 +325,17 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public restart = () => {
     this.clearDelayedStart();
-    this.stores.simulation.restart();
-    this.stores.ui.setNorthAtlanticView();
+    const { simulation, ui, multiTrack } = this.stores;
+    simulation.restart();
+    ui.setNorthAtlanticView();
+    // Restart returns the storm to its start position — make sure it's visible (and re-runnable) by
+    // unlocking a locked/completed run, instead of staying hidden behind the completed-run view.
+    if (multiTrack.enabled) {
+      const sel = multiTrack.selectedRun;
+      if (sel && sel.state) multiTrack.editRun(sel.id);
+    } else if (multiTrack.singleRun && !multiTrack.singleTrackEditing) {
+      multiTrack.setSingleTrackEditing(true);
+    }
   }
 
   public handleRestart = () => {
