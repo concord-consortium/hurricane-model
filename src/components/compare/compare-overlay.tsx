@@ -216,7 +216,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
             {Row("Sea Surface Temp", data.map(d => JSON.stringify(d.anomalies)), i => (
               data[i].anomalies.length === 0
                 ? <span className={css.muted}>Baseline</span>
-                : <span className={css.chips}>{data[i].anomalies.map(a => (
+                : <span className={css.chipsCol}>{data[i].anomalies.map(a => (
                     <span key={a.label} className={clsx(css.chip, a.v > 0 ? css.warm : css.cool)}>
                       {a.label} {a.v > 0 ? "+" : "−"}{Math.abs(a.v)}°
                     </span>))}</span>
