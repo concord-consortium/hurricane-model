@@ -7,7 +7,9 @@ import { namedRegions, seasonLabels } from "../../types";
 import { IHurricaneInteractiveState } from "../../types/interactive-state";
 import { useStores } from "../../stores-context";
 import { temperatureAnomalyRegions } from "../../utils/regions";
-import { durationSteps, intensitySeries, landfallSummary, peakCategory, pressureSignature } from "../../utils/run-outcomes";
+import {
+  durationSteps, intensitySeries, landfallSummary, peakCategory, pressureSignature
+} from "../../utils/run-outcomes";
 import { resolveStartLocation } from "../../models/simulation";
 import { CATEGORY_COLORS, categoryChip, runLetter } from "../left-panel/run-summary";
 
@@ -196,7 +198,11 @@ export const CompareOverlay = observer(function CompareOverlay() {
         <span className={css.title}>Compare Runs</span>
         {collapsed
           ? <span className={css.legend}>{data.length} run{data.length === 1 ? "" : "s"}</span>
-          : <span className={css.legend}><span className={css.diffDot} /> differs · <span className={css.sameWord}>same</span> unchanged</span>}
+          : (
+            <span className={css.legend}>
+              <span className={css.diffDot} /> differs · <span className={css.sameWord}>same</span> unchanged
+            </span>
+          )}
         <button type="button" className={css.iconBtn} data-test="compare-collapse"
           aria-label={collapsed ? "Expand compare" : "Collapse compare"} aria-expanded={!collapsed}
           onClick={() => setCollapsed(c => !c)}>
@@ -210,7 +216,13 @@ export const CompareOverlay = observer(function CompareOverlay() {
 
       {!collapsed && <div className={css.scroll}>
         <div className={css.tableWrap} ref={wrapRef}>
-        {colBox && <div className={css.colOutline} style={{ left: colBox.left, width: colBox.width }} aria-hidden="true" />}
+        {colBox && (
+          <div
+            className={css.colOutline}
+            style={{ left: colBox.left, width: colBox.width }}
+            aria-hidden="true"
+          />
+        )}
         <table className={css.table}>
           <thead>
             <tr>
@@ -229,8 +241,10 @@ export const CompareOverlay = observer(function CompareOverlay() {
           </thead>
           <tbody>
             <tr className={css.groupRow}><th colSpan={data.length + 1}>Setup — what you changed</th></tr>
-            {Row("Storm Location", data.map(d => d.location), i => <span className={css.mono}>{data[i].location}</span>)}
-            {Row("Storm Category", data.map(d => String(d.startCat ?? 0)), i => <CatChip category={data[i].startCat} />)}
+            {Row("Storm Location", data.map(d => d.location),
+              i => <span className={css.mono}>{data[i].location}</span>)}
+            {Row("Storm Category", data.map(d => String(d.startCat ?? 0)),
+              i => <CatChip category={data[i].startCat} />)}
             {Row("Season", data.map(d => d.season), i => data[i].season)}
             {Row("Sea Surface Temp", data.map(d => JSON.stringify(d.anomalies)), i => (
               data[i].anomalies.length === 0
