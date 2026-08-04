@@ -211,6 +211,12 @@
   margin-right: 6px;
 }
 
+.runHeadName {
+  font-weight: 700;
+  font-size: 13px;
+  color: $charcoal;
+}
+
 // Diff / same treatment.
 .dataRow td { border-top: 1px solid #f0f0f0; }
 

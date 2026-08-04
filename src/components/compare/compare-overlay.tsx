@@ -222,7 +222,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
                   onClick={() => selectColumn(d.id)}
                   title="Select this run on the map">
                   <span className={css.runBadge}>{d.letter}</span>
-                  <CatChip category={d.startCat} />
+                  <span className={css.runHeadName}>Run {d.letter}</span>
                 </th>
               ))}
             </tr>
