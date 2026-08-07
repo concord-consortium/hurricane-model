@@ -6,6 +6,7 @@
   border-bottom: $leftPanelBorder;
   color: $charcoal;
   height: 40px;
+  padding: 8px 15px; // standardize the panel's horizontal inset (was MUI default 16)
 
   &:hover {
     background-color: #dfdfdf;
@@ -39,7 +40,7 @@
 .section {
   background-color: #fafafa;
   border-bottom: $leftPanelBorder;
-  padding: 8px 16px 12px;
+  padding: 8px 15px 12px;
 
   // Locked (a completed run is selected, view-only): controls greyed and non-interactive. The
   // section header stays clickable, so it can still be opened to inspect the values.
