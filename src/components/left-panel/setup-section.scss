@@ -23,8 +23,8 @@
   }
 
   .dropdownArrow {
-    // Align the caret to the panel's 15px right inset (was margin-right: -12px, pulling it to the edge).
-    margin-right: 0;
+    // Sit the caret 5px from the panel edge (section right padding is 15px, so pull in 10px).
+    margin-right: -10px;
     transform: rotate(-90deg);
     transition: transform 0.1s;
 
