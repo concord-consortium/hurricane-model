@@ -12,7 +12,7 @@
     padding: 7px 8px;
     font-family: inherit;
     // Matches the 12px bold convention used by the existing setup-panel controls.
-    font-size: 12px;
+    font-size: 16px; // min-font standard (was 12px)
     font-weight: bold;
     color: $charcoal;
     background-color: #ececec;
