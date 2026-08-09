@@ -52,16 +52,16 @@
   }
 
   .markLabel {
-    font-family: $scaleFont;
-    font-size: 12px;
+    font-family: inherit; // Lato (the app default), not the Roboto Condensed scale font
+    font-size: 14px;
     font-weight: bold;
     top: 26px;
   }
 }
 
 .categoryName {
-  font-family: $scaleFont;
-  font-size: 12px;
+  font-family: inherit; // Lato (the app default), not the Roboto Condensed scale font
+  font-size: 14px;
   font-weight: bold;
   text-align: center;
 }
