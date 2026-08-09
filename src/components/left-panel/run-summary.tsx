@@ -57,7 +57,7 @@ export function runCategory(sim: IRunSetupSim) {
 }
 
 function anomalyText(v: number): string {
-  return `${v > 0 ? "+" : "−"}${Math.abs(v)}°C`;
+  return `${v > 0 ? "+" : "−"}${Math.abs(v)} °C`;
 }
 function coords(lat: number, lng: number): string {
   return `${lat.toFixed(1)}°, ${lng.toFixed(1)}°`;
