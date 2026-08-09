@@ -15,7 +15,7 @@ const hint = "Select a season, which determines sea surface temperatures and win
 const postscript = (
   <>
     <span className={css.bold}>Note:</span>{" "}
-    Sea surface temperatures peak in Late Fall, giving storms more energy to intensify.
+    Sea surface temps peak in Late Fall, giving storms more energy to intensify.
   </>
 );
 
