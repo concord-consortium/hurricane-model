@@ -2,6 +2,7 @@
 
 .label {
   color: $charcoal;
+  font-size: 14px; // matches the panel body text
   font-weight: bold;
   white-space: nowrap;
 }
@@ -15,6 +16,7 @@
   .status {
     min-width: 64px;
     text-align: center;
+    font-size: 14px; // "Baseline" / value readout — matches the region label
     font-variant-numeric: tabular-nums;
 
     &.cold {
