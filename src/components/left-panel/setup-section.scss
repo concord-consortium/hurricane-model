@@ -52,6 +52,7 @@
   }
 
   .hint, .postscript {
+    font-size: 14px; // matches the section labels and bottom-bar controls
     line-height: normal;
   }
 
@@ -60,7 +61,6 @@
   }
 
   .postscript {
-    font-size: 10.5px;
     margin-top: 11px;
   }
 
