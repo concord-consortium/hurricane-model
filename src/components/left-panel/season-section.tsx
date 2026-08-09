@@ -11,7 +11,7 @@ import SeasonIcon from "../../assets/left-panel/season.svg";
 
 import css from "./season-section.scss";
 
-const hint = "The season determines sea surface temperatures and wind shear.";
+const hint = "Select a season, which determines sea surface temperatures and wind shear.";
 const postscript = "Sea surface temperatures peak in Late Fall, giving storms more energy to intensify.";
 
 interface ISeasonButtonProps {
