@@ -68,6 +68,7 @@
     background-color: #eaf3d6; // soft green callout with enough presence to read against the #fafafa section
     font-size: 14px; // matches the hint/postscript body text
     line-height: 1.2; // was inheriting a cramped 13px (0.93x); open it up a touch
+    margin-top: 11px; // separate the callout from preceding content (e.g. the Season buttons)
     padding: 8px;
 
     .bold {
