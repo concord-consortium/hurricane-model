@@ -22,11 +22,12 @@ interface ISetupSectionProps {
   postscript?: ReactNode;
   setupMode: SetupMode;
   tip?: string;
+  tipLabel?: string; // bold label prefix for the tip callout (defaults to "Tip")
   title: string;
 }
 
 export const SetupSection = observer(function SetupSection({
-  children, dataTest, hint, Icon, iconClassName, postscript, setupMode, tip, title
+  children, dataTest, hint, Icon, iconClassName, postscript, setupMode, tip, tipLabel, title
 }: ISetupSectionProps) {
   const stores = useStores();
   const open = stores.ui.setupMode === setupMode;
@@ -60,7 +61,7 @@ export const SetupSection = observer(function SetupSection({
         <div className={clsx(css.section, { [css.locked]: locked })} data-test={`${dt}-section`}>
           {hint && <div className={css.hint}>{hint}</div>}
           {children}
-          {tip && <div className={css.tip}><span className={css.bold}>Tip:</span> {tip}</div>}
+          {tip && <div className={css.tip}><span className={css.bold}>{tipLabel ?? "Tip"}:</span> {tip}</div>}
           {postscript && <div className={css.postscript}>{postscript}</div>}
         </div>
       </Collapse>

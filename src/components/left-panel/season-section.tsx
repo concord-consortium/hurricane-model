@@ -12,12 +12,7 @@ import SeasonIcon from "../../assets/left-panel/season.svg";
 import css from "./season-section.scss";
 
 const hint = "Select a season, which determines sea surface temperatures and wind shear.";
-const postscript = (
-  <>
-    <span className={css.bold}>Note:</span>{" "}
-    Sea surface temps peak in Late Fall, giving storms more energy to intensify.
-  </>
-);
+const note = "Sea surface temps peak in Late Fall, giving storms more energy to intensify.";
 
 interface ISeasonButtonProps {
   season: Season;
@@ -44,8 +39,9 @@ export function SeasonSection() {
       dataTest="season"
       hint={hint}
       Icon={SeasonIcon}
-      postscript={postscript}
       setupMode="season"
+      tip={note}
+      tipLabel="Note"
       title="Season"
     >
       <div className={css.buttonArea}>
