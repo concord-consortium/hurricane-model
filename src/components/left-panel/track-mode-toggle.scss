@@ -19,10 +19,12 @@
     border: 1px solid $charcoalMedium;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.12s, color 0.12s;
 
     &:hover:not(.active) {
       background-color: $secondaryColorHover;
+      // Transition scoped to hover only (fades in on hover, snaps instantly on select) — kept in sync
+      // with the Season buttons so the two control groups feel identical.
+      transition: background-color 0.12s;
     }
 
     &.active {

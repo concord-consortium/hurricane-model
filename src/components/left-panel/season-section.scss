@@ -25,10 +25,15 @@
     border: 1px solid $charcoalMedium;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.12s, color 0.12s;
+    // Override MUI Button's default 250ms transition so selecting snaps instantly. A smooth select
+    // transition would visibly stutter: the wind-arrow redraw (deferred a frame after the season
+    // change) drops a frame mid-transition. An instant select has no animation to stutter.
+    transition: none;
 
     &:hover:not(.selected) {
       background-color: $secondaryColorHover;
+      // ...but still fade in on hover, where there's no redraw to compete with.
+      transition: background-color 0.12s;
     }
 
     &.selected {
