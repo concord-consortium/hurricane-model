@@ -2,22 +2,41 @@
 
 .buttonArea {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
   width: 100%;
 
+  // Match the Single/Multi-track toggle buttons: equal-width, 10px apart, same
+  // default / hover / selected / focus states.
   .seasonButton {
-    border: 1px solid $charcoalMedium;
-    font-size: 12px;
+    flex: 1;
+    min-width: 0; // let flex shrink the buttons instead of MUI's default min-width
+    padding: 7px 8px;
+    font-family: inherit;
+    font-size: 14px;
     font-weight: bold;
-    padding: 7px 15px;
+    line-height: normal; // MUI Button forces 1.75; match the toggle's native line-height (height parity)
+    text-transform: none;
+    color: $charcoal;
+    background-color: transparent;
+    border: 1px solid $charcoalMedium;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.12s, color 0.12s;
 
-    &:hover {
+    &:hover:not(.selected) {
       background-color: $secondaryColorHover;
     }
 
     &.selected {
       background-color: $secondaryColor;
+      border-color: $secondaryColor;
+      color: $charcoal;
       cursor: default; // already selected — clicking is a no-op, so drop the clickable hand
+    }
+
+    &:focus-visible {
+      outline: 2px solid $charcoal;
+      outline-offset: 1px;
     }
   }
 }
