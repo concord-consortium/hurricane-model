@@ -19,7 +19,7 @@ interface ISetupSectionProps {
   hint?: string;
   Icon?: FunctionComponent;
   iconClassName?: string;
-  postscript?: string;
+  postscript?: ReactNode;
   setupMode: SetupMode;
   tip?: string;
   title: string;

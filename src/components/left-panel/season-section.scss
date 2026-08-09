@@ -1,5 +1,9 @@
 @use "../common.scss" as *;
 
+.bold {
+  font-weight: bold;
+}
+
 .buttonArea {
   display: flex;
   gap: 10px;
