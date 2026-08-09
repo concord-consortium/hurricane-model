@@ -29,6 +29,7 @@
       background-color: $secondaryColor;
       border-color: $secondaryColor;
       color: $charcoal;
+      cursor: default; // already selected — clicking is a no-op, so drop the clickable hand
     }
 
     &:focus-visible {

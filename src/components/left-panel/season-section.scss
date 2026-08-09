@@ -17,6 +17,7 @@
 
     &.selected {
       background-color: $secondaryColor;
+      cursor: default; // already selected — clicking is a no-op, so drop the clickable hand
     }
   }
 }
