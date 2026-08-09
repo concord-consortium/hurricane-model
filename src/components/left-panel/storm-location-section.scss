@@ -20,7 +20,7 @@
     .input {
       font-family: inherit; // Lato (inputs don't inherit font-family by default)
       font-size: 14px;
-      padding: 4px 6px;
+      padding: 7px 6px; // 33px tall, matching the toggle/Season buttons
       border: 1px solid $charcoalMedium;
       border-radius: 4px;
       width: 64px;
