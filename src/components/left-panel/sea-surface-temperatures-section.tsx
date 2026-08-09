@@ -8,7 +8,7 @@ import ThermometerIcon from "../../assets/left-panel/thermometer.svg";
 
 import css from "./sea-surface-temperatures-section.scss";
 
-const hint = "Adjust sea surface temperature by up to ±3°C in each region. Changes are highlighted on the map.";
+const hint = "Adjust sea surface temperature by up to ±3°C in each region. Changes highlight on the map.";
 
 export function SeaSurfaceTemperaturesSection() {
   return (
