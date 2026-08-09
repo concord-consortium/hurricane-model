@@ -12,19 +12,23 @@
     gap: 7px;
 
     .label {
-      font-family: $scaleFont;
-      font-size: 13px;
+      font-family: inherit; // Lato (the app default), not the Roboto Condensed scale font
+      font-size: 14px;
       font-weight: bold;
     }
 
     .input {
-      font-family: $scaleFont;
-      font-size: 13px;
+      font-family: inherit; // Lato (inputs don't inherit font-family by default)
+      font-size: 14px;
       padding: 4px 6px;
       border: 1px solid $charcoalMedium;
       border-radius: 4px;
       width: 64px;
       box-sizing: border-box;
+    }
+
+    .degree {
+      font-size: 14px; // °N / °W suffix; font-family already inherits Lato
     }
   }
 }

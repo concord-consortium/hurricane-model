@@ -108,7 +108,7 @@ const CoordinateInput = observer(function CoordinateInput({ axis }: ICoordinateI
         onKeyDown={handleKeyDown}
         data-test={`storm-location-${axis}-input`}
       />
-      <div>°{axis === "lat" ? "N" : "W"}</div>
+      <div className={css.degree}>°{axis === "lat" ? "N" : "W"}</div>
     </div>
   );
 });
