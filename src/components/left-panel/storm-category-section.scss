@@ -1,7 +1,9 @@
 @use "../common" as *;
 
 .sliderContainer {
-  padding: 0 12px;
+  // No extra horizontal padding — the section already provides the panel's standard 15px inset, and
+  // the tick labels sit under chip centers (inset), so they don't clip.
+  padding: 0;
 
   // Inset the slider to the middle 83.3% (6 - 1 segments) so the thumb snaps to the CENTER of each
   // of the six equal color chips (values 0..5 -> 8.3%, 25%, 41.7%, 58.3%, 75%, 91.7%).
@@ -12,10 +14,12 @@
   }
 
   .rail {
-    // Six equal-width category chips (each 1/6). The rail is stretched back to the container's full
-    // width (left -10% / width 120% of the inset slider) so the end chips (TS, 5) aren't half-width.
+    // Six equal-width category chips (each 1/6). The rail is stretched symmetrically back to the
+    // container's full width (both edges -10% of the inset slider) so the end chips (TS, 5) aren't
+    // half-width and the left/right margins stay balanced.
     left: -10%;
-    width: 120%;
+    right: -10%;
+    width: auto;
     background: linear-gradient(
       to right,
       $cat0Color 0 16.6667%,
