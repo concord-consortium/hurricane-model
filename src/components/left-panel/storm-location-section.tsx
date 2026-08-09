@@ -120,7 +120,7 @@ export function StormLocationSection() {
       hint={hint}
       Icon={StormLocationIcon}
       setupMode="stormLocation"
-      title="Storm Location"
+      title="Storm Starting Location"
     >
       <div className={css.coordinates}>
         <CoordinateInput axis="lat" />
