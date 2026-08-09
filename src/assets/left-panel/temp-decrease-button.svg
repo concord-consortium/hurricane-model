@@ -1,9 +1,11 @@
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="25px" height="24px" viewBox="0 0 25 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Temp Decrease Button</title>
     <defs>
-        <path d="M0 0h24v24H0V0z" id="rw5tttr4va"/>
+        <path d="M24,12 C24,18.627417 18.627417,24 12,24 C5.372583,24 0,18.627417 0,12 C0,5.372583 5.372583,0 12,0 C18.627417,0 24,5.372583 24,12 Z" id="path-1"></path>
     </defs>
-    <g fill="none" xlink:href="#rw5tttr4va" fill-rule="evenodd">
-        <circle stroke="#797979" fill="#FFF" cx="12" cy="12" r="11.5"/>
-        <path fill-rule="nonzero" d="M8 11h7.6v1.575H8z" fill="#797979"/>
+    <g id="Temp-Decrease-Button" stroke="none" fill="none" transform="translate(0.2402, 0)" xlink:href="#path-1">
+        <circle id="Button-Back" stroke="#797979" stroke-width="1" fill="#FFFFFF" fill-rule="evenodd" cx="12" cy="12" r="11.5"></circle>
+        <rect id="Path" fill="#797979" fill-rule="nonzero" transform="translate(12, 12) rotate(90) translate(-12, -12)" x="11" y="7" width="2" height="10"></rect>
     </g>
 </svg>

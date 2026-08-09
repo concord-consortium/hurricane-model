@@ -1,9 +1,11 @@
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="25px" height="24px" viewBox="0 0 25 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Temp Increase Button</title>
     <defs>
-        <path d="M0 0h24v24H0V0z" id="rli6cdy1ha"/>
+        <path d="M24,12 C24,18.627417 18.627417,24 12,24 C5.372583,24 0,18.627417 0,12 C0,5.372583 5.372583,0 12,0 C18.627417,0 24,5.372583 24,12 Z" id="path-1"></path>
     </defs>
-    <g fill="none" xlink:href="#rli6cdy1ha" fill-rule="evenodd">
-        <circle stroke="#797979" fill="#FFF" cx="12" cy="12" r="11.5"/>
-        <path fill-rule="nonzero" d="M12.882 7.443v3.69h3.501v1.647h-3.501v3.708h-1.8V12.78H7.599v-1.647h3.483v-3.69z" fill="#797979"/>
+    <g id="Temp-Increase-Button" stroke="none" fill="none" transform="translate(0.2402, 0)" xlink:href="#path-1">
+        <circle id="Button-Back" stroke="#797979" stroke-width="1" fill="#FFFFFF" fill-rule="evenodd" cx="12" cy="12" r="11.5"></circle>
+        <polygon id="Path" fill="#797979" fill-rule="nonzero" points="13 7 12.999 10.999 17 11 17 13 13 13 13 17 11 17 11 13 7 13 7 11 11 10.999 11 7"></polygon>
     </g>
 </svg>
