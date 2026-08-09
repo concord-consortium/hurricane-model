@@ -38,6 +38,7 @@ export const StormCategorySection = observer(function StormCategorySection() {
       <div className={css.sliderContainer}>
         <Slider
           classes={{
+            root: css.sliderRoot,
             rail: css.rail,
             track: css.track,
             mark: css.mark,
