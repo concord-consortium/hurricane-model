@@ -32,7 +32,7 @@
       $cat5Color 83.3333% 100%
     );
     border: 1px solid $charcoalMedium;
-    border-radius: 4px;
+    border-radius: 999px; // fully round (pill) ends; caps at half the bar height
     height: 8px;
     opacity: 1;
   }
