@@ -35,9 +35,10 @@
     cursor: pointer;
     line-height: 0;
 
-    // The circle (ring + fill) and glyph carry the SVG's default grey/white; recolor them per state.
+    // The circle is the ring + fill; the glyph (+/−) is a path inside the <g> (SVGO converts the
+    // authored polygon/rect to a path). `svg g path` targets only the glyph, not the unused <defs> path.
     svg circle { transition: fill 0.12s, stroke 0.12s; }
-    svg polygon, svg rect { transition: fill 0.12s; }
+    svg g path { transition: fill 0.12s; }
 
     &:disabled { opacity: 0.4; cursor: default; }
 
@@ -46,22 +47,22 @@
     &.increase {
       &:hover:not(:disabled) {
         svg circle { stroke: #c62828; fill: #ffebee; }
-        svg polygon { fill: #c62828; }
+        svg g path { fill: #c62828; }
       }
       &:active:not(:disabled) {
         svg circle { stroke: #c62828; fill: #c62828; }
-        svg polygon { fill: #fff; }
+        svg g path { fill: #fff; }
       }
     }
 
     &.decrease {
       &:hover:not(:disabled) {
         svg circle { stroke: #2255cc; fill: #e8f0ff; }
-        svg rect { fill: #2255cc; }
+        svg g path { fill: #2255cc; }
       }
       &:active:not(:disabled) {
         svg circle { stroke: #2255cc; fill: #2255cc; }
-        svg rect { fill: #fff; }
+        svg g path { fill: #fff; }
       }
     }
 
