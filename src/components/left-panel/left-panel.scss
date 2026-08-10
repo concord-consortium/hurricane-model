@@ -2,7 +2,7 @@
 @use "./left-panel-common" as *;
 
 $leftPanelContainerWidth: calc($leftPanelWidth + 2px);
-$leftPanelBorderRadius: 5px;
+$leftPanelBorderRadius: 0; // square corners
 
 .leftPanelContainer {
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
