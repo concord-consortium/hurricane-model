@@ -49,7 +49,9 @@
     // (matches the pressure sliders / buttons, overriding MUI's default grey halo). Cover MUI's
     // focus/drag classes so it holds while dragging.
     &:hover, &:active, &:global(.Mui-focusVisible), &:global(.Mui-active) {
-      background-color: $secondaryColorHover;
+      // currentColor = the current category's color (set via the category class on the thumb), so the
+      // thumb matches the chip it sits on and recolors as it's dragged across the scale.
+      background-color: currentColor;
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
     }
 

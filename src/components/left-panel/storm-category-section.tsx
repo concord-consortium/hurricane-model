@@ -1,4 +1,5 @@
 import Slider from "@mui/material/Slider";
+import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React from "react";
 
@@ -43,7 +44,9 @@ export const StormCategorySection = observer(function StormCategorySection() {
             track: css.track,
             mark: css.mark,
             markLabel: css.markLabel,
-            thumb: css.thumb
+            // Tag the thumb with the current category's color (sets `color`); the thumb's hover fill
+            // uses currentColor, so it matches the chip it sits on and recolors as you drag.
+            thumb: clsx(css.thumb, categoryCss["category" + startingCategory])
           }}
           min={0}
           max={maxCategory}
