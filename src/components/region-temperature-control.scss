@@ -6,6 +6,15 @@
   font-family: Lato, "Roboto Condensed", Helvetica, Arial, sans-serif;
 }
 
+// On the map these labels sit over the varied SST-region colors — give them a white outline for
+// legibility. Scoped to the Leaflet container so the panel copies are untouched.
+:global(.leaflet-container) {
+  .label, .status {
+    paint-order: stroke fill; // stroke behind the fill so letters stay legible
+    -webkit-text-stroke: 2px #fff;
+  }
+}
+
 .label {
   color: $charcoal;
   font-size: 14px; // matches the panel body text
