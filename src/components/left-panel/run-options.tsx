@@ -21,7 +21,7 @@ export const RunOptions = observer(function RunOptions() {
           data-test="keep-panel-open-checkbox"
           onChange={e => ui.setKeepPanelOpenOnRun(e.target.checked)}
         />
-        <span>Keep panel open when running</span>
+        <span>Keep panel open during run</span>
       </label>
     </div>
   );
