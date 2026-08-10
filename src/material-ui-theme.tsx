@@ -58,6 +58,9 @@ export default createTheme({
           "height": 18,
           "boxShadow": "0 1px 5px 0 rgba(0, 0, 0, 0.35)",
           "border": "1px solid #797979",
+          // The 1px border on the content-box thumb throws MUI's centering off by 1px; nudge it back
+          // onto the track's vertical center.
+          "marginTop": "1px",
           ".MuiSwitch-switchBase:hover &": {
             boxShadow: "0 0 0 3px rgba(255, 255, 255, 0.5)",
           },
