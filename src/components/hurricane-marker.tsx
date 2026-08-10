@@ -6,7 +6,7 @@ import HurricaneIconSVG from "../assets/hurricane.svg";
 import config from "../config";
 import { log } from "../log";
 import { useStores } from "../stores-context";
-import { getDirectionLetter } from "../utils/lat-long";
+import { formatLatLng } from "../utils/lat-long";
 import { clampToRegion } from "../utils/region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
 import { CategoryNumber } from "./category-number";
@@ -102,9 +102,7 @@ export const HurricaneIcon = observer(function HurricaneIcon() {
   const draggable = !stores.simulation.simulationStarted && !stores.multiTrack.setupLocked;
 
   const { lat, lng } = hurricane.center;
-  const latL = getDirectionLetter(lat, "lat");
-  const lngL = getDirectionLetter(lng, "lng");
-  const label = `${Math.abs(lat).toFixed(2)}°${latL}, ${Math.abs(lng).toFixed(2)}°${lngL}`;
+  const label = formatLatLng(lat, lng);
 
   // Note that the realistic hurricane image should scale with the map. This is simplified scaling that only uses
   // the map zoom. The real one should also take into account the map projection. But since it's a simplified view

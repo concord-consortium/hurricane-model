@@ -11,6 +11,7 @@ import {
   durationSteps, intensitySeries, landfallSummary, peakCategory, pressureSignature
 } from "../../utils/run-outcomes";
 import { resolveStartLocation } from "../../models/simulation";
+import { formatLatLng } from "../../utils/lat-long";
 import { CATEGORY_COLORS, categoryChip, runLetter } from "../left-panel/run-summary";
 
 import css from "./compare-overlay.scss";
@@ -133,7 +134,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
       id: slot.id,
       letter: runLetter(index),
       startCat: sim.hurricane.startingCategory,
-      location: `${start.lat.toFixed(1)}°, ${start.lng.toFixed(1)}°`,
+      location: formatLatLng(start.lat, start.lng),
       season: seasonLabels[sim.season] ?? sim.season,
       anomalies: namedRegions
         .map(rg => ({ label: temperatureAnomalyRegions[rg].label, v: sim.temperatureAnomalies?.[rg] ?? 0 }))

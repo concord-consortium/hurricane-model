@@ -5,6 +5,7 @@ import { hurricaneCategoryInfo } from "../../constants";
 import { resolveStartLocation } from "../../models/simulation";
 import { NamedRegion, namedRegions, Season, seasonLabels, StartLocation } from "../../types";
 import { IPressureSystemState } from "../../types/interactive-state";
+import { formatLatLng } from "../../utils/lat-long";
 import { temperatureAnomalyRegions } from "../../utils/regions";
 
 import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
@@ -59,9 +60,6 @@ export function runCategory(sim: IRunSetupSim) {
 function anomalyText(v: number): string {
   return `${v > 0 ? "+" : "−"}${Math.abs(v)} °C`;
 }
-function coords(lat: number, lng: number): string {
-  return `${lat.toFixed(1)}°, ${lng.toFixed(1)}°`;
-}
 
 interface IProps {
   sim: IRunSetupSim;
@@ -74,7 +72,7 @@ interface IProps {
 export function RunSummary({ sim }: IProps) {
   // Always show the actual lat/lon of the start position (even for a preset like "Atlantic").
   const start = resolveStartLocation(sim.startLocation);
-  const location = coords(start.lat, start.lng);
+  const location = formatLatLng(start.lat, start.lng);
   const cat = categoryChip(sim.hurricane.startingCategory);
   const season = seasonLabels[sim.season] ?? sim.season;
   const anomalies = namedRegions
