@@ -1,5 +1,11 @@
 @use "common" as *;
 
+// Set Lato explicitly (not `inherit`): on the map these render inside Leaflet's container, whose CSS
+// sets font-family to Helvetica Neue, so an inherited font would diverge from the panel's Lato.
+.label, .status {
+  font-family: Lato, "Roboto Condensed", Helvetica, Arial, sans-serif;
+}
+
 .label {
   color: $charcoal;
   font-size: 14px; // matches the panel body text
