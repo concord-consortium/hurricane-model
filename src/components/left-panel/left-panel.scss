@@ -84,11 +84,13 @@ $leftPanelBorderRadius: 5px;
         background: none;
         border: none;
         border-radius: 4px;
-        color: $charcoalMedium; // grey icon
+        color: $charcoal; // #222 icon
         cursor: pointer;
         display: inline-flex;
+        font-size: 20px; // the smaller text "×", matching the Compare table's close button
         height: 24px;
         justify-content: center;
+        line-height: 1;
         padding: 0;
         position: absolute;
         right: 5px;

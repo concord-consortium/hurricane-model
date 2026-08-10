@@ -1,4 +1,3 @@
-import CloseIcon from "@mui/icons-material/Close";
 import List from "@mui/material/List";
 import ListSubheader from "@mui/material/ListSubheader";
 import clsx from "clsx";
@@ -48,7 +47,7 @@ export const LeftPanel = observer(function LeftPanel({ open, toggleOpen }: ILeft
                 data-test="left-panel-close-button"
                 onClick={toggleOpen}
               >
-                <CloseIcon />
+                ×
               </button>
             </ListSubheader>
           }
