@@ -79,5 +79,6 @@
   font-family: inherit; // Lato (the app default), not the Roboto Condensed scale font
   font-size: 14px;
   font-weight: bold;
+  margin-top: -5px; // nudge the category-name readout up 5px, closer to the tick values
   text-align: center;
 }
