@@ -45,9 +45,11 @@
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35); // matches the MUI switch thumb elevation
     cursor: grab;
 
-    // Match the pressure sliders: the same 0.5 white ring on hover and select (overrides MUI's
-    // default grey halo). Cover MUI's focus/drag classes so it holds while dragging.
+    // Engaged (hover / select / drag): fill with the button hover orange and show the 0.5 white ring
+    // (matches the pressure sliders / buttons, overriding MUI's default grey halo). Cover MUI's
+    // focus/drag classes so it holds while dragging.
     &:hover, &:active, &:global(.Mui-focusVisible), &:global(.Mui-active) {
+      background-color: $secondaryColorHover;
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
     }
 
