@@ -1,8 +1,7 @@
 @use "../common" as *;
 @use "./left-panel-common" as *;
 
-$leftPanelBand: 6px; // light-orange band running the full right (vertical) edge
-$leftPanelContainerWidth: calc($leftPanelWidth + 1px + $leftPanelBand); // content + left border + band
+$leftPanelContainerWidth: calc($leftPanelWidth + 2px);
 $leftPanelBorderRadius: 5px;
 
 .leftPanelContainer {
@@ -19,10 +18,8 @@ $leftPanelBorderRadius: 5px;
   .leftPanel {
     background-color: #fdf5e8;
     border: $leftPanelBorder;
-    // Light-orange band down the full right edge (like the Base Maps / Map Overlays panels).
-    border-right: $leftPanelBand solid $secondaryColorHover;
     border-bottom-right-radius: $leftPanelBorderRadius;
-    border-top-right-radius: 0; // square top-right corner
+    border-top-right-radius: $leftPanelBorderRadius;
     color: $charcoal;
     display: flex;
     flex-direction: column;
@@ -57,7 +54,7 @@ $leftPanelBorderRadius: 5px;
       align-items: center;
       background-color: $secondaryColor;
       border-bottom: $leftPanelBorder;
-      border-top-right-radius: 0;
+      border-top-right-radius: $leftPanelBorderRadius;
       color: $charcoal;
       display: flex;
       height: 35px;
