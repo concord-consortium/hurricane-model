@@ -45,6 +45,12 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
     }
   }
 
+  // A plain click (no drag) opens the panel + Storm Location section, same as finishing a drag.
+  const handleClick = () => {
+    ui.setLeftPanelOpen(true);
+    ui.setSetupMode("stormLocation");
+  };
+
   const handleDragEnd = (e: Leaflet.DragEndEvent) => {
     const { lat, lng } = (e.target as Leaflet.Marker).getLatLng();
     const startLocation = { lat, lng };
@@ -61,6 +67,7 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
       draggable={draggable}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
+      onClick={draggable ? handleClick : undefined}
       // Keep the storm above the tracks and their letter labels (which use offsets up to ~50000).
       zIndexOffset={1000000}
     >

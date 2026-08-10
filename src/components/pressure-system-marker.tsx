@@ -36,6 +36,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
         position={model.center}
         onDrag={this.handlePressureSysDrag}
         onDragEnd={this.handlePressureSysDragEnd}
+        onClick={!disabled ? this.handlePressureSysClick : undefined}
         // Disable dragging when slider is being dragged, so they don't interfere.
         draggable={!sliderDrag && !disabled}
       >
@@ -55,6 +56,12 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     // Reveal the Pressure Systems section as soon as a marker is being moved.
     if (this.stores.ui.setupMode !== "pressureSystems") this.stores.ui.setSetupMode("pressureSystems");
     this.stores.simulation.setPressureSysCenter(model, e.latlng);
+  }
+
+  // A plain click (no drag) opens the panel + Pressure Systems section, same as finishing a drag.
+  public handlePressureSysClick = () => {
+    this.stores.ui.setLeftPanelOpen(true);
+    this.stores.ui.setSetupMode("pressureSystems");
   }
 
   public handlePressureSysDragEnd = () => {
