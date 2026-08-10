@@ -50,10 +50,11 @@
     // focus/drag classes so it holds while dragging.
     &:hover, &:active, &:global(.Mui-focusVisible), &:global(.Mui-active) {
       // currentColor = the current category's color (set via the category class on the thumb), so the
-      // thumb matches the chip it sits on and recolors as it's dragged across the scale.
+      // thumb matches the chip it sits on and recolors as it's dragged across the scale. Keep only the
+      // drop-shadow elevation (no white ring — it added little over the colored fill); setting it
+      // explicitly overrides MUI's default grey hover halo.
       background-color: currentColor;
-      // Keep the drop-shadow elevation underneath the white ring (stacked, not replaced).
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(255, 255, 255, 0.5);
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
     }
 
     &:active, &:global(.Mui-active) {
