@@ -84,7 +84,7 @@ $leftPanelBorderRadius: 5px;
         background: none;
         border: none;
         border-radius: 4px;
-        color: $charcoal;
+        color: $charcoalMedium; // grey icon
         cursor: pointer;
         display: inline-flex;
         height: 24px;
@@ -94,10 +94,13 @@ $leftPanelBorderRadius: 5px;
         right: 5px;
         width: 24px;
 
-        // Match the Compare table's close button: a rounded background highlight on hover.
+        // Background highlight on hover / select, matching the button language: light orange -> orange.
         &:hover {
-          background: $hoverColor;
-          color: $charcoal;
+          background: $secondaryColorHover;
+        }
+
+        &:active {
+          background: $secondaryColor;
         }
 
         &:focus-visible {
