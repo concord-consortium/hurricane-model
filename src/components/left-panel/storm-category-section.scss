@@ -6,6 +6,7 @@
   // room for the absolutely-positioned tick labels (top: 26px) so the category-name readout below
   // the slider doesn't collide with them.
   padding: 0 0 26px;
+  margin-top: -5px; // nudge the slider (rail, thumb, tick labels) up 5px
 
   // Inset the slider to the middle 83.3% (6 - 1 segments) so the thumb snaps to the CENTER of each
   // of the six equal color chips (values 0..5 -> 8.3%, 25%, 41.7%, 58.3%, 75%, 91.7%).
