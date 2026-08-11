@@ -17,7 +17,7 @@
   border-radius: 8px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
   font-family: Lato, arial, sans-serif;
-  color: $charcoal;
+  color: #222; // all table text is #222; differences read from the row background, not text color
   overflow: hidden;
 }
 
@@ -47,7 +47,6 @@
 }
 
 .legend {
-  margin-left: auto;
   font-size: 11px;
   color: $charcoalMedium;
   display: flex;
@@ -55,28 +54,23 @@
   gap: 4px;
 }
 
-.diffDot {
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-  background: $secondaryColor;
-}
-
-.sameWord {
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 10px;
+// Caret + close buttons: always pinned to the right of the header, in any state.
+.headerActions {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .iconBtn {
   appearance: none;
   border: none;
   background: transparent;
-  font-size: 20px;
+  font-size: 24px; // 24px icon glyph…
   line-height: 1;
-  width: 30px;
-  height: 30px;
+  width: 32px; // …in a 32×32 button
+  height: 32px;
   cursor: pointer;
   color: $charcoalMedium;
   border-radius: 4px;
@@ -87,16 +81,22 @@
   &:hover { background: $hoverColor; color: $charcoal; }
 }
 
-// Chevron points down (⌃ rotated 180°) when collapsed = "click to expand"; up when expanded.
+// The left-panel dropdown-arrow SVG (natively points down) — centers cleanly in the button via its
+// 24×24 viewBox, unlike a text glyph. Down when collapsed = "click to expand"; up when expanded.
 .chevron {
-  display: inline-block;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.15s ease;
-  transform: rotate(180deg);
+  transform: rotate(0deg);
+
+  svg { display: block; }
+  // Match the × button: grey by default (#797979 == the SVG's native fill), darkening on hover.
+  svg path:last-child { fill: currentColor; }
 }
 
 .chevronUp {
-  transform: rotate(0deg);
+  transform: rotate(180deg);
 }
 
 .scroll {
@@ -126,7 +126,7 @@
 .table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 13px;
+  font-size: 14px;
 
   th, td {
     padding: 6px 10px;
@@ -140,18 +140,33 @@
   position: sticky;
   left: 0;
   background: #ffffff;
+  font-family: Lato, arial, sans-serif; // prose labels stay Lato; only the run-column data is condensed
+  font-size: 14px;
   font-weight: 600;
+  color: #222;
   white-space: nowrap;
   border-right: 1px solid $hoverColor;
   z-index: 1;
 
-  .sameTag {
-    margin-left: 6px;
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: $charcoalMedium;
-    font-weight: 700;
+  // Icon + label, matching the run-card setup rows. Setup rows pass an icon; result rows don't.
+  // Block-level flex (not inline-flex) so the cell's vertical-align:middle centers it geometrically —
+  // keeping the label aligned with the cell content despite the label (Lato) vs data (Condensed) fonts.
+  .rowLabelName {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .rowIcon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  // The Storm Category row-label hurricane keeps a white fill (its grey base outlines the shape);
+  // the run's category color lives on the per-column icons instead.
+  .rowIconHurricane {
+    color: #fff;
   }
 }
 
@@ -187,6 +202,7 @@
 // Every run cell selects its column on click.
 .runCell {
   cursor: pointer;
+  font-family: $scaleFont; // Roboto Condensed — the app's data/readout font (matches the run cards)
 
   &:hover { background: #fff6e6; }
 }
@@ -204,38 +220,35 @@
   width: 22px;
   height: 22px;
   border-radius: 5px; // rounded rectangle, matching the run-thumbnail badge (was a circle)
-  background: $charcoal;
-  color: #ffffff;
+  background: #ccc;
+  color: #222;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
   margin-right: 6px;
 }
 
 
-// Diff / same treatment.
 .dataRow td { border-top: 1px solid #f0f0f0; }
 
-.diff {
-  .rowLabel { box-shadow: inset 3px 0 0 $secondaryColor; }
-  td { background: #fffaf0; }
+// Category cell (Storm Category / Peak Category): hurricane icon (category-colored) + label, no pill.
+// Block-level flex so the cell's vertical-align:middle centers it geometrically (see .rowLabelName).
+.catCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.same {
-  .rowLabel, td { color: $charcoalMedium; }
+.catCellIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
-// Chips + values.
-.catChip {
-  display: inline-block;
-  min-width: 34px;
-  text-align: center;
-  padding: 1px 7px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 12px;
-  color: $charcoal;
-  border: 1px solid rgba(0, 0, 0, 0.18);
+.catCellLabel {
+  font-size: 14px;
 }
+
+// The category cell's grey base still shapes the icon even when its category fill is pale (TS/Cat 1).
 
 .chips { display: inline-flex; flex-wrap: wrap; gap: 4px; }
 
@@ -257,7 +270,7 @@
 .low  { background: #d7d7ff; }
 
 .mono { font-variant-numeric: tabular-nums; }
-.muted { color: $charcoalMedium; }
+.muted { color: #222; }
 
 // Lifetime bar.
 .bar {
@@ -277,4 +290,4 @@
 }
 
 .spark { display: block; }
-.noData { color: $charcoalMedium; }
+.noData { color: #222; }

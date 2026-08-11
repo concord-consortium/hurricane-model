@@ -14,6 +14,14 @@ import { resolveStartLocation } from "../../models/simulation";
 import { formatLatLng } from "../../utils/lat-long";
 import { CATEGORY_COLORS, categoryChip, runLetter } from "../left-panel/run-summary";
 
+import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
+import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
+import SeasonIcon from "../../assets/left-panel/season.svg";
+import ThermometerIcon from "../../assets/left-panel/thermometer.svg";
+import PressureSystemIcon from "../../assets/left-panel/pressure-system.svg";
+import DropdownArrow from "../../assets/left-panel/dropdown-arrow.svg";
+
+import categoryCss from "../hurricane-category.scss";
 import css from "./compare-overlay.scss";
 
 // Darker, legible-on-white strokes for the intensity sparkline, indexed by category (the Saffir–
@@ -54,9 +62,16 @@ function Sparkline({ series, uid, widthPx }: { series: number[]; uid: string; wi
   );
 }
 
-function CatChip({ category }: { category: number | undefined }) {
+// Category cell (Storm Category / Peak Category): the hurricane icon recolored to the run's category
+// + the label (TS, Cat 1…), no pill. Mirrors the icon on the row label, but colored per run.
+function CatCell({ category }: { category: number | undefined }) {
   const c = categoryChip(category);
-  return <span className={css.catChip} style={{ backgroundColor: c.color }}>{c.label}</span>;
+  return (
+    <span className={css.catCell}>
+      <HurricaneIcon className={clsx(css.catCellIcon, categoryCss["category" + c.index])} />
+      <span className={css.catCellLabel}>{c.label}</span>
+    </span>
+  );
 }
 
 /**
@@ -143,16 +158,15 @@ export const CompareOverlay = observer(function CompareOverlay() {
       pressures: (sim.pressureSystems || []).map(ps => (ps.type === "high" ? "H" : "L")),
       peak: peakCategory(sim),
       landfall,
-      landfallText: landfall.count === 0 ? "None" : `${landfall.count}×, ${categoryChip(landfall.peakCategory).label}`,
+      landfallText: landfall.count === 0 ? "None" : `${landfall.count}×`,
       duration: durationSteps(sim),
       series: intensitySeries(sim)
     };
   });
 
   const maxDuration = Math.max(1, ...data.map(d => d.duration));
-  const LIFE_W = 84; // full Lifetime bar width (matches .bar in the scss); sparklines share this scale
+  const LIFE_W = 84; // px width for the longest-lived run; the Category-over-time sparkline scales to this
   const lifeWidth = (d: { duration: number }) => (d.duration / maxDuration) * LIFE_W;
-  const differs = (vals: string[]) => new Set(vals).size > 1;
 
   const selectRun = (id: string, state: IHurricaneInteractiveState) => {
     multiTrack.selectRun(id);
@@ -168,14 +182,13 @@ export const CompareOverlay = observer(function CompareOverlay() {
     if (state) selectRun(id, state);
   };
 
-  // A diff-aware data row: `cmp` drives same/diff detection, `render` draws each run's cell.
-  const Row = (label: string, cmp: string[], render: (i: number) => React.ReactNode) => {
-    const diff = differs(cmp);
+  // A data row. `icon` (Setup rows only) is drawn beside the label, matching the run-card summary
+  // icons; `render` draws each run's cell. Differences are not indicated (no color, no tag).
+  const Row = (label: string, render: (i: number) => React.ReactNode, icon?: React.ReactNode) => {
     return (
-      <tr className={clsx(css.dataRow, diff ? css.diff : css.same)}>
+      <tr className={css.dataRow}>
         <th scope="row" className={css.rowLabel}>
-          <span>{label}</span>
-          {!diff && <span className={css.sameTag}>same</span>}
+          <span className={css.rowLabelName}>{icon}{label}</span>
         </th>
         {data.map((d, i) => (
           <td key={d.id} className={css.runCell} onClick={() => selectColumn(d.id)}>
@@ -197,22 +210,19 @@ export const CompareOverlay = observer(function CompareOverlay() {
     >
       <header className={css.header} onPointerDown={onHeaderPointerDown}>
         <span className={css.title}>Compare Runs</span>
-        {collapsed
-          ? <span className={css.legend}>{data.length} run{data.length === 1 ? "" : "s"}</span>
-          : (
-            <span className={css.legend}>
-              <span className={css.diffDot} /> differs · <span className={css.sameWord}>same</span> unchanged
-            </span>
-          )}
-        <button type="button" className={css.iconBtn} data-test="compare-collapse"
-          aria-label={collapsed ? "Expand compare" : "Collapse compare"} aria-expanded={!collapsed}
-          onClick={() => setCollapsed(c => !c)}>
-          <span className={clsx(css.chevron, { [css.chevronUp]: !collapsed })}>⌃</span>
-        </button>
-        <button type="button" className={css.iconBtn} data-test="compare-close"
-          aria-label="Close compare" onClick={() => ui.setCompareOpen(false)}>
-          ×
-        </button>
+        {collapsed && <span className={css.legend}>{data.length} run{data.length === 1 ? "" : "s"}</span>}
+        {/* Actions stay pinned to the right of the header in every state (collapsed or not). */}
+        <div className={css.headerActions}>
+          <button type="button" className={css.iconBtn} data-test="compare-collapse"
+            aria-label={collapsed ? "Expand compare" : "Collapse compare"} aria-expanded={!collapsed}
+            onClick={() => setCollapsed(c => !c)}>
+            <span className={clsx(css.chevron, { [css.chevronUp]: !collapsed })}><DropdownArrow /></span>
+          </button>
+          <button type="button" className={css.iconBtn} data-test="compare-close"
+            aria-label="Close compare" onClick={() => ui.setCompareOpen(false)}>
+            ×
+          </button>
+        </div>
       </header>
 
       {!collapsed && <div className={css.scroll}>
@@ -241,36 +251,34 @@ export const CompareOverlay = observer(function CompareOverlay() {
           </thead>
           <tbody>
             <tr className={css.groupRow}><th colSpan={data.length + 1}>Setup — what you changed</th></tr>
-            {Row("Storm Location", data.map(d => d.location),
-              i => <span className={css.mono}>{data[i].location}</span>)}
-            {Row("Storm Category", data.map(d => String(d.startCat ?? 0)),
-              i => <CatChip category={data[i].startCat} />)}
-            {Row("Season", data.map(d => d.season), i => data[i].season)}
-            {Row("Sea Surface Temp", data.map(d => JSON.stringify(d.anomalies)), i => (
+            {Row("Storm Location",
+              i => <span className={css.mono}>{data[i].location}</span>,
+              <StormLocationIcon className={css.rowIcon} />)}
+            {Row("Storm Category",
+              i => <CatCell category={data[i].startCat} />,
+              <HurricaneIcon className={clsx(css.rowIcon, css.rowIconHurricane)} />)}
+            {Row("Season", i => data[i].season,
+              <SeasonIcon className={css.rowIcon} />)}
+            {Row("Sea Surface Temp", i => (
               data[i].anomalies.length === 0
                 ? <span className={css.muted}>Baseline</span>
                 : <span className={css.chipsCol}>{data[i].anomalies.map(a => (
                     <span key={a.label} className={clsx(css.chip, a.v > 0 ? css.warm : css.cool)}>
                       {a.label} {a.v > 0 ? "+" : "−"}{Math.abs(a.v)}°
                     </span>))}</span>
-            ))}
-            {Row("Pressure Systems", data.map(d => d.pressureSig), i => (
+            ), <ThermometerIcon className={css.rowIcon} />)}
+            {Row("Pressure Systems", i => (
               <span className={css.chips}>{data[i].pressures.map((p, k) => (
                 <span key={k} className={clsx(css.chip, p === "H" ? css.high : css.low)}>{p}</span>))}</span>
-            ))}
+            ), <PressureSystemIcon className={css.rowIcon} />)}
 
             <tr className={css.groupRow}><th colSpan={data.length + 1}>Result — what happened</th></tr>
-            {Row("Peak Category", data.map(d => String(d.peak)), i => <CatChip category={data[i].peak} />)}
-            {Row("Landfall", data.map(d => d.landfallText), i => (
-              data[i].landfall.count === 0
-                ? <span className={css.muted}>None</span>
-                : <span>{data[i].landfall.count}× · <CatChip category={data[i].landfall.peakCategory} /></span>
-            ))}
-            {Row("Lifetime", data.map(d => String(d.duration)), i => (
-              <span className={css.bar}><span className={css.barFill}
-                style={{ width: `${Math.round((data[i].duration / maxDuration) * 100)}%` }} /></span>
-            ))}
-            {Row("Intensity over time", data.map(d => JSON.stringify(d.series)), i => (
+            {Row("Peak Category", i => <CatCell category={data[i].peak} />)}
+            {Row("Landfall",
+              i => <span>{data[i].landfall.count === 0 ? "None" : `${data[i].landfall.count}×`}</span>)}
+            {/* Lifetime row removed by content design, but the sparkline still scales its width to the
+                run's lifetime (lifeWidth), so a longer-lived storm reads as a wider category trace. */}
+            {Row("Category Over Time", i => (
               <Sparkline series={data[i].series} uid={data[i].id} widthPx={lifeWidth(data[i])} />
             ))}
           </tbody>

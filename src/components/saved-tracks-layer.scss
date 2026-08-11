@@ -10,11 +10,11 @@
   align-items: center;
   justify-content: center;
   font-family: Lato, sans-serif;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 18px;
   line-height: 1;
-  color: #fff;
-  background: #333333;
+  color: #222;
+  background: #ccc;
   border: 2px solid #fff;
   border-radius: 5px; // rounded rectangle, matching the run-thumbnail badge (was a circle)
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
@@ -22,6 +22,6 @@
 
   &.selected {
     background: $secondaryColor;
-    color: #333333;
+    color: $charcoal;
   }
 }

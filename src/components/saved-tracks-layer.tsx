@@ -63,13 +63,15 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
           multiTrack.autoCaptureSuppressed = false;
         };
         return (
-          // Include selection in the key so the polylines re-create when selection changes:
-          // react-leaflet applies pane/className only at layer creation.
-          <React.Fragment key={`${run.id}-${isSelected ? "sel" : "ghost"}`}>
-            <StaticTrack track={track} selected={isSelected} onClick={select} />
+          <React.Fragment key={run.id}>
+            {/* Selection is in StaticTrack's key (only) so the polylines re-create when selection
+                changes — react-leaflet applies pane/className only at layer creation. The letter
+                marker keeps a stable key so it persists (updating zIndexOffset/className in place)
+                instead of being torn down and re-added, which made the A/B/C labels blink. */}
+            <StaticTrack key={isSelected ? "sel" : "ghost"} track={track} selected={isSelected} onClick={select} />
             {/* Base order is by run index (A lowest … F highest); the selected run's label jumps
                 above all unselected labels, but stays below the storm marker (offset 1,000,000). */}
-            <LeafletCustomMarker position={endPos} zIndexOffset={(isSelected ? 500000 : 0) + i * 10000}>
+            <LeafletCustomMarker key="label" position={endPos} zIndexOffset={(isSelected ? 500000 : 0) + i * 10000}>
               <div className={clsx(css.trackEndLabel, { [css.selected]: isSelected })} onClick={select}>
                 {runLetter(i)}
               </div>

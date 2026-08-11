@@ -244,11 +244,15 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           { navigation && <ZoomControl position="topleft" ref={this.zoomRef} /> }
           {
-            navigation && ui.mapModifiedByUser &&
+            // Persistent fit-all: always shown alongside the zoom controls. When the view is already
+            // fit (not modified by the user) it's disabled and its icon dimmed — same treatment as
+            // the zoom-in/out buttons at their min/max (Leaflet's .leaflet-disabled).
+            navigation &&
             <Control position="topleft" className={resetButtonClasses}>
-              <a className={css.resetViewBtn}
-                onClick={this.resetView}
-                title="Reset view" role="button" aria-label="Reset view"
+              <a className={clsx(css.resetViewBtn, { "leaflet-disabled": !ui.mapModifiedByUser })}
+                onClick={ui.mapModifiedByUser ? this.resetView : undefined}
+                title="Fit all" role="button" aria-label="Fit all"
+                aria-disabled={!ui.mapModifiedByUser}
               >
                 <FitAllIcon/>
               </a>
@@ -314,8 +318,18 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public resetView = () => {
-    this.leafletMap?.flyToBounds(this.stores.ui.initialBounds);
-    this.stores.ui.resetMapView();
+    const map = this.leafletMap;
+    if (!map) return;
+    const { ui } = this.stores;
+    // Mark this fly as programmatic so its moveend doesn't re-flag the view as user-modified —
+    // otherwise mapModifiedByUser flips back to true right after resetMapView() cleared it, and the
+    // Fit-all button re-enables the instant it was fit. Cleared once this fly settles.
+    this._programmaticMapUpdate = true;
+    map.once("moveend", () => { this._programmaticMapUpdate = false; });
+    // With the panel open, fit panelMaxBounds (the "full region, offset right of the panel" framing,
+    // which also equals the active maxBounds — so it can't overshoot and bounce). Closed: initialBounds.
+    map.flyToBounds(ui.leftPanelOpen ? ui.panelMaxBounds : ui.initialBounds);
+    ui.resetMapView();
     log("ResetMapViewClicked");
   }
 

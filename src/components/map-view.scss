@@ -57,6 +57,11 @@
     svg {
       margin-top: 3px;
     }
+
+    // Disabled (view already fit): dim just the icon, matching the zoom-limit buttons.
+    &:global(.leaflet-disabled) svg {
+      opacity: 0.4;
+    }
   }
 
   .mapButtonLabel {
