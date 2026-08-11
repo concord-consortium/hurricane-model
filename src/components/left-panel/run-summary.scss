@@ -5,11 +5,12 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
+  font-family: $scaleFont; // Roboto Condensed — the app's data/readout font (matches the map labels)
   font-size: 14px;
   color: $charcoal;
 
   .setupHeading {
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -45,7 +46,7 @@
     display: inline-block;
     padding: 1px 6px;
     border-radius: 9px;
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 700;
     background: #eef1f4;
     color: #4a5560;
