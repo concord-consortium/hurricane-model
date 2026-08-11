@@ -98,6 +98,17 @@
     background-image: url("../assets/zoom-out.svg");
   }
 
+  // Pressed / selected — the same grey as the app's hover state.
+  :global(.leaflet-bar a:active) {
+    background-color: $hoverColor;
+  }
+
+  // Disabled zoom button (Leaflet adds .leaflet-disabled at min/max zoom) — dim the icon with our
+  // standard disabled opacity.
+  :global(.leaflet-bar a.leaflet-disabled) {
+    opacity: 0.4;
+  }
+
   :global(.leaflet-top.leaflet-left) {
     display: flex;
     flex-direction: column;
