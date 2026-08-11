@@ -18,8 +18,9 @@ import { StaticTrack } from "./static-track";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
 import config from "../config";
-import CenterFocusStrong from "@mui/icons-material/CenterFocusStrong";
 import Home from "@mui/icons-material/Home";
+
+import FitAllIcon from "../assets/map/fit-all.svg";
 import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
@@ -249,7 +250,7 @@ export class MapView extends BaseComponent<IProps, IState> {
                 onClick={this.resetView}
                 title="Reset view" role="button" aria-label="Reset view"
               >
-                <CenterFocusStrong/>
+                <FitAllIcon/>
               </a>
             </Control>
           }
