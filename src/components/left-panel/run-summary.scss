@@ -11,7 +11,7 @@
 
   .setupHeading {
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: $charcoalMedium;
@@ -31,9 +31,8 @@
     flex-shrink: 0;
   }
 
-  // Keep the storm category prominent (its headline attribute) among the summary rows.
   .catText {
-    font-weight: 800;
+    font-weight: 400;
   }
 
   .chips {
@@ -47,7 +46,7 @@
     padding: 1px 6px;
     border-radius: 9px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 400;
     background: #eef1f4;
     color: #4a5560;
   }
