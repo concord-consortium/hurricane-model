@@ -39,9 +39,9 @@ interface IState {}
 const getPressureLabel = (model: PressureSystem) => {
   const normalizedStrength = (model.strength - minStrength) / (maxStrength - minStrength);
   if (model.type === "high") {
-    return Math.round(1015 + normalizedStrength * mbLabelRange) + "mb";
+    return Math.round(1015 + normalizedStrength * mbLabelRange) + " mb";
   } else {
-    return Math.round(1010 - normalizedStrength * mbLabelRange) + "mb";
+    return Math.round(1010 - normalizedStrength * mbLabelRange) + " mb";
   }
 };
 
