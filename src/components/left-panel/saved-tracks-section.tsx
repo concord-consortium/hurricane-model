@@ -111,7 +111,6 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
                 {editable && <div className={css.editableLabel}>Not run yet — editable</div>}
                 <div className={css.runCardHeader}>
                   <span className={css.badge}>{runLetter(i)}</span>
-                  <span className={css.runName}>Run {runLetter(i)}</span>
                 </div>
                 <div className={css.splitBody}>
                   <div className={css.setupCol}>
