@@ -156,7 +156,8 @@
     }
 
     .resultHeading {
-      font-size: 10px;
+      font-family: $scaleFont; // match RunSummary's SETUP heading (Roboto Condensed)
+      font-size: 14px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.04em;
