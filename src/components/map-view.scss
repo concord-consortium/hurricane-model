@@ -81,9 +81,10 @@
   }
 
   // Swap Leaflet's built-in +/- text glyphs for our zoom icons (loaded as background images).
+  // !important beats Leaflet's touch-mode font-size rule, which otherwise keeps the +/- text visible.
   :global(.leaflet-control-zoom-in),
   :global(.leaflet-control-zoom-out) {
-    font-size: 0; // hide the built-in +/- character
+    font-size: 0 !important; // hide the built-in +/- character
     background-repeat: no-repeat;
     background-position: center;
     background-size: 22px 22px;
