@@ -80,21 +80,30 @@
     border-bottom-right-radius: 4px;
   }
 
-  // Swap Leaflet's built-in +/- text glyphs for our zoom icons (loaded as background images).
-  // !important beats Leaflet's touch-mode font-size rule, which otherwise keeps the +/- text visible.
+  // Swap Leaflet's built-in +/- text glyphs for our 24x24 zoom icons. The icon is drawn on a
+  // pseudo-element (not the button background) so the disabled state can dim just the icon, not the
+  // whole button. !important beats Leaflet's touch-mode font-size rule that keeps the +/- text.
   :global(.leaflet-control-zoom-in),
   :global(.leaflet-control-zoom-out) {
     font-size: 0 !important; // hide the built-in +/- character
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 22px 22px;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 24px 24px;
+      pointer-events: none;
+    }
   }
 
-  :global(.leaflet-control-zoom-in) {
+  :global(.leaflet-control-zoom-in)::after {
     background-image: url("../assets/zoom-in.svg");
   }
 
-  :global(.leaflet-control-zoom-out) {
+  :global(.leaflet-control-zoom-out)::after {
     background-image: url("../assets/zoom-out.svg");
   }
 
@@ -103,9 +112,9 @@
     background-color: $hoverColor;
   }
 
-  // Disabled zoom button (Leaflet adds .leaflet-disabled at min/max zoom) — dim the icon with our
-  // standard disabled opacity.
-  :global(.leaflet-bar a.leaflet-disabled) {
+  // Disabled zoom button (Leaflet adds .leaflet-disabled at min/max zoom) — dim just the icon.
+  :global(.leaflet-control-zoom-in.leaflet-disabled)::after,
+  :global(.leaflet-control-zoom-out.leaflet-disabled)::after {
     opacity: 0.4;
   }
 
