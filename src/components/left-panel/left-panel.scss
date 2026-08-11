@@ -48,6 +48,10 @@ $leftPanelBorderRadius: 0; // square corners
     // runs can't squeeze the setup options off the top — the Runs section below scrolls instead.
     &.multiTrackMode .panelList {
       flex: 0 0 auto;
+      // Drop the list's bottom padding so the last section's border sits flush against the Saved
+      // Tracks section's top border — one clean 2px separator, matching single-track (where the
+      // Single Track card sits inside the list and abuts the section border directly).
+      padding-bottom: 0;
     }
 
     .leftPanelHeader {
