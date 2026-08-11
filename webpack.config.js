@@ -76,7 +76,16 @@ module.exports = (env, argv) => {
             },
             {
               issuer: /\.tsx?$/,
-              loader: '@svgr/webpack'
+              loader: '@svgr/webpack',
+              // Keep the viewBox (SVGO's removeViewBox strips it by default), so icons scale to any
+              // CSS size instead of cropping when rendered smaller than their native width/height.
+              options: {
+                svgoConfig: {
+                  plugins: [
+                    { name: 'preset-default', params: { overrides: { removeViewBox: false } } }
+                  ]
+                }
+              }
             }
           ]
         }
