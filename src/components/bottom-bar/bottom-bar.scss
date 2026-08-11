@@ -82,22 +82,29 @@ $overflowHeight: 11px;
     margin-right: 10px;
   }
 
+  .rightContainer {
+    display: flex;
+    align-items: center;  // center the fullscreen icon vertically in the bar
+    padding-right: 10px;  // ...and sit it 10px from the right edge
+  }
+
   .fullscreenIcon {
-    margin-right: 5px;
-    margin-top: 5px;
-    height: 50px;
-    width: 50px;
-    background-size: 100%;
+    width: 42px;
+    height: 42px;
     cursor: pointer;
-    background-image: url("../../assets/fullscreen.svg");
+    // One icon each (enter / exit), colored via CSS mask: #D1D3D4 default, #797979 on hover.
+    background-color: #D1D3D4;
+    -webkit-mask: url("../../assets/fullscreen.svg") no-repeat center / contain;
+    mask: url("../../assets/fullscreen.svg") no-repeat center / contain;
+    transition: background-color 0.12s;
+
     &:hover {
-      background-image: url("../../assets/fullscreen-dark.svg");
+      background-color: #797979;
     }
+
     &.fullscreen {
-      background-image: url("../../assets/fullscreen-exit.svg");
-      &:hover {
-        background-image: url("../../assets/fullscreen-exit-dark.svg");
-      }
+      -webkit-mask-image: url("../../assets/fullscreen-exit.svg");
+      mask-image: url("../../assets/fullscreen-exit.svg");
     }
   }
 
