@@ -20,7 +20,7 @@ import { PrecipitationLayer } from "./precipitation-layer";
 import config from "../config";
 import Home from "@mui/icons-material/Home";
 
-import FitAllIcon from "../assets/map/fit-all.svg";
+import FitAllIcon from "../assets/fit-all.svg";
 import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
