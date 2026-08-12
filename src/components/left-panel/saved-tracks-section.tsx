@@ -28,7 +28,10 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
   const selectedCardRef = useRef<HTMLLIElement | null>(null);
   useEffect(() => {
     if (multiTrack.enabled && stores.ui.leftPanelOpen && selectedCardRef.current) {
-      selectedCardRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      // "auto" (instant), not "smooth": when selection comes from the compare table, the card's
+      // .selected applies immediately, but a smooth scroll to an off-screen card made it *look* like
+      // selection lagged (~300ms of animation). Snapping it into view keeps both directions instant.
+      selectedCardRef.current.scrollIntoView({ block: "nearest", behavior: "auto" });
     }
   }, [multiTrack.enabled, multiTrack.selectedRunId, stores.ui.leftPanelOpen]);
 

@@ -57,7 +57,7 @@ export function runCategory(sim: IRunSetupSim) {
   };
 }
 
-function anomalyText(v: number): string {
+export function anomalyText(v: number): string {
   return `${v > 0 ? "+" : "−"}${Math.abs(v)} °C`;
 }
 
@@ -91,10 +91,10 @@ export function RunSummary({ sim }: IProps) {
       <div className={css.row}><SeasonIcon className={css.icon} /><span>{season}</span></div>
       <div className={css.row}>
         <ThermometerIcon className={css.icon} />
-        <span className={css.chips}>
-          {anomalies.length === 0 && <span className={css.chip}>Baseline</span>}
+        <span className={css.anomList}>
+          {anomalies.length === 0 && <span className={css.anomVal}>Baseline</span>}
           {anomalies.map(a => (
-            <span key={a.label} className={clsx(css.chip, a.v > 0 ? css.warm : css.cool)}>
+            <span key={a.label} className={clsx(css.anomVal, a.v > 0 ? css.warm : css.cool)}>
               {a.label} {anomalyText(a.v)}
             </span>
           ))}

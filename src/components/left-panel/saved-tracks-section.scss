@@ -16,24 +16,26 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    font-size: 12px;
+    font-size: 14px; // match the Single/Multi-track toggle button text
     font-weight: bold;
     color: $charcoal;
     margin-bottom: 8px;
   }
 
+  // Matches the Single/Multi-track toggle buttons: 14px bold, 6px radius, transparent -> light-orange
+  // hover; the active (.compareOn) state goes full orange.
   .compareBtn {
     appearance: none;
     cursor: pointer;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 7px 8px;
+    border-radius: 6px;
     border: 1px solid $charcoalMedium;
-    background: #ffffff;
+    background: transparent;
     color: $charcoal;
 
-    &:hover { background: $hoverColor; }
+    &:hover { background: $secondaryColorHover; }
 
     &:disabled {
       cursor: default;
@@ -79,7 +81,8 @@
     cursor: pointer;
     transition: background-color 0.12s, border-color 0.12s, box-shadow 0.12s;
 
-    &:hover { background: #fafafa; }
+    // Same light orange as the selected fill; selected is still set apart by its orange border + shadow.
+    &:hover { background: #fff6e6; }
 
     &.selected {
       border-color: $secondaryColor;

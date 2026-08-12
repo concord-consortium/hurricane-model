@@ -12,7 +12,7 @@ import {
 } from "../../utils/run-outcomes";
 import { resolveStartLocation } from "../../models/simulation";
 import { formatLatLng } from "../../utils/lat-long";
-import { CATEGORY_COLORS, categoryChip, runLetter } from "../left-panel/run-summary";
+import { CATEGORY_COLORS, anomalyText, categoryChip, runLetter } from "../left-panel/run-summary";
 
 import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
 import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
@@ -55,7 +55,7 @@ function Sparkline({ series, uid, widthPx }: { series: number[]; uid: string; wi
         {grad(strokeId, SPARK_STROKE)}
         {grad(fillId, CATEGORY_COLORS)}
       </defs>
-      <polygon points={area} fill={`url(#${fillId})`} opacity={0.5} />
+      <polygon points={area} fill={`url(#${fillId})`} opacity={0.75} />
       <polyline points={pts} fill="none" stroke={`url(#${strokeId})`} strokeWidth={1.75}
         strokeLinejoin="round" strokeLinecap="round" />
     </svg>
@@ -263,8 +263,8 @@ export const CompareOverlay = observer(function CompareOverlay() {
               data[i].anomalies.length === 0
                 ? <span className={css.muted}>Baseline</span>
                 : <span className={css.chipsCol}>{data[i].anomalies.map(a => (
-                    <span key={a.label} className={clsx(css.chip, a.v > 0 ? css.warm : css.cool)}>
-                      {a.label} {a.v > 0 ? "+" : "−"}{Math.abs(a.v)}°
+                    <span key={a.label} className={clsx(css.anomVal, a.v > 0 ? css.warm : css.cool)}>
+                      {a.label} {anomalyText(a.v)}
                     </span>))}</span>
             ), <ThermometerIcon className={css.rowIcon} />)}
             {Row("Pressure Systems", i => (

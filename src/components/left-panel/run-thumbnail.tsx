@@ -98,16 +98,15 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: { sim: ISimu
           stroke={CATEGORY_COLORS[p.category] || "#ffffff"} strokeWidth={1.4} strokeLinecap="round" />
       ))}
 
-      {/* Pressure systems: blue H (high) / red L (low), matching the map. */}
+      {/* Pressure systems: blue H (high) / red L (low), matching the map markers. No circle — just
+          the larger letter, with a white halo (paintOrder=stroke) so it stays legible over the map. */}
       {(sim.pressureSystems || []).map((ps, i) => {
         const x = px(ps.center.lng), y = py(ps.center.lat);
         const high = ps.type === "high";
         return (
-          <g key={`ps-${i}`}>
-            <circle cx={x} cy={y} r={4.4} fill={high ? "#1f6fb2" : "#c0392b"} stroke="#fff" strokeWidth={0.7} />
-            <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={5.4}
-              fontWeight={700} fill="#fff">{high ? "H" : "L"}</text>
-          </g>
+          <text key={`ps-${i}`} x={x} y={y} textAnchor="middle" dominantBaseline="central"
+            fontSize={12} fontWeight={700} fill={high ? "#327cfc" : "#fc542d"}
+            stroke="#fff" strokeWidth={1} paintOrder="stroke">{high ? "H" : "L"}</text>
         );
       })}
     </svg>

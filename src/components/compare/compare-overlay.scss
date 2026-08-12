@@ -255,6 +255,16 @@
 // SST anomalies stack vertically so multiple regions don't widen the column.
 .chipsCol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; }
 
+// SST anomaly per-region value: plain 14px text (region name + signed value), no pill.
+// Warm = red, cool = blue — the same tokens the +/- temperature buttons use.
+.anomVal {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.warm { color: $warmColor; }
+.cool { color: $coldColor; }
+
 .chip {
   padding: 1px 6px;
   border-radius: 9px;
@@ -264,8 +274,6 @@
   white-space: nowrap;
 }
 
-.warm { background: #ffe0cc; }
-.cool { background: #cfe5ff; }
 .high { background: #ffe7b3; }
 .low  { background: #d7d7ff; }
 

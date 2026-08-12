@@ -20,8 +20,15 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
   cursor: pointer;
 
+  // Hover = light orange, matching the left-panel close (×) button (selected stays full orange).
+  &:hover:not(.selected) {
+    background: $secondaryColorHover;
+  }
+
+  // Already selected — re-selecting is a no-op, so it's not a pointer target.
   &.selected {
     background: $secondaryColor;
     color: $charcoal;
+    cursor: default;
   }
 }

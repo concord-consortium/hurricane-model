@@ -58,6 +58,12 @@
 
   .hint {
     margin-bottom: 11px;
+
+    // When the hint is the only content (no controls follow, e.g. Sea Surface Temp), drop the
+    // trailing gap so the section keeps its standard 12px bottom padding, nothing extra.
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   .postscript {
@@ -66,7 +72,7 @@
 
   .tip {
     background-color: #eaf3d6; // soft green callout with enough presence to read against the #fafafa section
-    font-size: 14px; // matches the hint/postscript body text
+    font-size: 12px; // Note/Tip callouts (whole thing: bold label + text)
     line-height: 1.2; // was inheriting a cramped 13px (0.93x); open it up a touch
     margin-top: 11px; // separate the callout from preceding content (e.g. the Season buttons)
     padding: 8px;

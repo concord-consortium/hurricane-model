@@ -41,6 +41,20 @@
     gap: 3px;
   }
 
+  // SST anomalies: plain text stacked (region + signed value), warm = red, cool = blue — matching
+  // the +/- temperature buttons. No pills, so they sit directly on the card fill.
+  .anomList {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .anomVal { white-space: nowrap; }
+
+  .warm { color: $warmColor; }
+  .cool { color: $coldColor; }
+
   .chip {
     display: inline-block;
     padding: 1px 6px;
@@ -51,8 +65,6 @@
     color: #4a5560;
   }
 
-  .warm { background: #fdeede; color: #a35a12; }
-  .cool { background: #e6f0fb; color: #2c6ca8; }
   .high { background: #e7eefc; color: #2b5a8c; }
   .low  { background: #f0eaf6; color: #6a4a86; }
 }

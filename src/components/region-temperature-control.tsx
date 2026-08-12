@@ -46,7 +46,7 @@ interface IProps {
 function statusText(anomaly: number): string {
   if (anomaly === 0) return "Baseline";
   // Non-breaking space so the value and unit never split across a line wrap.
-  return `${anomaly > 0 ? "+" : ""}${anomaly} °C`;
+  return `${anomaly > 0 ? "+" : "−"}${Math.abs(anomaly)} °C`;
 }
 
 export const RegionTemperatureControl = observer(function RegionTemperatureControl({ regionKey }: IProps) {
