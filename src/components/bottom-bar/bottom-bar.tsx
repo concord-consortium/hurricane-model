@@ -8,7 +8,6 @@ import config from "../../config";
 import { log } from "../../log";
 import { safeStartLocation } from "../../utils/interactive-state";
 import { BaseComponent, IBaseProps } from "../base";
-import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 import { Dialog } from "../dialog";
 import { HurricaneImageToggle } from "./hurricane-image-toggle";
 import { HurricaneScale } from "./hurricane-scale";
@@ -55,7 +54,6 @@ function toggleFullscreen() {
 @inject("stores")
 @observer
 export class BottomBar extends BaseComponent<IProps, IState> {
-  private delayedStart: ReturnType<typeof setTimeout> | null = null;
 
   constructor(props: IProps) {
     super(props);
@@ -78,7 +76,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public componentWillUnmount() {
-    this.clearDelayedStart();
     if (screenfull && screenfull.isEnabled) {
       document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
@@ -262,27 +259,16 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         outcome: simulation.getOutcomeData()
       });
     } else {
-      // Collapse any open setup category when the run starts.
+      // Collapse any open setup category when the run starts; the panel itself is left as the user
+      // set it (open or closed) — it no longer auto-closes on run.
       ui.setSetupMode(undefined);
-      if (ui.leftPanelOpen && !ui.keepPanelOpenOnRun) {
-        // Close the setup panel, then start after it finishes closing.
-        ui.setLeftPanelOpen(false);
-        this.delayedStart = setTimeout(() => this.start(), LEFT_PANEL_TRANSITION_SECONDS * 1000);
-      } else {
-        // Panel is closed, or the user opted to keep it open during the run.
-        this.start();
-      }
+      this.start();
     }
-  }
-
-  private clearDelayedStart = () => {
-    if (this.delayedStart) clearTimeout(this.delayedStart);
   }
 
   public start = () => {
     const { simulation: sim, ui } = this.stores;
     const { hurricane, startLocation } = sim;
-    this.clearDelayedStart();
 
     // In multi-track mode each Start is a NEW run: clear the previous run's track (keeping the
     // current setup) so the storm re-launches from the configured start instead of appending onto
@@ -324,7 +310,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public restart = () => {
-    this.clearDelayedStart();
     const { simulation, ui, multiTrack } = this.stores;
     simulation.restart();
     ui.setNorthAtlanticView();
@@ -356,7 +341,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public confirmReload = () => {
-    this.clearDelayedStart();
     log("SimulationEnded", {
       reason: "SimulationReloaded",
       outcome: this.stores.simulation.getOutcomeData()

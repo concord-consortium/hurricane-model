@@ -7,7 +7,6 @@ import React from "react";
 import { useStores } from "../../stores-context";
 import SetupIcon from "../../assets/bottom-bar/setup-icon.svg";
 import { PressureSystemsSection } from "./pressure-systems-section";
-import { RunOptions } from "./run-options";
 import { SavedTracksSection } from "./saved-tracks-section";
 import { SeasonSection } from "./season-section";
 import { SeaSurfaceTemperaturesSection } from "./sea-surface-temperatures-section";
@@ -61,7 +60,6 @@ export const LeftPanel = observer(function LeftPanel({ open, toggleOpen }: ILeft
           <SingleTrackCard />
         </List>
         <SavedTracksSection />
-        <RunOptions />
       </div>
     </div>
   );
