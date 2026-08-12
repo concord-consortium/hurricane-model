@@ -58,7 +58,7 @@ export function runCategory(sim: IRunSetupSim) {
 }
 
 export function anomalyText(v: number): string {
-  return `${v > 0 ? "+" : "−"}${Math.abs(v)} °C`;
+  return `${v > 0 ? "+" : "−"}${Math.abs(v)}\u00A0°C`;
 }
 
 interface IProps {
