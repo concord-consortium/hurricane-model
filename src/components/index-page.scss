@@ -1,5 +1,11 @@
 .index {
   height: 100%;
+  // Positioning context for the absolutely-positioned panels. Without this they resolve their
+  // heights against the viewport, but the bottom bar lives in .index's flow (which has a min-height
+  // and can be taller than the viewport). The mismatch let the left panel stop at the viewport
+  // bottom while the bar sat lower — opening a gap that grew as the window shrank. Anchoring the
+  // panels to .index makes them share the bar's reference frame, so they always reach it.
+  position: relative;
 
   .progress {
     position: absolute;

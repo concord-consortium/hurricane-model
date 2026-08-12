@@ -5,13 +5,10 @@ import { createStores } from "../../models/stores";
 import { Provider } from "mobx-react";
 import { BottomBar } from "./bottom-bar";
 import { PNG } from "pngjs";
-import config from "../../config";
 import * as logModule from "../../log";
 import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
-
-const toggleLeftPanelOpen = () => null;
 
 describe("BottomBar component", () => {
   let stores = createStores();
@@ -22,7 +19,7 @@ describe("BottomBar component", () => {
   it("renders basic components", () => {
     render(
       <Provider stores={stores}>
-        <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+        <BottomBar />
       </Provider>
     );
     expect(screen.getByTestId("season-container")).toBeInTheDocument();
@@ -35,7 +32,7 @@ describe("BottomBar component", () => {
   it("start button is disabled until model is ready", () => {
     render(
       <Provider stores={stores}>
-        <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+        <BottomBar />
       </Provider>
     );
     expect(screen.getByTestId("start-button")).toBeDisabled();
@@ -48,7 +45,7 @@ describe("BottomBar component", () => {
       jest.spyOn(stores.ui, "setNorthAtlanticView");
       render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       await user.click(screen.getByTestId("restart-button"));
@@ -61,7 +58,7 @@ describe("BottomBar component", () => {
       (logModule.log as jest.Mock).mockClear();
       render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       await user.click(screen.getByTestId("restart-button"));
@@ -83,7 +80,7 @@ describe("BottomBar component", () => {
       (logModule.log as jest.Mock).mockClear();
       render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       await user.click(screen.getByTestId("reload-button"));
@@ -114,7 +111,7 @@ describe("BottomBar component", () => {
       jest.spyOn(stores.ui, "reset");
       render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       await user.click(screen.getByTestId("reload-button"));
@@ -128,7 +125,7 @@ describe("BottomBar component", () => {
       (logModule.log as jest.Mock).mockClear();
       render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       await user.click(screen.getByTestId("reload-button"));
@@ -160,7 +157,7 @@ describe("BottomBar component", () => {
       });
       render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       // Click start
@@ -189,7 +186,7 @@ describe("BottomBar component", () => {
       });
       render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       await user.click(screen.getByTestId("start-button"));
@@ -211,35 +208,6 @@ describe("BottomBar component", () => {
       expect(params.hurricane).toHaveProperty("center");
       expect(params).toHaveProperty("deterministic");
       expect(params).toHaveProperty("timestep");
-    });
-  });
-
-  describe("storm setup button", () => {
-    let originalMode: string;
-    beforeEach(() => {
-      originalMode = config.mode;
-      config.mode = "storm";
-    });
-    afterEach(() => {
-      config.mode = originalMode;
-    });
-
-    it("restarts the simulation when clicked after the simulation has started", async () => {
-      const user = userEvent.setup();
-      const toggleLeftPanelOpenMock = jest.fn();
-      jest.spyOn(stores.simulation, "restart");
-      render(
-        <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpenMock} />
-        </Provider>
-      );
-      act(() => {
-        stores.simulation.setSimulationStarted(true);
-      });
-
-      await user.click(screen.getByTestId("storm-setup-button"));
-      expect(stores.simulation.restart).toHaveBeenCalled();
-      expect(toggleLeftPanelOpenMock).toHaveBeenCalled();
     });
   });
 
@@ -269,7 +237,7 @@ describe("BottomBar component", () => {
 
       render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
 
@@ -292,14 +260,14 @@ describe("BottomBar component", () => {
     it("is disabled when overlay is different from SST", () => {
       const { rerender } = render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       expect(screen.getByTestId("temp-button")).not.toBeDisabled();
       act(() => stores.ui.setOverlay("stormSurge"));
       rerender(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       expect(screen.getByTestId("temp-button")).toBeDisabled();
@@ -308,14 +276,14 @@ describe("BottomBar component", () => {
     it("is enabled when simulation is started", () => {
       const { rerender } = render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       expect(screen.getByTestId("temp-button")).not.toBeDisabled();
       act(() => stores.simulation.start());
       rerender(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+          <BottomBar />
         </Provider>
       );
       expect(screen.getByTestId("temp-button")).not.toBeDisabled();

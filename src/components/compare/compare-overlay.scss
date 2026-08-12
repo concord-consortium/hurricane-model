@@ -3,7 +3,11 @@
 .overlay {
   position: absolute;
   top: 12px;
-  right: 12px;
+  // Default dock: top-center (clear of the zoom controls top-left and the Base Maps / Map Overlays
+  // tabs top-right). Stays centered as it collapses/expands; dragging switches to explicit left/top
+  // (transform cleared inline) so the clamp math stays simple.
+  left: 50%;
+  transform: translateX(calc(-50% + 400px)); // centered, then nudged 400px right (default dock)
   z-index: 1200;
   // Grows with the number of runs instead of scrolling; capped to the map, then scrolls if needed.
   width: fit-content;
@@ -25,11 +29,21 @@
   min-width: 300px;
 }
 
+// Shown when expanded but there's only one run — nothing to compare yet.
+.hint {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #666;
+}
+
 .header {
+  position: relative; // positioning context for the centered grab dots
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px 8px 14px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 0 10px 0 14px;
   border-bottom: 1px solid $hoverColor;
   background: #fafafa;
   cursor: grab;
@@ -39,6 +53,18 @@
   &:active { cursor: grabbing; }
 }
 
+// Drag affordance: the same 3×3 grab dots as the map markers, centered in the header, gray.
+.grabDots {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 14px;
+  pointer-events: none; // the whole header is the drag target
+
+  circle { fill: #797979; }
+}
+
 .collapsed .header { border-bottom: none; }
 
 .title {
@@ -46,13 +72,6 @@
   font-size: 15px;
 }
 
-.legend {
-  font-size: 11px;
-  color: $charcoalMedium;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
 
 // Caret + close buttons: always pinned to the right of the header, in any state.
 .headerActions {
@@ -179,12 +198,13 @@
 
 .groupRow th {
   background: #f0f0f0;
-  font-size: 11px;
+  font-size: 14px; // match the row-label ("category") text
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: $charcoalMedium;
-  padding: 4px 10px;
+  // Gray, but WCAG AA on the #f0f0f0 row fill: 5.0:1 (the old #797979 was 3.8:1 — failed at this size).
+  color: #666666;
+  padding: 7px 10px; // a bit taller to carry the larger text
 }
 
 // Run-column headers.
@@ -219,12 +239,30 @@
   justify-content: center;
   width: 22px;
   height: 22px;
+  flex-shrink: 0;
   border-radius: 5px; // rounded rectangle, matching the run-thumbnail badge (was a circle)
   background: #ccc;
   color: #222;
   font-weight: 700;
   font-size: 14px;
-  margin-right: 6px;
+}
+
+// Header cell content: the letter badge + (when relevant) the run's state label beside it.
+.headInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+// "Not run yet — editable" / "Editing…" beside the letter, matching the run-card state labels.
+.headState {
+  font-family: Lato, arial, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #a35a12;
+  white-space: nowrap;
 }
 
 
@@ -254,6 +292,21 @@
 
 // SST anomalies stack vertically so multiple regions don't widen the column.
 .chipsCol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+
+// Pressure Systems: one line per changed system ("H1: moved SSW, 1000 mb"), matching the run cards.
+// Lines stay on one row (nowrap) so the table widens to fit rather than wrapping — the overlay is
+// fit-content up to the map width, so it grows to make room.
+.pressureCol {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+// Labels (H1, L2…): the map blue/red, AA on the table's white background (~5.1:1 / ~4.8:1).
+.psHigh { color: #2a69d6; }
+.psLow  { color: #c93f22; }
 
 // SST anomaly per-region value: plain 14px text (region name + signed value), no pill.
 // Warm = red, cool = blue — the same tokens the +/- temperature buttons use.

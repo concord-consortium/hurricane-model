@@ -19,7 +19,7 @@ export class UIModel {
   @observable public sstOverlay: SSTOverlayModel;
   @observable public mode: InteractiveMode = "runtime";
   @observable public setupMode: SetupMode | undefined = undefined;
-  @observable public leftPanelOpen = false;
+  @observable public leftPanelOpen = true; // Storm Setup panel open by default
   @observable public initialBounds = config.initialBounds;
   @observable public mapSize = { x: 0, y: 0 };
   @observable public zoomedInView: ZoomedInViewProps = false;
@@ -37,8 +37,6 @@ export class UIModel {
   @observable public thermometerActive = false;
   @observable public thermometerPositionSaved: LatLngExpression | null = null;
   @observable public thermometerPositionHover: LatLngExpression | null = null;
-  // Whether the Multi-track "Compare runs" overlay is open (a floating card on the map).
-  @observable public compareOpen = false;
 
   // These values are updated when the window size or initial bounds change.
   // They are used to update the map view when the left panel is open and closed.
@@ -97,10 +95,6 @@ export class UIModel {
 
   @action.bound public setLeftPanelOpen(open: boolean) {
     this.leftPanelOpen = open;
-  }
-
-  @action.bound public setCompareOpen(open: boolean) {
-    this.compareOpen = open;
   }
 
   @action.bound public mapUpdated(map: Map, programmaticUpdate: boolean) {

@@ -161,7 +161,8 @@
     }
 
     &.leftPanelOpen {
-      left: $leftPanelWidth;
+      // Clear the panel content + the orange band on its right edge.
+      left: $leftPanelFullWidth;
     }
   }
 

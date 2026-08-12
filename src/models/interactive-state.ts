@@ -252,3 +252,14 @@ export function getInteractiveState(stores: IStores): IHurricaneInteractiveState
     }
   };
 }
+
+// Freeze the editable ("Not run yet") card's setup before navigating away from it, so it keeps its own
+// values while another card is active (they all share one live simulation). No-op when the currently
+// selected card isn't the editable one.
+export function freezeEditableCard(stores: IStores) {
+  const { multiTrack } = stores;
+  const cur = multiTrack.runs.find(r => r.id === multiTrack.selectedRunId);
+  if (cur && cur.state === null) {
+    multiTrack.setEditableDraft(getInteractiveState(stores));
+  }
+}

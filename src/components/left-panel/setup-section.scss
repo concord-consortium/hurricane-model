@@ -2,6 +2,8 @@
 @use "./left-panel-common" as *;
 
 .sectionHeader.sectionHeader {
+  // Default white; hover uses the button hover color ($secondaryColorHover, as on the Season
+  // buttons); the open/selected state stays at the light orange (#fff7e6).
   background-color: white;
   border-bottom: $leftPanelBorder;
   color: $charcoal;
@@ -9,11 +11,11 @@
   padding: 8px 15px; // standardize the panel's horizontal inset (was MUI default 16)
 
   &:hover {
-    background-color: #dfdfdf;
+    background-color: $secondaryColorHover;
   }
 
   &.openSectionHeader {
-    background-color: #f0f0f0;
+    background-color: #fff7e6;
     border-bottom: none;
   }
 
@@ -39,7 +41,7 @@
 }
 
 .section {
-  background-color: #fafafa;
+  background-color: white;
   border-bottom: $leftPanelBorder;
   padding: 8px 15px 12px;
 
@@ -71,7 +73,7 @@
   }
 
   .tip {
-    background-color: #eaf3d6; // soft green callout with enough presence to read against the #fafafa section
+    background-color: #eaf3d6; // soft green callout with enough presence to read against the section fill
     font-size: 12px; // Note/Tip callouts (whole thing: bold label + text)
     line-height: 1.2; // was inheriting a cramped 13px (0.93x); open it up a touch
     margin-top: 11px; // separate the callout from preceding content (e.g. the Season buttons)

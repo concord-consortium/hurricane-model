@@ -9,12 +9,12 @@ import { LatLng, Map as LeafletMap, Point, PointTuple, latLngBounds, DomEvent } 
 import Control from "./leaflet-control";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
+import { perTypeNumbers } from "../utils/pressure";
 import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneCategoryMarker } from "./hurricane-category-marker";
 import { HurricaneTrack } from "./hurricane-track";
 import { SavedTracksLayer } from "./saved-tracks-layer";
 import { CompareOverlay } from "./compare/compare-overlay";
-import { StaticTrack } from "./static-track";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
 import config from "../config";
@@ -25,7 +25,7 @@ import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
 import { LeafletMouseEvent } from "leaflet";
-import { LEFT_PANEL_TRANSITION_SECONDS, LEFT_PANEL_WIDTH_PX } from "./common";
+import { LEFT_PANEL_TRANSITION_SECONDS, LEFT_PANEL_FULL_WIDTH_PX } from "./common";
 import css from "./map-view.scss";
 import { ThermometerMarker } from "./thermometer-marker";
 import { PolygonRegion } from "./polygon-region";
@@ -126,6 +126,8 @@ export class MapView extends BaseComponent<IProps, IState> {
 
   public render() {
     const { simulation: sim, ui, multiTrack } = this.stores;
+    // Per-type labels (H1, H2, L1, L2…) for the pressure markers — same helper the run cards use.
+    const pressureSystemNumbers = perTypeNumbers(sim.pressureSystems);
     const { sstOverlay } = ui;
     const navigation = !!ui.zoomedInView || config.navigation;
 
@@ -204,12 +206,6 @@ export class MapView extends BaseComponent<IProps, IState> {
             ui.overlay === "precipitation" && <PrecipitationLayer/>
           }
           <SavedTracksLayer />
-          {
-            // While editing a single-track run, show its previous track greyed out (a ghost).
-            !multiTrack.enabled && multiTrack.singleTrackEditing && multiTrack.singleRun &&
-            multiTrack.singleRun.simulation.hurricaneTrack.length > 0 &&
-            <StaticTrack track={multiTrack.singleRun.simulation.hurricaneTrack} />
-          }
           <HurricaneTrack />
           {
             config.markLandfalls && sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
@@ -221,6 +217,7 @@ export class MapView extends BaseComponent<IProps, IState> {
               <PressureSystemMarker
                 key={idx}
                 model={ps}
+                systemNumber={pressureSystemNumbers[idx]}
               />
             )
           }
@@ -370,7 +367,7 @@ export class MapView extends BaseComponent<IProps, IState> {
       // from the equator (northern lat in the visible region)
       const initWidthPixels = (visibleWidthLong / 360) * 256 * (2 ** minZoom);
       const widthPadding = (size.x - initWidthPixels) / 2;
-      const extraLeftPanelWidth = Math.max(LEFT_PANEL_WIDTH_PX - widthPadding, 0);
+      const extraLeftPanelWidth = Math.max(LEFT_PANEL_FULL_WIDTH_PX - widthPadding, 0);
       const extraLeftPanelHeight = extraLeftPanelWidth * size.y / size.x;
 
       // Determine the min zoom needed to show both the full initial bounds and left panel.
@@ -408,7 +405,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     const open = ui.leftPanelOpen;
 
     const verticalPadding = (open ? 1 : -1) * ui.panelVerticalPadding;
-    const paddingTopLeft: PointTuple = [open ? LEFT_PANEL_WIDTH_PX : 0, verticalPadding];
+    const paddingTopLeft: PointTuple = [open ? LEFT_PANEL_FULL_WIDTH_PX : 0, verticalPadding];
     const paddingBottomRight: PointTuple = [0, verticalPadding];
     const opts = { duration: LEFT_PANEL_TRANSITION_SECONDS, paddingBottomRight, paddingTopLeft };
 
@@ -419,7 +416,7 @@ export class MapView extends BaseComponent<IProps, IState> {
       map.flyToBounds(map.getBounds(), opts);
     } else {
       const size = map.getSize();
-      const topLeft = map.containerPointToLatLng([LEFT_PANEL_WIDTH_PX, ui.panelVerticalPadding]);
+      const topLeft = map.containerPointToLatLng([LEFT_PANEL_FULL_WIDTH_PX, ui.panelVerticalPadding]);
       const bottomRight = map.containerPointToLatLng([size.x, size.y - ui.panelVerticalPadding]);
       map.flyToBounds(latLngBounds(topLeft, bottomRight), opts);
 

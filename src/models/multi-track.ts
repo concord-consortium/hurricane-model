@@ -12,46 +12,29 @@ export interface IRunSlot {
 }
 
 /**
- * Multi-track state: the on/off flag plus a pack of run cards. Each card is an editable slot that
- * auto-fills when you run it (state goes from null -> a captured snapshot). Resetting a card clears
- * it back to editable. Layers on top of single-run storm mode; the map/panel reuse the same engine.
+ * Multi-track state: a pack of run cards. Each card is an editable slot that auto-fills when you run
+ * it (state goes from null -> a captured snapshot). Resetting a card clears it back to editable.
+ * Multi-track is the only mode.
  */
 export class MultiTrackModel {
-  @observable public enabled = false;
   @observable public runs: IRunSlot[] = [];
   @observable public selectedRunId: string | undefined = undefined;
   // The run currently unlocked for editing (via the card's Edit button). A selected completed run
   // is otherwise locked (its setup is view-only) until Edit is pressed.
   @observable public editingRunId: string | undefined = undefined;
-  // The current Single-Track run (captured on completion; persists across mode toggles). null while
-  // no run exists (defaults / configuring the first run).
-  @observable public singleRun: IHurricaneInteractiveState | null = null;
-  // Whether the Single-Track run is unlocked for editing (setup changeable, storm shown).
-  @observable public singleTrackEditing = false;
+
+  // A frozen snapshot of the editable ("Not run yet") card's setup, so that card keeps its own values
+  // while the learner is off viewing/editing another card (they all share one live simulation). It is
+  // captured the moment you navigate away from the editable card and restored when you return.
+  @observable.ref public editableDraft: IHurricaneInteractiveState | null = null;
 
   // Transient guard so restoring/resetting a card (which replays a finished state) isn't mistaken
   // for a natural run completion by the auto-capture reaction. Not observable.
   public autoCaptureSuppressed = false;
 
-  // Pristine default setup captured once at startup. Used to fully reset Single-track when leaving
-  // Multi-track with no saved single run, so edits made in Multi-track (Category, season, SST, …)
-  // don't leak across — simulation.reset() alone doesn't restore hurricane.startingCategory. Not observable.
+  // Pristine default setup captured once at startup — used for the default-category reset (Reload),
+  // since simulation.reset() alone doesn't restore hurricane.startingCategory. Not observable.
   public defaultState: IHurricaneInteractiveState | null = null;
-
-  // The live Multi-track setup (the in-progress editable card / currently selected run) stashed when
-  // leaving Multi-track, so returning restores that work instead of resetting to default. Not observable.
-  public multiWorkingState: IHurricaneInteractiveState | null = null;
-
-  // The live Single-track setup (in-progress pre-run config OR a completed run) stashed when leaving
-  // Single-track, plus its editing flag, so returning restores it. Symmetric with multiWorkingState.
-  public singleWorkingState: IHurricaneInteractiveState | null = null;
-  public singleWorkingEditing = false;
-
-  // Which run was selected/being-edited in Multi-track, stashed on leave so returning re-selects the
-  // same card. Without this, setEnabled(false) clears the selection and a finished run has no slot to
-  // auto-capture into (it stays "Not run yet"). Not observable.
-  public multiWorkingSelectedId: string | undefined = undefined;
-  public multiWorkingEditingId: string | undefined = undefined;
 
   private nextId = 1;
 
@@ -77,27 +60,14 @@ export class MultiTrackModel {
     return this.runs.find(r => r.id === this.selectedRunId);
   }
 
-  // The setup is locked (view-only, storm hidden) when viewing a completed run.
+  // Setup is locked (view-only, storm hidden) when a completed run is selected and not being edited.
   @computed public get setupLocked(): boolean {
-    if (this.enabled) {
-      // Multi-track: a completed run is selected and not being edited.
-      const sel = this.selectedRun;
-      return !!sel && sel.state !== null && this.editingRunId !== sel.id;
-    }
-    // Single-run: a completed run is showing and it's not being edited.
-    return this.singleRun !== null && !this.singleTrackEditing;
+    const sel = this.selectedRun;
+    return !!sel && sel.state !== null && this.editingRunId !== sel.id;
   }
 
   public runNumber(id: string): number {
     return this.runs.findIndex(r => r.id === id) + 1;
-  }
-
-  @action.bound public setEnabled(enabled: boolean) {
-    this.enabled = enabled;
-    if (!enabled) {
-      this.selectedRunId = undefined;
-      this.editingRunId = undefined;
-    }
   }
 
   // Adds a fresh editable card and selects it.
@@ -106,6 +76,7 @@ export class MultiTrackModel {
     this.runs.push(run);
     this.selectedRunId = run.id;
     this.editingRunId = undefined;
+    this.editableDraft = null; // a fresh editable card starts from the live sim
     return run;
   }
 
@@ -134,6 +105,10 @@ export class MultiTrackModel {
     this.editingRunId = id;
   }
 
+  @action.bound public setEditableDraft(state: IHurricaneInteractiveState | null) {
+    this.editableDraft = state;
+  }
+
   @action.bound public deleteRun(id: string) {
     const idx = this.runs.findIndex(r => r.id === id);
     if (idx < 0) return;
@@ -150,58 +125,8 @@ export class MultiTrackModel {
     this.editingRunId = undefined;
   }
 
-  // Stash the current selection before leaving Multi-track (setEnabled(false) will clear it).
-  @action.bound public stashMultiSelection() {
-    this.multiWorkingSelectedId = this.selectedRunId;
-    this.multiWorkingEditingId = this.editingRunId;
-  }
-
-  // Re-select the stashed run when returning to Multi-track, if it still exists.
-  @action.bound public restoreMultiSelection() {
-    if (this.multiWorkingSelectedId && this.runs.some(r => r.id === this.multiWorkingSelectedId)) {
-      this.selectedRunId = this.multiWorkingSelectedId;
-      this.editingRunId = this.multiWorkingEditingId;
-    }
-  }
-
-  @action.bound public setSingleRun(state: IHurricaneInteractiveState | null) {
-    this.singleRun = state;
-  }
-
   public setDefaultState(state: IHurricaneInteractiveState) {
     this.defaultState = state;
-  }
-
-  public setMultiWorkingState(state: IHurricaneInteractiveState | null) {
-    this.multiWorkingState = state;
-  }
-
-  public setSingleWorkingState(state: IHurricaneInteractiveState | null, editing: boolean) {
-    this.singleWorkingState = state;
-    this.singleWorkingEditing = editing;
-  }
-
-  @action.bound public setSingleTrackEditing(editing: boolean) {
-    this.singleTrackEditing = editing;
-  }
-
-  @action.bound public deleteSingleRun() {
-    this.singleRun = null;
-    this.singleTrackEditing = false;
-  }
-
-  // Saves an external (Single-Track) run into the first empty slot, or a new slot if there's room.
-  // Returns the run's 1-based number, or null if all slots are full.
-  @action.bound public saveExternalRun(state: IHurricaneInteractiveState): number | null {
-    let idx = this.runs.findIndex(r => r.state === null);
-    if (idx < 0) {
-      if (this.isFull) return null;
-      this.runs.push({ id: `run-${this.nextId++}`, state: null });
-      idx = this.runs.length - 1;
-    }
-    // Access via the array so we mutate the observable element, not a stale pushed reference.
-    this.runs[idx].state = state;
-    return idx + 1;
   }
 
   @action.bound public clear() {
@@ -209,19 +134,11 @@ export class MultiTrackModel {
     this.selectedRunId = undefined;
   }
 
-  // Full wipe back to the initial state — used by Reload (start fresh).
+  // Full wipe back to the initial state — used by Reload (start fresh). Stays in multi-track.
   @action.bound public resetAll() {
-    this.enabled = false;
     this.runs = [];
     this.selectedRunId = undefined;
     this.editingRunId = undefined;
-    this.singleRun = null;
-    this.singleTrackEditing = false;
-    this.multiWorkingState = null;
-    this.singleWorkingState = null;
-    this.singleWorkingEditing = false;
-    this.multiWorkingSelectedId = undefined;
-    this.multiWorkingEditingId = undefined;
     this.nextId = 1;
   }
 }

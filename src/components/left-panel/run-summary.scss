@@ -35,11 +35,19 @@
     font-weight: 400;
   }
 
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px;
+  // Pressure systems: plain stacked text lines, one per changed system ("H1: moved SSW, 1000 mb"),
+  // or "Default" — same text styling as the other categories.
+  .pressureLines {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
   }
+
+  // System labels (H1, L2…): the map's blue/red, darkened to meet WCAG AA (normal text) on the
+  // card fill #fffaf2. Raw map colors (#327cfc / #fc542d) fail; these pass (~4.9:1 / ~4.8:1).
+  .psHigh { color: #2a69d6; }
+  .psLow  { color: #c93f22; }
 
   // SST anomalies: plain text stacked (region + signed value), warm = red, cool = blue — matching
   // the +/- temperature buttons. No pills, so they sit directly on the card fill.
@@ -54,17 +62,4 @@
 
   .warm { color: $warmColor; }
   .cool { color: $coldColor; }
-
-  .chip {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 9px;
-    font-size: 14px;
-    font-weight: 400;
-    background: #eef1f4;
-    color: #4a5560;
-  }
-
-  .high { background: #e7eefc; color: #2b5a8c; }
-  .low  { background: #f0eaf6; color: #6a4a86; }
 }

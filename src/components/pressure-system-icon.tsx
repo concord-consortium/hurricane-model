@@ -8,12 +8,12 @@ import High from "../assets/high.svg";
 import Low from "../assets/low.svg";
 import config from "../config";
 import { log } from "../log";
+import { minStrength, maxStrength, mbLabelRange, strengthToMb } from "../utils/pressure";
 import { DraggableMapIcon } from "./draggable-map-icon";
 import css from "./pressure-system-icon.scss";
 
-export const minStrength = 3;
-export const maxStrength = 20;
-export const mbLabelRange = 13;
+// Re-exported from utils/pressure (the single source) so existing imports of these keep working.
+export { minStrength, maxStrength, mbLabelRange };
 
 const VerticalThumb = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
   (props, ref) => {
@@ -29,6 +29,8 @@ const VerticalThumb = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTM
 
 interface IProps extends IBaseProps {
   model: PressureSystem;
+  // Per-type label (H1, H2, L1, L2…) shown as a small badge on the letter, matching the run cards.
+  systemNumber?: number;
   dimmed?: boolean;
   disabled?: boolean;
   onSliderDrag?: () => void;
@@ -36,21 +38,14 @@ interface IProps extends IBaseProps {
 }
 interface IState {}
 
-const getPressureLabel = (model: PressureSystem) => {
-  const normalizedStrength = (model.strength - minStrength) / (maxStrength - minStrength);
-  if (model.type === "high") {
-    return Math.round(1015 + normalizedStrength * mbLabelRange) + " mb";
-  } else {
-    return Math.round(1010 - normalizedStrength * mbLabelRange) + " mb";
-  }
-};
+const getPressureLabel = (model: PressureSystem) => strengthToMb(model.type, model.strength) + " mb";
 
 @inject("stores")
 @observer
 export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public render() {
-    const { model, dimmed, disabled } = this.props;
+    const { model, systemNumber, dimmed, disabled } = this.props;
     const strengthNorm = (model.strength - minStrength) / (maxStrength - minStrength) - 0.5; // [-0.5, 0.5]
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
     const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
@@ -63,11 +58,21 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
         disabled={uiDisabled}
         label={this.renderLabel()}
       >
-        {
-          model.type === "high" ?
-            <High className={css.letter} style={letterStyle} /> :
-            <Low className={css.letter} style={letterStyle} />
-        }
+        <span className={css.letterWrap}>
+          {
+            model.type === "high" ?
+              <High className={css.letter} style={letterStyle} /> :
+              <Low className={css.letter} style={letterStyle} />
+          }
+          {systemNumber != null &&
+            <span
+              className={model.type === "high" ? `${css.systemBadge} ${css.high}` : `${css.systemBadge} ${css.low}`}
+              data-test="pressure-system-number"
+            >
+              {systemNumber}
+            </span>
+          }
+        </span>
         {
           !config.pressureSystemsLocked &&
           <div

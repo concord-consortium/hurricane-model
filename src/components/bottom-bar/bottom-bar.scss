@@ -20,6 +20,10 @@ $overflowHeight: 11px;
   display: flex;
   justify-content: space-between;
   border-top: $bottomBarBorderStyle;
+  // Sit above the left/right panels (z-index 1000) so, on short viewports, the panels slide BEHIND
+  // the bottom controls instead of cropping (left) or overlapping them in front (right).
+  position: relative;
+  z-index: 1001;
 
   .leftContainer {
     position: relative;
@@ -143,34 +147,6 @@ $overflowHeight: 11px;
     svg {
       path {
         fill: $charcoalMedium;
-      }
-    }
-  }
-
-  .stormSetupButton {
-    // Match the other bottom-bar labels (14px); the "Storm Setup" / "and Runs" break keeps it to
-    // two tight lines.
-    font-size: 14px;
-    line-height: 1.1;
-    min-width: 104px;
-
-    // Smaller icon, moved up, so the two-line label fits within the bar height.
-    svg {
-      height: 22px;
-      width: 22px;
-      border-radius: 11px;
-      margin: -2px auto 4px auto; // icon up 4px (2 -> -2), plus 4px gap to the label
-    }
-
-    &:hover {
-      background-color: $secondaryColorHover;
-    }
-
-    &.open {
-      background-color: $secondaryColor;
-
-      svg {
-        box-shadow: 0 0 0 3px rgba(255,255,255,1);
       }
     }
   }

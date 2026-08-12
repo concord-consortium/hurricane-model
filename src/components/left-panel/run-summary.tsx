@@ -6,6 +6,7 @@ import { resolveStartLocation } from "../../models/simulation";
 import { NamedRegion, namedRegions, Season, seasonLabels, StartLocation } from "../../types";
 import { IPressureSystemState } from "../../types/interactive-state";
 import { formatLatLng } from "../../utils/lat-long";
+import { pressureReport } from "../../utils/pressure";
 import { temperatureAnomalyRegions } from "../../utils/regions";
 
 import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
@@ -76,9 +77,10 @@ export function RunSummary({ sim }: IProps) {
   const cat = categoryChip(sim.hurricane.startingCategory);
   const season = seasonLabels[sim.season] ?? sim.season;
   const anomalies = namedRegions
-    .map(r => ({ label: temperatureAnomalyRegions[r].label, v: sim.temperatureAnomalies?.[r] ?? 0 }))
+    .map(r => ({ label: temperatureAnomalyRegions[r].shortLabel, v: sim.temperatureAnomalies?.[r] ?? 0 }))
     .filter(a => a.v !== 0);
-  const pressures = sim.pressureSystems.map(ps => (ps.type === "high" ? "H" : "L"));
+  // One entry per changed pressure system (label + what changed); empty = "default".
+  const report = pressureReport(sim.startLocation, sim.pressureSystems);
 
   return (
     <div className={css.runSummary}>
@@ -102,11 +104,14 @@ export function RunSummary({ sim }: IProps) {
       </div>
       <div className={css.row}>
         <PressureSystemIcon className={css.icon} />
-        <span className={css.chips}>
-          {pressures.length === 0 && <span className={css.chip}>None</span>}
-          {pressures.map((p, i) => (
-            <span key={i} className={clsx(css.chip, p === "H" ? css.high : css.low)}>{p}</span>
-          ))}
+        <span className={css.pressureLines}>
+          {report.length === 0
+            ? <span>Default</span>
+            : report.map((r, i) => (
+                <span key={i}>
+                  <span className={r.type === "high" ? css.psHigh : css.psLow}>{r.label}</span>: {r.detail}
+                </span>
+              ))}
         </span>
       </div>
     </div>

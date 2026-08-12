@@ -35,7 +35,6 @@ function categoryMarkersForTrack(track: ITrackPoint[], strengthChangePositions: 
 export const SavedTracksLayer = observer(function SavedTracksLayer() {
   const stores = useStores();
   const { multiTrack, simulation, ui } = stores;
-  if (!multiTrack.enabled) return null;
 
   const selected = multiTrack.selectedRun;
   const showCategoryMarkers = ui.categoryChangeMarkers && !simulation.simulationRunning && selected?.state;

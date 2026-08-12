@@ -10,6 +10,7 @@ import * as Leaflet from "leaflet";
 
 interface IProps extends IBaseProps {
   model: PressureSystem;
+  systemNumber?: number;
 }
 interface IState {}
 
@@ -21,7 +22,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
   };
 
   public render() {
-    const { model } = this.props;
+    const { model, systemNumber } = this.props;
     const { sliderDrag } = this.state;
     const { simulation, ui } = this.stores;
     const { isReportMode, setupMode } = ui;
@@ -42,6 +43,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
       >
         <PressureSystemIcon
           model={model}
+          systemNumber={systemNumber}
           dimmed={dimmed}
           disabled={disabled}
           onSliderDrag={this.handleDrag}

@@ -76,7 +76,7 @@ if git -C "$WT" diff --cached --quiet; then
   echo "==> No changes vs current $ROLLING_BRANCH — skipping rolling push."
 else
   git -C "$WT" commit -q -m "Deploy Storm Explorer Multi-track $VERSION"
-  echo "==> Pushing $ROLLING_BRANCH…"
+  echo "==> Pushing ${ROLLING_BRANCH}..."
   git -C "$WT" push origin "$ROLLING_BRANCH"
 fi
 
@@ -85,7 +85,7 @@ if git -C "$DEMOS_DIR" ls-remote --exit-code --heads origin "$PINNED_BRANCH" >/d
   echo "==> NOTE: $PINNED_BRANCH already exists (pinned versions are immutable)."
   echo "          Bump the version in top-bar.tsx for a new pinned release."
 else
-  echo "==> Cutting pinned branch $PINNED_BRANCH…"
+  echo "==> Cutting pinned branch ${PINNED_BRANCH}..."
   git -C "$WT" push origin "HEAD:refs/heads/$PINNED_BRANCH"
 fi
 

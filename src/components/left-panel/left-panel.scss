@@ -1,11 +1,25 @@
 @use "../common" as *;
 @use "./left-panel-common" as *;
 
-$leftPanelContainerWidth: calc($leftPanelWidth + 2px);
+$stormSetupTabWidth: 68px;
+// Outer (border-box) length of the tab: content ($stormSetupTabWidth + 1px) + 1px right border.
+// Measured = 70px.
+$stormSetupTabOuterWidth: $stormSetupTabWidth + 2px;
+// The handle rides RIGHT with the opening panel, ending with its right edge at the panel's right
+// edge — fully under the panel. Travel = panel width - tab length, so the panel catches up to it at
+// a steady rate and the peek (tab sticking out past the panel's right edge) shrinks linearly: full
+// when closed, half at the mid-point, gone when open.
+$tabTuckTravel: $leftPanelFullWidth - $stormSetupTabOuterWidth;
+// Panel outer width = content + orange band (peek) + 1px map-facing gray border (shown when open).
+$leftPanelOuterWidth: $leftPanelFullWidth + 1px;
+// Container must also fit the protruding Storm Setup tab.
+$leftPanelContainerWidth: $leftPanelOuterWidth + $stormSetupTabWidth + 4px;
 $leftPanelBorderRadius: 0; // square corners
 
 .leftPanelContainer {
-  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
+  // Full height below the top bar; the panel extends BEHIND the bottom bar (which sits on top via
+  // z-index) rather than stopping short of it. Content is kept clear of the bar via .panelContent.
+  height: calc(100% - #{$topBarHeight});
   left: 0;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -15,24 +29,52 @@ $leftPanelBorderRadius: 0; // square corners
   width: $leftPanelContainerWidth;
   z-index: 1000;
 
+  // The sliding panel. Like the right panel, only the top + map-facing edges get the gray outline;
+  // the color band and content live in stacked absolute layers inside it (see .panelBack/.panelContent).
+  // Its z-index sits ABOVE the Storm Setup handle so, as it slides in, the panel passes over the
+  // handle and hides it (and reveals it again on the way out).
   .leftPanel {
-    background-color: #fdf5e8;
-    border: $leftPanelBorder;
-    border-bottom-right-radius: $leftPanelBorderRadius;
-    border-top-right-radius: $leftPanelBorderRadius;
+    border-top: $leftPanelBorder;
     color: $charcoal;
-    display: flex;
-    flex-direction: column;
     height: 100%;
-    left: -$leftPanelContainerWidth;
+    left: -$leftPanelOuterWidth;
     pointer-events: all;
     position: absolute;
     top: 0;
     transition: $leftPanelTransition;
-    width: $leftPanelWidth;
+    width: $leftPanelFullWidth;
+    z-index: 2;
 
     &.open {
       left: 0;
+      // Gray line on the map-facing edge only (mirror of the right panel's border-left when open).
+      border-right: $leftPanelBorder;
+    }
+
+    // Orange colored backing — exactly how the right panel builds its band (.tabContentBack): a
+    // full-width colored layer that the narrower content sits on top of, so the color peeks out.
+    .panelBack {
+      background-color: $secondaryColor;
+      bottom: 0;
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: $leftPanelFullWidth;
+    }
+
+    // The content (mirror of .tabContent): narrower than the backing and flush to the screen side, so
+    // the orange backing shows through as a $leftPanelBandWidth strip on the map-facing (right) edge.
+    .panelContent {
+      background-color: $leftPanelFill;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: $leftPanelWidth;
     }
 
     // The setup list. In single-run mode it fills the panel (scrolling if tall). In multi-track
@@ -44,8 +86,9 @@ $leftPanelBorderRadius: 0; // square corners
       overflow-y: auto;
     }
 
-    // In multi-track mode the setup list keeps its natural height and does NOT shrink, so adding
-    // runs can't squeeze the setup options off the top — the Runs section below scrolls instead.
+    // In multi-track mode the setup list takes its natural height (no shrink) so the Saved Tracks
+    // section flexes to fill the rest on tall viewports; on short ones the whole .panelContent
+    // scrolls as one, so the list is never clipped or overlapped by the Runs section.
     &.multiTrackMode .panelList {
       flex: 0 0 auto;
       // Drop the list's bottom padding so the last section's border sits flush against the Saved
@@ -56,12 +99,13 @@ $leftPanelBorderRadius: 0; // square corners
 
     .leftPanelHeader {
       align-items: center;
-      background-color: $secondaryColor;
+      // Match the panel's warm fill so the header reads as part of the panel (not a separate bar).
+      background-color: $leftPanelFill;
       border-bottom: $leftPanelBorder;
       border-top-right-radius: $leftPanelBorderRadius;
       color: $charcoal;
       display: flex;
-      height: 35px;
+      height: 40px; // match the section-header rows (Storm Location, etc.)
       justify-content: center;
       position: relative;
 
@@ -70,17 +114,6 @@ $leftPanelBorderRadius: 0; // square corners
         font-weight: bold;
         display: flex;
         align-items: center;
-        gap: 6px;
-
-        .titleIcon {
-          width: 18px;
-          height: 18px;
-          flex-shrink: 0;
-          border-radius: 50%;
-          // The icon SVG is already a grey disc + white gear; add the white outline ring the
-          // bottom-bar button shows when open.
-          box-shadow: 0 0 0 2px #fff;
-        }
       }
 
       .leftPanelCloseButton {
@@ -114,6 +147,84 @@ $leftPanelBorderRadius: 0; // square corners
           outline-offset: 2px;
         }
       }
+    }
+  }
+
+  // Storm Setup handle — a sibling of the panel (NOT a child), pinned to the screen edge and
+  // vertically centered (re-centers when the window height changes). It stays put while the panel
+  // slides; because the panel sits at a higher z-index, the panel passes OVER this handle — visible
+  // when the panel is closed, covered/hidden beneath the panel when open, on the panel's own timing.
+  // 68x52 content frame + 64x44 interior, matching the right panel's Base Maps / Map Overlays tabs;
+  // orange frame + neutral-gray interior, rounded on the outer (map-facing) corners, square on the
+  // screen-edge side.
+  .stormSetupTab {
+    background-color: $secondaryColor;      // orange frame
+    border: 1px solid $charcoalMedium;      // gray outline (top/bottom + outer side)
+    border-left: 0;                          // screen-edge side (no border)
+    border-radius: 0 9px 9px 0;              // square on the screen-edge side, rounded on the outer side
+    box-sizing: content-box;                 // 68x52 content -> 69x54 outer, matching the right tabs
+    cursor: pointer;
+    font-family: inherit;                    // use the panel's Lato, not the <button> default (Arial)
+    height: 52px;
+    left: 0;                                 // pinned to the screen edge; the panel slides over it
+    padding: 0;
+    pointer-events: all;
+    position: absolute;
+    // Center in the VISIBLE area (above the bottom bar), since the container now extends behind it.
+    top: calc(50% - (#{$bottomBarHeight} + #{$bottomBarBorderWidth}) / 2);
+    transform: translateY(-50%);
+    // Travels with the panel: same duration + easing, so the handle stays in sync while the panel slides.
+    transition: transform $leftPanelTransitionSeconds $leftPanelTransitionEasing;
+    width: $stormSetupTabWidth + 1px;
+    z-index: 1;                              // below the panel, so the panel slides over/hides it
+
+    // When open, the handle has ridden RIGHT with the panel to sit fully under it (its right edge at
+    // the panel's right edge). Because it travels slower than the panel's leading edge, the panel
+    // progressively covers it — the peek shrinks from full (closed) to half (mid) to none (open).
+    // Reverses on close.
+    &.tucked {
+      transform: translateY(-50%) translateX($tabTuckTravel);
+    }
+
+    // Interior background (mirror of the right tabs' .mapTabImage thumbnail): 64x44, inset 4px on
+    // top + outer side, flush to the screen-edge side, rounded only on the outer corners. This is
+    // the layer that dims on hover — it sits BELOW the label.
+    .stormSetupTabInner {
+      background-color: #fff;
+      border-radius: 0 6px 6px 0;
+      bottom: 4px;
+      left: 1px;
+      position: absolute;
+      right: 4px;
+      top: 4px;
+    }
+
+    // Label (mirror of .mapTabContent): a separate layer ON TOP of the interior, so the hover dim
+    // fades only the background behind it, never the text.
+    .stormSetupTabLabel {
+      align-items: center;
+      bottom: 4px;
+      color: $charcoal;
+      display: flex;
+      font-size: 14px;
+      font-weight: 700;
+      justify-content: center;
+      left: 0;
+      line-height: 14px;
+      position: absolute;
+      right: 4px;
+      text-align: center;
+      top: 4px;
+    }
+
+    // Hover dims only the background layer to 0.75, mirroring the right panel tabs' thumbnail hover.
+    &:hover .stormSetupTabInner {
+      opacity: 0.75;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $charcoal;
+      outline-offset: 2px;
     }
   }
 }

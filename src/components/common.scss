@@ -36,11 +36,28 @@ $warmColor: #c62828;
 
 $tabContents: rgba(255, 255, 255, 0.9);
 
+// The left panel's fill (header bar, content backing, and section bodies) — the orange counterpart
+// of the right panels' content fills (green ~#f5faf6 / blue ~#f3faff, each 90% white over their
+// strip). Orange reads stronger than those pale hues, so this is lightened past the strict 90%
+// analog to 95% white over $secondaryColor (#ff9900) for a subtler tint.
+$leftPanelFill: #fffaf2;
+
 $mapTabWidth: 68px;
 
 $leftPanelWidth: 296px;
-$leftPanelTransitionSeconds: 0.35s;
-$leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.7, 1.0);
+// Orange accent band down the panel's map-facing (right) edge — mirrors the right panel's color band.
+$leftPanelBandWidth: 6px;
+// Full footprint the panel occupies on the map = content + band. Drives the map region offset and the
+// zoom/fit-all control position so both clear the band.
+$leftPanelFullWidth: $leftPanelWidth + $leftPanelBandWidth;
+// Duration for the panel slide + the synced map reframe + the zoom/fit-all controls (all 0.8s).
+$leftPanelTransitionSeconds: 0.8s;
+// Approximates the map reframe's easing so the panel + map read as one motion. The map (Leaflet
+// flyTo) is a hardcoded ease-out (1-(1-t)^1.5); this is that curve softened with a little ease-in at
+// the start for a gentler ease-in-out feel (so it's very close to the fly, just a touch slower to
+// start). A different curve than the right panel's `ease`.
+$leftPanelTransitionEasing: cubic-bezier(0.3, 0.25, 0.6, 1);
+$leftPanelTransition: left $leftPanelTransitionSeconds $leftPanelTransitionEasing;
 
 .error {
   padding: 8px 12px;
@@ -56,5 +73,7 @@ $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.
   coldColor: $coldColor;
   warmColor: $warmColor;
   leftPanelWidth: $leftPanelWidth;
+  leftPanelBandWidth: $leftPanelBandWidth;
+  leftPanelFullWidth: $leftPanelFullWidth;
   leftPanelTransitionSeconds: $leftPanelTransitionSeconds;
 }

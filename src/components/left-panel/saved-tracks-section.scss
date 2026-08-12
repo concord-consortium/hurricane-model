@@ -1,59 +1,18 @@
 @use "../common" as *;
 
 .savedTracks {
-  // Flex child of the panel: fills the space between the setup list and the pinned footer.
+  // Flex child of the panel: fills the space below the setup list; the run cards scroll inside it.
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 10px 15px 12px;
-  background-color: #fafafa;
+  // No horizontal padding: the scrolling list (.runList) runs full-width so its scrollbar lands at
+  // the panel's outer edge. The 16px inset is applied to each card instead. No TOP padding either —
+  // the space above the first card lives inside the scrolling list (its padding-top), so the whole
+  // section scrolls as one and that space scrolls away instead of sitting as a fixed empty gap.
+  padding: 0 0 12px;
+  background-color: $leftPanelFill;
   border-top: 1px solid $charcoalMedium;
-
-  .heading {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 14px; // match the Single/Multi-track toggle button text
-    font-weight: bold;
-    color: $charcoal;
-    margin-bottom: 8px;
-  }
-
-  // Matches the Single/Multi-track toggle buttons: 14px bold, 6px radius, transparent -> light-orange
-  // hover; the active (.compareOn) state goes full orange.
-  .compareBtn {
-    appearance: none;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 7px 8px;
-    border-radius: 6px;
-    border: 1px solid $charcoalMedium;
-    background: transparent;
-    color: $charcoal;
-
-    &:hover { background: $secondaryColorHover; }
-
-    &:disabled {
-      cursor: default;
-      opacity: 0.45;
-      border-color: $hoverColor;
-      color: $charcoalMedium;
-
-      &:hover { background: #ffffff; }
-    }
-  }
-
-  .compareOn {
-    background: $secondaryColor;
-    border-color: $secondaryColor;
-    color: $charcoal;
-
-    &:hover { background: $secondaryColorHover; }
-  }
 
   .runList {
     flex: 1 1 auto;
@@ -61,10 +20,21 @@
     overflow-y: auto;
     list-style: none;
     margin: 0;
-    padding: 0;
+    // padding-top is the scrollable gap above the first card — part of the list, so it scrolls away
+    // (no fixed empty space above the cards). padding-bottom is scroll-room only — it lets the LAST
+    // card scroll up clear of the bar; it lives below the fold, so it never opens a gap above the bar.
+    // scroll-padding-bottom makes scrollIntoView (on card select) land the card ABOVE the bar.
+    padding: 15px 0 ($bottomBarHeight + $bottomBarBorderWidth);
+    scroll-padding-bottom: $bottomBarHeight + $bottomBarBorderWidth;
     display: flex;
     flex-direction: column;
     gap: 8px;
+
+    // 16px left/right inset (cards 2px narrower). Because the list itself is full-width, its
+    // scrollbar sits in the outer margin rather than on top of the cards.
+    > li {
+      margin: 0 16px;
+    }
   }
 
   // ---- run card ----
@@ -74,24 +44,39 @@
     box-sizing: border-box;
     text-align: left;
     background: #fff;
-    border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 8px 10px 9px;
     color: $charcoal;
     cursor: pointer;
-    transition: background-color 0.12s, border-color 0.12s, box-shadow 0.12s;
+    transition: background-color 0.12s;
 
-    // Same light orange as the selected fill; selected is still set apart by its orange border + shadow.
-    &:hover { background: #fff6e6; }
+    // The border is an overlay ring (::after), NOT a real border, so its thickness can change between
+    // states (1px unselected -> 2px selected/editable) without resizing the card or nudging its
+    // content — no scaling between select/unselect.
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid $charcoalMedium;
+      pointer-events: none;
+      transition: border-color 0.12s, border-width 0.12s;
+    }
+
+    // Hover uses the button hover color (as on the Season buttons / category headers).
+    &:hover { background: $secondaryColorHover; }
 
     &.selected {
+      background: #fff6e6; // set apart by the orange ring below
+    }
+    &.selected::after {
+      border-width: 2px;
       border-color: $secondaryColor;
-      background: #fff6e6;
-      box-shadow: inset 0 0 0 1px $secondaryColor;
     }
 
     // An editable (not-yet-run) card reads as a form slot.
-    &.editable {
+    &.editable::after {
+      border-width: 2px;
       border-style: dashed;
       border-color: $secondaryColor;
     }
@@ -232,9 +217,21 @@
     &.selected .trash { opacity: 1; }
   }
 
+  // Two side-by-side add cards ("Duplicate Last Run" | "New Run"). Equal halves, equal height.
+  .newRunPair {
+    display: flex;
+    gap: 8px;
+
+    .newRunCard {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
   // ---- New Run card ----
   .newRunCard {
     width: 100%;
+    box-sizing: border-box; // include the 2px border + padding so it matches the run cards' width
     font-family: inherit;
     display: flex;
     flex-direction: column;
@@ -249,7 +246,7 @@
     cursor: pointer;
     transition: background-color 0.12s;
 
-    &:hover { background: #fff6e6; }
+    &:hover { background: $secondaryColorHover; }
 
     &.disabled {
       border-style: solid;

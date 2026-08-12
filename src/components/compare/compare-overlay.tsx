@@ -2,16 +2,18 @@ import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { setInteractiveState } from "../../models/interactive-state";
+import { freezeEditableCard, setInteractiveState } from "../../models/interactive-state";
+import { IRunSlot } from "../../models/multi-track";
 import { namedRegions, seasonLabels } from "../../types";
 import { IHurricaneInteractiveState } from "../../types/interactive-state";
 import { useStores } from "../../stores-context";
 import { temperatureAnomalyRegions } from "../../utils/regions";
 import {
-  durationSteps, intensitySeries, landfallSummary, peakCategory, pressureSignature
+  durationSteps, intensitySeries, landfallSummary, peakCategory
 } from "../../utils/run-outcomes";
 import { resolveStartLocation } from "../../models/simulation";
 import { formatLatLng } from "../../utils/lat-long";
+import { pressureReport } from "../../utils/pressure";
 import { CATEGORY_COLORS, anomalyText, categoryChip, runLetter } from "../left-panel/run-summary";
 
 import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
@@ -20,6 +22,7 @@ import SeasonIcon from "../../assets/left-panel/season.svg";
 import ThermometerIcon from "../../assets/left-panel/thermometer.svg";
 import PressureSystemIcon from "../../assets/left-panel/pressure-system.svg";
 import DropdownArrow from "../../assets/left-panel/dropdown-arrow.svg";
+import DragIcon from "../../assets/drag.svg";
 
 import categoryCss from "../hurricane-category.scss";
 import css from "./compare-overlay.scss";
@@ -83,13 +86,13 @@ function CatCell({ category }: { category: number | undefined }) {
  */
 export const CompareOverlay = observer(function CompareOverlay() {
   const stores = useStores();
-  const { multiTrack, simulation, ui } = stores;
+  const { multiTrack, simulation } = stores;
 
   // Hooks must run before any early return.
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true); // always on the map; starts collapsed
   const [colBox, setColBox] = useState<{ left: number; width: number } | null>(null);
   const completedCount = multiTrack.runs.filter(r => r.state).length;
 
@@ -103,7 +106,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
     const sr = sel.getBoundingClientRect();
     setColBox({ left: sr.left - wr.left, width: sr.width });
   }, []);
-  useLayoutEffect(measureCol, [measureCol, multiTrack.selectedRunId, completedCount, collapsed, ui.compareOpen]);
+  useLayoutEffect(measureCol, [measureCol, multiTrack.selectedRunId, completedCount, collapsed]);
   useEffect(() => {
     window.addEventListener("resize", measureCol);
     return () => window.removeEventListener("resize", measureCol);
@@ -135,32 +138,55 @@ export const CompareOverlay = observer(function CompareOverlay() {
     e.preventDefault();
   };
 
-  if (!multiTrack.enabled || !ui.compareOpen) return null;
+  // Compare Runs is on the map from the start (collapsed by default). Keep a Run A column even after
+  // the last run is deleted — the column stays, its info reset to the current (default) setup.
+  const runsForCompare: IRunSlot[] = multiTrack.runs.length
+    ? multiTrack.runs
+    : [{ id: "run-a-empty", state: null }];
 
-  const completed = multiTrack.runs
-    .map((slot, index) => ({ slot, index }))
-    .filter(r => r.slot.state);
-
-  const data = completed.map(({ slot, index }) => {
-    const sim = slot.state!.simulation;
-    const start = resolveStartLocation(sim.startLocation);
-    const landfall = landfallSummary(sim);
+  // A column per run. Completed runs use their captured state; the editable (not-yet-run) card uses
+  // the LIVE simulation, so its Setup appears immediately when the card is created and updates as the
+  // learner edits (drag storm, change season, move pressure systems…). Result cells stay empty until run.
+  const data = runsForCompare.map((slot, index) => {
+    const done = !!slot.state;
+    const editing = multiTrack.editingRunId === slot.id;
+    const isSelected = slot.id === multiTrack.selectedRunId;
+    // Setup source: the card being actively set up (edited, or the selected editable card) reads the
+    // LIVE sim so edits show; the editable card reads its frozen draft while you're away; else its
+    // captured state. `setupSim === null` means "read the live simulation".
+    const live = editing || (!done && (isSelected || !multiTrack.editableDraft));
+    const setupSim = live ? null : (done ? slot.state!.simulation : multiTrack.editableDraft!.simulation);
+    const resultSim = slot.state?.simulation; // Result cells always use the captured run (frozen)
+    // Location: from the setup source; for the live storm, track it while placing (pre-run), then
+    // freeze at the start location once the run starts (hurricane.center moves with the storm).
+    const locCoords = setupSim
+      ? resolveStartLocation(setupSim.startLocation)
+      : (simulation.simulationStarted ? resolveStartLocation(simulation.startLocation) : simulation.hurricane.center);
+    const startLoc = setupSim ? setupSim.startLocation : simulation.startLocation;
+    const pressureSystems = setupSim
+      ? (setupSim.pressureSystems || [])
+      : simulation.pressureSystems.map(ps => ps.serialize());
+    const seasonKey = setupSim ? setupSim.season : simulation.season;
     return {
       id: slot.id,
       letter: runLetter(index),
-      startCat: sim.hurricane.startingCategory,
-      location: formatLatLng(start.lat, start.lng),
-      season: seasonLabels[sim.season] ?? sim.season,
+      editable: !done,
+      editing,
+      running: isSelected && simulation.simulationStarted && !simulation.simulationFinished,
+      startCat: setupSim ? setupSim.hurricane.startingCategory : simulation.hurricane.startingCategory,
+      location: formatLatLng(locCoords.lat, locCoords.lng),
+      season: seasonLabels[seasonKey] ?? seasonKey,
       anomalies: namedRegions
-        .map(rg => ({ label: temperatureAnomalyRegions[rg].label, v: sim.temperatureAnomalies?.[rg] ?? 0 }))
+        .map(rg => ({
+          label: temperatureAnomalyRegions[rg].shortLabel,
+          v: setupSim ? (setupSim.temperatureAnomalies?.[rg] ?? 0) : simulation.temperatureAnomalyAt(rg)
+        }))
         .filter(a => a.v !== 0),
-      pressureSig: pressureSignature(sim),
-      pressures: (sim.pressureSystems || []).map(ps => (ps.type === "high" ? "H" : "L")),
-      peak: peakCategory(sim),
-      landfall,
-      landfallText: landfall.count === 0 ? "None" : `${landfall.count}×`,
-      duration: durationSteps(sim),
-      series: intensitySeries(sim)
+      report: pressureReport(startLoc, pressureSystems),
+      peak: done ? peakCategory(resultSim!) : undefined,
+      landfall: done ? landfallSummary(resultSim!) : null,
+      duration: done ? durationSteps(resultSim!) : 0,
+      series: done ? intensitySeries(resultSim!) : []
     };
   });
 
@@ -178,8 +204,21 @@ export const CompareOverlay = observer(function CompareOverlay() {
 
   // Clicking any cell in a column selects that run (not just the header).
   const selectColumn = (id: string) => {
-    const state = multiTrack.runs.find(r => r.id === id)?.state;
-    if (state) selectRun(id, state);
+    const run = multiTrack.runs.find(r => r.id === id);
+    if (!run || id === multiTrack.selectedRunId) return;
+    freezeEditableCard(stores); // keep the editable card's own values if we're leaving it
+    if (run.state) {
+      selectRun(id, run.state);
+    } else {
+      // Editable column: make it current, restoring its own draft.
+      multiTrack.selectRun(id);
+      if (multiTrack.editableDraft) {
+        multiTrack.autoCaptureSuppressed = true;
+        setInteractiveState(stores, multiTrack.editableDraft);
+        simulation.restart(false);
+        multiTrack.autoCaptureSuppressed = false;
+      }
+    }
   };
 
   // A data row. `icon` (Setup rows only) is drawn beside the label, matching the run-card summary
@@ -203,24 +242,21 @@ export const CompareOverlay = observer(function CompareOverlay() {
     <div
       ref={overlayRef}
       className={clsx(css.overlay, { [css.collapsed]: collapsed })}
-      style={pos ? { left: pos.left, top: pos.top, right: "auto" } : undefined}
+      style={pos ? { left: pos.left, top: pos.top, right: "auto", transform: "none" } : undefined}
       data-test="compare-overlay"
       role="region"
       aria-label="Compare Runs"
     >
       <header className={css.header} onPointerDown={onHeaderPointerDown}>
         <span className={css.title}>Compare Runs</span>
-        {collapsed && <span className={css.legend}>{data.length} run{data.length === 1 ? "" : "s"}</span>}
+        {/* Grab-dots drag affordance, centered in the header (same dots as the map markers). */}
+        <DragIcon className={css.grabDots} aria-hidden="true" />
         {/* Actions stay pinned to the right of the header in every state (collapsed or not). */}
         <div className={css.headerActions}>
           <button type="button" className={css.iconBtn} data-test="compare-collapse"
             aria-label={collapsed ? "Expand compare" : "Collapse compare"} aria-expanded={!collapsed}
             onClick={() => setCollapsed(c => !c)}>
             <span className={clsx(css.chevron, { [css.chevronUp]: !collapsed })}><DropdownArrow /></span>
-          </button>
-          <button type="button" className={css.iconBtn} data-test="compare-close"
-            aria-label="Close compare" onClick={() => ui.setCompareOpen(false)}>
-            ×
           </button>
         </div>
       </header>
@@ -244,13 +280,22 @@ export const CompareOverlay = observer(function CompareOverlay() {
                   data-selhead={d.id === multiTrack.selectedRunId ? "1" : undefined}
                   onClick={() => selectColumn(d.id)}
                   title="Select this run on the map">
-                  <span className={css.runBadge}>{d.letter}</span>
+                  <span className={css.headInner}>
+                    <span className={css.runBadge}>{d.letter}</span>
+                    {d.running
+                      ? <span className={css.headState}>Running…</span>
+                      : d.editing
+                        ? <span className={css.headState}>Editing…</span>
+                        : d.editable
+                          ? <span className={css.headState}>Not run yet</span>
+                          : null}
+                  </span>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            <tr className={css.groupRow}><th colSpan={data.length + 1}>Setup — what you changed</th></tr>
+            <tr className={css.groupRow}><th colSpan={data.length + 1}>Setup</th></tr>
             {Row("Storm Location",
               i => <span className={css.mono}>{data[i].location}</span>,
               <StormLocationIcon className={css.rowIcon} />)}
@@ -268,18 +313,29 @@ export const CompareOverlay = observer(function CompareOverlay() {
                     </span>))}</span>
             ), <ThermometerIcon className={css.rowIcon} />)}
             {Row("Pressure Systems", i => (
-              <span className={css.chips}>{data[i].pressures.map((p, k) => (
-                <span key={k} className={clsx(css.chip, p === "H" ? css.high : css.low)}>{p}</span>))}</span>
+              data[i].report.length === 0
+                ? <span className={css.muted}>Default</span>
+                : <span className={css.pressureCol}>{data[i].report.map((r, k) => (
+                    <span key={k}>
+                      <span className={r.type === "high" ? css.psHigh : css.psLow}>{r.label}</span>: {r.detail}
+                    </span>))}</span>
             ), <PressureSystemIcon className={css.rowIcon} />)}
 
-            <tr className={css.groupRow}><th colSpan={data.length + 1}>Result — what happened</th></tr>
-            {Row("Peak Category", i => <CatCell category={data[i].peak} />)}
-            {Row("Landfall",
-              i => <span>{data[i].landfall.count === 0 ? "None" : `${data[i].landfall.count}×`}</span>)}
+            <tr className={css.groupRow}><th colSpan={data.length + 1}>Result</th></tr>
+            {Row("Peak Category", i => (
+              data[i].editable ? <span className={css.muted}>—</span> : <CatCell category={data[i].peak} />
+            ))}
+            {Row("Landfall", i => (
+              data[i].editable
+                ? <span className={css.muted}>—</span>
+                : <span>{data[i].landfall!.count === 0 ? "None" : `${data[i].landfall!.count}×`}</span>
+            ))}
             {/* Lifetime row removed by content design, but the sparkline still scales its width to the
                 run's lifetime (lifeWidth), so a longer-lived storm reads as a wider category trace. */}
             {Row("Category Over Time", i => (
-              <Sparkline series={data[i].series} uid={data[i].id} widthPx={lifeWidth(data[i])} />
+              data[i].editable
+                ? <span className={css.muted}>—</span>
+                : <Sparkline series={data[i].series} uid={data[i].id} widthPx={lifeWidth(data[i])} />
             ))}
           </tbody>
         </table>

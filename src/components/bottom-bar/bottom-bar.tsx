@@ -16,7 +16,6 @@ import { SeasonButton } from "./season-button";
 import { StartLocationButton } from "./start-location-button";
 import { WindArrowsToggle } from "./wind-arrows-toggle";
 
-import SetupIcon from "../../assets/bottom-bar/setup-icon.svg";
 import CCLogo from "../../assets/cc-logo.svg";
 import CCLogoSmall from "../../assets/cc-logo-small.svg";
 import PauseIcon from "../../assets/pause.svg";
@@ -28,9 +27,7 @@ import ThermometerHoverIcon from "../../assets/thermometer-hover.svg";
 
 import css from "./bottom-bar.scss";
 
-interface IProps extends IBaseProps {
-  toggleLeftPanelOpen: () => void;
-}
+interface IProps extends IBaseProps {}
 interface IState {
   fullscreen: boolean;
   isSeasonMenuOpen: boolean;
@@ -83,18 +80,20 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const { ready, simulationRunning, simulationStarted } = this.stores.simulation;
-    const { isReportMode, leftPanelOpen, overlay, thermometerActive } = this.stores.ui;
+    const { isReportMode, overlay, thermometerActive } = this.stores.ui;
     const { isSeasonMenuOpen, isStartLocationMenuOpen } = this.state;
     const startLocationButtonHoveredClass = isStartLocationMenuOpen ? css.hovered : "";
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     const tempButtonDisabled = overlay !== "sst";
     const isStormMode = config.mode === "storm";
-    const stormSetupButtonDisabled = simulationRunning;
     const startLocationButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && simulationStarted);
     const seasonButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && simulationStarted);
     const simulationControlsDisabled = isReportMode;
+    // A finished run is selected (view-only): there's nothing to Start until the learner edits it or
+    // starts a new run.
+    const { setupLocked } = this.stores.multiTrack;
     const startLocationButtonClasses = clsx(
       css.widgetGroup,
       startLocationButtonHoveredClass,
@@ -107,20 +106,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <CCLogoSmall className={css.logoSmall} />
         </div>
         <div className={css.mainContainer}>
-          {
-            isStormMode &&
-            <div className={css.widgetGroup}>
-              <Button
-                onClick={this.toggleLeftPanel}
-                disabled={stormSetupButtonDisabled}
-                className={clsx(css.bottomBarButton, css.stormSetupButton, { [css.open]: leftPanelOpen })}
-                data-test="storm-setup-button"
-                disableRipple={true}
-              >
-                <span><SetupIcon/>Storm Setup<br/>and Runs</span>
-              </Button>
-            </div>
-          }
           {
             config.startLocationButton && !isStormMode &&
             <div className={startLocationButtonClasses}>
@@ -190,7 +175,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <div className={`${css.widgetGroup} ${css.stopStart}`}>
             <Button
               onClick={this.handleStartStop}
-              disabled={simulationControlsDisabled || !ready}
+              disabled={simulationControlsDisabled || !ready || setupLocked}
               className={clsx(css.bottomBarButton, css.playbackButton)}
               data-test="start-button"
               disableRipple={true}
@@ -216,7 +201,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           ariaDescribedBy="reload-confirm-message"
         >
           <p id="reload-confirm-message">
-            Are you sure you want to reload the model? You will lose all of your current settings.
+            Are you sure you want to reload the model? You will lose all of your current settings and saved runs.
           </p>
           <div className={css.confirmActions}>
             <Button
@@ -244,13 +229,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     this.setState({ fullscreen: screenfull && screenfull.isFullscreen });
   }
 
-  public toggleLeftPanel = () => {
-    // Opening/closing Storm Setup just toggles the panel — it must NOT wipe a finished run's track.
-    // The Single-track "Current Run" card owns start-over/edit (Edit re-runs, Delete resets), and
-    // multi-track keeps its saved runs, so there's nothing to restart here.
-    this.props.toggleLeftPanelOpen();
-  }
-
   public handleStartStop = () => {
     const { simulation, ui } = this.stores;
     if (simulation.simulationRunning) {
@@ -270,12 +248,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const { simulation: sim, ui } = this.stores;
     const { hurricane, startLocation } = sim;
 
-    // In multi-track mode each Start is a NEW run: clear the previous run's track (keeping the
-    // current setup) so the storm re-launches from the configured start instead of appending onto
-    // the last track, and deselect any saved run so the new active run stays distinct from them.
-    if (this.stores.multiTrack.enabled && sim.simulationStarted) {
-      // Ensure a fresh track for this run; the selected editable card stays selected so the run is
-      // auto-captured into it when it finishes.
+    // Each Start is a NEW run: clear the previous run's track (keeping the current setup) so the
+    // storm re-launches from the configured start instead of appending onto the last track. The
+    // selected editable card stays selected so the run is auto-captured into it when it finishes.
+    if (sim.simulationStarted) {
       sim.restart(false);
     }
 
@@ -315,12 +291,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     ui.setNorthAtlanticView();
     // Restart returns the storm to its start position — make sure it's visible (and re-runnable) by
     // unlocking a locked/completed run, instead of staying hidden behind the completed-run view.
-    if (multiTrack.enabled) {
-      const sel = multiTrack.selectedRun;
-      if (sel && sel.state) multiTrack.editRun(sel.id);
-    } else if (multiTrack.singleRun && !multiTrack.singleTrackEditing) {
-      multiTrack.setSingleTrackEditing(true);
-    }
+    const sel = multiTrack.selectedRun;
+    if (sel && sel.state) multiTrack.editRun(sel.id);
   }
 
   public handleRestart = () => {
@@ -350,10 +322,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     // simulation.reset() doesn't restore hurricane.startingCategory — reset it to the captured default.
     const defCat = this.stores.multiTrack.defaultState?.simulation.hurricane.startingCategory;
     if (defCat != null) this.stores.simulation.hurricane.setStartingCategory(defCat);
-    // Reload is a clean slate: also wipe all Multi-track runs, the Single-track run, mode/selection,
-    // and close Compare — matching the dialog's "you will lose all of your current settings."
+    // Reload is a clean slate: wipe all runs and selection, then start fresh with one empty run.
+    // (The Compare strip auto-hides once there are no completed runs.)
     this.stores.multiTrack.resetAll();
-    this.stores.ui.setCompareOpen(false);
+    this.stores.multiTrack.addRun();
     this.stores.ui.setSetupMode(undefined);
     log("SimulationReloaded");
     this.setState({ reloadConfirmOpen: false });

@@ -52,7 +52,7 @@ export class IndexPage extends BaseComponent<IProps, IState> {
           />
         )}
         <RightPanel />
-        <BottomBar toggleLeftPanelOpen={() => this.toggleLeftPanelOpen()}/>
+        <BottomBar />
         {
           config.benchmark &&
           <div className={css.stepsPerSecond}>
