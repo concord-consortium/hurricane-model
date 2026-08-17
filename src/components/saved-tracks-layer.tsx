@@ -37,7 +37,11 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
   const { multiTrack, simulation, ui } = stores;
 
   const selected = multiTrack.selectedRun;
-  const showCategoryMarkers = ui.categoryChangeMarkers && !simulation.simulationRunning && selected?.state;
+  // While a completed run is being edited (Restart/Edit), it's drawn greyed like an unselected track
+  // (the old result is just a reference while you move things), so hide its category markers too.
+  const editingSelected = !!selected && multiTrack.editingRunId === multiTrack.selectedRunId;
+  const showCategoryMarkers =
+    ui.categoryChangeMarkers && !simulation.simulationRunning && selected?.state && !editingSelected;
   const categoryMarkers = showCategoryMarkers
     ? categoryMarkersForTrack(
         selected!.state!.simulation.hurricaneTrack,
@@ -53,6 +57,9 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
         const track = state.simulation.hurricaneTrack;
         if (!track || track.length === 0) return null;
         const isSelected = run.id === multiTrack.selectedRunId;
+        // A run being edited (Restart/Edit) draws greyed — unselected styling — even though it's the
+        // selected run, so it reads as a stale reference while the setup is being changed.
+        const litSelected = isSelected && run.id !== multiTrack.editingRunId;
         const endPos = track[track.length - 1].position;
         const select = () => {
           multiTrack.selectRun(run.id);
@@ -67,11 +74,11 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
                 changes — react-leaflet applies pane/className only at layer creation. The letter
                 marker keeps a stable key so it persists (updating zIndexOffset/className in place)
                 instead of being torn down and re-added, which made the A/B/C labels blink. */}
-            <StaticTrack key={isSelected ? "sel" : "ghost"} track={track} selected={isSelected} onClick={select} />
+            <StaticTrack key={litSelected ? "sel" : "ghost"} track={track} selected={litSelected} onClick={select} />
             {/* Base order is by run index (A lowest … F highest); the selected run's label jumps
                 above all unselected labels, but stays below the storm marker (offset 1,000,000). */}
-            <LeafletCustomMarker key="label" position={endPos} zIndexOffset={(isSelected ? 500000 : 0) + i * 10000}>
-              <div className={clsx(css.trackEndLabel, { [css.selected]: isSelected })} onClick={select}>
+            <LeafletCustomMarker key="label" position={endPos} zIndexOffset={(litSelected ? 500000 : 0) + i * 10000}>
+              <div className={clsx(css.trackEndLabel, { [css.selected]: litSelected })} onClick={select}>
                 {runLetter(i)}
               </div>
             </LeafletCustomMarker>

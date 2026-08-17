@@ -14,13 +14,20 @@ import css from "./storm-category-section.scss";
 
 const hint = "Drag the slider to set the storm’s starting strength.";
 
-const marks = hurricaneCategoryInfo.map((info, idx) => ({ value: idx, label: info.nameShort }));
 const maxCategory = hurricaneCategoryInfo.length - 1;
 
 export const StormCategorySection = observer(function StormCategorySection() {
   const stores = useStores();
   const { hurricane } = stores.simulation;
   const startingCategory = hurricane.startingCategory ?? 0;
+
+  // Tick labels are all regular #222 (see .scss); the selected one is bold.
+  const marks = hurricaneCategoryInfo.map((info, idx) => ({
+    value: idx,
+    label: (
+      <span className={clsx({ [css.selectedMarkLabel]: idx === startingCategory })}>{info.nameShort}</span>
+    )
+  }));
 
   const handleChange = (_event: Event, value: number | number[]) => {
     const numericValue = Array.isArray(value) ? value[0] : value;

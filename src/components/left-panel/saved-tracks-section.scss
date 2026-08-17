@@ -24,8 +24,8 @@
     // (no fixed empty space above the cards). padding-bottom is scroll-room only — it lets the LAST
     // card scroll up clear of the bar; it lives below the fold, so it never opens a gap above the bar.
     // scroll-padding-bottom makes scrollIntoView (on card select) land the card ABOVE the bar.
-    padding: 15px 0 ($bottomBarHeight + $bottomBarBorderWidth);
-    scroll-padding-bottom: $bottomBarHeight + $bottomBarBorderWidth;
+    padding: 15px 0 ($bottomBarHeight + $barTopGrowth + $bottomBarBorderWidth);
+    scroll-padding-bottom: $bottomBarHeight + $barTopGrowth + $bottomBarBorderWidth;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -86,13 +86,22 @@
       outline-offset: 1px;
     }
 
+    // Sits inline on the badge/buttons row, horizontally centered in the card (badge at left, delete at
+    // right). Absolute so it overlays that row instead of stacking above the badge.
     .editableLabel {
-      font-size: 10px;
-      font-weight: 800;
+      position: absolute;
+      top: 8px;               // same row as the badge (card padding-top) and the buttons
+      left: 38px;             // badge right edge (10px inset + 28px badge)
+      right: 70px;            // reset/restart button left edge (42px inset + 28px button)
+      height: 28px;           // match the badge/button height so it's vertically centered on the row
+      display: flex;
+      align-items: center;
+      justify-content: center; // center the label in the gap between the badge and the reset button
+      font-family: $scaleFont; // Roboto Condensed
+      font-size: 14px;        // match the rest of the card text
+      font-weight: 700;       // a real loaded RC weight (avoids faux-bold at 800)
       letter-spacing: 0.02em;
-      text-transform: uppercase;
       color: #a35a12;
-      margin-bottom: 5px;
     }
 
     .runCardHeader {
@@ -102,15 +111,15 @@
     }
 
     .badge {
-      width: 22px;
-      height: 22px;
+      width: 28px;
+      height: 28px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 5px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 18px; // match the map track label (.trackEndLabel)
       color: #222;
       background: #ccc;
     }
@@ -141,11 +150,19 @@
     .resultHeading {
       font-family: $scaleFont; // match RunSummary's SETUP heading (Roboto Condensed)
       font-size: 14px;
-      font-weight: 400;
+      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      color: $charcoalMedium;
-      margin-bottom: 1px;
+      color: $charcoal;
+      margin-bottom: 5px;
+    }
+
+    // While editing a run whose setup has changed, its captured result (thumbnail + read-outs) is stale
+    // — desaturate + dim it so it reads as "not current" until the run is re-run.
+    .staleResult {
+      filter: grayscale(1);
+      opacity: 0.45;
+      transition: filter 0.15s, opacity 0.15s;
     }
 
     .resultPlaceholder {
@@ -157,47 +174,80 @@
       align-items: center;
       justify-content: center;
       padding: 6px;
-      font-size: 10px;
+      font-family: $scaleFont; // Roboto Condensed
+      font-size: 14px;
+      font-weight: 400;
       color: $charcoalMedium;
-      border: 1px dashed rgba(0, 0, 0, 0.22);
+      border: 1px dashed $charcoalMedium;
       border-radius: 4px;
       text-align: center;
     }
 
-    .cardActions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 8px;
-    }
-
-    .editBtn {
-      font-family: inherit;
-      font-size: 11px;
-      font-weight: 700;
-      color: $charcoal;
-      background: #ececec;
-      border: 1px solid #d3d3d3;
-      border-radius: 5px;
-      padding: 3px 14px;
-      cursor: pointer;
-      &:hover { background: $hoverColor; }
-      &:focus-visible { outline: 2px solid $charcoal; outline-offset: 1px; }
-    }
-
+    // Sits inline on the badge/buttons row, centered — same spot as .editableLabel.
     .editingTag {
-      font-size: 11px;
-      font-weight: 800;
+      position: absolute;
+      top: 8px;               // same row as the badge (card padding-top) and the buttons
+      left: 38px;             // badge right edge (10px inset + 28px badge)
+      right: 70px;            // reset/restart button left edge (42px inset + 28px button)
+      height: 28px;           // match the badge/button height so it's vertically centered on the row
+      display: flex;
+      align-items: center;
+      justify-content: center; // center the label in the gap between the badge and the reset button
+      font-family: $scaleFont; // Roboto Condensed
+      font-size: 14px;        // match the rest of the card text
+      font-weight: 700;       // a real loaded RC weight (avoids faux-bold at 800)
       letter-spacing: 0.02em;
       color: #a35a12;
     }
 
-    // Trash target revealed on hover / when selected.
+    // Restart (edit setup) — 28x28 icon button just left of the delete button. Always visible;
+    // disabled + dimmed while this run is the one being edited, so it stays in sync with the
+    // bottom-bar "Restart/Edit" button (also disabled while editing).
+    .restartBtn {
+      position: absolute;
+      top: 8px; // lined up with the letter badge (card padding-top)
+      right: 42px; // left of the 28px delete (right: 10px) with a 4px gap
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: none;
+      border-radius: 5px;
+      color: $charcoalMedium;
+      cursor: pointer;
+      opacity: 0; // hidden unless the card is selected (revealed below)
+      transition: opacity 0.1s, background-color 0.1s;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        path { fill: currentColor; }
+      }
+
+      // Icon color is constant ($charcoalMedium); only the 28x28 container changes on hover/press.
+      &:hover { background-color: $secondaryColorHover; }
+      &:active { background-color: $secondaryColor; }
+      &:focus-visible { opacity: 1; outline: 2px solid $charcoal; }
+
+      // Disabled (nothing to restart / mid-edit / while a run plays): dim the icon — not the button
+      // opacity, which the selected-reveal drives — and suppress the container hover fill.
+      &:disabled {
+        cursor: default;
+        svg { opacity: 0.35; }
+        &:hover { background-color: transparent; }
+      }
+    }
+
+    // Delete target — 28x28, revealed on hover / when selected.
     .trash {
       position: absolute;
-      top: 5px;
-      right: 6px;
-      width: 24px;
-      height: 24px;
+      top: 8px; // lined up with the letter badge (card padding-top)
+      right: 10px; // match the letter badge's 10px inset from the left edge
+      width: 28px;
+      height: 28px;
       padding: 0;
       display: inline-flex;
       align-items: center;
@@ -206,14 +256,33 @@
       background: none;
       color: $charcoalMedium;
       cursor: pointer;
+      border-radius: 5px;
       opacity: 0;
-      transition: opacity 0.1s, color 0.1s;
+      transition: opacity 0.1s, background-color 0.1s;
 
-      &:hover { color: #c0392b; }
+      // Local delete.svg ships with fill="#797979" on its path; override to currentColor so it takes
+      // the button's grey. Icon color is constant — only the 28x28 container changes on hover/press.
+      svg {
+        width: 24px;
+        height: 24px;
+        path { fill: currentColor; }
+      }
+
+      &:hover { background-color: $secondaryColorHover; }
+      &:active { background-color: $secondaryColor; }
       &:focus-visible { opacity: 1; outline: 2px solid $charcoal; }
+
+      // Disabled while a run is playing. Dim the icon (not the button opacity, which the hover/select
+      // reveal drives) and suppress the container hover fill.
+      &:disabled {
+        cursor: default;
+        svg { opacity: 0.35; }
+        &:hover { background-color: transparent; }
+      }
     }
 
-    &:hover .trash,
+    // Both action buttons show only while the card is selected.
+    &.selected .restartBtn,
     &.selected .trash { opacity: 1; }
   }
 
@@ -226,6 +295,13 @@
       flex: 1 1 0;
       min-width: 0;
     }
+
+    // "Duplicate Last Run" fits on one line in Roboto Condensed, so keep both labels single-line —
+    // the content blocks match and the + circles line up naturally.
+    .newRunLabel {
+      white-space: nowrap;
+      text-align: center;
+    }
   }
 
   // ---- New Run card ----
@@ -237,8 +313,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    padding: 12px;
+    gap: 5px;
+    padding: 12px 12px 9px; // room below the label (shortened from the earlier 24px)
     border: 2px dashed $secondaryColor;
     border-radius: 8px;
     background: #fff;
@@ -248,44 +324,45 @@
 
     &:hover { background: $secondaryColorHover; }
 
-    &.disabled {
-      border-style: solid;
-      border-color: #d8d8d8;
-      background: #f2f2f2;
-      color: $charcoalMedium;
-      cursor: default;
-      &:hover { background: #f2f2f2; }
-    }
-
     &:focus-visible {
       outline: 2px solid $charcoal;
       outline-offset: 1px;
     }
 
     .newRunPlus {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: $secondaryColor;
-      color: #fff;
+      color: #222;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 700;
       line-height: 1;
     }
 
     .newRunLabel {
-      font-weight: 800;
-      font-size: 12px;
+      font-family: $scaleFont; // Roboto Condensed
+      font-weight: 500; // medium
+      font-size: 14px;
     }
 
-    .newRunNote {
-      font-size: 11px;
-      font-weight: 700;
-      text-align: center;
-      color: $charcoalMedium;
-    }
+  }
+
+  // Disabled "add another run" states ("Complete the run(s)…" / "Pack full…") — plain centered text,
+  // no card box, styled like the run-card state labels (Roboto Condensed 14px/700, orange).
+  .addRunNote {
+    font-family: $scaleFont;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+    color: $charcoal;
+    text-align: center;
+    white-space: nowrap;
+    padding: 2px 12px 0;
+    margin: -2px 0; // tighten the prompt: 2px less above and below
   }
 }

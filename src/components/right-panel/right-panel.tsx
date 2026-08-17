@@ -6,10 +6,12 @@ import { log } from "../../log";
 import { BaseComponent, IBaseProps } from "../base";
 import { MapTab } from "./map-tab";
 import { MapButton } from "./map-button";
+import { WindArrowsToggle } from "./wind-arrows-toggle";
+import { HurricaneImageToggle } from "./hurricane-image-toggle";
 
 import css from "./right-panel.scss";
 
-export type MapType = "base" | "overlay";
+export type MapType = "base" | "overlay" | "settings";
 
 interface IProps extends IBaseProps { }
 interface IState {
@@ -64,7 +66,16 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                 </div>
               </li>
             }
-
+            <li>
+              <div
+                id="settings"
+                data-test="tab-settings"
+                className={css.rightPanelTab}
+                onClick={this.handleToggleDrawer}
+              >
+                <MapTab tabType="settings" active={selectedTab === "settings" || !open} />
+              </div>
+            </li>
           </ul>
           {
             selectedTab === "base" &&
@@ -97,6 +108,18 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                     <MapButton label="Storm Surge" value="stormSurge" mapType="overlay" />
                   }
                 </div>
+            </div>
+          }
+          {
+            selectedTab === "settings" &&
+            <div className={`${css.tabContentBack} ${css.settingsMaps}`} data-test="settings-panel">
+              <div className={css.tabContent}>
+                <div className={css.drawerTitle}>Settings</div>
+                {config.windArrowsToggle && <WindArrowsToggle />}
+                {config.windArrowsToggle && config.hurricaneImageToggle &&
+                  <div className={css.settingsDivider} />}
+                {config.hurricaneImageToggle && <HurricaneImageToggle />}
+              </div>
             </div>
           }
         </div>

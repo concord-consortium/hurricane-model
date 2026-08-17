@@ -3,10 +3,10 @@
 .mapView {
   position: relative; // anchor for the Compare overlay (a floating card over the map)
   width: 100%;
-  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
+  height: calc(100% - #{$bottomBarHeight + $barTopGrowth + $bottomBarBorderWidth + $topBarHeight});
 
   &.noTopBar {
-    height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + 1});
+    height: calc(100% - #{$bottomBarHeight + $barTopGrowth + $bottomBarBorderWidth});
   }
 
   .highPressure, .lowPressure {
@@ -118,9 +118,14 @@
     background-image: url("../assets/zoom-out.svg");
   }
 
-  // Pressed / selected — the same grey as the app's hover state.
-  :global(.leaflet-bar a:active) {
+  // Match the Temp button's greys. Hover = $hoverColor (#dfdfdf), overriding Leaflet's lighter
+  // default; pressed/clicking = #cfcfcf, the same darker grey as Temp's selected state. Excluded on
+  // disabled buttons (fit-all when already fit, zoom at min/max) so they show no hover/press feedback.
+  :global(.leaflet-bar a:not(.leaflet-disabled):hover) {
     background-color: $hoverColor;
+  }
+  :global(.leaflet-bar a:not(.leaflet-disabled):active) {
+    background-color: #cfcfcf;
   }
 
   // Disabled zoom button (Leaflet adds .leaflet-disabled at min/max zoom) — dim just the icon.

@@ -96,7 +96,11 @@ export const HurricaneIcon = observer(function HurricaneIcon() {
   const opacity = hurrStrengthToOpacity(hurricane.strength);
 
   const { hurricaneImage, mapZoom, setupMode } = stores.ui;
-  const dimmed = !!setupMode && !(setupMode === "stormLocation" || setupMode === "stormCategory");
+  // Only dim the storm to focus another section's markers while the setup is actually editable. During
+  // a run — or while viewing a finished run — opening a section must NOT fade the storm.
+  const setupEditable = !stores.simulation.simulationStarted && !stores.multiTrack.setupLocked;
+  const dimmed = setupEditable && !!setupMode &&
+    !(setupMode === "stormLocation" || setupMode === "stormCategory");
   // Show the grab affordance whenever the storm can actually be moved (editable), not only when the
   // Storm Location section happens to be open.
   const draggable = !stores.simulation.simulationStarted && !stores.multiTrack.setupLocked;

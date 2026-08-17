@@ -121,25 +121,34 @@ $leftPanelBorderRadius: 0; // square corners
         background: none;
         border: none;
         border-radius: 4px;
-        color: $charcoal; // #222 icon
+        color: $charcoalMedium; // #797979 by default (#222 on hover/select, below)
         cursor: pointer;
         display: inline-flex;
-        font-size: 20px; // the smaller text "×", matching the Compare table's close button
-        height: 24px;
+        height: 32px;
         justify-content: center;
         line-height: 1;
         padding: 0;
         position: absolute;
-        right: 5px;
-        width: 24px;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%); // vertically centered in the 40px header regardless of size
+        width: 32px;
+
+        // MUI Close icon (a real 24×24 "×" SVG), fixed at 24px regardless of the root font-size.
+        svg {
+          width: 24px;
+          height: 24px;
+        }
 
         // Background highlight on hover / select, matching the button language: light orange -> orange.
         &:hover {
           background: $secondaryColorHover;
+          color: $charcoal; // #222 on hover
         }
 
         &:active {
           background: $secondaryColor;
+          color: $charcoal; // #222 on select/press
         }
 
         &:focus-visible {
@@ -171,7 +180,7 @@ $leftPanelBorderRadius: 0; // square corners
     pointer-events: all;
     position: absolute;
     // Center in the VISIBLE area (above the bottom bar), since the container now extends behind it.
-    top: calc(50% - (#{$bottomBarHeight} + #{$bottomBarBorderWidth}) / 2);
+    top: calc(50% - (#{$bottomBarHeight} + #{$barTopGrowth} + #{$bottomBarBorderWidth}) / 2);
     transform: translateY(-50%);
     // Travels with the panel: same duration + easing, so the handle stays in sync while the panel slides.
     transition: transform $leftPanelTransitionSeconds $leftPanelTransitionEasing;
@@ -210,7 +219,7 @@ $leftPanelBorderRadius: 0; // square corners
       font-weight: 700;
       justify-content: center;
       left: 0;
-      line-height: 14px;
+      line-height: 1.1; // match the right-panel tab labels (Base Maps / Map Overlays / Settings)
       position: absolute;
       right: 4px;
       text-align: center;
@@ -220,6 +229,11 @@ $leftPanelBorderRadius: 0; // square corners
     // Hover dims only the background layer to 0.75, mirroring the right panel tabs' thumbnail hover.
     &:hover .stormSetupTabInner {
       opacity: 0.75;
+    }
+
+    // Click/press dims further to 0.5 (after :hover so it wins while pressed), matching the right tabs.
+    &:active .stormSetupTabInner {
+      opacity: 0.5;
     }
 
     &:focus-visible {

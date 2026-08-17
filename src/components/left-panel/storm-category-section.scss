@@ -70,8 +70,14 @@
   .markLabel {
     font-family: inherit; // Lato (the app default), not the Roboto Condensed scale font
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 400; // all tick labels are regular; the selected one is bolded (.selectedMarkLabel)
+    color: $charcoal !important; // #222 for every label — overrides MUI's grey inactive-mark colour
     top: 26px;
+  }
+
+  // The label for the currently selected category.
+  .selectedMarkLabel {
+    font-weight: bold;
   }
 }
 

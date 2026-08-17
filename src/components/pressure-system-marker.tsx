@@ -31,7 +31,10 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     // Draggable whenever the setup is editable — no need to open Pressure Systems first; dragging a
     // marker opens that section (see the drag handlers). Only dim it when another section is active.
     const disabled = uiDisabled || this.stores.multiTrack.setupLocked;
-    const dimmed = setupMode !== undefined && setupMode !== "pressureSystems";
+    // Only dim to focus another section while the setup is editable. During a run — or while viewing a
+    // finished run — opening a section must NOT fade the H/L markers.
+    const setupEditable = !simulation.simulationStarted && !this.stores.multiTrack.setupLocked;
+    const dimmed = setupEditable && setupMode !== undefined && setupMode !== "pressureSystems";
     return (
       <LeafletCustomMarker
         position={model.center}

@@ -1,6 +1,24 @@
 @use "../common" as *;
 
 $overflowHeight: 11px;
+// Extra pill height added at the TOP of each converted bubble (button + Hurricane Scale). Applied as
+// top padding so the white fill + outline grow upward while the content and the bottom edge stay put.
+$pillTopGrowth: 8px;
+
+// Behind-the-bar outline pill for a converted bubble. Portaled into .index (so it can sit behind the
+// bar); box is set via inline style to the bubble's BORDER box. The stroke is a 1px INSET box-shadow
+// (not an outer outline) so it follows the 9px border-box radius and nests concentrically with the
+// white fill (gray outer 9px / inner 8px), sitting exactly where the old border was. Only the ~10px
+// above the bar shows.
+.pillBelow {
+  position: absolute;
+  background: #fff;
+  border-top-left-radius: $bottomBarBorderRadius;
+  border-top-right-radius: $bottomBarBorderRadius;
+  box-shadow: inset 0 0 0 $bottomBarBorderWidth $charcoalMedium;
+  z-index: 1000;                          // behind the bar (1001)
+  pointer-events: none;
+}
 
 // Covers part of the border, just below the rounded corner.
 %borderCover {
@@ -17,6 +35,7 @@ $overflowHeight: 11px;
   background: #fff;
   color: $charcoal;
   height: $bottomBarHeight;
+  padding-top: $barTopGrowth; // grow the bar (and its gray top line) up 8px; content stays put
   display: flex;
   justify-content: space-between;
   border-top: $bottomBarBorderStyle;
@@ -27,8 +46,18 @@ $overflowHeight: 11px;
 
   .leftContainer {
     position: relative;
-    vertical-align: top;
-    padding: 14px 10px 0 10px;
+    display: flex;
+    align-items: center; // vertically center the logo in the (taller) bar
+    // Equal flex-grow on the left+right containers keeps the mainContainer centered in the VIEWPORT
+    // (not in the space left over after the logo/fullscreen), so the buttons don't shift when the
+    // logo changes size. min-width:0 lets them shrink past their content on very narrow screens.
+    flex: 1;
+    min-width: 0;
+    padding: 0 10px;
+    // Center the logo in the bar's white area. The container stretches, so a negative top margin
+    // grows it and shifts its center by only HALF the margin — hence -$barTopGrowth (not half) exactly
+    // cancels the top-padding offset. Measured: lands dead-center.
+    margin-top: -$barTopGrowth;
     .logo, .logoSmall {
       height: 38px;
     }
@@ -36,6 +65,7 @@ $overflowHeight: 11px;
 
   .mainContainer {
     display: flex;
+    flex: 0 0 auto; // natural width; the equal-grow side containers center it in the viewport
   }
 
   // Base styles that ensure that given container sticks out from the bottom bar, has a nice, round corners and its border
@@ -78,6 +108,58 @@ $overflowHeight: 11px;
     background: $hoverColor;
   }
 
+  // Layered-pill treatment, applied per converted bubble (Reload/Restart, Start, Temp, Hurricane
+  // Scale). The gray outline now comes from a pill BEHIND the bar (.pillBelow), so hide this group's
+  // own border outline — but keep the 1px borders (transparent) for layout, so the box, position and
+  // neighbors are unchanged — and clip the white fill to the padding box so it stays inside the
+  // outline. The below pill's stroke then shows through the now-transparent 1px borders, exactly
+  // where the old border sat.
+  .pillGroup {
+    // The bar now reaches the exact viewport bottom, so this group's content height PLUS its 1px
+    // (transparent) top border pushed the border-box 1px past the viewport — a hairline document
+    // scrollbar. Trim that 1px off the height so the border-box ends exactly at the bar bottom; the
+    // trimmed strip is behind the bar, so nothing visible changes (and the content top is unmoved).
+    height: $bottomBarHeight + $overflowHeight - $bottomBarBorderWidth;
+    // Fade the group fill (Temp's hover + selected states) in sync with the MUI button's hover, so
+    // hovering off doesn't leave the shorter button fill fading alone (a not-full-height gray flash).
+    transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    // Grow the pill $pillTopGrowth taller at the TOP: top padding extends the white fill + outline
+    // upward (content box unchanged, so icons/labels/scale don't move), and the extra negative
+    // margin lifts it so the bottom edge stays exactly at the bar bottom.
+    padding-top: $pillTopGrowth;
+    margin-top: -($overflowHeight + $pillTopGrowth);
+    border-top-color: transparent;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    background-clip: padding-box;
+
+    // The .hoverable group-hover fills with the `background` shorthand, which resets background-clip
+    // to border-box — that would let the gray hover fill spill over the transparent borders and cover
+    // the outline. Re-assert the padding-box clip on hover so the fill stays inside the outline.
+    &:global(.hoverable):hover {
+      background-clip: padding-box;
+    }
+
+    // The old %borderCover strips (:before/:after) are vestigial now the side borders are transparent.
+    // At the outermost bubbles (left of Reload, right of Hurricane Scale) they paint 1px of white over
+    // the bar's gray top line — the stray white pixel. Drop them.
+    &:before, &:after {
+      display: none;
+    }
+
+    // Each bubble's white fill is inset 1px (padding-box clip) so the outline shows through the
+    // transparent borders; with only a 1px overlap between bubbles that left a 1px gap between
+    // adjacent fills (a thin stem in the valley). Overlap 2px so neighboring white fills meet.
+    margin-left: -2 * $bottomBarBorderWidth;
+  }
+
+  // Temp's selected state, filled at the GROUP level so it covers the whole pill (incl. the top
+  // headroom) — same approach as its hover. Its button content is absolutely positioned, so the
+  // button itself can't be stretched into the headroom the way the other buttons are.
+  .pillSelected {
+    background-color: #cfcfcf; // matches the button's .active select colour
+  }
+
   .reloadRestart {
     white-space: nowrap;
   }
@@ -88,8 +170,15 @@ $overflowHeight: 11px;
 
   .rightContainer {
     display: flex;
-    align-items: center;  // center the fullscreen icon vertically in the bar
-    padding-right: 10px;  // ...and sit it 10px from the right edge
+    align-items: center;   // center the fullscreen icon vertically in the bar
+    justify-content: flex-end; // keep the icon pinned right now that this container flex-grows
+    flex: 1;               // equal grow with .leftContainer → mainContainer stays viewport-centered
+    min-width: 0;
+    // Symmetric with .leftContainer's padding so both side containers end up the same width (equal
+    // flex-grow only matches the CONTENT width; unequal padding would offset the centering). The icon
+    // still sits 10px from the right via the right padding + flex-end.
+    padding: 0 10px;
+    margin-top: -$barTopGrowth; // centers the fullscreen icon in the bar's white area (see .leftContainer)
   }
 
   .fullscreenIcon {
@@ -114,9 +203,19 @@ $overflowHeight: 11px;
 
   .bottomBarButton {
     min-width: 60px;
-    height: 100%;
+    // The pill grew $pillTopGrowth taller at the top (added as group padding above this button).
+    // Extend the button up into that headroom (negative margin + extra height) so its hover fill
+    // covers the whole pill, and re-pad the top by the same amount so the icon/label stay put.
+    height: calc(100% + #{$pillTopGrowth});
+    margin-top: -$pillTopGrowth;
+    padding-top: $pillTopGrowth !important; // beats MUI's text-button padding:0
     color: $charcoal;
     font-weight: bold;
+    // Square ALL corners by default (override MUI's 4px). The first/last-child rules below round only
+    // the OUTER top corners to 8px, so the INNER corners where Reload and Restart meet inside the
+    // shared bubble stay square — the hover fill no longer bulges there.
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 
@@ -140,6 +239,8 @@ $overflowHeight: 11px;
       width: 30px;
       border-radius: 15px;
       margin: $bottomBarTopPadding auto 0 auto;
+      position: relative;
+      top: -5px; // icon nudged up
     }
   }
 
@@ -150,6 +251,18 @@ $overflowHeight: 11px;
       }
     }
   }
+
+  // Explicit bottom-control widths. Clear All + Restart/Edit share one bubble, so their button widths
+  // sum to that bubble's width; Start and Temp are their own bubbles.
+  .w66 { width: 66px; }
+  .restartEdit { width: 90px; }
+
+  // Label position (visual shift only, doesn't disturb the button's centered layout): was +2px; now
+  // moved up 3px from there.
+  .btnLabel {
+    position: relative;
+    top: -1px;
+  }
 }
 
 .confirmActions {
@@ -159,12 +272,16 @@ $overflowHeight: 11px;
   margin-top: 1em;
 }
 
-@media (max-width: 1200px) {
+// Switch to the small (icon-only) logo when the full logo would sit within 10px of the Clear All
+// button. With the mainContainer viewport-centered, the full-logo gap = (viewport - mainWidth)/2 -
+// (10 + logoWidth); it hits 10px at viewport = mainWidth(≈704) + 40 + 2·logoWidth(≈120) ≈ 983px.
+// Recompute if the bottom-control widths or the full logo change substantially.
+@media (max-width: 983px) {
   .logo {
     display: none;
   }
 }
-@media (min-width: 1200px) {
+@media (min-width: 983.02px) {
   .logoSmall {
     display: none;
   }

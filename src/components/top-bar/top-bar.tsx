@@ -11,7 +11,7 @@ import css from "./top-bar.scss";
 
 // StormExplorer version label shown at the top-left. Bump these when cutting a new version.
 const APP_VERSION_MAIN = "Storm Explorer: Multi-track · v0.6 · ";
-const APP_VERSION_UPDATED = "updated: 8/12/26";
+const APP_VERSION_UPDATED = "updated: 8/17/26";
 
 interface IProps extends IBaseProps {}
 interface IState {

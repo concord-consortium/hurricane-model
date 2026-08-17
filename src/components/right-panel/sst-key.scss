@@ -1,30 +1,50 @@
 @use "../common" as *;
 
-
-.units {
-  display: flex;
-  justify-content: space-between;
-  width: 65%;
-  margin: 0 auto;
+// The 9 temperature labels are referenced in sst-key.tsx but were never defined here, so they
+// inherited a loose ~24px line-height — 9 of them (≈220px) overflowed the 173px scale and collided
+// with the checkbox. Tighten so all 9 fit; the column's space-around then distributes them across the
+// bar (top label at the bar top, bottom label at the bar bottom) without lengthening the bar.
+.temperatureContainer {
+  line-height: 17px;
 }
 
 .scaleContainer {
   text-align: center;
 
-  .column {
-    text-align: right;
-    height: 173px;
+  // Each column stacks its header (°C / °F) over its 173px value column, so the header centers over
+  // exactly that column's values. The gradient column's header is an equal-height empty spacer.
+  .colWrap {
     display: inline-flex;
     flex-direction: column;
-    justify-content: space-around;
     vertical-align: middle;
   }
 
+  .colHeader {
+    height: 20px;
+    line-height: 20px;
+    font-family: $scaleFont;
+    font-size: 14px;
+    text-align: center; // centered over the column of values below
+  }
+
+  .column {
+    text-align: right;
+    height: 173px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+
+  // °F column (last of the three) left-aligns so its values hug the bar, mirroring the right-aligned °C.
+  .colWrap:last-child .column {
+    text-align: left;
+  }
+
   .scaleGradient {
-    margin-left: 12px;
-    margin-right: 7px;
+    margin-left: 8px; // 8px gap to the values on each side; symmetric so the bar stays centered
+    margin-right: 8px;
     height: 88%;
-    width: 24px;
+    width: 20px; // 4px narrower than before (was 24)
     background-size: cover;
     background-repeat: no-repeat;
     border-radius: 0;
@@ -35,21 +55,56 @@
 .checkbox {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-  margin-top: -6px;
+  justify-content: center; // center the box + label as a group
+  gap: 7px; // a bit more space between the box and its label
 
-  input {
-    margin-right: 5px;
-    width: 18px;
-    height: 18px;
+  margin-top: -6px;
+  padding: 6px 0; // restore the vertical breathing room the old MUI checkbox's padding gave
+  cursor: pointer; // the whole row (box + label) is clickable
+  user-select: none;
+  white-space: nowrap; // keep "Accessible Key" on one line
+  font-family: $scaleFont; // Roboto Condensed, per request
+  font-size: 14px; // was 12px — matching the rest of the overlay key labels
+  font-weight: normal; // was bold — starting everything at regular weight
+
+  .label {
+    margin-left: -1px; // nudge the label 1px left, per request
   }
 
-  .checkboxElement {
-    padding: 6px 5px 6px 0px;
-    svg {
-      fill: $tabImpact;
-    }
+  // Custom checkbox box (the row is the real control; this is presentational).
+  .box {
+    box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid $overlayMapBar;
+    border-radius: 3px;
+    background-color: transparent;
+    transition: background-color 0.12s;
+  }
+
+  // Checkmark — a rotated border "L", hidden until checked.
+  .check {
+    width: 4px;
+    height: 8px;
+    margin-bottom: 2px; // optical centering
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+  }
+
+  .boxChecked {
+    background-color: $overlayMapBar; // solid fill when selected
+    .check { opacity: 1; }
+  }
+
+  // Hover/focus an UNCHECKED box → fill it (preview of selected), not a disc.
+  &:hover .box:not(.boxChecked),
+  &:focus-visible .box:not(.boxChecked) {
+    background-color: rgba($overlayMapBar, 0.22);
   }
 }

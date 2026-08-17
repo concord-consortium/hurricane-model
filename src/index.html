@@ -7,9 +7,9 @@
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Load the exact weights the app uses: Lato 400/700/900, Roboto Condensed 400/700.
+    <!-- Load the exact weights the app uses: Lato 400/700/900, Roboto Condensed 400/500/600/700.
          Without explicit weights, Google Fonts serves only 400 and the browser faux-bolds everything. -->
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Roboto+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       html, body, #app {
         margin: 0;
@@ -19,6 +19,10 @@
       body {
         font-family: 'Lato', sans-serif;
         user-select: none;
+        /* Grayscale antialiasing so text stroke weight matches the Sketch specs (browsers default to
+           a heavier macOS rasterization that reads as slightly bolder). WebKit/macOS only. */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
     </style>
   </head>

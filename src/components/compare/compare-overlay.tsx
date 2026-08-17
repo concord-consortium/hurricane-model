@@ -2,7 +2,7 @@ import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { freezeEditableCard, setInteractiveState } from "../../models/interactive-state";
+import { freezeEditableCard, liveSetupDiffersFromRun, setInteractiveState } from "../../models/interactive-state";
 import { IRunSlot } from "../../models/multi-track";
 import { namedRegions, seasonLabels } from "../../types";
 import { IHurricaneInteractiveState } from "../../types/interactive-state";
@@ -14,56 +14,22 @@ import {
 import { resolveStartLocation } from "../../models/simulation";
 import { formatLatLng } from "../../utils/lat-long";
 import { pressureReport } from "../../utils/pressure";
-import { CATEGORY_COLORS, anomalyText, categoryChip, runLetter } from "../left-panel/run-summary";
+import { anomalyText, categoryChip, runLetter } from "../left-panel/run-summary";
+import { CategorySparkline } from "../left-panel/category-sparkline";
 
 import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
 import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
 import SeasonIcon from "../../assets/left-panel/season.svg";
 import ThermometerIcon from "../../assets/left-panel/thermometer.svg";
 import PressureSystemIcon from "../../assets/left-panel/pressure-system.svg";
+import PeakCategoryIcon from "../../assets/left-panel/peak-category.svg";
+import LandfallIcon from "../../assets/left-panel/landfall.svg";
+import CategoryOverTimeIcon from "../../assets/left-panel/category-over-time.svg";
 import DropdownArrow from "../../assets/left-panel/dropdown-arrow.svg";
 import DragIcon from "../../assets/drag.svg";
 
 import categoryCss from "../hurricane-category.scss";
 import css from "./compare-overlay.scss";
-
-// Darker, legible-on-white strokes for the intensity sparkline, indexed by category (the Saffir–
-// Simpson fills are too pale to read as a thin line for TS/Cat 1).
-const SPARK_STROKE = ["#9a9a9a", "#c9a400", "#e0a020", "#d97a1e", "#c85a10", "#e03b3b"];
-
-// A category sparkline for one run: the storm's category (0..5) at each track point. The line and
-// the fill beneath it are colored by category over time (a gradient with a stop per point), so the
-// color shifts as the storm strengthens/weakens. Width matches the run's Lifetime bar (widthPx).
-function Sparkline({ series, uid, widthPx }: { series: number[]; uid: string; widthPx: number }) {
-  const w = Math.max(8, widthPx), h = 22, pad = 2;
-  if (series.length === 0) return <span className={css.noData}>—</span>;
-  const n = series.length;
-  const x = (i: number) => n <= 1 ? w / 2 : pad + (i / (n - 1)) * (w - 2 * pad);
-  const y = (c: number) => h - pad - (c / 5) * (h - 2 * pad);
-  const ci = (c: number) => Math.max(0, Math.min(5, Math.round(c)));
-  const pts = series.map((c, i) => `${x(i).toFixed(1)},${y(c).toFixed(1)}`).join(" ");
-  const area = `${pad},${h - pad} ${pts} ${(w - pad)},${h - pad}`;
-  const strokeId = `spk-s-${uid}`, fillId = `spk-f-${uid}`;
-  // userSpaceOnUse so the stroke and fill gradients share the same x-mapping (offset i/(n-1) == x(i)).
-  const grad = (id: string, palette: string[]) => (
-    <linearGradient id={id} gradientUnits="userSpaceOnUse" x1={pad} y1="0" x2={w - pad} y2="0">
-      {series.map((c, i) => (
-        <stop key={i} offset={n <= 1 ? 0 : i / (n - 1)} stopColor={palette[ci(c)]} />
-      ))}
-    </linearGradient>
-  );
-  return (
-    <svg className={css.spark} width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
-      <defs>
-        {grad(strokeId, SPARK_STROKE)}
-        {grad(fillId, CATEGORY_COLORS)}
-      </defs>
-      <polygon points={area} fill={`url(#${fillId})`} opacity={0.75} />
-      <polyline points={pts} fill="none" stroke={`url(#${strokeId})`} strokeWidth={1.75}
-        strokeLinejoin="round" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 // Category cell (Storm Category / Peak Category): the hurricane icon recolored to the run's category
 // + the label (TS, Cat 1…), no pill. Mirrors the icon on the row label, but colored per run.
@@ -93,6 +59,8 @@ export const CompareOverlay = observer(function CompareOverlay() {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const [collapsed, setCollapsed] = useState(true); // always on the map; starts collapsed
+  // Cross-highlight: hovering a column header lights the whole column (row highlight is pure CSS).
+  const [hoverCol, setHoverCol] = useState<string | null>(null);
   const [colBox, setColBox] = useState<{ left: number; width: number } | null>(null);
   const completedCount = multiTrack.runs.filter(r => r.state).length;
 
@@ -107,10 +75,30 @@ export const CompareOverlay = observer(function CompareOverlay() {
     setColBox({ left: sr.left - wr.left, width: sr.width });
   }, []);
   useLayoutEffect(measureCol, [measureCol, multiTrack.selectedRunId, completedCount, collapsed]);
+
   useEffect(() => {
     window.addEventListener("resize", measureCol);
     return () => window.removeEventListener("resize", measureCol);
   }, [measureCol]);
+
+  // Keep the overlay on-screen as it grows: adding runs widens it, so if its right edge would pass the
+  // map's right edge, shift it left to sit 10px inside. Re-checks when runs are added/removed, on
+  // expand/collapse, and on resize. Once shifted it holds an explicit position (like a drag).
+  useLayoutEffect(() => {
+    const el = overlayRef.current;
+    const parent = el?.offsetParent as HTMLElement | null;
+    if (!el || !parent) return;
+    const clampToViewport = () => {
+      const prect = parent.getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
+      const curLeft = rect.left - prect.left;
+      const maxLeft = prect.width - el.offsetWidth - 10; // 10px gap from the map's right edge
+      if (curLeft > maxLeft) setPos({ left: Math.max(0, maxLeft), top: rect.top - prect.top });
+    };
+    clampToViewport();
+    window.addEventListener("resize", clampToViewport);
+    return () => window.removeEventListener("resize", clampToViewport);
+  }, [multiTrack.runs.length, collapsed]);
 
   // Drag the card by its header. Position is kept relative to the map wrapper (the offsetParent)
   // and clamped so it can't be dragged off the map. offsetWidth is read live so the clamp respects
@@ -173,6 +161,8 @@ export const CompareOverlay = observer(function CompareOverlay() {
       editable: !done,
       editing,
       running: isSelected && simulation.simulationStarted && !simulation.simulationFinished,
+      // Editing this run with a changed setup → its captured Result values are stale (grayed out).
+      resultStale: editing && !!slot.state && liveSetupDiffersFromRun(stores, slot.state.simulation),
       startCat: setupSim ? setupSim.hurricane.startingCategory : simulation.hurricane.startingCategory,
       location: formatLatLng(locCoords.lat, locCoords.lng),
       season: seasonLabels[seasonKey] ?? seasonKey,
@@ -191,7 +181,9 @@ export const CompareOverlay = observer(function CompareOverlay() {
   });
 
   const maxDuration = Math.max(1, ...data.map(d => d.duration));
-  const LIFE_W = 84; // px width for the longest-lived run; the Category-over-time sparkline scales to this
+  // Longest-lived run's sparkline width fills the fixed run-column content (128px column − 20px cell
+  // padding = 108px), reaching ~10px from the cell's right edge. Shorter runs scale proportionally.
+  const LIFE_W = 108;
   const lifeWidth = (d: { duration: number }) => (d.duration / maxDuration) * LIFE_W;
 
   const selectRun = (id: string, state: IHurricaneInteractiveState) => {
@@ -223,20 +215,42 @@ export const CompareOverlay = observer(function CompareOverlay() {
 
   // A data row. `icon` (Setup rows only) is drawn beside the label, matching the run-card summary
   // icons; `render` draws each run's cell. Differences are not indicated (no color, no tag).
-  const Row = (label: string, render: (i: number) => React.ReactNode, icon?: React.ReactNode) => {
+  // `isResult` marks the Result-section rows: their cells gray out for a run being edited with a
+  // changed setup (its captured values no longer match the setup), mirroring the run cards.
+  const Row = (label: string, render: (i: number) => React.ReactNode, icon?: React.ReactNode,
+    isResult = false) => {
     return (
       <tr className={css.dataRow}>
         <th scope="row" className={css.rowLabel}>
           <span className={css.rowLabelName}>{icon}{label}</span>
         </th>
         {data.map((d, i) => (
-          <td key={d.id} className={css.runCell} onClick={() => selectColumn(d.id)}>
+          <td key={d.id}
+            className={clsx(css.runCell, {
+              [css.colHover]: hoverCol === d.id,
+              [css.staleCell]: isResult && d.resultStale
+            })}
+            onClick={() => selectColumn(d.id)}>
             {render(i)}
           </td>
         ))}
       </tr>
     );
   };
+
+  // A section divider (Setup / Result). Its per-run cells are clickable — selecting the column — just
+  // like the data-row cells; the label cell stays sticky like the row labels.
+  const GroupRow = (label: string) => (
+    <tr className={css.groupRow}>
+      <th scope="row" className={css.groupLabel}>{label}</th>
+      {data.map(d => (
+        <td key={d.id}
+          className={clsx(css.groupCell, { [css.colHover]: hoverCol === d.id })}
+          onClick={() => selectColumn(d.id)}
+          title="Select this run on the map" />
+      ))}
+    </tr>
+  );
 
   return (
     <div
@@ -261,7 +275,9 @@ export const CompareOverlay = observer(function CompareOverlay() {
         </div>
       </header>
 
-      {!collapsed && <div className={css.scroll}>
+      {/* The table is always rendered so the overlay's width is table-driven in BOTH states; when
+          collapsed it's clipped to zero height (see .scroll in the SCSS), so closed === open width. */}
+      <div className={css.scroll}>
         <div className={css.tableWrap} ref={wrapRef}>
         {colBox && (
           <div
@@ -276,9 +292,14 @@ export const CompareOverlay = observer(function CompareOverlay() {
               <th className={css.corner} />
               {data.map(d => (
                 <th key={d.id}
-                  className={clsx(css.runHead, { [css.selHead]: d.id === multiTrack.selectedRunId })}
+                  className={clsx(css.runHead, {
+                    [css.selHead]: d.id === multiTrack.selectedRunId,
+                    [css.colHover]: hoverCol === d.id
+                  })}
                   data-selhead={d.id === multiTrack.selectedRunId ? "1" : undefined}
                   onClick={() => selectColumn(d.id)}
+                  onMouseEnter={() => setHoverCol(d.id)}
+                  onMouseLeave={() => setHoverCol(null)}
                   title="Select this run on the map">
                   <span className={css.headInner}>
                     <span className={css.runBadge}>{d.letter}</span>
@@ -295,7 +316,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
             </tr>
           </thead>
           <tbody>
-            <tr className={css.groupRow}><th colSpan={data.length + 1}>Setup</th></tr>
+            {GroupRow("Setup")}
             {Row("Storm Location",
               i => <span className={css.mono}>{data[i].location}</span>,
               <StormLocationIcon className={css.rowIcon} />)}
@@ -321,26 +342,26 @@ export const CompareOverlay = observer(function CompareOverlay() {
                     </span>))}</span>
             ), <PressureSystemIcon className={css.rowIcon} />)}
 
-            <tr className={css.groupRow}><th colSpan={data.length + 1}>Result</th></tr>
+            {GroupRow("Result")}
             {Row("Peak Category", i => (
               data[i].editable ? <span className={css.muted}>—</span> : <CatCell category={data[i].peak} />
-            ))}
+            ), <PeakCategoryIcon className={clsx(css.rowIcon, css.rowIconWhiteFill)} />, true)}
             {Row("Landfall", i => (
               data[i].editable
                 ? <span className={css.muted}>—</span>
                 : <span>{data[i].landfall!.count === 0 ? "None" : `${data[i].landfall!.count}×`}</span>
-            ))}
+            ), <LandfallIcon className={css.rowIcon} />, true)}
             {/* Lifetime row removed by content design, but the sparkline still scales its width to the
                 run's lifetime (lifeWidth), so a longer-lived storm reads as a wider category trace. */}
             {Row("Category Over Time", i => (
               data[i].editable
                 ? <span className={css.muted}>—</span>
-                : <Sparkline series={data[i].series} uid={data[i].id} widthPx={lifeWidth(data[i])} />
-            ))}
+                : <CategorySparkline series={data[i].series} uid={data[i].id} widthPx={lifeWidth(data[i])} />
+            ), <CategoryOverTimeIcon className={clsx(css.rowIcon, css.rowIconWhiteFill)} />, true)}
           </tbody>
         </table>
         </div>
-      </div>}
+      </div>
     </div>
   );
 });

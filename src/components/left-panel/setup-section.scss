@@ -16,7 +16,9 @@
 
   &.openSectionHeader {
     background-color: #fff7e6;
-    border-bottom: none;
+    // Keep the 1px border's SPACE (transparent), not `border-bottom: none` — removing it changes the
+    // header's box height and shifts the centered icon/title/caret ~0.5px when the section opens/closes.
+    border-bottom-color: transparent;
   }
 
   .sectionTitle.sectionTitle {

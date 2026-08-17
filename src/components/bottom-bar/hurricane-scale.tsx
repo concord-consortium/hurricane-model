@@ -12,7 +12,6 @@ const renderCategory = (cat: number) => {
     <div key={cat} className={css.categoryContainer}>
       <div className={css.categoryValue}>{ nameShort }</div>
       <div className={barClass} />
-      <div className={css.dot}>.</div>
       <div className={css.windSpeedRange}>{ windRange }</div>
     </div>
    );

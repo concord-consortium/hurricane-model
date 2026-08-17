@@ -106,7 +106,8 @@ export function pressureReport(startLocation: StartLocation, systems: IPressureS
     // Position: "moved <dir>" if dragged, otherwise "default" (unchanged) — so a strength-only change
     // reads "H1: default, 1000 mb".
     parts.push(d.moved && d.direction ? `moved ${d.direction}` : "default");
-    if (d.strengthChanged) parts.push(`${d.mb} mb`);
+    // Non-breaking space so the value and its "mb" unit never split across a wrap (cards + table).
+    if (d.strengthChanged) parts.push(`${d.mb}\u00A0mb`);
     out.push({ type: d.type, label: `${d.type === "high" ? "H" : "L"}${nums[i]}`, detail: parts.join(", ") });
   });
   return out;

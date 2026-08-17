@@ -126,6 +126,11 @@ export class MapView extends BaseComponent<IProps, IState> {
 
   public render() {
     const { simulation: sim, ui, multiTrack } = this.stores;
+    // Setup is locked during a run (simulationStarted) and while viewing a finished run (setupLocked).
+    // While locked, the map's setup-editing affordances — the thermometer, the per-region temperature
+    // controls, and the storm-placement region — must NOT appear, so opening a setup section (or a
+    // thermometer left on) can't change anything on the map. Matches the panel's setup-section lock.
+    const setupInteractionLocked = multiTrack.setupLocked || sim.simulationStarted;
     // Per-type labels (H1, H2, L1, L2…) for the pressure markers — same helper the run cards use.
     const pressureSystemNumbers = perTypeNumbers(sim.pressureSystems);
     const { sstOverlay } = ui;
@@ -268,17 +273,19 @@ export class MapView extends BaseComponent<IProps, IState> {
             </Control>
           }
           {
-            ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionSaved} saved={true} />
+            ui.thermometerActive && !setupInteractionLocked &&
+              <ThermometerMarker position={ui.thermometerPositionSaved} saved={true} />
           }
           {
-            ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
+            ui.thermometerActive && !setupInteractionLocked &&
+              <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
           }
           {
-            ui.setupMode === "stormLocation" &&
+            ui.setupMode === "stormLocation" && !setupInteractionLocked &&
             <PolygonRegion region={stormPlacementRegion} />
           }
           {
-            ui.setupMode === "seaSurfaceTemperatures" &&
+            ui.setupMode === "seaSurfaceTemperatures" && !setupInteractionLocked &&
             namedRegions.map(key => {
               const { region, anchor } = temperatureAnomalyRegions[key];
               const anomalyColor = anomalyFillColor(sim.temperatureAnomalyAt(key));

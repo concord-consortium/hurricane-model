@@ -31,9 +31,10 @@ export const SetupSection = observer(function SetupSection({
 }: ISetupSectionProps) {
   const stores = useStores();
   const open = stores.ui.setupMode === setupMode;
-  // When a completed run is selected (and not being edited), its setup is locked: the section can
-  // still be opened, but its controls are greyed and non-interactive.
-  const locked = stores.multiTrack.setupLocked;
+  // Setup is locked (section still opens, but its controls are greyed and non-interactive) once a run
+  // has STARTED — you can't change the setup mid-run — and it stays locked while viewing the finished
+  // run (setupLocked). Restart/Edit or a new run unlocks it again (both reset simulationStarted).
+  const locked = stores.multiTrack.setupLocked || stores.simulation.simulationStarted;
   const dt = dataTest || title;
 
   const handleClick = () => {

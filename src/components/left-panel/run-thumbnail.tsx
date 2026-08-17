@@ -1,6 +1,7 @@
 import { observer } from "mobx-react";
 import React from "react";
 
+import { temperatureAnomalyMax, temperatureAnomalyMin } from "../../constants";
 import { sstImages } from "../../models/simulation";
 import { useStores } from "../../stores-context";
 import { namedRegions } from "../../types";
@@ -72,14 +73,17 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: { sim: ISimu
           (only meaningful with the SST overlay on). */}
       {showSST && anomalies.map((a, i) => {
         // Keep the marker fully inside the frame even when a region anchor sits near an edge.
-        const x = Math.max(7.5, Math.min(W - 7.5, px(a.anchor.lng)));
-        const y = Math.max(7.5, Math.min(H - 7.5, py(a.anchor.lat)));
+        const x = Math.max(9.5, Math.min(W - 9.5, px(a.anchor.lng)));
+        const y = Math.max(9.5, Math.min(H - 9.5, py(a.anchor.lat)));
         return (
           <g key={`sst-${i}`}>
-            <circle cx={x} cy={y} r={6.6} fill={anomalyFillColor(a.v)} opacity={0.92}
-              stroke="#fff" strokeWidth={0.7} />
-            <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={6}
-              fontWeight={700} fill="#fff" stroke="#1a1a1a" strokeWidth={0.4} paintOrder="stroke">
+            {/* Always the darkest warm/cold shade (the ±3 end of the scale) regardless of magnitude —
+                only the sign picks warm vs cold; the label still shows the real value. */}
+            <circle cx={x} cy={y} r={8.5} opacity={0.92} stroke="#fff" strokeWidth={1.2}
+              fill={anomalyFillColor(a.v > 0 ? temperatureAnomalyMax : temperatureAnomalyMin)} />
+            <text x={x} y={y} className={css.sstLabel} textAnchor="middle" dominantBaseline="central"
+              fontSize={10} fontWeight={700} fill="#fff" stroke="#1a1a1a" strokeWidth={0.67}
+              paintOrder="stroke">
               {(a.v > 0 ? "+" : "−") + Math.abs(a.v)}
             </text>
           </g>
@@ -105,8 +109,8 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: { sim: ISimu
         const high = ps.type === "high";
         return (
           <text key={`ps-${i}`} x={x} y={y} textAnchor="middle" dominantBaseline="central"
-            fontSize={12} fontWeight={700} fill={high ? "#327cfc" : "#fc542d"}
-            stroke="#fff" strokeWidth={1} paintOrder="stroke">{high ? "H" : "L"}</text>
+            fontSize={15} fontWeight={700} fill={high ? "#327cfc" : "#fc542d"}
+            stroke="#fff" strokeWidth={1.2} paintOrder="stroke">{high ? "H" : "L"}</text>
         );
       })}
     </svg>

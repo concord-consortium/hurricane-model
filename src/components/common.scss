@@ -2,7 +2,8 @@ $charcoal: #222222; // primary text ink (was #434343) — darker for stronger co
 $charcoalMedium: #797979;
 
 $topBarHeight: 22px;
-$bottomBarHeight: 65px;
+$bottomBarHeight: 64px;
+$barTopGrowth: 8px; // extra height added at the TOP of the bottom bar (white fill + gray line move up)
 $bottomBarBorderWidth: 1px;
 $bottomBarBorderStyle: $bottomBarBorderWidth solid $charcoalMedium;
 $bottomBarTopPadding: 7px;
@@ -30,6 +31,13 @@ $tabImpact: #0099ff;
 $tabImpactTransparent: rgba(0,153,255,0.5);
 $tabImpactLight: #7fccff;
 $tabImpactLightTransparent: rgba(127,204,255,0.75);
+// Map Overlays label bar (the "Sea Surface Temp" bar) — also the SST accessible-key checkbox fill.
+$overlayMapBar: #0078C7;
+
+// Settings tab + stripe: the left-panel orange at the green/blue tab lightness (50% tint of #ff9900),
+// mirroring how $tabImpactLight = 50% tint of $tabImpact.
+$tabSettings: $secondaryColor; // #ff9900 — accent (parallels $tabGeo / $tabImpact)
+$tabSettingsLight: #ffcc80;
 
 $coldColor: #2255cc;
 $warmColor: #c62828;

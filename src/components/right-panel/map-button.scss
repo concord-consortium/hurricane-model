@@ -1,5 +1,9 @@
 @use "../common" as *;
 
+// Base Maps label bar: a darker green than the panel stripe so the (white) label text reads clearly.
+$baseMapBar: #1E821E;
+// Map Overlays label bar ($overlayMapBar) now lives in common.scss (shared with the SST checkbox fill).
+
 .mapButton {
   box-sizing: border-box !important;
   display: block !important;
@@ -22,7 +26,7 @@
   .viewIcon {
     position: absolute;
     left: -10px;
-    top: 7px;
+    top: 4px; // nudged up 3px (was 7px) — applies to both Base Maps and Map Overlays
     width: 26px;
   }
 
@@ -64,8 +68,19 @@
     }
 
     &.geoMaps  {
+      // Base Maps labels: larger white text on a darker-green bar ($baseMapBar). The bar deepens by
+      // state via OPACITY — 65% default → 80% hover → opaque selected — so the map shows through until
+      // selected. Taller (28px) to fit the 14px text; the green outline also marks selection.
+      // (#222 text failed AA on this green (~3.2:1); white passes (~4.9:1 on the opaque bar).)
       .label {
-        background-color: $tabGeoTransparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba($baseMapBar, 0.65);
+        color: #fff;
+        font-size: 14px;
+        height: 28px;
+        margin-top: -28px;
       }
 
       .viewIcon {
@@ -79,21 +94,32 @@
       &:hover {
         box-shadow: 0 0 0 2px $tabGeoLight;
         .label {
-          background-color: $tabGeoLightTransparent;
+          background-color: rgba($baseMapBar, 0.8);
         }
       }
 
       &.active {
         box-shadow: 0 0 0 2px $tabGeo;
         .label {
-          background-color: $tabGeo;
+          background-color: $baseMapBar;
         }
       }
     }
 
     &.impactMaps {
+      // Map Overlays labels: mirrors Base Maps — larger white text on a blue bar ($overlayMapBar)
+      // that deepens by OPACITY (65% default → 80% hover → opaque selected). 28px tall for the 14px
+      // text; the blue outline also marks selection.
       .label {
-        background-color: $tabImpactTransparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba($overlayMapBar, 0.65);
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold; // map labels stay bold; the key labels below are the regular ones
+        height: 28px;
+        margin-top: -28px;
       }
 
       .viewIcon {
@@ -107,15 +133,14 @@
       &:hover {
         box-shadow: 0 0 0 2px $tabImpactLight;
         .label {
-          background-color: $tabImpactLightTransparent;
+          background-color: rgba($overlayMapBar, 0.8);
         }
       }
-
 
       &.active {
         box-shadow: 0 0 0 2px $tabImpact;
         .label {
-          background-color: $tabImpact;
+          background-color: $overlayMapBar;
         }
       }
     }

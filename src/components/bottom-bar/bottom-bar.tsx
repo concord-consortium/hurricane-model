@@ -2,19 +2,19 @@ import Button from "@mui/material/Button";
 import { clsx } from "clsx";
 import { inject, observer } from "mobx-react";
 import * as React from "react";
+import { createPortal } from "react-dom";
 import screenfull from "screenfull";
 
 import config from "../../config";
 import { log } from "../../log";
+import { setupChangedFromDefault } from "../../models/interactive-state";
 import { safeStartLocation } from "../../utils/interactive-state";
 import { BaseComponent, IBaseProps } from "../base";
 import { Dialog } from "../dialog";
-import { HurricaneImageToggle } from "./hurricane-image-toggle";
 import { HurricaneScale } from "./hurricane-scale";
 import { IconButton } from "./icon-button";
 import { SeasonButton } from "./season-button";
 import { StartLocationButton } from "./start-location-button";
-import { WindArrowsToggle } from "./wind-arrows-toggle";
 
 import CCLogo from "../../assets/cc-logo.svg";
 import CCLogoSmall from "../../assets/cc-logo-small.svg";
@@ -33,6 +33,7 @@ interface IState {
   isSeasonMenuOpen: boolean;
   isStartLocationMenuOpen: boolean;
   reloadConfirmOpen: boolean;
+  pillBoxes: { left: number; top: number; width: number; height: number }[];
 }
 
 function toggleFullscreen() {
@@ -52,14 +53,50 @@ function toggleFullscreen() {
 @observer
 export class BottomBar extends BaseComponent<IProps, IState> {
 
+  // Refs on each converted bubble so its behind-the-bar outline pill can be measured + positioned
+  // (the bar uses space-between, so each bubble's x depends on window width — measure, don't hardcode).
+  private barRef = React.createRef<HTMLDivElement>();
+  private reloadRef = React.createRef<HTMLDivElement>();
+  private startRef = React.createRef<HTMLDivElement>();
+  private tempRef = React.createRef<HTMLDivElement>();
+  private hurricaneRef = React.createRef<HTMLDivElement>();
+
   constructor(props: IProps) {
     super(props);
     this.state = {
       fullscreen: false,
       isSeasonMenuOpen: false,
       isStartLocationMenuOpen: false,
-      reloadConfirmOpen: false
+      reloadConfirmOpen: false,
+      pillBoxes: []
     };
+  }
+
+  // Recompute the portaled behind-the-bar outline pills on mount + resize (the bar uses space-between,
+  // so button x depends on window width — measure, don't hardcode). One pill per converted bubble,
+  // sized to the bubble's BORDER box so its 1px inset stroke sits exactly where the old border was —
+  // concentric with the white fill (gray outer 9px / inner 8px).
+  public measureLayout = () => {
+    const bar = this.barRef.current;
+    const index = bar?.parentElement;
+    if (!bar || !index) return;
+    const ir = index.getBoundingClientRect();
+
+    // Clamp each pill's bottom to the bar's bottom (the viewport edge). The bubble border-box spills
+    // ~1px below the viewport; since the pill is absolutely positioned directly in .index, that spill
+    // would add a 1px document scrollbar. The clamped-off part sits behind the bar anyway, so nothing
+    // visible changes.
+    const barBottom = bar.getBoundingClientRect().bottom - ir.top;
+    const pillBoxes = [this.reloadRef, this.startRef, this.tempRef, this.hurricaneRef]
+      .map(ref => ref.current)
+      .filter((el): el is HTMLDivElement => !!el)
+      .map(el => {
+        const r = el.getBoundingClientRect();
+        const top = r.top - ir.top;
+        return { left: r.left - ir.left, top, width: r.width, height: Math.min(r.height, barBottom - top) };
+      });
+
+    this.setState({ pillBoxes });
   }
 
   get fullscreenIconStyle() {
@@ -70,12 +107,15 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     if (screenfull && screenfull.isEnabled) {
       document.addEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
+    requestAnimationFrame(this.measureLayout);
+    window.addEventListener("resize", this.measureLayout);
   }
 
   public componentWillUnmount() {
     if (screenfull && screenfull.isEnabled) {
       document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
+    window.removeEventListener("resize", this.measureLayout);
   }
 
   public render() {
@@ -94,13 +134,26 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     // A finished run is selected (view-only): there's nothing to Start until the learner edits it or
     // starts a new run.
     const { setupLocked } = this.stores.multiTrack;
+    // Restart/Edit only makes sense once a run has actually been run (or a completed run is being
+    // viewed, to unlock it) — so it's disabled on first load and on every new (not-yet-run) card.
+    // It also stays disabled *while the run is playing* — it only becomes available once the run
+    // finishes or the learner hits Stop (simulationRunning goes false).
+    const restartDisabled = simulationControlsDisabled || simulationRunning ||
+      (!simulationStarted && !setupLocked);
+    // Clear All only makes sense once there's something to clear — the learner has changed the setup
+    // from default, a run is completed, or a run was started. So on a pristine first card it's inert,
+    // and (like Restart/Edit) it stays disabled *while a run is playing* — only re-enabling once the
+    // run finishes or the learner hits Stop.
+    const hasCompletedRuns = this.stores.multiTrack.runs.some(r => r.state !== null);
+    const clearAllDisabled = simulationControlsDisabled || simulationRunning ||
+      (!simulationStarted && !hasCompletedRuns && !setupChangedFromDefault(this.stores));
     const startLocationButtonClasses = clsx(
       css.widgetGroup,
       startLocationButtonHoveredClass,
       { hoverable: !startLocationButtonDisabled }
     );
     return (
-      <div className={css.bottomBar}>
+      <div className={css.bottomBar} ref={this.barRef}>
         <div className={css.leftContainer}>
           <CCLogo className={css.logo} />
           <CCLogoSmall className={css.logoSmall} />
@@ -130,19 +183,44 @@ export class BottomBar extends BaseComponent<IProps, IState> {
                 }} />
             </div>
           }
-          <div className={`${css.widgetGroup} hoverable`}>
-            {
-              config.windArrowsToggle &&
-              <WindArrowsToggle />
-            }
+          <div className={`${css.widgetGroup} ${css.reloadRestart} ${css.pillGroup}`} ref={this.reloadRef}>
+            <Button
+              className={clsx(css.bottomBarButton, css.playbackButton, css.w66)}
+              data-test="reload-button"
+              onClick={this.handleReload}
+              disabled={clearAllDisabled}
+              disableRipple={true}
+            >
+              <span><ReloadIcon/><span className={css.btnLabel}>Clear All</span></span>
+            </Button>
+            <Button
+              className={clsx(css.bottomBarButton, css.playbackButton, css.restartEdit)}
+              data-test="restart-button"
+              onClick={this.handleRestart}
+              disabled={restartDisabled}
+              disableRipple={true}
+            >
+              <span><RestartIcon/><span className={css.btnLabel}>Restart/Edit</span></span>
+            </Button>
           </div>
-          <div className={`${css.widgetGroup} hoverable`}>
-            {
-              config.hurricaneImageToggle &&
-              <HurricaneImageToggle />
-            }
+          <div className={`${css.widgetGroup} ${css.stopStart} ${css.pillGroup}`} ref={this.startRef}>
+            <Button
+              onClick={this.handleStartStop}
+              disabled={simulationControlsDisabled || !ready || setupLocked}
+              className={clsx(css.bottomBarButton, css.playbackButton, css.w66)}
+              data-test="start-button"
+              disableRipple={true}
+            >
+              { simulationRunning
+                ? <span><PauseIcon/><span className={css.btnLabel}>Stop</span></span>
+                : <span><StartIcon /><span className={css.btnLabel}>Start</span></span> }
+            </Button>
           </div>
-          <div className={`${css.widgetGroup} ${tempButtonDisabled ? "" : "hoverable"}`}>
+          <div
+            className={`${css.widgetGroup} ${css.pillGroup} ${css.w66} ` +
+              `${thermometerActive ? css.pillSelected : ""} ${tempButtonDisabled ? "" : "hoverable"}`}
+            ref={this.tempRef}
+          >
             <IconButton
               disabled={tempButtonDisabled}
               active={thermometerActive}
@@ -152,38 +230,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               onClick={this.handleThermometerToggle}
             />
           </div>
-          <div className={`${css.widgetGroup} ${css.reloadRestart}`}>
-            <Button
-              className={clsx(css.bottomBarButton, css.playbackButton)}
-              data-test="reload-button"
-              onClick={this.handleReload}
-              disabled={simulationControlsDisabled}
-              disableRipple={true}
-            >
-              <span><ReloadIcon/> Reload</span>
-            </Button>
-            <Button
-              className={clsx(css.bottomBarButton, css.playbackButton)}
-              data-test="restart-button"
-              onClick={this.handleRestart}
-              disabled={simulationControlsDisabled}
-              disableRipple={true}
-            >
-              <span><RestartIcon/> Restart</span>
-            </Button>
-          </div>
-          <div className={`${css.widgetGroup} ${css.stopStart}`}>
-            <Button
-              onClick={this.handleStartStop}
-              disabled={simulationControlsDisabled || !ready || setupLocked}
-              className={clsx(css.bottomBarButton, css.playbackButton)}
-              data-test="start-button"
-              disableRipple={true}
-            >
-              { simulationRunning ? <span><PauseIcon/> Stop</span> : <span><StartIcon /> Start</span> }
-            </Button>
-          </div>
-          <div className={css.widgetGroup}>
+          <div className={`${css.widgetGroup} ${css.pillGroup}`} ref={this.hurricaneRef}>
             <HurricaneScale />
           </div>
         </div>
@@ -197,11 +244,11 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         <Dialog
           onClose={this.cancelReload}
           open={this.state.reloadConfirmOpen}
-          title="Reload Model"
+          title="Clear All"
           ariaDescribedBy="reload-confirm-message"
         >
           <p id="reload-confirm-message">
-            Are you sure you want to reload the model? You will lose all of your current settings and saved runs.
+            Are you sure you want to clear everything? You will lose all of your current settings and saved runs.
           </p>
           <div className={css.confirmActions}>
             <Button
@@ -217,10 +264,28 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               onClick={this.confirmReload}
               disableRipple={true}
             >
-              Reload
+              Clear All
             </Button>
           </div>
         </Dialog>
+        {
+          // Behind-the-bar outline pills (layered-pill treatment), one per converted bubble. Portaled
+          // into .index so they sit BEHIND the bar; only each rounded top peeks above, providing the
+          // gray outline.
+          this.state.pillBoxes.length > 0 && this.barRef.current?.parentElement &&
+          createPortal(
+            <>
+              {this.state.pillBoxes.map((box, i) => (
+                <div
+                  key={i}
+                  className={css.pillBelow}
+                  style={{ left: box.left, top: box.top, width: box.width, height: box.height }}
+                />
+              ))}
+            </>,
+            this.barRef.current.parentElement
+          )
+        }
       </div>
     );
   }

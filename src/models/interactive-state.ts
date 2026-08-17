@@ -4,7 +4,7 @@ import { appModes, namedRegions } from "../types";
 import { IHurricaneInteractiveState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
 import { PressureSystem } from "./pressure-system";
-import { extendedLandfallBounds } from "./simulation";
+import { extendedLandfallBounds, resolveStartLocation } from "./simulation";
 import { IStores } from "./stores";
 
 const CURRENT_VERSION = 1;
@@ -251,6 +251,56 @@ export function getInteractiveState(stores: IStores): IHurricaneInteractiveState
       zoomedInView: ui.zoomedInView
     }
   };
+}
+
+// Fingerprint of the LIVE sim's learner-editable setup inputs (season, storm location, starting
+// category, pressure systems, temperature anomalies). Reads ONLY the setup inputs (not run output like
+// the track), so comparisons don't re-fire on every simulation tick.
+function liveSetupFingerprint(simulation: IStores["simulation"]): string {
+  const { hurricane } = simulation;
+  // Location as resolved coordinates: before a run, use the storm's LIVE position so it changes
+  // continuously *while dragging* (not just on drop); once started it's frozen at the start location
+  // (hurricane.center then moves with the storm).
+  const location = simulation.simulationStarted
+    ? resolveStartLocation(simulation.startLocation)
+    : { lat: hurricane.center.lat, lng: hurricane.center.lng };
+  return JSON.stringify({
+    season: simulation.season,
+    location,
+    startingCategory: hurricane.startingCategory,
+    pressureSystems: simulation.pressureSystems.map(ps => ps.serialize()),
+    temperatureAnomalies: Object.fromEntries(simulation.temperatureAnomalies)
+  });
+}
+
+// Same fingerprint for a captured/serialized simulation state (the default, or a run's saved state).
+// Location is resolved to coordinates so it compares against the live fingerprint's resolved center.
+function stateSetupFingerprint(sim: IHurricaneInteractiveState["simulation"]): string {
+  return JSON.stringify({
+    season: sim.season,
+    location: resolveStartLocation(sim.startLocation),
+    startingCategory: sim.hurricane.startingCategory,
+    pressureSystems: sim.pressureSystems,
+    temperatureAnomalies: sim.temperatureAnomalies
+  });
+}
+
+// True when the current setup differs from the pristine default in any learner-editable input. Used to
+// gate Clear All so it's inert on an untouched first card and only lights up once the learner changes
+// something.
+export function setupChangedFromDefault(stores: IStores): boolean {
+  const def = stores.multiTrack.defaultState?.simulation;
+  if (!def) return false;
+  return liveSetupFingerprint(stores.simulation) !== stateSetupFingerprint(def);
+}
+
+// True when the live setup no longer matches a given run's captured setup — i.e. the learner edited a
+// value since loading it, so that run's stored result (thumbnail, peak/landfall/sparkline) is stale and
+// should read grayed-out until it's re-run.
+export function liveSetupDiffersFromRun(
+  stores: IStores, runSim: IHurricaneInteractiveState["simulation"]
+): boolean {
+  return liveSetupFingerprint(stores.simulation) !== stateSetupFingerprint(runSim);
 }
 
 // Freeze the editable ("Not run yet") card's setup before navigating away from it, so it keeps its own

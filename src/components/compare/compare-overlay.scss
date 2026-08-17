@@ -1,5 +1,9 @@
 @use "../common" as *;
 
+// Fixed width for every run column. Sized so the Storm Location value ("10.50°N, 20.00°W") fits on one
+// line; longer values in other rows wrap. The sparkline's max width is this minus the 20px cell padding.
+$runColW: 128px;
+
 .overlay {
   position: absolute;
   top: 12px;
@@ -9,11 +13,13 @@
   left: 50%;
   transform: translateX(calc(-50% + 400px)); // centered, then nudged 400px right (default dock)
   z-index: 1200;
-  // Grows with the number of runs instead of scrolling; capped to the map, then scrolls if needed.
+  // Grows to fit its content, capped to the map — but never narrower than the one-run OPEN width
+  // (~297px, measured), so the closed header defaults to that same width and there's no jump when
+  // opening/closing with a single run (Run A).
   width: fit-content;
-  min-width: 360px;
   max-width: calc(100% - 24px);
-  max-height: calc(100% - 96px);
+  // Height follows the table's content (rows get taller as values wrap) and is NOT capped to the
+  // viewport — shortening the browser doesn't shrink or scroll the table.
   display: flex;
   flex-direction: column;
   background: #ffffff;
@@ -25,9 +31,20 @@
   overflow: hidden;
 }
 
-.collapsed {
-  min-width: 300px;
+// Closed: the table is still in the DOM (so it drives the overlay's width — closed matches open
+// exactly), but clipped to zero height so only the header shows. Keep the horizontal padding (it's part
+// of the width); only the vertical padding + height are zeroed. No hardcoded min-width needed.
+.collapsed .scroll {
+  height: 0;
+  padding-bottom: 0;
+  overflow: hidden;
 }
+
+// Closed width = the ONE-RUN width, regardless of how many runs exist: keep only the row-label column
+// (child 1) and the first run column (child 2); hide run columns 2+ (child 3+). The table is clipped to
+// zero height anyway, so this only sets the collapsed overlay's width — matching the open single-run
+// table exactly (DOM-driven, no hardcoded value).
+.collapsed .table tr > :nth-child(n + 3) { display: none; }
 
 // Shown when expanded but there's only one run — nothing to compare yet.
 .hint {
@@ -43,7 +60,7 @@
   gap: 10px;
   height: 40px;
   box-sizing: border-box;
-  padding: 0 10px 0 14px;
+  padding: 0 4px 0 14px; // 4px right so the caret button sits 4px from the overlay's right edge
   border-bottom: 1px solid $hoverColor;
   background: #fafafa;
   cursor: grab;
@@ -65,7 +82,10 @@
   circle { fill: #797979; }
 }
 
-.collapsed .header { border-bottom: none; }
+// Keep the 1px bottom border's SPACE when collapsed (just transparent), not `border-bottom: none` —
+// with box-sizing: border-box, removing it would make the header's inner box 1px taller and shift the
+// vertically-centered title + grab dots down ~0.5px on collapse.
+.collapsed .header { border-bottom-color: transparent; }
 
 .title {
   font-weight: 700;
@@ -97,7 +117,9 @@
   align-items: center;
   justify-content: center;
 
-  &:hover { background: $hoverColor; color: $charcoal; }
+  // Match the Storm Setup panel's × button: light orange on hover -> orange on press, icon -> #222.
+  &:hover { background: $secondaryColorHover; color: $charcoal; }
+  &:active { background: $secondaryColor; color: $charcoal; }
 }
 
 // The left-panel dropdown-arrow SVG (natively points down) — centers cleanly in the button via its
@@ -120,7 +142,7 @@
 
 .scroll {
   overflow: auto;
-  padding-right: 10px;
+  padding-right: 5px; // 5px between the (rightmost) selection border and the overlay's right edge
   padding-bottom: 5px;
   padding-left: 2px; // small gutter so the orange diff-accent bar isn't jammed against the edge
 }
@@ -136,6 +158,9 @@
   position: absolute;
   top: 0;
   bottom: 0;
+  // Border-box so the 2px border draws INSIDE the measured column width (this app has no global reset,
+  // so the default content-box would add 4px and push the right edge past the column).
+  box-sizing: border-box;
   border: 2px solid $secondaryColor;
   border-radius: 6px;
   pointer-events: none;
@@ -187,6 +212,12 @@
   .rowIconHurricane {
     color: #fff;
   }
+
+  // Peak Category & Category Over Time icons are two-tone (grey outline + inner fill). White fill so
+  // only the outline shows on the white table — the run's value color lives in the cell, not here.
+  .rowIconWhiteFill {
+    color: #fff;
+  }
 }
 
 .corner {
@@ -196,15 +227,32 @@
   z-index: 2;
 }
 
-.groupRow th {
+.groupRow th,
+.groupRow td {
   background: #f0f0f0;
+}
+
+// The "SETUP" / "RESULT" label — sticky like the row labels so it stays put on horizontal scroll.
+.groupLabel {
+  position: sticky;
+  left: 0;
+  z-index: 1;
   font-size: 14px; // match the row-label ("category") text
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  // Gray, but WCAG AA on the #f0f0f0 row fill: 5.0:1 (the old #797979 was 3.8:1 — failed at this size).
-  color: #666666;
+  color: #222;
   padding: 7px 10px; // a bit taller to carry the larger text
+  white-space: nowrap;
+}
+
+// Per-run cells in a section-divider row: clickable, selecting the column like the data-row cells.
+.groupCell {
+  cursor: pointer;
+
+  // A bit darker/warmer than the white-cell hover (#fff6e6) so the step off the gray fill reads the
+  // same — plain #fff6e6 is actually brighter than the #f0f0f0 gray, so it looked like a lighten.
+  &:hover { background: #f6e5cb; }
 }
 
 // Run-column headers.
@@ -216,8 +264,16 @@
   &:hover { background: #fff6e6; }
 }
 
-// Give each run column a comfortable width so the card visibly widens as runs are added.
-.runHead, .dataRow td { min-width: 92px; }
+// Every run column is a FIXED width so a column never resizes as its values change — long values wrap
+// to more lines (making the table taller) instead of widening the column. Border-box so the width
+// includes the 10px cell padding on each side (content ≈ 90px). $runColW is shared with the sparkline.
+.runHead, .dataRow td, .groupRow td {
+  box-sizing: border-box;
+  width: $runColW;
+  min-width: $runColW;
+  max-width: $runColW;
+  overflow-wrap: anywhere; // let long unbroken values wrap rather than overflow the fixed column
+}
 
 // Every run cell selects its column on click.
 .runCell {
@@ -226,6 +282,27 @@
 
   &:hover { background: #fff6e6; }
 }
+
+// Cross-highlight (spreadsheet-style). Hovering a column header lights the whole column: JS toggles
+// .colHover on that column's cells (they live in different rows, so CSS alone can't reach them). Must
+// sit after .runHead/.runCell to win the cascade; .groupRow td.colHover beats the gray section fill.
+// A Result cell for a run being edited with a changed setup: its captured value is stale, so desaturate
+// + dim it until the run is re-run (mirrors the run cards' grayed-out result).
+.staleCell {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
+.colHover { background: #fff6e6; }
+.groupRow td.colHover { background: #f6e5cb; } // gray section cells: darker orange for an equal step
+
+// Hovering a row label lights the whole row — pure CSS: the label is the row's first cell, so the
+// general-sibling `~ td` reaches every run cell after it. White (data) rows get #fff6e6; the gray
+// section rows (Setup/Result) get the darker orange so both look like the same amount of highlight.
+.rowLabel:hover,
+.rowLabel:hover ~ td { background: #fff6e6; }
+.groupLabel:hover,
+.groupLabel:hover ~ td { background: #f6e5cb; }
 
 // Selected run header: the badge goes solid orange as an extra cue; the column outline does the rest.
 .selHead .runBadge {
@@ -254,13 +331,13 @@
   gap: 6px;
 }
 
-// "Not run yet — editable" / "Editing…" beside the letter, matching the run-card state labels.
+// "Not run yet" / "Editing…" / "Running…" beside the letter — matches the run-card state labels
+// (Roboto Condensed 14px/700, no uppercase).
 .headState {
-  font-family: Lato, arial, sans-serif;
-  font-size: 10px;
-  font-weight: 800;
+  font-family: $scaleFont; // Roboto Condensed
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
   color: #a35a12;
   white-space: nowrap;
 }
@@ -294,15 +371,13 @@
 .chipsCol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; }
 
 // Pressure Systems: one line per changed system ("H1: moved SSW, 1000 mb"), matching the run cards.
-// Lines stay on one row (nowrap) so the table widens to fit rather than wrapping — the overlay is
-// fit-content up to the map width, so it grows to make room.
+// A long line wraps within the fixed column width (making the row taller) rather than widening it.
 .pressureCol {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 3px;
   font-size: 14px;
-  white-space: nowrap;
 }
 // Labels (H1, L2…): the map blue/red, AA on the table's white background (~5.1:1 / ~4.8:1).
 .psHigh { color: #2a69d6; }
@@ -330,7 +405,7 @@
 .high { background: #ffe7b3; }
 .low  { background: #d7d7ff; }
 
-.mono { font-variant-numeric: tabular-nums; }
+.mono { font-variant-numeric: tabular-nums; white-space: nowrap; } // Storm Location stays on one line
 .muted { color: #222; }
 
 // Lifetime bar.
