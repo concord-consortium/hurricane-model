@@ -4,9 +4,10 @@ import * as React from "react";
 import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { MapContainer, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
+import { MapContainer, TileLayer, ZoomControl, AttributionControl } from "react-leaflet";
 import { LatLng, Map as LeafletMap, Point, PointTuple, latLngBounds, DomEvent } from "leaflet";
 import Control from "./leaflet-control";
+import { CrossfadeImageOverlay } from "./crossfade-image-overlay";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
 import { perTypeNumbers } from "../utils/pressure";
@@ -21,6 +22,8 @@ import config from "../config";
 import Home from "@mui/icons-material/Home";
 
 import FitAllIcon from "../assets/fit-all.svg";
+import WarningIcon from "../assets/warning.svg";
+import { WarningModal } from "./warning-modal";
 import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
@@ -37,13 +40,16 @@ import { temperatureAnomalyRegions, anomalyFillColor } from "../utils/regions";
 import "leaflet/dist/leaflet.css";
 
 interface IProps extends IBaseProps {}
-interface IState {}
+interface IState {
+  warningOpen: boolean;
+}
 
 const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
 
 @inject("stores")
 @observer
 export class MapView extends BaseComponent<IProps, IState> {
+  public state: IState = { warningOpen: true }; // shown by default on every load/reload
   private mapRef = React.createRef<LeafletMap>();
   private _programmaticMapUpdate = false;
   private _lastThermometerUpdateTime = 0;
@@ -140,6 +146,10 @@ export class MapView extends BaseComponent<IProps, IState> {
       css.topLeftControl, css.resetViewContainer, "leaflet-bar",
       { [css.leftPanelOpen]: this.stores.ui.leftPanelOpen }
     );
+    const warningButtonClasses = clsx(
+      css.topLeftControl, css.warningContainer, "leaflet-bar",
+      { [css.leftPanelOpen]: this.stores.ui.leftPanelOpen }
+    );
 
     // Change the TileLayer's key when the base map changes to force an update.
     // Otherwise, the new layer renders offset to the northwest.
@@ -185,7 +195,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             ui.overlay === "sst" &&
-            <ImageOverlay
+            <CrossfadeImageOverlay
               // accessible version of sea surface temperature should always use 100% opacity
               opacity={sstOverlay.accessibleSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
               url={
@@ -261,6 +271,20 @@ export class MapView extends BaseComponent<IProps, IState> {
             </Control>
           }
           {
+            // Warning button: opens a dismissible "this is a simulation" notice. Same styling and
+            // hover/press states as Fit All; sits 12px below it (via .warningContainer margin).
+            navigation &&
+            <Control position="topleft" className={warningButtonClasses}>
+              <a className={clsx(css.resetViewBtn, { "leaflet-disabled": this.state.warningOpen })}
+                onClick={this.state.warningOpen ? undefined : this.openWarning}
+                title="Warning" role="button" aria-label="Warning"
+                aria-disabled={this.state.warningOpen}
+              >
+                <WarningIcon/>
+              </a>
+            </Control>
+          }
+          {
             ui.zoomedInView &&
             <Control position="topleft" className={`${css.fullMapViewContainer} leaflet-bar`}>
               <a className={css.resetViewBtn}
@@ -305,6 +329,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           <AttributionControl position="topright" />
         </MapContainer>
         <CompareOverlay />
+        <WarningModal open={this.state.warningOpen} onClose={this.closeWarning} />
       </div>
     );
   }
@@ -320,6 +345,9 @@ export class MapView extends BaseComponent<IProps, IState> {
       this.handleViewportChanged();
     }
   }
+
+  public openWarning = () => this.setState({ warningOpen: true });
+  public closeWarning = () => this.setState({ warningOpen: false });
 
   public resetView = () => {
     const map = this.leafletMap;

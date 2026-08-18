@@ -1,0 +1,10 @@
+// Each ping-pong overlay img fades its opacity so SST image swaps cross-fade instead of hard-cutting.
+.layer {
+  transition: opacity 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer {
+    transition: none;
+  }
+}

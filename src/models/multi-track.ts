@@ -9,6 +9,10 @@ export interface IRunSlot {
   // The captured run snapshot once this slot has been run; null while it's still editable
   // ("Not run yet"). Capturing happens automatically when a run finishes — there is no Save button.
   state: IHurricaneInteractiveState | null;
+  // In-progress edits to a COMPLETED run (unlocked via Restart/Edit) that haven't been re-run yet.
+  // Preserved when navigating away so returning restores the edited setup; the captured result stays
+  // (shown stale/grayed) until a re-run. Cleared on re-run (captureRun) and reset.
+  editDraft: IHurricaneInteractiveState | null;
 }
 
 /**
@@ -72,7 +76,7 @@ export class MultiTrackModel {
 
   // Adds a fresh editable card and selects it.
   @action.bound public addRun(): IRunSlot {
-    const run: IRunSlot = { id: `run-${this.nextId++}`, state: null };
+    const run: IRunSlot = { id: `run-${this.nextId++}`, state: null, editDraft: null };
     this.runs.push(run);
     this.selectedRunId = run.id;
     this.editingRunId = undefined;
@@ -85,6 +89,7 @@ export class MultiTrackModel {
     const run = this.runs.find(r => r.id === id);
     if (run) {
       run.state = state;
+      run.editDraft = null; // the edit is now committed as the new result
     }
     this.editingRunId = undefined;
   }
@@ -94,6 +99,7 @@ export class MultiTrackModel {
     const run = this.runs.find(r => r.id === id);
     if (run) {
       run.state = null;
+      run.editDraft = null;
       this.selectedRunId = id;
     }
     this.editingRunId = undefined;
@@ -107,6 +113,12 @@ export class MultiTrackModel {
 
   @action.bound public setEditableDraft(state: IHurricaneInteractiveState | null) {
     this.editableDraft = state;
+  }
+
+  // Store (or clear) the in-progress edits for a completed run being edited (see IRunSlot.editDraft).
+  @action.bound public setEditDraft(id: string, state: IHurricaneInteractiveState | null) {
+    const run = this.runs.find(r => r.id === id);
+    if (run) run.editDraft = state;
   }
 
   @action.bound public deleteRun(id: string) {

@@ -1,0 +1,102 @@
+@use "common" as *;
+
+.body {
+  position: relative; // anchor for the corner close button
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 28px 25px 25px; // the × sits in the top-right corner; the centered icon clears it, so
+                           // the top doesn't need to fully clear the button's height
+  text-align: center;
+}
+
+// Close button matches the Compare table's × — a 24px icon in a 32x32 box with the orange
+// hover/press treatment — wrapped in a 44x44 touch target for accessibility.
+.closeButton {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover .closeInner { background: $secondaryColorHover; color: $charcoal; }
+  &:active .closeInner { background: $secondaryColor; color: $charcoal; }
+  &:focus-visible .closeInner {
+    outline: 2px solid $charcoal;
+    outline-offset: 2px;
+  }
+}
+
+// The visible 32x32 button, centered in the 44x44 target.
+.closeInner {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  color: $charcoalMedium;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    font-size: 24px;
+  }
+}
+
+.icon {
+  display: inline-flex;
+
+  // CSS wins over the SVG's own 24px width/height attributes, scaling the 24-viewBox icon up.
+  svg {
+    display: block;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.message {
+  margin: 0;
+  color: $charcoal;
+  font-size: 18px;
+  line-height: 1.4;
+  white-space: nowrap; // keep the message on a single line
+}
+
+// Dismiss button — same styling as the left-panel Season buttons: transparent fill, thin grey
+// border, 6px radius, 14px bold; light-orange hover and orange press (echoing Season's selected).
+.okButton {
+  margin-top: 16px; // extra space beyond the 16px gap, separating the action from the message (~32px)
+  min-width: 88px;
+  padding: 11px 8px; // taller button to go with the 16px text (~44px tall, an accessible target)
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: normal;
+  text-transform: none;
+  color: $charcoal;
+  background-color: transparent;
+  border: 1px solid $charcoalMedium;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: none;
+
+  &:hover {
+    background-color: $secondaryColorHover;
+    transition: background-color 0.12s;
+  }
+  &:active {
+    background-color: $secondaryColor;
+    border-color: $secondaryColor;
+  }
+  &:focus-visible {
+    outline: 2px solid $charcoal;
+    outline-offset: 1px;
+  }
+}

@@ -2,7 +2,7 @@ import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React, { useEffect, useRef } from "react";
 
-import { freezeEditableCard, liveSetupDiffersFromRun, setInteractiveState } from "../../models/interactive-state";
+import { freezeCurrentCard, liveSetupDiffersFromRun, setInteractiveState } from "../../models/interactive-state";
 import { IRunSlot } from "../../models/multi-track";
 import { namedRegions } from "../../types";
 import { durationSteps } from "../../utils/run-outcomes";
@@ -106,25 +106,28 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
   // track; the loaded track is cleared from the sim (the map layer draws it) and the storm resets.
   const handleSelect = (run: IRunSlot) => {
     if (run.id === multiTrack.selectedRunId) return;
-    freezeEditableCard(stores); // keep the editable card's own values if we're leaving it
+    freezeCurrentCard(stores); // preserve the leaving card's in-progress edits (editable or editing run)
     multiTrack.selectRun(run.id);
-    // Load the completed run's captured state, or restore the editable card's own draft.
-    const restore = run.state ?? multiTrack.editableDraft;
+    // A completed run with pending edits restores its edit draft; otherwise its captured state, or the
+    // editable card's own draft.
+    const restore = run.editDraft ?? run.state ?? multiTrack.editableDraft;
     if (restore) {
       multiTrack.autoCaptureSuppressed = true;
       setInteractiveState(stores, restore);
       simulation.restart(false);
       multiTrack.autoCaptureSuppressed = false;
     }
+    // Returning to a run with unsaved edits re-enters edit mode so the edits stay changeable.
+    if (run.editDraft) multiTrack.editRun(run.id);
   };
 
   // Edit a completed run: load its setup, unlock it for changes, and select it. Changing settings
   // and pressing Start re-runs it, updating the card.
   const handleEdit = (run: IRunSlot) => {
     if (!run.state) return;
-    freezeEditableCard(stores); // keep the editable card's own values if we're leaving it to edit this one
+    freezeCurrentCard(stores); // preserve the leaving card's in-progress edits
     multiTrack.autoCaptureSuppressed = true;
-    setInteractiveState(stores, run.state);
+    setInteractiveState(stores, run.editDraft ?? run.state); // resume any pending edits to this run
     simulation.restart(false);
     multiTrack.autoCaptureSuppressed = false;
     multiTrack.editRun(run.id);
@@ -231,7 +234,7 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
                     <div className={css.resultHeading}>Result</div>
                     <div className={clsx({ [css.staleResult]: resultStale })}>
                       {run.state
-                        ? <RunThumbnail sim={run.state.simulation} />
+                        ? <div className={css.thumbCrop}><RunThumbnail sim={run.state.simulation} /></div>
                         : <div className={css.resultPlaceholder}>Run to see result</div>}
                       <RunResult sim={run.state?.simulation ?? null} uid={run.id} maxDuration={maxRunDuration} />
                     </div>
@@ -271,7 +274,7 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
 
         <li ref={addRowRef}>
           {multiTrack.isFull ? (
-            <div className={css.addRunNote}>Pack full — delete a run to add another</div>
+            <div className={css.addRunNote}>Limit reached — delete a run to add another</div>
           ) : multiTrack.hasEditableCard ? (
             <div className={css.addRunNote}>Complete run(s) above to add another run</div>
           ) : multiTrack.runs.some(r => r.state) ? (

@@ -2,7 +2,8 @@ import { observer } from "mobx-react";
 import React from "react";
 
 import { temperatureAnomalyMax, temperatureAnomalyMin } from "../../constants";
-import { sstImages } from "../../models/simulation";
+import config from "../../config";
+import { sstImages } from "../../models/sst-overlay";
 import { useStores } from "../../stores-context";
 import { namedRegions } from "../../types";
 import { ISimulationState } from "../../types/interactive-state";
@@ -49,6 +50,11 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: { sim: ISimu
   const { ui } = useStores();
   const baseImg = BASE_IMAGES[ui.baseMap] || satelliteImg;
   const showSST = ui.overlay === "sst";
+  // Both SST scale images for this run's season, stacked so toggling the accessible key cross-fades
+  // (see .sstLayer). Accessible renders at full opacity (matching the map); default at 0.72.
+  const accessibleSST = ui.sstOverlay.accessibleSSTScale;
+  const defaultSSTUrl = sstImages[config.defaultSSTScale][sim.season];
+  const accessibleSSTUrl = sstImages[config.accessibleSSTScale][sim.season];
 
   const track = sim.hurricaneTrack || [];
   const casing = track.map(p => `${px(p.position.lng).toFixed(1)},${py(p.position.lat).toFixed(1)}`).join(" ");
@@ -62,11 +68,18 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: { sim: ISimu
       {/* Base map ground (reflects the current Satellite / Relief / Street choice). */}
       <image href={baseImg} x={0} y={0} width={W} height={H} preserveAspectRatio="none" />
 
-      {/* Season sea-surface-temperature overlay (semi-transparent), only when the SST overlay is on.
-          It's transparent over land, so the base map's continents still show through. */}
+      {/* Season sea-surface-temperature overlay, only when the SST overlay is on. Both scale images
+          are stacked and cross-faded on toggle (they're transparent over land, so the base map's
+          continents still show through). */}
       {showSST && (
-        <image href={sstImages[sim.season]} x={IMG_X} y={IMG_Y} width={IMG_W} height={IMG_H}
-          preserveAspectRatio="none" opacity={0.72} />
+        <>
+          <image href={defaultSSTUrl} x={IMG_X} y={IMG_Y} width={IMG_W} height={IMG_H}
+            preserveAspectRatio="none" className={css.sstLayer}
+            style={{ opacity: accessibleSST ? 0 : 0.72 }} />
+          <image href={accessibleSSTUrl} x={IMG_X} y={IMG_Y} width={IMG_W} height={IMG_H}
+            preserveAspectRatio="none" className={css.sstLayer}
+            style={{ opacity: accessibleSST ? 1 : 0 }} />
+        </>
       )}
 
       {/* SST anomaly hints at each region's anchor: colored by the anomaly, labeled with its value

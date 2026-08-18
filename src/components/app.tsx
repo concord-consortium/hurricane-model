@@ -26,7 +26,7 @@ export const AppComponent = observer(function AppComponent() {
       (async () => {
         try {
           const state = await loadModelFromCloud(config.modelId);
-          if (canUpdate) setInteractiveState(stores, state);
+          if (canUpdate) setInteractiveState(stores, state, true);
         } catch (e) {
           if (canUpdate) setModelLoadError(e instanceof Error ? e.message : String(e));
         }

@@ -2,7 +2,7 @@ import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { freezeEditableCard, liveSetupDiffersFromRun, setInteractiveState } from "../../models/interactive-state";
+import { freezeCurrentCard, liveSetupDiffersFromRun, setInteractiveState } from "../../models/interactive-state";
 import { IRunSlot } from "../../models/multi-track";
 import { namedRegions, seasonLabels } from "../../types";
 import { IHurricaneInteractiveState } from "../../types/interactive-state";
@@ -130,7 +130,7 @@ export const CompareOverlay = observer(function CompareOverlay() {
   // the last run is deleted — the column stays, its info reset to the current (default) setup.
   const runsForCompare: IRunSlot[] = multiTrack.runs.length
     ? multiTrack.runs
-    : [{ id: "run-a-empty", state: null }];
+    : [{ id: "run-a-empty", state: null, editDraft: null }];
 
   // A column per run. Completed runs use their captured state; the editable (not-yet-run) card uses
   // the LIVE simulation, so its Setup appears immediately when the card is created and updates as the
@@ -198,9 +198,11 @@ export const CompareOverlay = observer(function CompareOverlay() {
   const selectColumn = (id: string) => {
     const run = multiTrack.runs.find(r => r.id === id);
     if (!run || id === multiTrack.selectedRunId) return;
-    freezeEditableCard(stores); // keep the editable card's own values if we're leaving it
+    freezeCurrentCard(stores); // preserve the leaving card's in-progress edits
     if (run.state) {
-      selectRun(id, run.state);
+      // Restore any pending edits to this run (and re-enter edit mode), else its captured state.
+      selectRun(id, run.editDraft ?? run.state);
+      if (run.editDraft) multiTrack.editRun(id);
     } else {
       // Editable column: make it current, restoring its own draft.
       multiTrack.selectRun(id);
@@ -337,8 +339,12 @@ export const CompareOverlay = observer(function CompareOverlay() {
               data[i].report.length === 0
                 ? <span className={css.muted}>Default</span>
                 : <span className={css.pressureCol}>{data[i].report.map((r, k) => (
-                    <span key={k}>
-                      <span className={r.type === "high" ? css.psHigh : css.psLow}>{r.label}</span>: {r.detail}
+                    <span key={k} className={css.psRow}>
+                      <span className={r.type === "high" ? css.psHigh : css.psLow}>{r.label}:</span>
+                      <span className={css.psDetail}>
+                        <span>{r.position},</span>
+                        <span>{r.mb}</span>
+                      </span>
                     </span>))}</span>
             ), <PressureSystemIcon className={css.rowIcon} />)}
 

@@ -247,25 +247,28 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           title="Clear All"
           ariaDescribedBy="reload-confirm-message"
         >
-          <p id="reload-confirm-message">
-            Are you sure you want to clear everything? You will lose all of your current settings and saved runs.
+          <p id="reload-confirm-message" className={css.confirmMessage}>
+            Are you sure you want to clear everything?<br />
+            You will lose all of your current settings and saved runs.
           </p>
           <div className={css.confirmActions}>
-            <Button
+            <button
+              type="button"
               data-test="reload-cancel-button"
+              className={css.confirmButton}
               onClick={this.cancelReload}
-              disableRipple={true}
               autoFocus={true}
             >
               Cancel
-            </Button>
-            <Button
+            </button>
+            <button
+              type="button"
               data-test="reload-confirm-button"
+              className={css.confirmButton}
               onClick={this.confirmReload}
-              disableRipple={true}
             >
               Clear All
-            </Button>
+            </button>
           </div>
         </Dialog>
         {

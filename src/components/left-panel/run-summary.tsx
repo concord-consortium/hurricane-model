@@ -108,8 +108,12 @@ export function RunSummary({ sim }: IProps) {
           {report.length === 0
             ? <span>Default</span>
             : report.map((r, i) => (
-                <span key={i}>
-                  <span className={r.type === "high" ? css.psHigh : css.psLow}>{r.label}</span>: {r.detail}
+                <span key={i} className={css.psRow}>
+                  <span className={r.type === "high" ? css.psHigh : css.psLow}>{r.label}:</span>
+                  <span className={css.psDetail}>
+                    <span>{r.position},</span>
+                    <span>{r.mb}</span>
+                  </span>
                 </span>
               ))}
         </span>

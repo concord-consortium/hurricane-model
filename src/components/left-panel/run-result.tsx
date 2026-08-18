@@ -54,15 +54,13 @@ export function RunResult({ sim, uid, maxDuration }:
 
   return (
     <div className={css.runResult}>
-      <div className={clsx(css.row, css.metricPair)}>
-        <span className={css.metric}>
-          <PeakCategoryIcon className={clsx(css.icon, peakFillClass)} />
-          {peak ? <span>{peak.label}</span> : dash}
-        </span>
-        <span className={css.metric}>
-          <LandfallIcon className={css.icon} />
-          {landfall ? <span>{landfall.count === 0 ? "None" : `${landfall.count}×`}</span> : dash}
-        </span>
+      <div className={css.row}>
+        <PeakCategoryIcon className={clsx(css.icon, peakFillClass)} />
+        {peak ? <span>{peak.label}</span> : dash}
+      </div>
+      <div className={css.row}>
+        <LandfallIcon className={css.icon} />
+        {landfall ? <span>{landfall.count === 0 ? "None" : `${landfall.count}×`}</span> : dash}
       </div>
       <div className={clsx(css.row, css.sparkRow)}>
         <CategoryOverTimeIcon className={clsx(css.icon, css.fillWhite)} />

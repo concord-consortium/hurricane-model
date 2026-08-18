@@ -126,7 +126,7 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
     if (interactiveState) {
       const migratedState = migrateState(interactiveState);
       if (migratedState) {
-        setInteractiveState(stores, migratedState);
+        setInteractiveState(stores, migratedState, true);
       }
       hasRestoredState.current = true;
     } else if (config.modelId && stores.ui.mode !== "authoring" && !seedLoadStarted.current) {
@@ -134,7 +134,7 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
       loadModelFromCloud(config.modelId)
         .then((state) => {
           if (!hasRestoredState.current) {
-            if (canUpdate) setInteractiveState(stores, state);
+            if (canUpdate) setInteractiveState(stores, state, true);
           }
         })
         .catch((e) => {

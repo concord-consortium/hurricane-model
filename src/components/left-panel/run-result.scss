@@ -18,19 +18,6 @@
     min-height: 18px;
   }
 
-  // Peak Category + Landfall share one line as two equal columns, so Landfall sits at the same x
-  // whether Peak shows a dash (pre-run) or a "Cat N" label (post-run).
-  .metricPair {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .metric {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-
   // The Category Over Time row holds a 22px sparkline after a run but only a dash before it. Reserve
   // the sparkline's height in BOTH states so the card doesn't grow ~4px taller once it's run.
   .sparkRow {

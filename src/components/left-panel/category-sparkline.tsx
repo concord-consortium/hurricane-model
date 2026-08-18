@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useRef } from "react";
 
 import { CATEGORY_COLORS } from "./run-summary";
 
 import css from "./category-sparkline.scss";
+
+// Per-instance counter so gradient IDs are unique across every rendered sparkline. Without this, the
+// card and the (always-mounted) Compare table render the same run's sparkline with the same uid, so
+// the SVG gradient IDs collide — and `url(#id)` resolves to the first match, which for later runs is
+// the table's collapsed (display:none, non-painting) gradient, leaving the card's sparkline blank.
+let sparklineSeq = 0;
 
 // Darker, legible-on-white strokes for the intensity sparkline, indexed by category (the Saffir–
 // Simpson fills are too pale to read as a thin line for TS/Cat 1).
@@ -12,6 +18,10 @@ const SPARK_STROKE = ["#9a9a9a", "#c9a400", "#e0a020", "#d97a1e", "#c85a10", "#e
 // the fill beneath it are colored by category over time (a gradient with a stop per point), so the
 // color shifts as the storm strengthens/weakens. Shared by the Compare table and the run cards.
 export function CategorySparkline({ series, uid, widthPx }: { series: number[]; uid: string; widthPx: number }) {
+  // Stable, globally-unique suffix for this instance (see sparklineSeq above) so no two sparklines —
+  // e.g. a run's card and its Compare-table row — ever share gradient IDs.
+  const seqRef = useRef<number>(0); // 0 = unassigned; the counter starts at 1
+  if (seqRef.current === 0) seqRef.current = ++sparklineSeq;
   const w = Math.max(8, widthPx), h = 22, pad = 2;
   if (series.length === 0) return <span className={css.noData}>—</span>;
   const n = series.length;
@@ -20,7 +30,7 @@ export function CategorySparkline({ series, uid, widthPx }: { series: number[]; 
   const ci = (c: number) => Math.max(0, Math.min(5, Math.round(c)));
   const pts = series.map((c, i) => `${x(i).toFixed(1)},${y(c).toFixed(1)}`).join(" ");
   const area = `${pad},${h - pad} ${pts} ${(w - pad)},${h - pad}`;
-  const strokeId = `spk-s-${uid}`, fillId = `spk-f-${uid}`;
+  const strokeId = `spk-s-${uid}-${seqRef.current}`, fillId = `spk-f-${uid}-${seqRef.current}`;
   // userSpaceOnUse so the stroke and fill gradients share the same x-mapping (offset i/(n-1) == x(i)).
   const grad = (id: string, palette: string[]) => (
     <linearGradient id={id} gradientUnits="userSpaceOnUse" x1={pad} y1="0" x2={w - pad} y2="0">

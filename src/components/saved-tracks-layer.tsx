@@ -2,7 +2,7 @@ import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import * as React from "react";
 
-import { setInteractiveState } from "../models/interactive-state";
+import { freezeCurrentCard, setInteractiveState } from "../models/interactive-state";
 import { ITrackPoint } from "../types";
 import { runLetter } from "./left-panel/run-summary";
 import { useStores } from "../stores-context";
@@ -62,11 +62,13 @@ export const SavedTracksLayer = observer(function SavedTracksLayer() {
         const litSelected = isSelected && run.id !== multiTrack.editingRunId;
         const endPos = track[track.length - 1].position;
         const select = () => {
+          freezeCurrentCard(stores); // preserve the leaving card's in-progress edits
           multiTrack.selectRun(run.id);
           multiTrack.autoCaptureSuppressed = true;
-          setInteractiveState(stores, state);
+          setInteractiveState(stores, run.editDraft ?? state); // resume any pending edits to this run
           simulation.restart(false);
           multiTrack.autoCaptureSuppressed = false;
+          if (run.editDraft) multiTrack.editRun(run.id); // re-enter edit mode if it had unsaved edits
         };
         return (
           <React.Fragment key={run.id}>

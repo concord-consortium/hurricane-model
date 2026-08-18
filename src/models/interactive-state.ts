@@ -67,7 +67,11 @@ function migrateLegacyState(rawState: Record<string, unknown>): IHurricaneIntera
  */
 export function setInteractiveState(
   stores: IStores,
-  state: IHurricaneInteractiveState | null
+  state: IHurricaneInteractiveState | null,
+  // Base map and map overlay are persistent GLOBAL view preferences: they change only when the user
+  // picks them, and are NOT reverted by selecting/restoring a run. They ARE restored when loading a
+  // saved model/session (restoreViewPrefs=true) so the user's last choice survives a reload.
+  restoreViewPrefs = false
 ): void {
   if (!state) {
     return;
@@ -166,20 +170,25 @@ export function setInteractiveState(
   // Restore UI state
   if (uiState) {
     runInAction(() => {
-      if (uiState.baseMap) {
-        ui.baseMap = uiState.baseMap;
-      }
-      if (uiState.overlay !== undefined) {
-        ui.overlay = uiState.overlay;
+      // Base map, map overlay, and the accessible SST scale are global view prefs — only apply them
+      // on a full model/session load, never when restoring a run (which would revert the user's
+      // current choice; these all drive the run thumbnails too, so they must stay put on run-select).
+      if (restoreViewPrefs) {
+        if (uiState.baseMap) {
+          ui.baseMap = uiState.baseMap;
+        }
+        if (uiState.overlay !== undefined) {
+          ui.overlay = uiState.overlay;
+        }
+        if (uiState.accessibleSSTScale !== undefined) {
+          ui.sstOverlay.accessibleSSTScale = uiState.accessibleSSTScale;
+        }
       }
       if (uiState.windArrows !== undefined) {
         ui.windArrows = uiState.windArrows;
       }
       if (uiState.hurricaneImage !== undefined) {
         ui.hurricaneImage = uiState.hurricaneImage;
-      }
-      if (uiState.accessibleSSTScale !== undefined) {
-        ui.sstOverlay.accessibleSSTScale = uiState.accessibleSSTScale;
       }
       if (uiState.categoryChangeMarkers !== undefined) {
         ui.categoryChangeMarkers = uiState.categoryChangeMarkers;
@@ -303,13 +312,22 @@ export function liveSetupDiffersFromRun(
   return liveSetupFingerprint(stores.simulation) !== stateSetupFingerprint(runSim);
 }
 
-// Freeze the editable ("Not run yet") card's setup before navigating away from it, so it keeps its own
-// values while another card is active (they all share one live simulation). No-op when the currently
-// selected card isn't the editable one.
-export function freezeEditableCard(stores: IStores) {
+// Freeze the currently selected card's in-progress edits before navigating away, so they survive and
+// are restored on return (they all share one live simulation):
+//  - the editable ("Not run yet") card's setup -> editableDraft;
+//  - a COMPLETED run unlocked for editing -> that run's editDraft, but only while its setup actually
+//    differs from its captured result (cleared to null if it was edited back to the captured setup).
+// No-op when the selected card is a locked completed run.
+export function freezeCurrentCard(stores: IStores) {
   const { multiTrack } = stores;
   const cur = multiTrack.runs.find(r => r.id === multiTrack.selectedRunId);
-  if (cur && cur.state === null) {
+  if (!cur) return;
+  if (cur.state === null) {
     multiTrack.setEditableDraft(getInteractiveState(stores));
+  } else if (multiTrack.editingRunId === cur.id) {
+    multiTrack.setEditDraft(
+      cur.id,
+      liveSetupDiffersFromRun(stores, cur.state.simulation) ? getInteractiveState(stores) : null
+    );
   }
 }

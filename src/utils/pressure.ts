@@ -89,26 +89,25 @@ export function pressureDeltas(
 
 export interface IPressureReport {
   type: PressureSystemType;
-  label: string;   // e.g. "H1" (colored per type on the card)
-  detail: string;  // e.g. "moved SSW, 1000 mb" — only what actually changed
+  label: string;    // e.g. "H1" (colored per type on the card)
+  position: string; // "Default" (unchanged) or "Moved <dir>"
+  mb: string;       // e.g. "1028 mb" (non-breaking space between value and unit)
 }
 
-// Run-card readout for the pressure systems: one entry per system the learner changed (moved and/or
-// re-strengthened). `detail` lists ONLY what changed — "moved <dir>" and/or "<mb> mb" (mb appears only
-// when strength differs from default). An empty array means nothing changed — the card shows "Default".
+// Run-card / table readout for the pressure systems: one entry per system. `detail` is
+// "<position>, <mb> mb" — position is "Moved <dir>" if dragged, else "Default" (unchanged) — and the
+// mb value is ALWAYS shown, so an unchanged system reads "H1: Default, 1015 mb" (its default value).
 export function pressureReport(startLocation: StartLocation, systems: IPressureSystemState[]): IPressureReport[] {
   const deltas = pressureDeltas(startLocation, systems);
   const nums = perTypeNumbers(deltas);
   const out: IPressureReport[] = [];
   deltas.forEach((d, i) => {
-    if (!d.moved && !d.strengthChanged) return;
-    const parts: string[] = [];
-    // Position: "moved <dir>" if dragged, otherwise "default" (unchanged) — so a strength-only change
-    // reads "H1: default, 1000 mb".
-    parts.push(d.moved && d.direction ? `moved ${d.direction}` : "default");
+    // Position ("Default" or "Moved <dir>") and mb are kept separate so the renderers can stack them
+    // on two left-aligned lines.
+    const position = d.moved && d.direction ? `Moved ${d.direction}` : "Default";
     // Non-breaking space so the value and its "mb" unit never split across a wrap (cards + table).
-    if (d.strengthChanged) parts.push(`${d.mb}\u00A0mb`);
-    out.push({ type: d.type, label: `${d.type === "high" ? "H" : "L"}${nums[i]}`, detail: parts.join(", ") });
+    const mb = `${d.mb}\u00A0mb`;
+    out.push({ type: d.type, label: `${d.type === "high" ? "H" : "L"}${nums[i]}`, position, mb });
   });
   return out;
 }

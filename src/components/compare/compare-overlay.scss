@@ -379,6 +379,19 @@ $runColW: 128px;
   gap: 3px;
   font-size: 14px;
 }
+
+// Each system: label inline with a stacked, left-aligned position / mb, so "Default" and "1028 mb"
+// line up under each other (label sits on the first line via baseline alignment).
+.psRow {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.psDetail {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 // Labels (H1, L2…): the map blue/red, AA on the table's white background (~5.1:1 / ~4.8:1).
 .psHigh { color: #2a69d6; }
 .psLow  { color: #c93f22; }

@@ -44,6 +44,19 @@
     gap: 2px;
   }
 
+  // Each system: label inline with a stacked, left-aligned position / mb, so "Default" and "1028 mb"
+  // line up under each other (label sits on the first line via baseline alignment).
+  .psRow {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .psDetail {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   // System labels (H1, L2…): the map's blue/red, darkened to meet WCAG AA (normal text) on the
   // card fill #fffaf2. Raw map colors (#327cfc / #fc542d) fail; these pass (~4.9:1 / ~4.8:1).
   .psHigh { color: #2a69d6; }

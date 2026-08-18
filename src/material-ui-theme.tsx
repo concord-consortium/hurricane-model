@@ -48,6 +48,19 @@ export default createTheme({
         }
       }
     },
+    MuiDialog: {
+      styleOverrides: {
+        // Sit modals slightly above dead-center — ~45% down the viewport (45/55) instead of 50/50.
+        paper: {
+          "transform": "translateY(-5vh)",
+          // The dialog paper takes focus on open (focus trap); suppress its default UA focus ring —
+          // interactive elements inside keep their own :focus-visible styles.
+          "&:focus, &:focus-visible": {
+            outline: "none"
+          }
+        }
+      }
+    },
     MuiSwitch: {
       styleOverrides: {
         root: {

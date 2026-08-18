@@ -163,6 +163,15 @@
 
     &.resetViewContainer {
       order: 1;
+      // Tighten the gap to the zoom bar: 12px between the visible buttons (2px bar border + 8px
+      // margin + 2px bar border) instead of Leaflet's default 10px margin (which reads as 14px).
+      margin-top: 8px;
+    }
+
+    // Warning button: directly below Fit All, same 12px visible gap (8px margin + the bars' borders).
+    &.warningContainer {
+      order: 2;
+      margin-top: 8px;
     }
 
     &.leftPanelOpen {
@@ -172,7 +181,7 @@
   }
 
   .fullMapViewContainer {
-    order: 2;
+    order: 3;
   }
 
   .temperatureControlMarker {
