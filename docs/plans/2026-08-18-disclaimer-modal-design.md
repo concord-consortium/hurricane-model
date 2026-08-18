@@ -24,7 +24,7 @@ The modal appears only when:
 
 - `config.mode === "storm"` (Hurricane Explorer does not show it)
 - `config.disclaimer` is true (new flag, default true, settable via `?disclaimer=false`)
-- `ui.readOnly` is false, so LARA report and reportItem views skip it
+- `ui.isReportMode` is false, so LARA report and reportItem views skip it
 
 ## Components
 
@@ -54,10 +54,16 @@ Renders `Dialog` with no title, `ariaDescribedBy` pointing at the message, and
 children: `WarningIcon` from `@mui/icons-material`, the message, the "Got it"
 button.
 
-Open state is local `useState`, initialized once from the scope conditions
-above. It is deliberately not in `UIModel`: a dismissal is not student work, so
-keeping it out of the store avoids touching `IHurricaneInteractiveState` and
-bumping `CURRENT_VERSION` in `migrateState`.
+Local `useState` holds only whether the user has dismissed it; visibility is
+derived on each render as `!dismissed && config.disclaimer && config.mode ===
+"storm" && !ui.isReportMode`. Deriving rather than initializing state once
+matters because `LaraAppWrapper` sets `ui.mode` asynchronously from LARA's
+`initMessage`, after first render — an `isReportMode` that arrives late still
+hides the modal.
+
+Dismissal is deliberately not stored in `UIModel`: it is not student work, so
+keeping it out avoids touching `IHurricaneInteractiveState` and bumping
+`CURRENT_VERSION` in `migrateState`.
 
 Mounted by `IndexPage`.
 
@@ -85,7 +91,15 @@ modal, so they append `disclaimer=false` to their visit URL.
 ## Logging
 
 `log("DisclaimerDismissed", { source })` fires on close, where `source` is
-`"gotIt"`, `"closeButton"` or `"escapeKey"`. Documented in `LOGGED-EVENTS.md`.
+`"gotIt"` or `"close"`. The shared `Dialog`'s `onClose` is typed `() => void`
+and drops MUI's `reason` argument, so a close-button click, an escape key and a
+backdrop click all arrive as `"close"`. Splitting them would mean widening the
+shared signature for one caller; not worth it. Documented in `LOGGED-EVENTS.md`.
+
+Backdrop click and escape therefore still dismiss the modal, per MUI's default.
+If the disclaimer must require an explicit acknowledgement, `Dialog` would need
+to forward MUI's `reason` so the modal can ignore `"backdropClick"`. Flagged,
+not built.
 
 ## Testing
 
@@ -94,7 +108,7 @@ Jest, in `disclaimer-modal.test.tsx`:
 - renders in storm mode with the flag on
 - absent when `disclaimer` is false
 - absent in hurricane mode
-- absent when `ui.readOnly`
+- absent when `ui.isReportMode`
 - each button closes it and logs with the right `source`
 
 Existing `dialog.test.tsx` gains a case for the untitled variant.

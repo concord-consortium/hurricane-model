@@ -1,0 +1,581 @@
+# Liability Disclaimer Modal Implementation Plan
+
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+
+**Goal:** Show a blocking "This is a simulation and cannot be used to make a forecast." modal when Storm Explorer loads.
+
+**Architecture:** Reuse the existing `Dialog` component (`src/components/dialog.tsx`), which already wraps MUI's `Dialog` and supplies the darkened backdrop, focus trap, scroll lock and top-right close button. Make its `title` prop optional so the disclaimer can render without one, and restyle its close button's hover/active to match the new "Got it" button. A new `DisclaimerModal` component supplies the icon, message and button as `children`, and `IndexPage` mounts it.
+
+**Tech Stack:** React 18 + TypeScript, MobX 6 (`mobx-react` `observer`), MUI 5 (`@mui/material`, `@mui/icons-material`), SCSS modules, Jest + React Testing Library, Cypress.
+
+**Design doc:** `docs/plans/2026-08-18-disclaimer-modal-design.md`
+
+---
+
+## Background you need before starting
+
+Read these first. They are short.
+
+- `src/components/dialog.tsx` — the component being reused. 30 lines.
+- `src/components/dialog.scss` — its styles.
+- `src/components/common.scss` — shared SCSS variables. Note `$secondaryColor: #ff9900` (this is `rgb(255,153,0)`) and `$secondaryColorHover: #ffdaa3`. **Use the variables, never the literals.**
+- `src/config.ts` — a plain object `DEFAULT_CONFIG` merged with URL params at module load and exported as the default. The merge loop already turns `?foo=false` into boolean `false`, so a new boolean flag needs no parsing code.
+- `src/models/ui.ts` — `UIModel`. You need `isReportMode` (line ~84), a computed that is true in LARA's report views.
+- `src/log.ts` — `log()` re-exported from `@concord-consortium/lara-interactive-api`. Events only actually fire when iframed in LARA; calling it outside LARA is harmless.
+- `LOGGED-EVENTS.md` — every event must be documented here. There is a `## Dialogs` section at the end of the file.
+
+**Two conventions that will bite you:**
+
+1. SCSS modules. `import css from "./foo.scss"` then `className={css.someClass}`. Class names are camelCase in both the SCSS and the JS.
+2. `@use "common" as *;` must be the first line of any SCSS file that references the shared variables or mixins.
+
+**Testing conventions:** tests live next to source as `*.test.tsx`. To fake config, tests assign to the imported config object and restore it afterwards — see `src/components/map-view.test.tsx:51-56` for the exact pattern. To fake logging, `jest.spyOn(logModule, "log").mockImplementation(() => undefined)` at module scope — see `src/components/top-bar/top-bar.test.tsx:11`.
+
+---
+
+## Task 1: Add the `disclaimer` config flag
+
+**Files:**
+- Modify: `src/config.ts`
+
+**Step 1: Add the flag**
+
+In `DEFAULT_CONFIG`, next to the existing `mode` entry (around line 78), add:
+
+```ts
+  // Whether the liability disclaimer modal is shown on load. Storm mode only.
+  // Set ?disclaimer=false to skip it (used by Cypress specs).
+  disclaimer: true,
+```
+
+**Step 2: Verify it typechecks**
+
+Run: `npx tsc --noEmit -p tsconfig.json`
+Expected: no errors. (If the repo has no such script, `npm run lint` also surfaces TS parse errors.)
+
+**Step 3: Commit**
+
+```bash
+git add src/config.ts
+git commit -m "Add disclaimer config flag, default on"
+```
+
+---
+
+## Task 2: Make `Dialog`'s title optional
+
+**Files:**
+- Modify: `src/components/dialog.tsx`
+- Test: `src/components/dialog.test.tsx`
+
+**Step 1: Write the failing test**
+
+Add to `src/components/dialog.test.tsx`, inside the existing `describe`:
+
+```tsx
+  it("renders without a title and omits aria-labelledby", () => {
+    render(<Dialog open={true} onClose={jest.fn()}><p>Body text</p></Dialog>);
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).not.toHaveAttribute("aria-labelledby");
+    expect(screen.getByText("Body text")).toBeInTheDocument();
+  });
+```
+
+**Step 2: Run it and watch it fail**
+
+Run: `npx jest src/components/dialog.test.tsx`
+Expected: FAIL. TypeScript rejects the missing required `title` prop, so the suite fails to compile.
+
+**Step 3: Make title optional**
+
+In `src/components/dialog.tsx`, change the interface:
+
+```ts
+  title?: string;
+```
+
+and change the two places that consume it. The `aria-labelledby` attribute:
+
+```tsx
+      aria-labelledby={title ? titleId : undefined}
+```
+
+and the title element, which becomes conditional:
+
+```tsx
+        { title && <div id={titleId} className={css.title}>{ title }</div> }
+```
+
+Leave `useId()` where it is — hooks cannot be called conditionally.
+
+**Step 4: Run the test and watch it pass**
+
+Run: `npx jest src/components/dialog.test.tsx`
+Expected: PASS, 2 tests.
+
+**Step 5: Confirm the existing callers still work**
+
+Run: `npx jest src/components/top-bar`
+Expected: PASS. The About and Share dialogs still pass a title, so nothing there changes.
+
+**Step 6: Commit**
+
+```bash
+git add src/components/dialog.tsx src/components/dialog.test.tsx
+git commit -m "Make Dialog title optional"
+```
+
+---
+
+## Task 3: Add the shared button-fill mixin
+
+**Files:**
+- Modify: `src/components/common.scss`
+
+**Step 1: Add the mixin**
+
+Append to `src/components/common.scss`, **above** the `:export` block at the bottom (the `:export` block must stay last, it is parsed by the CSS-modules loader):
+
+```scss
+// Shared hover/active fill for dialog buttons: the close button and the
+// disclaimer's "Got it" button must behave identically.
+// Active uses a transparent border rather than `border: none` so the button
+// keeps its size and does not shift by a pixel when pressed.
+@mixin dialogButtonFill {
+  &:hover {
+    background-color: $secondaryColorHover;
+  }
+  &:active {
+    background-color: $secondaryColor;
+    border-color: transparent;
+  }
+}
+```
+
+**Step 2: Verify the build still compiles the SCSS**
+
+Run: `npx jest src/components/dialog.test.tsx`
+Expected: PASS. (Jest maps SCSS through a mock, so this only proves nothing broke. The real check is Task 4.)
+
+**Step 3: Commit**
+
+```bash
+git add src/components/common.scss
+git commit -m "Add dialogButtonFill mixin for shared button hover/active"
+```
+
+---
+
+## Task 4: Restyle the shared close button
+
+This intentionally changes the About and Share dialogs' close buttons too. That was the explicit decision: one close-button treatment across the app.
+
+**Files:**
+- Modify: `src/components/dialog.scss`
+
+**Step 1: Update `.closeButton`**
+
+Replace the `.closeButton` rule in `src/components/dialog.scss` with:
+
+```scss
+.closeButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px;
+  background: none;
+  // Transparent rather than absent so `dialogButtonFill`'s active state, which
+  // sets border-color, has a border to recolor.
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: $charcoalMedium;
+  cursor: pointer;
+  display: inline-flex;
+  &:hover {
+    color: $charcoal;
+  }
+  @include dialogButtonFill;
+  &:focus-visible {
+    outline: 2px solid $charcoal;
+    outline-offset: 2px;
+  }
+}
+```
+
+Note `padding` went from `0` to `4px` so the hover fill has room around the icon.
+
+**Step 2: Verify it compiles and looks right**
+
+Run: `npm start`, open the app, click **About** in the top bar, and hover the X.
+Expected: pale orange (`#ffdaa3`) rounded square behind the X on hover; solid orange (`#ff9900`) with no visible border while the mouse is held down.
+
+Stop the dev server when done.
+
+**Step 3: Commit**
+
+```bash
+git add src/components/dialog.scss
+git commit -m "Give dialog close button a filled hover and active state"
+```
+
+---
+
+## Task 5: Build the DisclaimerModal component
+
+**Files:**
+- Create: `src/components/disclaimer-modal.tsx`
+- Create: `src/components/disclaimer-modal.scss`
+- Test: `src/components/disclaimer-modal.test.tsx`
+
+**Step 1: Write the failing tests**
+
+Create `src/components/disclaimer-modal.test.tsx`:
+
+```tsx
+import * as React from "react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { Provider } from "mobx-react";
+
+import config from "../config";
+import * as logModule from "../log";
+import { createStores, IStores } from "../models/stores";
+import { StoresContext } from "../stores-context";
+import { DisclaimerModal } from "./disclaimer-modal";
+
+const logSpy = jest.spyOn(logModule, "log").mockImplementation(() => undefined);
+
+const MESSAGE = "This is a simulation and cannot be used to make a forecast.";
+
+describe("DisclaimerModal component", () => {
+  let stores: IStores;
+  let oldMode: string;
+  let oldDisclaimer: boolean;
+
+  beforeEach(() => {
+    stores = createStores();
+    oldMode = config.mode;
+    oldDisclaimer = config.disclaimer;
+    config.mode = "storm";
+    config.disclaimer = true;
+    logSpy.mockClear();
+  });
+
+  afterEach(() => {
+    config.mode = oldMode;
+    config.disclaimer = oldDisclaimer;
+  });
+
+  const renderModal = () => render(
+    <Provider stores={stores}>
+      <StoresContext value={stores}>
+        <DisclaimerModal />
+      </StoresContext>
+    </Provider>
+  );
+
+  it("shows the disclaimer in storm mode", () => {
+    renderModal();
+    expect(screen.getByText(MESSAGE)).toBeInTheDocument();
+  });
+
+  it("does not show when the disclaimer flag is off", () => {
+    config.disclaimer = false;
+    renderModal();
+    expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
+  });
+
+  it("does not show in hurricane mode", () => {
+    config.mode = "hurricane";
+    renderModal();
+    expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
+  });
+
+  it("does not show in report mode", () => {
+    stores.ui.setMode("report");
+    renderModal();
+    expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
+  });
+
+  it("closes and logs when Got it is clicked", async () => {
+    const user = userEvent.setup();
+    renderModal();
+    await user.click(screen.getByRole("button", { name: "Got it" }));
+    expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
+    expect(logSpy).toHaveBeenCalledWith("DisclaimerDismissed", { source: "gotIt" });
+  });
+
+  it("closes and logs when the close button is clicked", async () => {
+    const user = userEvent.setup();
+    renderModal();
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
+    expect(logSpy).toHaveBeenCalledWith("DisclaimerDismissed", { source: "close" });
+  });
+});
+```
+
+Note `queryByText` returns null when absent, `getByText` throws. Use `queryBy*` for every "should not exist" assertion.
+
+**Step 2: Run the tests and watch them fail**
+
+Run: `npx jest src/components/disclaimer-modal.test.tsx`
+Expected: FAIL — `Cannot find module './disclaimer-modal'`.
+
+**Step 3: Write the styles**
+
+Create `src/components/disclaimer-modal.scss`:
+
+```scss
+@use "common" as *;
+
+.disclaimer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  // Right padding clears the absolutely positioned close button.
+  padding: 16px 32px 8px;
+  max-width: 420px;
+}
+
+.icon {
+  color: $secondaryColor;
+  font-size: 48px !important; // MUI sets font-size inline on its SvgIcon root.
+}
+
+.message {
+  margin: 16px 0 24px;
+  font-size: 16px;
+  line-height: 1.4;
+  color: $charcoal;
+}
+
+.gotItButton {
+  padding: 6px 20px;
+  font-family: inherit;
+  font-size: 14px;
+  color: $charcoal;
+  background: none;
+  border: 1px solid $charcoalMedium;
+  border-radius: 4px;
+  cursor: pointer;
+  @include dialogButtonFill;
+  &:focus-visible {
+    outline: 2px solid $charcoal;
+    outline-offset: 2px;
+  }
+}
+```
+
+**Step 4: Write the component**
+
+Create `src/components/disclaimer-modal.tsx`:
+
+```tsx
+import WarningIcon from "@mui/icons-material/Warning";
+import { observer } from "mobx-react";
+import React, { useId, useState } from "react";
+
+import config from "../config";
+import { log } from "../log";
+import { useStores } from "../stores-context";
+import { Dialog } from "./dialog";
+
+import css from "./disclaimer-modal.scss";
+
+type DismissSource = "gotIt" | "close";
+
+export const DisclaimerModal = observer(function DisclaimerModal() {
+  const { ui } = useStores();
+  const [dismissed, setDismissed] = useState(false);
+  const messageId = useId();
+
+  // Derived rather than initial state: LaraAppWrapper sets ui.mode from LARA's
+  // initMessage after the first render, so an isReportMode that arrives late
+  // still has to hide the modal.
+  const open = !dismissed && config.disclaimer && config.mode === "storm" && !ui.isReportMode;
+
+  const dismiss = (source: DismissSource) => {
+    setDismissed(true);
+    log("DisclaimerDismissed", { source });
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={() => dismiss("close")}
+      ariaDescribedBy={messageId}
+    >
+      <div className={css.disclaimer}>
+        <WarningIcon className={css.icon} />
+        <div id={messageId} className={css.message}>
+          This is a simulation and cannot be used to make a forecast.
+        </div>
+        <button
+          type="button"
+          className={css.gotItButton}
+          onClick={() => dismiss("gotIt")}
+        >
+          Got it
+        </button>
+      </div>
+    </Dialog>
+  );
+});
+```
+
+`onClose` also fires on escape and on backdrop click; both are logged as `"close"` because the shared `Dialog` drops MUI's `reason` argument.
+
+**Step 5: Run the tests and watch them pass**
+
+Run: `npx jest src/components/disclaimer-modal.test.tsx`
+Expected: PASS, 6 tests.
+
+If the "does not show in report mode" test fails, check that you used `ui.isReportMode` and not `ui.readOnly` — the latter does not exist.
+
+**Step 6: Commit**
+
+```bash
+git add src/components/disclaimer-modal.tsx src/components/disclaimer-modal.scss src/components/disclaimer-modal.test.tsx
+git commit -m "Add disclaimer modal component"
+```
+
+---
+
+## Task 6: Mount the modal in IndexPage
+
+**Files:**
+- Modify: `src/components/index-page.tsx`
+
+**Step 1: Import the component**
+
+Add to the imports in `src/components/index-page.tsx`, keeping alphabetical order within the local-component group:
+
+```tsx
+import { DisclaimerModal } from "./disclaimer-modal";
+```
+
+**Step 2: Render it**
+
+Inside the `content` fragment in `render()`, add `<DisclaimerModal />` as the last element, after the `config.benchmark` block. MUI renders it in a portal, so its position in the tree does not affect layout.
+
+**Step 3: Verify the existing page tests still pass**
+
+Run: `npx jest src/components/index-page.test.tsx`
+Expected: PASS. Those tests do not set `mode=storm`, so the modal stays closed and nothing changes.
+
+**Step 4: Verify in the browser**
+
+Run: `npm start`, open `http://localhost:8080/?mode=storm`.
+Expected: darkened page, centered modal, warning icon, the message, a "Got it" button, an X top right. Both buttons close it. Hovering either shows the pale orange fill; holding either shows solid orange with no border.
+
+Then open `http://localhost:8080/?mode=storm&disclaimer=false` — no modal. And `http://localhost:8080/` — no modal.
+
+Stop the dev server.
+
+**Step 5: Commit**
+
+```bash
+git add src/components/index-page.tsx
+git commit -m "Show disclaimer modal on Storm Explorer load"
+```
+
+---
+
+## Task 7: Document the log event
+
+**Files:**
+- Modify: `LOGGED-EVENTS.md`
+
+**Step 1: Add the row**
+
+In the `## Dialogs` table at the end of `LOGGED-EVENTS.md`, add:
+
+```
+| `DisclaimerDismissed` | `{ source }` | User dismisses the load-time disclaimer modal (`source` is `"gotIt"` for the Got it button, or `"close"` for the close button, escape key or backdrop click) |
+```
+
+**Step 2: Commit**
+
+```bash
+git add LOGGED-EVENTS.md
+git commit -m "Document DisclaimerDismissed event"
+```
+
+---
+
+## Task 8: Keep the Cypress specs unblocked
+
+Only `storm.cy.js` visits with `mode=storm`, so it is the only spec the modal blocks. The others load hurricane mode and never see it.
+
+**Files:**
+- Modify: `cypress/e2e/integration/storm.cy.js:11`
+
+**Step 1: Add the param**
+
+Change:
+
+```js
+    cy.visit("/?mode=storm");
+```
+
+to:
+
+```js
+    // disclaimer=false skips the load-time modal, which would otherwise block
+    // every interaction in this spec.
+    cy.visit("/?mode=storm&disclaimer=false");
+```
+
+**Step 2: Run the spec**
+
+Run: `npm run test:cypress`
+Expected: PASS, same as before the change.
+
+**Step 3: Commit**
+
+```bash
+git add cypress/e2e/integration/storm.cy.js
+git commit -m "Skip disclaimer modal in storm Cypress spec"
+```
+
+---
+
+## Task 9: Full verification
+
+**Step 1: Lint**
+
+Run: `npm run lint`
+Expected: no errors.
+
+**Step 2: Unused-symbol check**
+
+Run: `npm run lint:unused`
+Expected: no errors.
+
+**Step 3: Full Jest suite**
+
+Run: `npm test`
+Expected: all suites pass.
+
+**Step 4: Production build**
+
+Run: `npm run build`
+Expected: succeeds. This runs `lint:build`, where stray `console.log` calls become errors — remove any you added while debugging.
+
+**Step 5: Full Cypress suite**
+
+Run: `npm run test:cypress`
+Expected: all specs pass.
+
+Do not claim the work is done until every one of these five has actually been run and passed. @superpowers:verification-before-completion
+
+---
+
+## Out of scope
+
+- Persisting dismissal across reloads. The modal shows on every load by design.
+- Requiring explicit acknowledgement. Backdrop click and escape currently dismiss it, per MUI's default. Making the disclaimer un-dismissable except via the two buttons would mean widening `Dialog`'s `onClose` to forward MUI's `reason`. Raise it with the user rather than building it.
+- A bespoke warning icon. MUI's `WarningIcon` is a deliberate placeholder.
