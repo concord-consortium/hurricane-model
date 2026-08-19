@@ -23,7 +23,7 @@ Dismissing it — by either button — reveals the app.
 The modal appears only when:
 
 - `config.mode === "storm"` (Hurricane Explorer does not show it)
-- `config.disclaimer` is true (new flag, default true, settable via `?disclaimer=false`)
+- `config.skipDisclaimer` is false (new flag, default false, set by `?skipDisclaimer`)
 - `ui.isReportMode` is false, so LARA report and reportItem views skip it
 
 ## Components
@@ -63,8 +63,8 @@ children: `WarningIcon` from `@mui/icons-material`, the message, the "Got it"
 button.
 
 Local `useState` holds only whether the user has dismissed it; visibility is
-derived on each render as `!dismissed && config.disclaimer && config.mode ===
-"storm" && !ui.isReportMode`. Deriving rather than initializing state once
+derived on each render as `!dismissed && !config.skipDisclaimer && config.mode
+=== "storm" && !ui.isReportMode`. Deriving rather than initializing state once
 matters because `LaraAppWrapper` sets `ui.mode` asynchronously from LARA's
 `initMessage`, after first render — an `isReportMode` that arrives late still
 hides the modal.
@@ -89,12 +89,17 @@ than being removed, so the button does not shift by a pixel.
 
 ## Config
 
-`DEFAULT_CONFIG` in `src/config.ts` gets `disclaimer: true`. The existing URL
-param loop already coerces `"false"` to boolean `false`, so no parsing change is
-needed.
+`DEFAULT_CONFIG` in `src/config.ts` gets `skipDisclaimer: false`.
+
+The flag is negative so that the URL param is a bare switch: `getURLParam`
+returns boolean `true` for a param with no `=value` (`src/config.ts:9`), and the
+merge loop passes that straight through, so `?skipDisclaimer` suppresses the
+modal with nothing after it. `?skipDisclaimer=true` works too. No parsing change
+is needed. `parseAuthoredParams` treats a bare key the same way, so LARA
+authored state can use the identical form.
 
 Cypress specs drive the app immediately after load and would be blocked by the
-modal, so they append `disclaimer=false` to their visit URL.
+modal, so they append `skipDisclaimer` to their visit URL.
 
 ## Logging
 
@@ -108,8 +113,8 @@ arrive as `"close"`. Documented in `LOGGED-EVENTS.md`.
 
 Jest, in `disclaimer-modal.test.tsx`:
 
-- renders in storm mode with the flag on
-- absent when `disclaimer` is false
+- renders in storm mode with the flag unset
+- absent when `skipDisclaimer` is true
 - absent in hurricane mode
 - absent when `ui.isReportMode`
 - each button closes it and logs with the right `source`

@@ -19,7 +19,7 @@ Read these first. They are short.
 - `src/components/dialog.tsx` — the component being reused. 30 lines.
 - `src/components/dialog.scss` — its styles.
 - `src/components/common.scss` — shared SCSS variables. Note `$secondaryColor: #ff9900` (this is `rgb(255,153,0)`) and `$secondaryColorHover: #ffdaa3`. **Use the variables, never the literals.**
-- `src/config.ts` — a plain object `DEFAULT_CONFIG` merged with URL params at module load and exported as the default. The merge loop already turns `?foo=false` into boolean `false`, so a new boolean flag needs no parsing code.
+- `src/config.ts` — a plain object `DEFAULT_CONFIG` merged with URL params at module load and exported as the default. `getURLParam` at line 9 returns boolean `true` for a param written without `=value`, and the merge loop passes that through, so a bare `?someFlag` sets it. No parsing code is needed for a new boolean flag.
 - `src/models/ui.ts` — `UIModel`. You need `isReportMode` (line ~84), a computed that is true in LARA's report views.
 - `src/log.ts` — `log()` re-exported from `@concord-consortium/lara-interactive-api`. Events only actually fire when iframed in LARA; calling it outside LARA is harmless.
 - `LOGGED-EVENTS.md` — every event must be documented here. There is a `## Dialogs` section at the end of the file.
@@ -33,7 +33,7 @@ Read these first. They are short.
 
 ---
 
-## Task 1: Add the `disclaimer` config flag
+## Task 1: Add the `skipDisclaimer` config flag
 
 **Files:**
 - Modify: `src/config.ts`
@@ -43,10 +43,13 @@ Read these first. They are short.
 In `DEFAULT_CONFIG`, next to the existing `mode` entry (around line 78), add:
 
 ```ts
-  // Whether the liability disclaimer modal is shown on load. Storm mode only.
-  // Set ?disclaimer=false to skip it (used by Cypress specs).
-  disclaimer: true,
+  // Suppresses the liability disclaimer modal, which otherwise shows on every
+  // load in storm mode. Negative so the URL param can be a bare switch:
+  // ?skipDisclaimer needs nothing after it.
+  skipDisclaimer: false,
 ```
+
+The polarity matters. `getURLParam` (`src/config.ts:9`) returns boolean `true` for a param written with no `=value`, and the merge loop below passes that straight through, so a negative default makes `?skipDisclaimer` self-contained. A positive `disclaimer: true` flag would have required `?disclaimer=false`.
 
 **Step 2: Verify it typechecks**
 
@@ -57,7 +60,7 @@ Expected: no errors. (If the repo has no such script, `npm run lint` also surfac
 
 ```bash
 git add src/config.ts
-git commit -m "Add disclaimer config flag, default on"
+git commit -m "Add skipDisclaimer config flag"
 ```
 
 ---
@@ -350,20 +353,20 @@ const MESSAGE = "This is a simulation and cannot be used to make a forecast.";
 describe("DisclaimerModal component", () => {
   let stores: IStores;
   let oldMode: string;
-  let oldDisclaimer: boolean;
+  let oldSkipDisclaimer: boolean;
 
   beforeEach(() => {
     stores = createStores();
     oldMode = config.mode;
-    oldDisclaimer = config.disclaimer;
+    oldSkipDisclaimer = config.skipDisclaimer;
     config.mode = "storm";
-    config.disclaimer = true;
+    config.skipDisclaimer = false;
     logSpy.mockClear();
   });
 
   afterEach(() => {
     config.mode = oldMode;
-    config.disclaimer = oldDisclaimer;
+    config.skipDisclaimer = oldSkipDisclaimer;
   });
 
   const renderModal = () => render(
@@ -379,8 +382,8 @@ describe("DisclaimerModal component", () => {
     expect(screen.getByText(MESSAGE)).toBeInTheDocument();
   });
 
-  it("does not show when the disclaimer flag is off", () => {
-    config.disclaimer = false;
+  it("does not show when skipDisclaimer is set", () => {
+    config.skipDisclaimer = true;
     renderModal();
     expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
   });
@@ -504,7 +507,7 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
   // Derived rather than initial state: LaraAppWrapper sets ui.mode from LARA's
   // initMessage after the first render, so an isReportMode that arrives late
   // still has to hide the modal.
-  const open = !dismissed && config.disclaimer && config.mode === "storm" && !ui.isReportMode;
+  const open = !dismissed && !config.skipDisclaimer && config.mode === "storm" && !ui.isReportMode;
 
   const dismiss = (source: DismissSource) => {
     setDismissed(true);
@@ -580,7 +583,7 @@ Expected: PASS. Those tests do not set `mode=storm`, so the modal stays closed a
 Run: `npm start`, open `http://localhost:8080/?mode=storm`.
 Expected: darkened page, centered modal, warning icon, the message, a "Got it" button, an X top right. Both buttons close it. Hovering either shows the pale orange fill; holding either shows solid orange with no border. Clicking the darkened area outside the modal does nothing.
 
-Then open `http://localhost:8080/?mode=storm&disclaimer=false` — no modal. And `http://localhost:8080/` — no modal.
+Then open `http://localhost:8080/?mode=storm&skipDisclaimer` — no modal, and note there is no `=` after the param. And `http://localhost:8080/` — no modal, because that is hurricane mode.
 
 Stop the dev server.
 
@@ -633,9 +636,9 @@ Change:
 to:
 
 ```js
-    // disclaimer=false skips the load-time modal, which would otherwise block
-    // every interaction in this spec.
-    cy.visit("/?mode=storm&disclaimer=false");
+    // skipDisclaimer suppresses the load-time modal, which would otherwise
+    // block every interaction in this spec. It is a bare switch, no value.
+    cy.visit("/?mode=storm&skipDisclaimer");
 ```
 
 **Step 2: Run the spec**
