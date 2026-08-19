@@ -98,6 +98,11 @@ describe("DisclaimerModal component", () => {
     expect(logSpy).toHaveBeenCalledTimes(1);
   });
 
+  it("focuses the Got it button when it opens", async () => {
+    renderModal();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Got it" })).toHaveFocus());
+  });
+
   it("stays open when the backdrop is clicked", async () => {
     const user = userEvent.setup();
     const { baseElement } = renderModal();

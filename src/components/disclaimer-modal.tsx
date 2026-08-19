@@ -38,6 +38,7 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
         </div>
         <button
           type="button"
+          autoFocus={true}
           data-test="disclaimer-got-it-button"
           className={css.gotItButton}
           onClick={() => dismiss("gotIt")}
