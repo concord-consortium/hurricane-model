@@ -31,13 +31,14 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
       ariaLabel="Disclaimer"
       ariaDescribedBy={messageId}
     >
-      <div className={css.disclaimer}>
+      <div className={css.disclaimer} data-test="disclaimer-modal">
         <WarningIcon className={css.icon} />
         <div id={messageId} className={css.message}>
           This is a simulation and cannot be used to make a forecast.
         </div>
         <button
           type="button"
+          data-test="disclaimer-got-it-button"
           className={css.gotItButton}
           onClick={() => dismiss("gotIt")}
         >
