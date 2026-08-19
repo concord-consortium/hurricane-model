@@ -16,9 +16,10 @@ interface IProps {
 export const Dialog: FC<IProps> = ({ onClose, open, title, ariaLabel, ariaDescribedBy, children }) => {
   const titleId = useId();
 
-  // Swallow backdrop clicks so a dialog only closes deliberately. Escape still closes.
+  // Escape is the only MUI-reported reason we honor, so a reason MUI adds later cannot
+  // dismiss a dialog by default. Backdrop clicks are ignored; the close button calls onClose directly.
   const handleClose: NonNullable<DialogProps["onClose"]> = (_event, reason) => {
-    if (reason === "backdropClick") return;
+    if (reason !== "escapeKeyDown") return;
     onClose();
   };
 
