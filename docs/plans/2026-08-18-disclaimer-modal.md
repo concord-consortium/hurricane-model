@@ -450,11 +450,11 @@ Create `src/components/disclaimer-modal.scss`:
   // Right padding clears the absolutely positioned close button.
   padding: 16px 32px 8px;
   max-width: 420px;
-}
 
-.icon {
-  color: $secondaryColor;
-  font-size: 48px !important; // MUI sets font-size inline on its SvgIcon root.
+  .icon {
+    color: $secondaryColor;
+    font-size: 48px;
+  }
 }
 
 .message {
@@ -582,6 +582,8 @@ Expected: PASS. Those tests do not set `mode=storm`, so the modal stays closed a
 
 Run: `npm start`, open `http://localhost:8080/?mode=storm`.
 Expected: darkened page, centered modal, warning icon, the message, a "Got it" button, an X top right. Both buttons close it. Hovering either shows the pale orange fill; holding either shows solid orange with no border. Clicking the darkened area outside the modal does nothing.
+
+Inspect the warning icon in devtools and confirm its computed `font-size` is `48px`, not `24px`. If it is `24px`, MUI's emotion class is winning and the `.icon` rule has been un-nested out of `.disclaimer` — put it back rather than reaching for `!important`.
 
 Then open `http://localhost:8080/?mode=storm&skipDisclaimer` — no modal, and note there is no `=` after the param. And `http://localhost:8080/` — no modal, because that is hurricane mode.
 
