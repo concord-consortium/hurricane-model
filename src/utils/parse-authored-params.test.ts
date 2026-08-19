@@ -83,7 +83,6 @@ describe("parse-authored-params", () => {
     });
 
     it("accepts skipDisclaimer written as a bare switch", () => {
-      // The flag is negative precisely so authors can write it with no value.
       const result = validateUrlParams("skipDisclaimer");
       expect(result.valid).toBe(true);
       expect(result.errors).toEqual([]);

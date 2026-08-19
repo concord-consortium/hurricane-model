@@ -17,7 +17,7 @@ export const Dialog: FC<IProps> = ({ onClose, open, title, ariaLabel, ariaDescri
   const titleId = useId();
 
   // Escape is the only MUI-reported reason we honor, so a reason MUI adds later cannot
-  // dismiss a dialog by default. Backdrop clicks are ignored; the close button calls onClose directly.
+  // dismiss a dialog by default.
   const handleClose: NonNullable<DialogProps["onClose"]> = (_event, reason) => {
     if (reason !== "escapeKeyDown") return;
     onClose();
