@@ -500,8 +500,8 @@ Create `src/components/disclaimer-modal.scss`:
   max-width: 420px;
 
   .icon {
-    color: $secondaryColor;
-    font-size: 48px;
+    width: 48px;
+    height: 48px;
   }
 
   .message {
@@ -530,10 +530,10 @@ Create `src/components/disclaimer-modal.scss`:
 Create `src/components/disclaimer-modal.tsx`:
 
 ```tsx
-import WarningIcon from "@mui/icons-material/Warning";
 import { observer } from "mobx-react";
 import React, { useId, useState } from "react";
 
+import WarningIcon from "../assets/warning.svg";
 import config from "../config";
 import { log } from "../log";
 import { useStores } from "../stores-context";
@@ -631,7 +631,7 @@ Expected: PASS. Those tests do not set `mode=storm`, so the modal stays closed a
 Run: `npm start`, open `http://localhost:8080/?mode=storm`.
 Expected: darkened page, centered modal, warning icon, the message, a "Got it" button, an X top right. Both buttons close it. Hovering either shows the pale orange fill; holding either shows solid orange with no border. Clicking the darkened area outside the modal does nothing.
 
-Inspect the warning icon in devtools and confirm its computed `font-size` is `48px`, not `24px`. If it is `24px`, MUI's emotion class is winning and the `.icon` rule has been un-nested out of `.disclaimer` — put it back rather than reaching for `!important`.
+Confirm the warning icon renders at 48px, not the 24px its `width`/`height` attributes declare — CSS overrides those presentational attributes, and the `viewBox` scales it cleanly.
 
 Then open `http://localhost:8080/?mode=storm&skipDisclaimer` — no modal, and note there is no `=` after the param. And `http://localhost:8080/` — no modal, because that is hurricane mode.
 
@@ -744,4 +744,3 @@ Do not claim the work is done until every one of these five has actually been ru
 
 - Persisting dismissal across reloads. The modal shows on every load by design.
 - Blocking the escape key. Task 3 stops backdrop clicks only. Escape still closes every dialog, which is the standard modal expectation.
-- A bespoke warning icon. MUI's `WarningIcon` is a deliberate placeholder.
