@@ -20,11 +20,11 @@ context("Test the Hurricane Model app", () => {
     disclaimerModal.checkMessage("This is a simulation and cannot be used to make a forecast.");
     disclaimerModal.getGotItButton().click();
     disclaimerModal.confirmClosed();
-    cy.get(".app--app--__hurr-v1__").get(".leaflet-container").should("be.visible");
+    cy.get(".app--app--__hurr-v1__").find(".leaflet-container").should("be.visible");
   });
 
   it("renders Leaflet map", () => {
-    cy.get(".app--app--__hurr-v1__").get(".leaflet-container").should("be.visible") ;
+    cy.get(".app--app--__hurr-v1__").find(".leaflet-container").should("be.visible") ;
   });
 
   it("does not include start location or season buttons in the bottom bar", () => {

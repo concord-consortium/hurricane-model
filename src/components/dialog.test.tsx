@@ -14,10 +14,11 @@ describe("Dialog component", () => {
   });
 
   it("renders without a title and omits aria-labelledby", () => {
-    render(<Dialog open={true} onClose={jest.fn()}><p>Body text</p></Dialog>);
+    render(<Dialog open={true} onClose={jest.fn()} ariaLabel="Test"><p>Body text</p></Dialog>);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeInTheDocument();
     expect(dialog).not.toHaveAttribute("aria-labelledby");
+    expect(dialog).toHaveAccessibleName("Test");
     expect(screen.getByText("Body text")).toBeInTheDocument();
   });
 

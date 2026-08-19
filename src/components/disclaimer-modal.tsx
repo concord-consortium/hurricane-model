@@ -32,7 +32,7 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
       ariaDescribedBy={messageId}
     >
       <div className={css.disclaimer} data-test="disclaimer-modal">
-        <WarningIcon className={css.icon} />
+        <WarningIcon aria-hidden={true} focusable={false} />
         <div id={messageId} className={css.message}>
           This is a simulation and cannot be used to make a forecast.
         </div>
