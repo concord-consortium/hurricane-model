@@ -48,6 +48,11 @@ describe("DisclaimerModal component", () => {
     expect(screen.getByRole("dialog")).toHaveAccessibleName("Disclaimer");
   });
 
+  it("describes the dialog with the disclaimer message", () => {
+    renderModal();
+    expect(screen.getByRole("dialog")).toHaveAccessibleDescription(MESSAGE);
+  });
+
   it("does not show when skipDisclaimer is set", () => {
     config.skipDisclaimer = true;
     renderModal();

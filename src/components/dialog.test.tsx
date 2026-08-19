@@ -26,6 +26,32 @@ describe("Dialog component", () => {
     expect(screen.getByRole("dialog")).toHaveAccessibleName("Disclaimer");
   });
 
+  // Routing this through slotProps.root instead would detach the description silently.
+  it("describes the element carrying role=dialog, not the MUI root", () => {
+    const { baseElement } = render(
+      <Dialog open={true} onClose={jest.fn()} title="Test Dialog" ariaDescribedBy="dialog-description">
+        <p id="dialog-description">Description text</p>
+      </Dialog>
+    );
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute("aria-describedby", "dialog-description");
+    expect(baseElement.querySelector(`.${dialogClasses.root}`)).not.toHaveAttribute("aria-describedby");
+    expect(dialog).toHaveAccessibleDescription("Description text");
+    expect(dialog).toHaveAccessibleName("Test Dialog");
+  });
+
+  it("describes an untitled dialog without disturbing its aria-label", () => {
+    render(
+      <Dialog open={true} onClose={jest.fn()} ariaLabel="Disclaimer" ariaDescribedBy="message">
+        <p id="message">Message text</p>
+      </Dialog>
+    );
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAccessibleDescription("Message text");
+    expect(dialog).toHaveAccessibleName("Disclaimer");
+    expect(dialog).not.toHaveAttribute("aria-labelledby");
+  });
+
   it("does not close when the backdrop is clicked", async () => {
     const user = userEvent.setup();
     const onClose = jest.fn();
