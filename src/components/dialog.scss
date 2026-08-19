@@ -13,15 +13,18 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  padding: 0;
+  padding: 4px;
   background: none;
-  border: none;
+  // Transparent, not absent, so dialogButtonFill's active state has a border to recolor.
+  border: 1px solid transparent;
+  border-radius: 4px;
   color: $charcoalMedium;
   cursor: pointer;
   display: inline-flex;
   &:hover {
     color: $charcoal;
   }
+  @include dialogButtonFill;
   &:focus-visible {
     outline: 2px solid $charcoal;
     outline-offset: 2px;
