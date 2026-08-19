@@ -51,15 +51,32 @@ In `DEFAULT_CONFIG`, next to the existing `mode` entry (around line 78), add:
 
 The polarity matters. `getURLParam` (`src/config.ts:9`) returns boolean `true` for a param written with no `=value`, and the merge loop below passes that straight through, so a negative default makes `?skipDisclaimer` self-contained. A positive `disclaimer: true` flag would have required `?disclaimer=false`.
 
-**Step 2: Verify it typechecks**
+**Step 2: Register the parameter for LARA authoring**
+
+`src/utils/parse-authored-params.ts` holds `KNOWN_PARAMETERS` (line 18), which drives both `validateUrlParams` and the parameter documentation table rendered in the authoring UI (`src/components/lara/authoring-interface.tsx:111`). A flag missing from that list still works — `handleSave` does not gate on validity — but an author who types it and clicks Validate gets `Unknown parameter: "skipDisclaimer"`, and it never appears in the docs table. Every other boolean flag is registered.
+
+Add an entry alongside the other boolean flags such as `topBarVisible` (line 113):
+
+```ts
+  {
+    name: "skipDisclaimer",
+    type: "boolean",
+    validValues: "true, false",
+    description: "Suppress the load-time liability disclaimer modal"
+  },
+```
+
+The bare-switch form survives this path too: `parse-authored-params.ts:216-220` maps an `=`-less param to `"true"`.
+
+**Step 3: Verify it typechecks**
 
 Run: `npx tsc --noEmit -p tsconfig.json`
 Expected: no errors. (If the repo has no such script, `npm run lint` also surfaces TS parse errors.)
 
-**Step 3: Commit**
+**Step 4: Commit**
 
 ```bash
-git add src/config.ts
+git add src/config.ts src/utils/parse-authored-params.ts
 git commit -m "Add skipDisclaimer config flag"
 ```
 
@@ -111,6 +128,32 @@ and the title element, which becomes conditional:
 ```
 
 Leave `useId()` where it is — hooks cannot be called conditionally.
+
+**Step 3b: Give title-less dialogs a way to be named**
+
+Making `title` optional without offering a substitute label means the first consumer — `DisclaimerModal` in Task 6 — would ship a `role="dialog"` element that screen readers announce as an unnamed dialog, which fails WCAG 4.1.2. Add a sibling prop:
+
+```ts
+  ariaLabel?: string;
+```
+
+and set it on the same slot as the label id, so exactly one of the two is ever present:
+
+```tsx
+      slotProps={{ paper: {
+        "aria-labelledby": title ? titleId : undefined,
+        "aria-label": title ? undefined : ariaLabel
+      } }}
+```
+
+Test that an untitled dialog given `ariaLabel` is actually named:
+
+```tsx
+  it("names an untitled dialog from ariaLabel", () => {
+    render(<Dialog open={true} onClose={jest.fn()} ariaLabel="Disclaimer" />);
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Disclaimer");
+  });
+```
 
 **Step 4: Run the test and watch it pass**
 
@@ -518,6 +561,7 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
     <Dialog
       open={open}
       onClose={() => dismiss("close")}
+      ariaLabel="Disclaimer"
       ariaDescribedBy={messageId}
     >
       <div className={css.disclaimer}>
@@ -546,6 +590,8 @@ Run: `npx jest src/components/disclaimer-modal.test.tsx`
 Expected: PASS, 7 tests.
 
 If the "does not show in report mode" test fails, check that you used `ui.isReportMode` and not `ui.readOnly` — the latter does not exist.
+
+The `ariaLabel="Disclaimer"` is not decoration. The modal has no visible title, and `Dialog` only emits `aria-labelledby` when a `title` is passed, so without it a screen reader announces an unnamed dialog.
 
 **Step 6: Commit**
 
