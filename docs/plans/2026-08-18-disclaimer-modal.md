@@ -237,12 +237,18 @@ In `src/components/dialog.tsx`, add a handler above the `return` and pass it to 
 
 ```tsx
   const handleClose: NonNullable<DialogProps["onClose"]> = (_event, reason) => {
-    if (reason === "backdropClick") return;
+    if (reason !== "escapeKeyDown") return;
     onClose();
   };
 ```
 
-with `import MuiDialog, { DialogProps } from "@mui/material/Dialog";`. Use MUI's exported type rather than hand-copying the `reason` union — MUI declares `onClose` with a bivariance hack, so a narrowed union compiles silently and a reason added in a later MUI version would slip through unnoticed.
+with `import MuiDialog, { DialogProps } from "@mui/material/Dialog";`.
+
+Two things here are deliberate and were arrived at the hard way:
+
+**Use MUI's exported type**, not a hand-copied `reason` union. MUI declares `onClose` with a bivariance hack, so a narrowed union compiles silently and drifts from MUI without warning.
+
+**The guard is an allow-list, not a deny-list.** `if (reason === "backdropClick") return;` looks equivalent today, since MUI emits exactly two reasons. It is not: a reason added in a later MUI version would fall through and dismiss the dialog, and no test would notice. The allow-list's opposite failure — MUI renaming `escapeKeyDown` — is caught immediately by the escape test below. Nobody can be trapped either way, because the close button's `onClick={onClose}` never goes through MUI at all.
 
 ```tsx
     <MuiDialog
@@ -251,15 +257,21 @@ with `import MuiDialog, { DialogProps } from "@mui/material/Dialog";`. Use MUI's
 
 Leave the close button's own `onClick={onClose}` alone — it does not go through MUI.
 
+**Step 3b: Pin the policy itself**
+
+The tests above cannot tell an allow-list from a deny-list — both make all of them pass, because MUI only ever emits the two reasons they exercise. Add `src/components/dialog-close-policy.test.tsx`, which mocks `@mui/material/Dialog` down to a prop-capture stub, grabs the `onClose` this component hands MUI, and invokes it directly with a reason MUI does not emit today. It needs its own file because `jest.mock` hoists file-wide and would break the real-DOM tests above.
+
+Verify it earns its place: flip the guard to `if (reason === "backdropClick") return;` and confirm this file fails, then flip it back.
+
 **Step 4: Run the tests and watch them pass**
 
-Run: `npx jest src/components/dialog.test.tsx`
-Expected: PASS, 5 tests.
+Run: `npx jest src/components/dialog.test.tsx src/components/dialog-close-policy.test.tsx`
+Expected: PASS, 9 tests (7 + 2).
 
 **Step 5: Confirm the other dialogs still close**
 
 Run: `npx jest src/components/top-bar`
-Expected: PASS.
+Expected: PASS, 8 tests.
 
 **Step 6: Commit**
 
