@@ -570,6 +570,7 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
         </div>
         <button
           type="button"
+          autoFocus={true}
           className={css.gotItButton}
           onClick={() => dismiss("gotIt")}
         >
@@ -591,6 +592,8 @@ Expected: PASS, 7 tests.
 If the "does not show in report mode" test fails, check that you used `ui.isReportMode` and not `ui.readOnly` — the latter does not exist.
 
 The `ariaLabel="Disclaimer"` is not decoration. The modal has no visible title, and `Dialog` only emits `aria-labelledby` when a `title` is passed, so without it a screen reader announces an unnamed dialog.
+
+`autoFocus` on the button is not decoration either. MUI's focus trap falls back to focusing the dialog paper when no child claims focus, which leaves the whole panel outlined on load. The reload-confirm dialog (`bottom-bar.tsx:229`) solves it the same way.
 
 **Step 6: Commit**
 
