@@ -10,7 +10,6 @@ describe("Dialog component", () => {
     render(<Dialog open={true} onClose={jest.fn()} title="Test Dialog" />);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeInTheDocument();
-    // The title element is what labels the dialog.
     expect(dialog).toHaveAccessibleName("Test Dialog");
   });
 
@@ -33,8 +32,7 @@ describe("Dialog component", () => {
     const { baseElement } = render(
       <Dialog open={true} onClose={onClose} title="Test Dialog" />
     );
-    // MUI renders the backdrop in a portal, outside the container the render
-    // helper returns, so query from baseElement rather than container.
+    // The backdrop renders in a portal, so query baseElement rather than container.
     const backdrop = baseElement.querySelector(`.${backdropClasses.root}`);
     expect(backdrop).toBeInTheDocument();
     await user.click(backdrop!);
