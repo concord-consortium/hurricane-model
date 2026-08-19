@@ -1,6 +1,8 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { backdropClasses } from "@mui/material/Backdrop";
+import { dialogClasses } from "@mui/material/Dialog";
 import { Dialog } from "./dialog";
 
 describe("Dialog component", () => {
@@ -20,6 +22,11 @@ describe("Dialog component", () => {
     expect(screen.getByText("Body text")).toBeInTheDocument();
   });
 
+  it("names an untitled dialog from ariaLabel", () => {
+    render(<Dialog open={true} onClose={jest.fn()} ariaLabel="Disclaimer" />);
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Disclaimer");
+  });
+
   it("does not close when the backdrop is clicked", async () => {
     const user = userEvent.setup();
     const onClose = jest.fn();
@@ -28,9 +35,23 @@ describe("Dialog component", () => {
     );
     // MUI renders the backdrop in a portal, outside the container the render
     // helper returns, so query from baseElement rather than container.
-    const backdrop = baseElement.querySelector(".MuiBackdrop-root");
+    const backdrop = baseElement.querySelector(`.${backdropClasses.root}`);
     expect(backdrop).toBeInTheDocument();
     await user.click(backdrop!);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  // The container stretches over the backdrop, so a click beside the paper lands here
+  // rather than on the backdrop element. MUI treats it as a backdrop click too.
+  it("does not close when the area around the dialog is clicked", async () => {
+    const user = userEvent.setup();
+    const onClose = jest.fn();
+    const { baseElement } = render(
+      <Dialog open={true} onClose={onClose} title="Test Dialog" />
+    );
+    const container = baseElement.querySelector(`.${dialogClasses.container}`);
+    expect(container).toBeInTheDocument();
+    await user.click(container!);
     expect(onClose).not.toHaveBeenCalled();
   });
 
@@ -39,7 +60,7 @@ describe("Dialog component", () => {
     const onClose = jest.fn();
     render(<Dialog open={true} onClose={onClose} title="Test Dialog" />);
     await user.keyboard("{Escape}");
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it("closes when the close button is clicked", async () => {
@@ -47,6 +68,6 @@ describe("Dialog component", () => {
     const onClose = jest.fn();
     render(<Dialog open={true} onClose={onClose} title="Test Dialog" />);
     await user.click(screen.getByRole("button", { name: "Close" }));
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
