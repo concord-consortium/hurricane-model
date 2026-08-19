@@ -43,11 +43,10 @@ Read these first. They are short.
 In `DEFAULT_CONFIG`, next to the existing `mode` entry (around line 78), add:
 
 ```ts
-  // Suppresses the liability disclaimer modal, which otherwise shows on every
-  // load in storm mode. Negative so the URL param can be a bare switch:
-  // ?skipDisclaimer needs nothing after it.
   skipDisclaimer: false,
 ```
+
+Do not add a comment here. Teale trims comments they consider unnecessary and does not want them re-added; this one has already been trimmed twice.
 
 The polarity matters. `getURLParam` (`src/config.ts:9`) returns boolean `true` for a param written with no `=value`, and the merge loop below passes that straight through, so a negative default makes `?skipDisclaimer` self-contained. A positive `disclaimer: true` flag would have required `?disclaimer=false`.
 
@@ -201,8 +200,7 @@ Then the tests:
     const { baseElement } = render(
       <Dialog open={true} onClose={onClose} title="Test Dialog" />
     );
-    // MUI renders the backdrop in a portal, outside the container the render
-    // helper returns, so query from baseElement rather than container.
+    // The backdrop renders in a portal, so query baseElement rather than container.
     const backdrop = baseElement.querySelector(".MuiBackdrop-root");
     expect(backdrop).toBeInTheDocument();
     await user.click(backdrop!);
@@ -238,14 +236,13 @@ Expected: the backdrop test FAILS with `expect(jest.fn()).not.toHaveBeenCalled()
 In `src/components/dialog.tsx`, add a handler above the `return` and pass it to `MuiDialog` in place of `onClose`:
 
 ```tsx
-  // MUI calls onClose for backdrop clicks, escape, and nothing else. Swallow
-  // backdrop clicks so a dialog only closes deliberately; callers keep their
-  // simple `() => void` signature and never see the reason.
-  const handleClose = (event: object, reason: "backdropClick" | "escapeKeyDown") => {
+  const handleClose: NonNullable<DialogProps["onClose"]> = (_event, reason) => {
     if (reason === "backdropClick") return;
     onClose();
   };
 ```
+
+with `import MuiDialog, { DialogProps } from "@mui/material/Dialog";`. Use MUI's exported type rather than hand-copying the `reason` union — MUI declares `onClose` with a bivariance hack, so a narrowed union compiles silently and a reason added in a later MUI version would slip through unnoticed.
 
 ```tsx
     <MuiDialog
@@ -283,10 +280,7 @@ git commit -m "Stop dialogs closing on backdrop clicks"
 Append to `src/components/common.scss`, **above** the `:export` block at the bottom (the `:export` block must stay last, it is parsed by the CSS-modules loader):
 
 ```scss
-// Shared hover/active fill for dialog buttons: the close button and the
-// disclaimer's "Got it" button must behave identically.
-// Active uses a transparent border rather than `border: none` so the button
-// keeps its size and does not shift by a pixel when pressed.
+// Active recolors the border rather than removing it so the button keeps its size.
 @mixin dialogButtonFill {
   &:hover {
     background-color: $secondaryColorHover;
@@ -330,8 +324,7 @@ Replace the `.closeButton` rule in `src/components/dialog.scss` with:
   right: 8px;
   padding: 4px;
   background: none;
-  // Transparent rather than absent so `dialogButtonFill`'s active state, which
-  // sets border-color, has a border to recolor.
+  // Transparent, not absent, so dialogButtonFill's active state has a border to recolor.
   border: 1px solid transparent;
   border-radius: 4px;
   color: $charcoalMedium;
@@ -547,9 +540,7 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
   const [dismissed, setDismissed] = useState(false);
   const messageId = useId();
 
-  // Derived rather than initial state: LaraAppWrapper sets ui.mode from LARA's
-  // initMessage after the first render, so an isReportMode that arrives late
-  // still has to hide the modal.
+  // Derived, not initial state: LaraAppWrapper sets ui.mode after the first render.
   const open = !dismissed && !config.skipDisclaimer && config.mode === "storm" && !ui.isReportMode;
 
   const dismiss = (source: DismissSource) => {
@@ -684,8 +675,6 @@ Change:
 to:
 
 ```js
-    // skipDisclaimer suppresses the load-time modal, which would otherwise
-    // block every interaction in this spec. It is a bare switch, no value.
     cy.visit("/?mode=storm&skipDisclaimer");
 ```
 
