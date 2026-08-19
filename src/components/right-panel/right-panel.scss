@@ -8,7 +8,9 @@ $mapTabVerticalSpacing: 10px;
 .rightPanelContainer {
   overflow-x: hidden;
   width: $rightPanelContainerWidth + $mapTabWidth;
-  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
+  // Full height below the top bar; the panel extends BEHIND the bottom bar (which sits on top via
+  // z-index), reaching the bottom edge — mirrors the left panel rather than stopping at the bar's top.
+  height: calc(100% - #{$topBarHeight});
   min-height: 551px;
   position: absolute;
   z-index: 1000;
@@ -65,6 +67,10 @@ $mapTabVerticalSpacing: 10px;
         background-color: $tabImpactLight;
       }
 
+      &.settingsMaps {
+        background-color: $tabSettingsLight;
+      }
+
       .tabContent {
         pointer-events: all;
         position: absolute;
@@ -91,6 +97,22 @@ $mapTabVerticalSpacing: 10px;
           letter-spacing: normal;
           text-align: center;
           color: $charcoal;
+        }
+
+        // 1px orange rule between the Settings switches.
+        .settingsDivider {
+          height: 1px;
+          background-color: $secondaryColor;
+          margin: 14px 12px;
+        }
+
+        // Placeholder until the Settings panel has real controls.
+        .settingsPlaceholder {
+          font-family: $scaleFont;
+          font-size: 14px;
+          color: $charcoalMedium;
+          text-align: center;
+          margin-top: 8px;
         }
       }
     }

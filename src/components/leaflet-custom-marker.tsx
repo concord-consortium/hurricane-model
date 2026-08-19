@@ -11,8 +11,11 @@ interface IProps {
   // Icon is passed as children.
   children?: React.ReactNode | React.ReactNode[];
   draggable?: boolean;
+  // Overrides Leaflet's latitude-based marker stacking (higher = on top).
+  zIndexOffset?: number;
   onDrag?(event: Leaflet.LeafletEvent): void;
   onDragEnd?(event: Leaflet.DragEndEvent): void;
+  onClick?(event: Leaflet.LeafletMouseEvent): void;
 }
 interface IState {}
 
@@ -25,7 +28,7 @@ export class LeafletCustomMarker extends React.Component<IProps, IState> {
   });
 
   public render() {
-    const { children, position, onDrag, onDragEnd, draggable } = this.props;
+    const { children, position, onDrag, onDragEnd, onClick, draggable, zIndexOffset } = this.props;
     // Rendering of this component is pretty awkward. Marker component accepts icon only as an instance of L.DivIcon
     // which accepts HTML content as... a string. So, it's impossible to easily create dynamic icon defined using React
     // Component and JSX. Workaround is to create just a div container, and then render a proper React component
@@ -42,6 +45,7 @@ export class LeafletCustomMarker extends React.Component<IProps, IState> {
     const eventHandlers: Leaflet.LeafletEventHandlerFnMap = {};
     if (onDrag) eventHandlers.drag = onDrag;
     if (onDragEnd) eventHandlers.dragend = onDragEnd;
+    if (onClick) eventHandlers.click = onClick;
     return (
       [
         <Marker
@@ -51,6 +55,7 @@ export class LeafletCustomMarker extends React.Component<IProps, IState> {
           position={position}
           eventHandlers={eventHandlers}
           draggable={draggable}
+          zIndexOffset={zIndexOffset}
         />,
         iconContainer && ReactDOM.createPortal(children, iconContainer)
       ]

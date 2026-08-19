@@ -95,6 +95,8 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
   // We can't reference it as a prop in the reaction set up in componentDidMount.
   private _stores: IStores | null = null;
   private disposeObserver: null | (() => void) = null;
+  // Pending animation-frame id for the deferred arrow redraw (see the autorun in drawCanvas).
+  private drawRafId: number | null = null;
 
   public componentDidMount(): void {
     this._stores = this.props.stores ?? null;
@@ -102,6 +104,10 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
 
   public componentWillUnmount(): void {
     this.disposeObserver?.();
+    if (this.drawRafId != null) {
+      cancelAnimationFrame(this.drawRafId);
+      this.drawRafId = null;
+    }
   }
 
   public componentDidUpdate(): void {
@@ -134,8 +140,22 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
         info.canvas.classList.add("canvas-3d");
         app.renderer.resize(parseInt(info.canvas.style.width, 10), parseInt(info.canvas.style.height, 10));
 
-        // Use MobX autorun to observe all the store properties that are necessary to update wind arrows.
-        this.disposeObserver = autorun(() => this.updateArrows());
+        // Observe all the store properties necessary to update the wind arrows. Recomputing the wind
+        // field and re-projecting 1000+ arrows is ~20ms of synchronous work; running it inside the
+        // reaction flush would block the paint that follows the triggering action (e.g. a Season
+        // button wouldn't flip to its selected state until the arrows finished redrawing). A custom
+        // scheduler defers each re-run to the next animation frame (coalescing rapid changes into one
+        // redraw), so that paint lands first and the arrows catch up on the following frame. MobX
+        // still tracks dependencies automatically — no manual dependency list to keep in sync.
+        this.disposeObserver = autorun(() => this.updateArrows(), {
+          scheduler: run => {
+            if (this.drawRafId != null) cancelAnimationFrame(this.drawRafId);
+            this.drawRafId = requestAnimationFrame(() => {
+              this.drawRafId = null;
+              run();
+            });
+          }
+        });
 
         return app;
       });
@@ -149,6 +169,9 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
     this.pixiApp.render();
   }
 
+  // Runs inside the scheduled MobX autorun (deferred to an animation frame — see drawCanvas). Reads
+  // every observable the arrows depend on (so the reaction stays reactive), recomputes the wind field,
+  // and redraws the Pixi stage.
   private updateArrows() {
     if (!this.pixiApp || !this._stores || !lineTexture || !arrowTexture) return;
     const stage = this.pixiApp.stage;
@@ -161,7 +184,13 @@ export class PixiWindLayer extends BaseComponent<IProps, IState> {
     // Capture in locals so TS preserves narrowing inside the forEach closure.
     const lineTex = lineTexture;
     const arrowTex = arrowTexture;
-    const data = this._stores.simulation.windIncHurricane;
+    // While viewing a locked run (storm hidden, not running), drop the storm's own displacement of
+    // the arrows — keep the base wind (which still reflects the pressure systems). While running,
+    // include the storm.
+    const viewingLocked = this._stores.multiTrack.setupLocked && !this._stores.simulation.simulationRunning;
+    const data = viewingLocked
+      ? this._stores.simulation.windWithinBounds
+      : this._stores.simulation.windIncHurricane;
     const latLngToContainerPoint = this._stores.ui.latLngToContainerPoint;
     data.forEach((w: IWindPoint, idx: number) => {
       // Reuse Pixi arrows when possible.

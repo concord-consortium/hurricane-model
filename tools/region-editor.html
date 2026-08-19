@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>StormExplorer — Region Boundary Editor</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css"/>
+<style>
+  html,body{margin:0;height:100%;font-family:system-ui,Arial,sans-serif}
+  #map{position:absolute;inset:0}
+  #panel{position:absolute;top:12px;right:12px;z-index:1000;background:#fff;border-radius:8px;
+    box-shadow:0 4px 18px rgba(0,0,0,.3);padding:12px 14px;width:238px;font-size:13px;color:#222}
+  #panel h1{font-size:14px;margin:0 0 8px}
+  label.legend{display:flex;align-items:center;gap:8px;margin:5px 0;cursor:pointer;user-select:none}
+  label.legend input{cursor:pointer;margin:0}
+  .sw{width:15px;height:15px;border-radius:3px;border:1px solid rgba(0,0,0,.25);flex:0 0 auto}
+  .row{display:flex;gap:6px;margin-top:8px}
+  #panel button{flex:1;padding:8px;border:none;border-radius:6px;background:#ff8a00;color:#fff;
+    font-weight:700;cursor:pointer;font-size:13px}
+  #panel button.sec{background:#eee;color:#222}
+  #panel button.mini{padding:5px;font-size:12px;font-weight:600}
+  .hint{font-size:11px;color:#555;line-height:1.4;margin-top:10px}
+  .hint b{color:#222}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="panel">
+  <h1>Region Boundary Editor</h1>
+  <div id="legend"></div>
+  <div class="row">
+    <button class="sec mini" id="allOn">All</button>
+    <button class="sec mini" id="allOff">None</button>
+  </div>
+  <div class="row"><button id="export">⬇ Export edits</button></div>
+  <div class="row"><button class="sec" id="reset">↺ Reset all (reload)</button></div>
+  <div class="hint">
+    <b>Toggle</b> layers with the checkboxes above.<br/>
+    <b>Drag</b> a vertex to move it.<br/>
+    <b>Click a midpoint</b> (faint handle) to add a vertex.<br/>
+    <b>Right-click</b> a vertex to delete it.<br/>
+    Switch base map (top-left) for clearer coastlines.<br/>
+    Export downloads <b>region-edits.json</b> (all regions, even hidden ones) to Downloads.
+  </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.min.js"></script>
+<script>
+const REGIONS = {"storm-placement-region.json":{"label":"Storm Location","color":"#ff8a00","data":{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-17.697574,20.989441],[-45.810287,32.39732],[-46.420674,32.740253],[-46.522405,32.654643],[-68.699771,41.48362],[-71.446509,40.947946],[-73.48113,39.314691],[-74.193247,38.443569],[-74.905364,36.751032],[-74.803633,35.435819],[-75.617482,34.435058],[-77.245178,33.422167],[-80.195378,31.360708],[-80.093647,29.518961],[-79.483261,26.465316],[-80.195378,24.53723],[-82.33173,25.367338],[-83.654234,27.282008],[-84.875006,28.629857],[-87.21482,29.430397],[-89.452903,28.629857],[-93.522144,29.075368],[-96.472344,27.55292],[-96.640859,23.531193],[-95.114893,19.46217],[-91.961231,19.55806],[-90.231804,22.407234],[-86.569486,22.595207],[-85.9591,20.609037],[-86.97641,16.852482],[-85.246983,17.241526],[-82.601976,16.267416],[-82.601976,12.9207],[-81.584665,10.129965],[-76.803307,10.530292],[-74.260031,12.424437],[-71.004637,13.019836],[-68.461361,11.927226],[-62.052306,11.528798],[-59.915954,9.428199],[-56.253637,7.415627],[-52.286127,6.20349],[-48.420347,4.177319],[-37.738588,3.771374],[-25.429133,3.974372],[-16.476801,5.697577],[-14.238718,8.221903],[-17.697574,13.415978],[-17.595843,15.974224],[-16.883725,18.500189],[-17.697574,20.989441]]]}}]}},"gulf-temp-anomaly-region.json":{"label":"Gulf","color":"#12c2e9","data":{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-86.920784,21.44943],[-84.343762,22.94067],[-82.249931,23.974918],[-81.525143,24.781778],[-82.088867,25.873617],[-82.733123,26.955458],[-83.135782,28.02701],[-83.296846,28.735526],[-84.102166,29.649453],[-85.229613,29.228653],[-86.357061,29.859197],[-87.484508,29.859197],[-88.611955,29.859197],[-88.934083,29.369114],[-90.142062,28.806117],[-91.350042,28.806117],[-92.558021,29.017601],[-93.121745,29.298907],[-94.410256,29.017601],[-94.97398,28.735526],[-95.940363,28.169091],[-96.504087,27.813536],[-96.826215,26.955458],[-96.665151,26.379739],[-96.504087,25.583425],[-96.906747,25.073895],[-97.148342,24.415662],[-97.309406,23.827667],[-97.228874,22.420542],[-96.906747,21.674119],[-96.584619,20.848572],[-96.020895,19.942784],[-95.215576,19.336011],[-94.651852,18.879442],[-94.16866,18.803226],[-93.041213,18.955624],[-92.155361,19.107884],[-91.350042,19.411983],[-91.108446,20.169729],[-91.108446,20.923812],[-90.544722,21.524365],[-88.692487,21.973161],[-87.56504,22.047823],[-86.920784,21.44943]]]}}]}},"caribbean-temp-anomaly-region.json":{"label":"Caribbean","color":"#ffd400","data":{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-86.970748,20.52439],[-87.115598,19.713159],[-87.346931,18.510989],[-87.69393,17.55781],[-87.886707,16.858053],[-87.848151,16.340774],[-87.115598,16.266764],[-86.190268,16.340774],[-84.609496,16.303773],[-83.799832,15.970446],[-82.913057,15.190541],[-82.874501,14.146191],[-83.105834,13.43476],[-83.182945,12.796419],[-83.2215,12.005653],[-83.2215,11.061241],[-82.990168,10.568925],[-82.643169,10.113777],[-81.910616,9.657983],[-81.062397,9.277681],[-80.059956,9.657983],[-79.481624,9.961916],[-78.17074,9.69599],[-77.129743,9.125444],[-76.435746,9.429852],[-75.862135,10.470676],[-75.515136,11.265811],[-74.435584,11.60592],[-73.587365,11.568151],[-72.854812,12.058753],[-72.083704,12.47318],[-71.27404,12.661339],[-70.618597,12.24721],[-69.9246,12.510823],[-68.57516,11.681444],[-67.958273,11.001002],[-66.955832,10.963153],[-65.953391,10.925299],[-65.567837,10.660185],[-63.220607,11.038845],[-61.138614,10.963152],[-60.675949,12.284884],[-60.406061,13.787307],[-60.521727,15.056853],[-60.868726,16.762394],[-61.562724,18.85461],[-66.497818,20.632675],[-68.811143,20.92106],[-70.122028,21.567891],[-71.317246,22.283219],[-72.281131,22.81733],[-73.592016,23.632236],[-74.324569,24.301623],[-75.481232,25.177032],[-76.522228,26.219269],[-76.984893,26.805779],[-77.563225,27.080743],[-78.835554,26.97771],[-79.760884,26.702496],[-79.683773,26.357541],[-79.87655,25.699291],[-80.107883,25.21192],[-80.570548,24.93254],[-81.071768,24.301623],[-82.074209,23.914506],[-83.346538,23.243119],[-84.271868,22.81733],[-84.734533,22.354553],[-85.467087,21.567891],[-86.315306,21.029062],[-86.970748,20.52439]]]}}]}},"central-atlantic-temp-anomaly-region.json":{"label":"Central Atlantic","color":"#b06cff","data":{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-76.860738,27.175156],[-76.20409,26.429213],[-75.248964,25.570763],[-74.174448,24.706115],[-73.099931,23.944584],[-71.906024,23.178531],[-69.936077,21.910494],[-68.62278,21.411176],[-66.234966,21.021633],[-64.444105,20.351478],[-62.593549,19.678404],[-61.160861,19.17173],[-60.444516,17.129764],[-60.086344,15.295571],[-59.907258,13.387113],[-60.26543,11.697327],[-60.384821,10.643183],[-60.444516,9.585381],[-59.608781,8.819335],[-58.355179,7.874338],[-57.280663,6.749368],[-56.265842,6.334222],[-54.713762,6.512184],[-52.445339,5.799975],[-51.490213,4.908461],[-33.084342,4.907047],[-26.2092,4.733608],[-26.557308,15.175695],[-26.731362,27.080761],[-76.860738,27.175156]]]}}]}},"coastal-africa-temp-anomaly-region.json":{"label":"Coastal Africa","color":"#26e07f","data":{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-26.725809,27.256164],[-25.765928,4.823671],[-21.446466,4.003363],[-10.887779,3.182232],[-8.213826,3.798151],[-9.859336,4.960297],[-11.230594,5.779434],[-12.3276,6.869747],[-13.767421,7.889658],[-13.97311,9.177902],[-14.93299,9.921636],[-16.509937,11.134967],[-17.401255,12.878531],[-17.606943,14.27807],[-17.606943,15.734967],[-16.715626,16.919305],[-16.647063,18.421796],[-16.921314,20.168924],[-17.606943,21.450693],[-16.921314,23.22629],[-15.755745,25.28894],[-14.590176,26.828698],[-13.97311,27.621263],[-26.725809,27.256164]]]}}]}}};
+const map = L.map("map",{zoomSnap:0,zoomControl:true}).setView([27,-52],4);
+const bases = {
+  Satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:13}),
+  Street: L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",{maxZoom:13}),
+  Relief: L.tileLayer("https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/ETOPO1_Global_Relief_Model_Color_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",{maxZoom:7}),
+};
+bases.Satellite.addTo(map);
+L.control.layers(bases,null,{position:"topleft"}).addTo(map);
+
+const layers={}, checks={};
+const legend=document.getElementById("legend");
+function enableEdit(gj){gj.eachLayer(l=>{ if(l.pm) l.pm.enable({allowSelfIntersection:true}); });}
+function toggle(fname,on){const gj=layers[fname]; if(on){gj.addTo(map); enableEdit(gj);} else {map.removeLayer(gj);}}
+
+Object.entries(REGIONS).forEach(([fname,cfg])=>{
+  const gj=L.geoJSON(cfg.data,{style:{color:cfg.color,weight:2,fillColor:cfg.color,fillOpacity:0.12}}).addTo(map);
+  enableEdit(gj); layers[fname]=gj;
+  const row=document.createElement("label"); row.className="legend";
+  const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=true;
+  cb.onchange=()=>toggle(fname,cb.checked);
+  const sw=document.createElement("span"); sw.className="sw"; sw.style.background=cfg.color;
+  const tx=document.createElement("span"); tx.textContent=cfg.label;
+  row.append(cb,sw,tx); legend.appendChild(row); checks[fname]=cb;
+});
+
+document.getElementById("allOn").onclick=()=>Object.keys(layers).forEach(f=>{checks[f].checked=true;toggle(f,true);});
+document.getElementById("allOff").onclick=()=>Object.keys(layers).forEach(f=>{checks[f].checked=false;toggle(f,false);});
+
+function round(v){return Math.round(v*1e6)/1e6;}
+function roundCoords(a){return a.map(x=>Array.isArray(x[0])?roundCoords(x):[round(x[0]),round(x[1])]);}
+document.getElementById("export").onclick=()=>{
+  const out={};
+  Object.entries(layers).forEach(([fname,gj])=>{
+    let feature=null; gj.eachLayer(l=>{feature=l.toGeoJSON();});
+    feature.properties={};
+    feature.geometry.coordinates=roundCoords(feature.geometry.coordinates);
+    out[fname]={type:"FeatureCollection",features:[feature]};
+  });
+  const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="region-edits.json";a.click();
+};
+document.getElementById("reset").onclick=()=>location.reload();
+</script>
+</body>
+</html>

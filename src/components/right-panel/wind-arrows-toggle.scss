@@ -1,0 +1,65 @@
+@use "../common" as *;
+
+// A Settings-panel toggle: centered label above a switch, stacked in the panel.
+.windArrowsToggle {
+  margin-top: 14px;
+
+  .label {
+    font-size: 14px;
+    font-weight: bold; // match the Base Maps "Satellite" label
+    line-height: 1.25; // a bit looser than the default ~1.2 between the two wrapped lines
+    text-align: center;
+    color: $charcoal; // #222
+  }
+
+  // Center the SWITCH (track+thumb) in the panel — not the whole label+switch+label row. Equal 1fr
+  // side columns push the auto-width switch to true center, so both toggles share one center axis;
+  // each label hugs its switch edge (justify-self), keeping the measured 6px thumb-to-label gap.
+  .toggleContainer {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    transform: translateX(-5px); // nudge the whole switch+labels group 5px left
+    cursor: pointer; // the entire row is one click target that toggles the switch
+    user-select: none; // don't select the label text when clicking the row
+
+    .stateLabel:first-child { justify-self: end; }
+    .stateLabel:last-child { justify-self: start; }
+
+    // Hovering / pressing a flanking label lights the thumb just like hovering the switch itself.
+    &:has(.stateLabel:hover) :global(.MuiSwitch-thumb) {
+      background-color: $secondaryColorHover;
+      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
+    }
+    &:has(.stateLabel:active) :global(.MuiSwitch-thumb) {
+      background-color: $secondaryColor;
+      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  // State labels flanking the switch (Hide | switch | Show). Clickable; the active side is bold.
+  // Each label is a fixed box the width of its OWN bold text, with the text centered inside it, so
+  // toggling regular <-> bold never changes the box width: the box edge stays 6px from the thumb and
+  // nothing shifts. The width is reserved by a hidden bold copy of the text (::after / data-text).
+  .stateLabel {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center; // center the visible text within the reserved-bold box
+    font-size: 14px;
+    color: $charcoal;
+    cursor: pointer;
+
+    &::after {
+      content: attr(data-text);
+      height: 0;
+      overflow: hidden;
+      visibility: hidden;
+      font-weight: bold; // reserves the bold width
+      pointer-events: none;
+    }
+  }
+
+  .active {
+    font-weight: bold;
+  }
+}

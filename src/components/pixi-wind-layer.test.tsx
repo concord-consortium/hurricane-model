@@ -7,6 +7,11 @@ import { MapContainer } from "react-leaflet";
 import * as Leaflet from "leaflet";
 import * as PIXI from "pixi.js";
 
+// The wind-arrow redraw is deferred to an animation frame (the autorun uses a rAF scheduler so a
+// season/bounds change doesn't block the paint that follows it), so tests must flush a frame before
+// asserting on the drawn arrows.
+const nextFrame = () => new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+
 describe("PixiWindLayer component", () => {
   let stores = createStores();
   beforeEach(() => {
@@ -35,6 +40,8 @@ describe("PixiWindLayer component", () => {
     );
     // pixi v8's Application.init is async; flush microtasks before asserting on the app.
     await Promise.resolve();
+    // The arrows draw on the next animation frame; flush it before asserting.
+    await nextFrame();
     const app = (PIXI.Application as any).instances[0];
     expect(app).toBeDefined();
     expect(app.stage.children.length).toEqual(stores.simulation.windWithinBounds.length);
@@ -50,6 +57,7 @@ describe("PixiWindLayer component", () => {
     );
     const arrowsCount = stores.simulation.windWithinBounds.length;
     await Promise.resolve();
+    await nextFrame();
     const app = (PIXI.Application as any).instances[0];
     expect(app).toBeDefined();
     expect(app.stage.children.length).toEqual(arrowsCount);
@@ -64,6 +72,8 @@ describe("PixiWindLayer component", () => {
 
     const newArrowsCount = stores.simulation.windWithinBounds.length;
     expect(newArrowsCount).toBeLessThan(arrowsCount);
+    // The bounds change also redraws on the next frame.
+    await nextFrame();
     expect(app.stage.children.length).toEqual(newArrowsCount);
   });
 });

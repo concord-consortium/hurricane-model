@@ -19,7 +19,7 @@ export class UIModel {
   @observable public sstOverlay: SSTOverlayModel;
   @observable public mode: InteractiveMode = "runtime";
   @observable public setupMode: SetupMode | undefined = undefined;
-  @observable public leftPanelOpen = false;
+  @observable public leftPanelOpen = true; // Storm Setup panel open by default
   @observable public initialBounds = config.initialBounds;
   @observable public mapSize = { x: 0, y: 0 };
   @observable public zoomedInView: ZoomedInViewProps = false;

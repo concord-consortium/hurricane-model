@@ -7,21 +7,24 @@
 
   .keyHeader {
     margin-top: 2px;
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 14px; // was 12px — bumped with the rest of the overlay key labels
+    font-weight: bold; // "Key" heading stays bold; the subheader/entries below are regular
   }
 
   .keySubheader {
     margin-top: -2px;
     margin-bottom: 2px;
     font-family: $scaleFont;
-    font-size: 11px;
-    font-weight: bold;
+    font-size: 14px; // was 11px
+    font-weight: normal; // was bold
+    line-height: 1.2; // was inheriting a loose line-height — tighten the wrapped "…above / ground"
+    white-space: pre-line; // honor explicit "\n" in a header (e.g. Storm Surge's "…above\nground")
   }
 
   .keyContent {
     font-family: $scaleFont;
-    font-size: 11px;
+    font-size: 14px; // was 11px
+    font-weight: normal; // was inheriting bold (700) from the MUI Button context
     padding-bottom: 6px;
     text-align: left;
 
@@ -41,6 +44,38 @@
         vertical-align: middle;
         margin-right: 5px;
       }
+    }
+  }
+
+  // Storm Surge only: center the color list as a block — keyContent shrinks to the widest entry and
+  // its auto margins center it, so every entry (and its dot) shares the same left edge, centered.
+  &[data-overlay="stormSurge"] .keyContent {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+
+    .entry {
+      min-width: 0; // was 42%
+      margin-left: 0; // was 8% — centering now comes from keyContent's auto margins
+      display: flex; // flex + align-items:center truly centers the label on the dot (block/vertical-align:middle didn't)
+      align-items: center;
+    }
+  }
+
+  // Precipitation: a centered two-column grid with one fixed, tighter gap. (The old 42%-wide cells +
+  // 8% gutter filled the width and left a big, variable space between the columns.)
+  &[data-overlay="precipitation"] .keyContent {
+    display: grid;
+    grid-template-columns: max-content max-content; // two content-sized columns
+    justify-content: center; // center the whole two-column block horizontally
+    column-gap: 15px; // ~half the previous inter-column space
+    row-gap: 2px;
+
+    .entry {
+      min-width: 0; // was 42%
+      margin: 0; // was margin-left 8% + margin-bottom 2px (grid gaps handle spacing now)
+      display: flex;
+      align-items: center;
     }
   }
 }

@@ -1,0 +1,47 @@
+@use "../common" as *;
+
+// Result read-outs under the card thumbnail. Mirrors run-summary's .row/.icon so the setup and
+// result columns line up.
+.runResult {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: $scaleFont; // Roboto Condensed — the app's data/readout font
+  font-size: 14px;
+  color: $charcoal;
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 18px;
+  }
+
+  // The Category Over Time row holds a 22px sparkline after a run but only a dash before it. Reserve
+  // the sparkline's height in BOTH states so the card doesn't grow ~4px taller once it's run.
+  .sparkRow {
+    min-height: 22px;
+  }
+
+  // Fills the space after the Category-over-time icon; measured so the sparkline can size to ~10px from
+  // the result column's right edge.
+  .sparkSlot {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .dash { color: $charcoal; }
+
+  // Two-tone result icons (Peak Category, Category Over Time) before a run: white inner fill, so only
+  // their grey outline shows. After a run they switch to the peak category's color (a .categoryN class).
+  .fillWhite { color: #fff; }
+}

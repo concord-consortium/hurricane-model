@@ -15,7 +15,7 @@ export const Dialog: FC<IProps> = ({ onClose, open, title, ariaDescribedBy, chil
   const titleId = useId();
   return (
     <MuiDialog
-      onClose={onClose}
+      onClose={(_e, reason) => { if (reason !== "backdropClick") onClose(); }}
       open={open}
       maxWidth="lg"
       aria-labelledby={titleId}
@@ -29,7 +29,7 @@ export const Dialog: FC<IProps> = ({ onClose, open, title, ariaDescribedBy, chil
           className={css.closeButton}
           onClick={onClose}
         >
-          <CloseIcon />
+          <span className={css.closeInner}><CloseIcon /></span>
         </button>
         <div className={css.content}>{ children }</div>
       </div>

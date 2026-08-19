@@ -1,0 +1,34 @@
+@use "common" as *;
+
+// Letter label centered on the track's ending point (1.5x size). The -7.5px shift centers the
+// 27px badge given the marker's 12px DivIcon anchors 6px off-center.
+.trackEndLabel {
+  transform: translate(-7.5px, -7.5px);
+  width: 27px;
+  height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Lato, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
+  color: #222;
+  background: #ccc;
+  border: 2px solid #fff;
+  border-radius: 5px; // rounded rectangle, matching the run-thumbnail badge (was a circle)
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+
+  // Hover = light orange, matching the left-panel close (×) button (selected stays full orange).
+  &:hover:not(.selected) {
+    background: $secondaryColorHover;
+  }
+
+  // Already selected — re-selecting is a no-op, so it's not a pointer target.
+  &.selected {
+    background: $secondaryColor;
+    color: $charcoal;
+    cursor: default;
+  }
+}

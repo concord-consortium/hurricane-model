@@ -1,7 +1,14 @@
 @use "common" as *;
 
+// Set Lato explicitly (not `inherit`): on the map these render inside Leaflet's container, whose CSS
+// sets font-family to Helvetica Neue, so an inherited font would diverge from the panel's Lato.
+.label, .status {
+  font-family: Lato, "Roboto Condensed", Helvetica, Arial, sans-serif;
+}
+
 .label {
   color: $charcoal;
+  font-size: 14px; // matches the panel body text
   font-weight: bold;
   white-space: nowrap;
 }
@@ -15,6 +22,7 @@
   .status {
     min-width: 64px;
     text-align: center;
+    font-size: 14px; // "Baseline" / value readout — matches the region label
     font-variant-numeric: tabular-nums;
 
     &.cold {
@@ -33,11 +41,41 @@
     cursor: pointer;
     line-height: 0;
 
-    .hoverIcon { display: none; }
-    &:hover:not(:disabled) {
-      .baseIcon { display: none; }
-      .hoverIcon { display: inline; }
-    }
+    // The circle is the ring + fill; the glyph (+/−) is a path inside the <g> (SVGO converts the
+    // authored polygon/rect to a path). `svg g path` targets only the glyph, not the unused <defs> path.
+    svg circle { transition: fill 0.12s, stroke 0.12s; }
+    svg g path { transition: fill 0.12s; }
+
     &:disabled { opacity: 0.4; cursor: default; }
+
+    // Increase = warm (red), Decrease = cool (blue). Hover uses the light tint (grabbed from the old
+    // hover icons); pressing ("select") fills the circle solid with a white glyph for clear feedback.
+    &.increase {
+      &:hover:not(:disabled) {
+        svg circle { stroke: #c62828; fill: #ffebee; }
+        svg g path { fill: #c62828; }
+      }
+      &:active:not(:disabled) {
+        svg circle { stroke: #c62828; fill: #c62828; }
+        svg g path { fill: #fff; }
+      }
+    }
+
+    &.decrease {
+      &:hover:not(:disabled) {
+        svg circle { stroke: #2255cc; fill: #e8f0ff; }
+        svg g path { fill: #2255cc; }
+      }
+      &:active:not(:disabled) {
+        svg circle { stroke: #2255cc; fill: #2255cc; }
+        svg g path { fill: #fff; }
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid $charcoal;
+      outline-offset: 2px;
+      border-radius: 50%;
+    }
   }
 }

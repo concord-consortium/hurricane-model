@@ -1,5 +1,6 @@
 import * as React from "react";
 import config from "../../config";
+import { getAppName } from "../../utils/app";
 import {Copyright} from "./copyright";
 
 export class AboutDialogContent extends React.Component {
@@ -28,7 +29,7 @@ export class AboutDialogContent extends React.Component {
           Explore how hurricanes impact communities in their path.
         </p>
         <p>
-          Hurricane Explorer was created
+          {getAppName()} was created
           by <a href="https://github.com/pjanik" target="_blank">Piotr Janik</a> from <a href="https://concord.org"
           target="_blank">the Concord Consortium.</a> This <a
           href="https://concord.org/our-work/research-projects/geohazard/" target="_blank">GeoHazard</a> interactive

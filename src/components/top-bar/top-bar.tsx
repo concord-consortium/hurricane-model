@@ -6,7 +6,12 @@ import { Dialog } from "../dialog";
 import { AboutDialogContent } from "./about-dialog-content";
 import { ShareDialogContent } from "./share-dialog-content";
 import { log } from "../../log";
+import { getAppName } from "../../utils/app";
 import css from "./top-bar.scss";
+
+// StormExplorer version label shown at the top-left. Bump these when cutting a new version.
+const APP_VERSION_MAIN = "Storm Explorer: Multi-track · v0.7 · ";
+const APP_VERSION_UPDATED = "updated: 8/18/26";
 
 interface IProps extends IBaseProps {}
 interface IState {
@@ -28,7 +33,12 @@ export class TopBar extends BaseComponent<IProps, IState> {
   public render() {
     return (
       <div className={css.topBar}>
-        <span data-test="reload" className={css.textButton} onClick={this.handleReload}><RefreshIcon /></span>
+        <span className={css.leftGroup}>
+          <span data-test="reload" className={css.textButton} onClick={this.handleReload}><RefreshIcon /></span>
+          <span data-test="version-label" className={css.versionLabel}>
+            <span className={css.versionMain}>{APP_VERSION_MAIN}</span>{APP_VERSION_UPDATED}
+          </span>
+        </span>
         <span>
           <span data-test="share" className={css.textButton} onClick={this.handleShareOpen}>Share</span>
           <span data-test="about" className={css.textButton} onClick={this.handleAboutOpen}>About</span>
@@ -36,14 +46,14 @@ export class TopBar extends BaseComponent<IProps, IState> {
         <Dialog
           onClose={this.handleAboutClose}
           open={this.state.aboutOpen}
-          title="About: Hurricane Explorer"
+          title={`About: ${getAppName()}`}
         >
           <AboutDialogContent />
         </Dialog>
         <Dialog
           onClose={this.handleShareClose}
           open={this.state.shareOpen}
-          title="Share: Hurricane Explorer"
+          title={`Share: ${getAppName()}`}
         >
           <ShareDialogContent />
         </Dialog>

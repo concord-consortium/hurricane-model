@@ -48,25 +48,51 @@ export default createTheme({
         }
       }
     },
+    MuiDialog: {
+      styleOverrides: {
+        // Sit modals slightly above dead-center — ~45% down the viewport (45/55) instead of 50/50.
+        paper: {
+          "transform": "translateY(-5vh)",
+          // The dialog paper takes focus on open (focus trap); suppress its default UA focus ring —
+          // interactive elements inside keep their own :focus-visible styles.
+          "&:focus, &:focus-visible": {
+            outline: "none"
+          }
+        }
+      }
+    },
     MuiSwitch: {
       styleOverrides: {
         root: {
           padding: 14
         },
         thumb: {
-          "width": 18,
-          "height": 18,
+          "width": 24,
+          "height": 24,
           "boxShadow": "0 1px 5px 0 rgba(0, 0, 0, 0.35)",
           "border": "1px solid #797979",
+          // The 24px thumb grows downward from the switchBase's fixed top, landing ~3px below the
+          // track's vertical center; nudge it up so the thumb is centered on the track (measured).
+          "marginTop": "-2px",
+          // Engaged look like the Storm Category slider thumb: fill with the orange (table × hover /
+          // press colors) and keep the elevation shadow — NO white ring/outline.
           ".MuiSwitch-switchBase:hover &": {
-            boxShadow: "0 0 0 3px rgba(255, 255, 255, 0.5)",
+            backgroundColor: "#ffdaa3", // $secondaryColorHover
+            boxShadow: "0 1px 5px 0 rgba(0, 0, 0, 0.35)",
           },
           ".MuiSwitch-switchBase:active &": {
-            boxShadow: "0 0 0 3px rgba(255, 255, 255, 1)",
+            backgroundColor: "#ff9900", // $secondaryColor
+            boxShadow: "0 1px 5px 0 rgba(0, 0, 0, 0.35)",
           }
         },
         switchBase: {
-          backgroundColor: "transparent !important" // disable default hover state
+          "backgroundColor": "transparent !important", // disable default hover state
+          // Center the 24px thumb's travel so it rests ~6px from EACH edge of the switch (symmetric),
+          // letting the flanking Hide/Show (Icon/Image) labels sit 6px from it on both sides.
+          "marginLeft": "-3px",
+          "&.Mui-checked": {
+            transform: "translateX(22px)",
+          },
         },
         track: {
           "backgroundColor": "#797979",

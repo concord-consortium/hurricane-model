@@ -19,17 +19,22 @@ interface ISetupSectionProps {
   hint?: string;
   Icon?: FunctionComponent;
   iconClassName?: string;
-  postscript?: string;
+  postscript?: ReactNode;
   setupMode: SetupMode;
   tip?: string;
+  tipLabel?: string; // bold label prefix for the tip callout (defaults to "Tip")
   title: string;
 }
 
 export const SetupSection = observer(function SetupSection({
-  children, dataTest, hint, Icon, iconClassName, postscript, setupMode, tip, title
+  children, dataTest, hint, Icon, iconClassName, postscript, setupMode, tip, tipLabel, title
 }: ISetupSectionProps) {
   const stores = useStores();
   const open = stores.ui.setupMode === setupMode;
+  // Setup is locked (section still opens, but its controls are greyed and non-interactive) once a run
+  // has STARTED — you can't change the setup mid-run — and it stays locked while viewing the finished
+  // run (setupLocked). Restart/Edit or a new run unlocks it again (both reset simulationStarted).
+  const locked = stores.multiTrack.setupLocked || stores.simulation.simulationStarted;
   const dt = dataTest || title;
 
   const handleClick = () => {
@@ -54,10 +59,10 @@ export const SetupSection = observer(function SetupSection({
         </div>
       </ListItemButton>
       <Collapse data-test={`${dt}-content`} in={open} unmountOnExit>
-        <div className={css.section} data-test={`${dt}-section`}>
+        <div className={clsx(css.section, { [css.locked]: locked })} data-test={`${dt}-section`}>
           {hint && <div className={css.hint}>{hint}</div>}
           {children}
-          {tip && <div className={css.tip}><span className={css.bold}>Tip:</span> {tip}</div>}
+          {tip && <div className={css.tip}><span className={css.bold}>{tipLabel ?? "Tip"}:</span> {tip}</div>}
           {postscript && <div className={css.postscript}>{postscript}</div>}
         </div>
       </Collapse>

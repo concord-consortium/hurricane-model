@@ -1,10 +1,48 @@
 @use "common" as *;
 
+.letterWrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .letter {
   height: 72px;
   margin: -3px -10px -10px -8px; // new asset has padding
   vertical-align: middle;
   transform-origin: center center;
+}
+
+// Numbered label (H1, H2, L1, L2…) tucked at the letter's bottom-right, matching the run-card chips.
+// First-pass styling — size/placement/color are easy knobs for the styling pass.
+.systemBadge {
+  position: absolute;
+  right: -8px;
+  // Center on the letter's actual height. The letter's -3/-10 crop margins shift the wrap's box up
+  // 3.5px relative to the glyph, so +3.5px lands the badge on the true vertical center (measured; the
+  // offset is constant across strengths since the letter scales about its own center).
+  top: calc(50% + 3.5px);
+  transform: translateY(-50%);
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 2px solid #fff;
+  background: #4a5560;
+  // Digit text matches the "mb" label (.label in draggable-map-icon.scss): Roboto Condensed 14px,
+  // normal weight, white with the same text-shadow.
+  color: #fff;
+  font-family: $scaleFont;
+  font-size: 14px;
+  text-shadow: 0 1px 5px #000;
+  line-height: 20px; // center the digit in the 20px inner circle
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+
+  &.high { background: #327cfc; } // same blue as the H letter (high.svg)
+  &.low  { background: #fc542d; } // same red as the L letter (low.svg)
 }
 
 .sliderContainer {

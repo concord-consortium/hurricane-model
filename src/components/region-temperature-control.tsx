@@ -8,9 +8,7 @@ import { NamedRegion } from "../types";
 import { temperatureAnomalyRegions } from "../utils/regions";
 
 import TempDecreaseIcon from "../assets/left-panel/temp-decrease-button.svg";
-import TempDecreaseHoverIcon from "../assets/left-panel/temp-decrease-button-hover.svg";
 import TempIncreaseIcon from "../assets/left-panel/temp-increase-button.svg";
-import TempIncreaseHoverIcon from "../assets/left-panel/temp-increase-button-hover.svg";
 
 import css from "./region-temperature-control.scss";
 
@@ -26,18 +24,17 @@ function ChangeButton({ adjustment, anomaly, regionKey }: IChangeButtonProps) {
   const changeWord = adjustment < 0 ? "Decrease" : "Increase";
   const disabled = adjustment < 0 ? anomaly <= temperatureAnomalyMin : anomaly >= temperatureAnomalyMax;
   const TempIcon = adjustment < 0 ? TempDecreaseIcon : TempIncreaseIcon;
-  const TempHoverIcon = adjustment < 0 ? TempDecreaseHoverIcon : TempIncreaseHoverIcon;
 
   return (
     <button
       type="button"
-      className={css.button}
+      // Direction class drives the hover/press recolor in CSS (decrease = cool/blue, increase = warm/red).
+      className={clsx(css.button, adjustment < 0 ? css.decrease : css.increase)}
       aria-label={`${changeWord} ${label} temperature`}
       disabled={disabled}
       onClick={() => simulation.adjustTemperatureAnomaly(regionKey, adjustment)}
     >
-      <TempIcon className={css.baseIcon} />
-      <TempHoverIcon className={css.hoverIcon} />
+      <TempIcon className={css.icon} />
     </button>
   );
 }
@@ -48,7 +45,8 @@ interface IProps {
 
 function statusText(anomaly: number): string {
   if (anomaly === 0) return "Baseline";
-  return `${anomaly > 0 ? "+" : ""}${anomaly}°C`;
+  // Non-breaking space so the value and unit never split across a line wrap.
+  return `${anomaly > 0 ? "+" : "−"}${Math.abs(anomaly)}\u00A0°C`;
 }
 
 export const RegionTemperatureControl = observer(function RegionTemperatureControl({ regionKey }: IProps) {

@@ -1,4 +1,5 @@
 import Slider from "@mui/material/Slider";
+import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React from "react";
 
@@ -11,15 +12,22 @@ import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
 import categoryCss from "../hurricane-category.scss";
 import css from "./storm-category-section.scss";
 
-const hint = "Drag the slider to set the storm's starting strength. The storm icon updates in real time.";
+const hint = "Drag the slider to set the storm’s starting strength.";
 
-const marks = hurricaneCategoryInfo.map((info, idx) => ({ value: idx, label: info.nameShort }));
 const maxCategory = hurricaneCategoryInfo.length - 1;
 
 export const StormCategorySection = observer(function StormCategorySection() {
   const stores = useStores();
   const { hurricane } = stores.simulation;
   const startingCategory = hurricane.startingCategory ?? 0;
+
+  // Tick labels are all regular #222 (see .scss); the selected one is bold.
+  const marks = hurricaneCategoryInfo.map((info, idx) => ({
+    value: idx,
+    label: (
+      <span className={clsx({ [css.selectedMarkLabel]: idx === startingCategory })}>{info.nameShort}</span>
+    )
+  }));
 
   const handleChange = (_event: Event, value: number | number[]) => {
     const numericValue = Array.isArray(value) ? value[0] : value;
@@ -38,11 +46,14 @@ export const StormCategorySection = observer(function StormCategorySection() {
       <div className={css.sliderContainer}>
         <Slider
           classes={{
+            root: css.sliderRoot,
             rail: css.rail,
             track: css.track,
             mark: css.mark,
             markLabel: css.markLabel,
-            thumb: css.thumb
+            // Tag the thumb with the current category's color (sets `color`); the thumb's hover fill
+            // uses currentColor, so it matches the chip it sits on and recolors as you drag.
+            thumb: clsx(css.thumb, categoryCss["category" + startingCategory])
           }}
           min={0}
           max={maxCategory}

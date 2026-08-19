@@ -37,12 +37,12 @@ const keyData: { [name: string]: IMapButtonKeyDef } = {
   },
   // Source: https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad
   stormSurge: {
-    header: "Height above ground",
+    header: "Height above\nground", // \n breaks "ground" onto a second line (keySubheader is pre-line)
     values: [
-      {background: "#0071fe", text: "Less than 3 feet"},
-      {background: "#fcfe0d", text: "Greater than 3 feet"},
-      {background: "#fea90c", text: "Greater than 6 feet"},
-      {background: "#fe0a03", text: "Greater than 9 feet"},
+      {background: "#0071fe", text: "<3 feet"},
+      {background: "#fcfe0d", text: ">3 feet"},
+      {background: "#fea90c", text: ">6 feet"},
+      {background: "#fe0a03", text: ">9 feet"},
       {background: `center / contain no-repeat url(${leveedAreaKey})`, text: "Leveed area"}
     ]
   },
@@ -78,7 +78,7 @@ export class MapButtonKey extends BaseComponent<IProps, IState> {
       return null;
     }
     return (
-      <div className={css.keyContainer}>
+      <div className={css.keyContainer} data-overlay={value}>
         <div className={css.keyHeader}>Key</div>
         { KeyElement && KeyElement }
         { keyDef &&

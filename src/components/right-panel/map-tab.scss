@@ -24,6 +24,9 @@ $tabPadding: 4px;
     &.impactMaps {
       background-color: $tabImpactLight;
     }
+    &.settingsMaps {
+      background-color: $tabSettingsLight; // #ffcc80 — the orange frame, matching the green/blue tabs
+    }
     &.active {
       width: $mapTabWidth + 1px; // to cover border on the right side
     }
@@ -44,22 +47,32 @@ $tabPadding: 4px;
       &:hover {
         opacity: 0.75;
       }
+      &:active { // click/press state — a bit stronger than hover (must follow :hover to win while pressed)
+        opacity: 0.5;
+      }
+      // Settings tab has no thumbnail — a plain white box (no outline) stands in for it.
+      &.settingsMaps {
+        background-color: #fff;
+      }
     }
+    // All tab labels are centered vertically within the tab (single-line "Settings" and the two-line
+    // "Base Maps" / "Map Overlays" alike).
     .mapTabContent {
       position: relative;
       width: 64px;
-      top: 5px;
       left: $tabPadding;
-      height: 30px;
+      height: 100%;
       font-size: 14px;
       font-weight: bold;
       font-style: normal;
       font-stretch: normal;
-      line-height: 1;
+      line-height: 1.1;
       letter-spacing: normal;
       text-align: center;
       color: $charcoal;
-      padding-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       pointer-events: none;
     }
   }

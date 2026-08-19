@@ -4,24 +4,31 @@ import * as React from "react";
 import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
-import { MapContainer, TileLayer, ImageOverlay, ZoomControl, AttributionControl } from "react-leaflet";
+import { MapContainer, TileLayer, ZoomControl, AttributionControl } from "react-leaflet";
 import { LatLng, Map as LeafletMap, Point, PointTuple, latLngBounds, DomEvent } from "leaflet";
 import Control from "./leaflet-control";
+import { CrossfadeImageOverlay } from "./crossfade-image-overlay";
 import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
+import { perTypeNumbers } from "../utils/pressure";
 import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneCategoryMarker } from "./hurricane-category-marker";
 import { HurricaneTrack } from "./hurricane-track";
+import { SavedTracksLayer } from "./saved-tracks-layer";
+import { CompareOverlay } from "./compare/compare-overlay";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
 import config from "../config";
-import CenterFocusStrong from "@mui/icons-material/CenterFocusStrong";
 import Home from "@mui/icons-material/Home";
+
+import FitAllIcon from "../assets/fit-all.svg";
+import WarningIcon from "../assets/warning.svg";
+import { WarningModal } from "./warning-modal";
 import { mapLayer } from "../map-layer-tiles";
 import { StormSurgeOverlay } from "./storm-surge-overlay";
 import { log } from "../log";
 import { LeafletMouseEvent } from "leaflet";
-import { LEFT_PANEL_TRANSITION_SECONDS, LEFT_PANEL_WIDTH_PX } from "./common";
+import { LEFT_PANEL_TRANSITION_SECONDS, LEFT_PANEL_FULL_WIDTH_PX } from "./common";
 import css from "./map-view.scss";
 import { ThermometerMarker } from "./thermometer-marker";
 import { PolygonRegion } from "./polygon-region";
@@ -33,13 +40,16 @@ import { temperatureAnomalyRegions, anomalyFillColor } from "../utils/regions";
 import "leaflet/dist/leaflet.css";
 
 interface IProps extends IBaseProps {}
-interface IState {}
+interface IState {
+  warningOpen: boolean;
+}
 
 const imageOverlayBounds: [[number, number], [number, number]] = [[-90, -180], [90, 180]];
 
 @inject("stores")
 @observer
 export class MapView extends BaseComponent<IProps, IState> {
+  public state: IState = { warningOpen: true }; // shown by default on every load/reload
   private mapRef = React.createRef<LeafletMap>();
   private _programmaticMapUpdate = false;
   private _lastThermometerUpdateTime = 0;
@@ -121,12 +131,23 @@ export class MapView extends BaseComponent<IProps, IState> {
   }
 
   public render() {
-    const { simulation: sim, ui } = this.stores;
+    const { simulation: sim, ui, multiTrack } = this.stores;
+    // Setup is locked during a run (simulationStarted) and while viewing a finished run (setupLocked).
+    // While locked, the map's setup-editing affordances — the thermometer, the per-region temperature
+    // controls, and the storm-placement region — must NOT appear, so opening a setup section (or a
+    // thermometer left on) can't change anything on the map. Matches the panel's setup-section lock.
+    const setupInteractionLocked = multiTrack.setupLocked || sim.simulationStarted;
+    // Per-type labels (H1, H2, L1, L2…) for the pressure markers — same helper the run cards use.
+    const pressureSystemNumbers = perTypeNumbers(sim.pressureSystems);
     const { sstOverlay } = ui;
     const navigation = !!ui.zoomedInView || config.navigation;
 
     const resetButtonClasses = clsx(
       css.topLeftControl, css.resetViewContainer, "leaflet-bar",
+      { [css.leftPanelOpen]: this.stores.ui.leftPanelOpen }
+    );
+    const warningButtonClasses = clsx(
+      css.topLeftControl, css.warningContainer, "leaflet-bar",
       { [css.leftPanelOpen]: this.stores.ui.leftPanelOpen }
     );
 
@@ -174,7 +195,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             ui.overlay === "sst" &&
-            <ImageOverlay
+            <CrossfadeImageOverlay
               // accessible version of sea surface temperature should always use 100% opacity
               opacity={sstOverlay.accessibleSSTScale ? 1 : ui.layerOpacity.seaSurfaceTemp}
               url={
@@ -199,6 +220,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           {
             ui.overlay === "precipitation" && <PrecipitationLayer/>
           }
+          <SavedTracksLayer />
           <HurricaneTrack />
           {
             config.markLandfalls && sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
@@ -210,11 +232,15 @@ export class MapView extends BaseComponent<IProps, IState> {
               <PressureSystemMarker
                 key={idx}
                 model={ps}
+                systemNumber={pressureSystemNumbers[idx]}
               />
             )
           }
           {
-            sim.hurricane.active && <HurricaneMarker />
+            // Once a run is captured (a completed run is selected/locked), hide the swirling
+            // hurricane symbol — only the track remains — until a new trial is started/edited. While
+            // a run is actually running (e.g. re-running a saved run), always show it.
+            sim.hurricane.active && (!multiTrack.setupLocked || sim.simulationRunning) && <HurricaneMarker />
           }
           {
             // ui.mapBounds can be null/undefined before the Leaflet map has finished initializing
@@ -230,13 +256,31 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           { navigation && <ZoomControl position="topleft" ref={this.zoomRef} /> }
           {
-            navigation && ui.mapModifiedByUser &&
+            // Persistent fit-all: always shown alongside the zoom controls. When the view is already
+            // fit (not modified by the user) it's disabled and its icon dimmed — same treatment as
+            // the zoom-in/out buttons at their min/max (Leaflet's .leaflet-disabled).
+            navigation &&
             <Control position="topleft" className={resetButtonClasses}>
-              <a className={css.resetViewBtn}
-                onClick={this.resetView}
-                title="Reset view" role="button" aria-label="Reset view"
+              <a className={clsx(css.resetViewBtn, { "leaflet-disabled": !ui.mapModifiedByUser })}
+                onClick={ui.mapModifiedByUser ? this.resetView : undefined}
+                title="Fit all" role="button" aria-label="Fit all"
+                aria-disabled={!ui.mapModifiedByUser}
               >
-                <CenterFocusStrong/>
+                <FitAllIcon/>
+              </a>
+            </Control>
+          }
+          {
+            // Warning button: opens a dismissible "this is a simulation" notice. Same styling and
+            // hover/press states as Fit All; sits 12px below it (via .warningContainer margin).
+            navigation &&
+            <Control position="topleft" className={warningButtonClasses}>
+              <a className={clsx(css.resetViewBtn, { "leaflet-disabled": this.state.warningOpen })}
+                onClick={this.state.warningOpen ? undefined : this.openWarning}
+                title="Warning" role="button" aria-label="Warning"
+                aria-disabled={this.state.warningOpen}
+              >
+                <WarningIcon/>
               </a>
             </Control>
           }
@@ -253,17 +297,19 @@ export class MapView extends BaseComponent<IProps, IState> {
             </Control>
           }
           {
-            ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionSaved} saved={true} />
+            ui.thermometerActive && !setupInteractionLocked &&
+              <ThermometerMarker position={ui.thermometerPositionSaved} saved={true} />
           }
           {
-            ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
+            ui.thermometerActive && !setupInteractionLocked &&
+              <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
           }
           {
-            ui.setupMode === "stormLocation" &&
+            ui.setupMode === "stormLocation" && !setupInteractionLocked &&
             <PolygonRegion region={stormPlacementRegion} />
           }
           {
-            ui.setupMode === "seaSurfaceTemperatures" &&
+            ui.setupMode === "seaSurfaceTemperatures" && !setupInteractionLocked &&
             namedRegions.map(key => {
               const { region, anchor } = temperatureAnomalyRegions[key];
               const anomalyColor = anomalyFillColor(sim.temperatureAnomalyAt(key));
@@ -282,6 +328,8 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           <AttributionControl position="topright" />
         </MapContainer>
+        <CompareOverlay />
+        <WarningModal open={this.state.warningOpen} onClose={this.closeWarning} />
       </div>
     );
   }
@@ -298,9 +346,22 @@ export class MapView extends BaseComponent<IProps, IState> {
     }
   }
 
+  public openWarning = () => this.setState({ warningOpen: true });
+  public closeWarning = () => this.setState({ warningOpen: false });
+
   public resetView = () => {
-    this.leafletMap?.flyToBounds(this.stores.ui.initialBounds);
-    this.stores.ui.resetMapView();
+    const map = this.leafletMap;
+    if (!map) return;
+    const { ui } = this.stores;
+    // Mark this fly as programmatic so its moveend doesn't re-flag the view as user-modified —
+    // otherwise mapModifiedByUser flips back to true right after resetMapView() cleared it, and the
+    // Fit-all button re-enables the instant it was fit. Cleared once this fly settles.
+    this._programmaticMapUpdate = true;
+    map.once("moveend", () => { this._programmaticMapUpdate = false; });
+    // With the panel open, fit panelMaxBounds (the "full region, offset right of the panel" framing,
+    // which also equals the active maxBounds — so it can't overshoot and bounce). Closed: initialBounds.
+    map.flyToBounds(ui.leftPanelOpen ? ui.panelMaxBounds : ui.initialBounds);
+    ui.resetMapView();
     log("ResetMapViewClicked");
   }
 
@@ -341,7 +402,7 @@ export class MapView extends BaseComponent<IProps, IState> {
       // from the equator (northern lat in the visible region)
       const initWidthPixels = (visibleWidthLong / 360) * 256 * (2 ** minZoom);
       const widthPadding = (size.x - initWidthPixels) / 2;
-      const extraLeftPanelWidth = Math.max(LEFT_PANEL_WIDTH_PX - widthPadding, 0);
+      const extraLeftPanelWidth = Math.max(LEFT_PANEL_FULL_WIDTH_PX - widthPadding, 0);
       const extraLeftPanelHeight = extraLeftPanelWidth * size.y / size.x;
 
       // Determine the min zoom needed to show both the full initial bounds and left panel.
@@ -379,7 +440,7 @@ export class MapView extends BaseComponent<IProps, IState> {
     const open = ui.leftPanelOpen;
 
     const verticalPadding = (open ? 1 : -1) * ui.panelVerticalPadding;
-    const paddingTopLeft: PointTuple = [open ? LEFT_PANEL_WIDTH_PX : 0, verticalPadding];
+    const paddingTopLeft: PointTuple = [open ? LEFT_PANEL_FULL_WIDTH_PX : 0, verticalPadding];
     const paddingBottomRight: PointTuple = [0, verticalPadding];
     const opts = { duration: LEFT_PANEL_TRANSITION_SECONDS, paddingBottomRight, paddingTopLeft };
 
@@ -390,7 +451,7 @@ export class MapView extends BaseComponent<IProps, IState> {
       map.flyToBounds(map.getBounds(), opts);
     } else {
       const size = map.getSize();
-      const topLeft = map.containerPointToLatLng([LEFT_PANEL_WIDTH_PX, ui.panelVerticalPadding]);
+      const topLeft = map.containerPointToLatLng([LEFT_PANEL_FULL_WIDTH_PX, ui.panelVerticalPadding]);
       const bottomRight = map.containerPointToLatLng([size.x, size.y - ui.panelVerticalPadding]);
       map.flyToBounds(latLngBounds(topLeft, bottomRight), opts);
 

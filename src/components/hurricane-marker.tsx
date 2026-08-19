@@ -6,7 +6,7 @@ import HurricaneIconSVG from "../assets/hurricane.svg";
 import config from "../config";
 import { log } from "../log";
 import { useStores } from "../stores-context";
-import { getDirectionLetter } from "../utils/lat-long";
+import { formatLatLng } from "../utils/lat-long";
 import { clampToRegion } from "../utils/region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
 import { CategoryNumber } from "./category-number";
@@ -25,11 +25,16 @@ const HURRICANE_IMG_SCALE_FACTOR = 0.05;
 export const HurricaneMarker = observer(function HurricaneMarker() {
   const stores = useStores();
 
-  const { ui, simulation } = stores;
+  const { ui, simulation, multiTrack } = stores;
   const { hurricane, simulationStarted } = simulation;
-  const draggable = ui.setupMode === "stormLocation" && !simulationStarted;
+  // Draggable whenever the setup is editable — no need to open Storm Location first; dragging the
+  // storm opens that section for you (below).
+  const draggable = !simulationStarted && !multiTrack.setupLocked;
 
   const handleDrag = (e: Leaflet.LeafletEvent) => {
+    // Reveal the Storm Location section as soon as the storm is being moved (no map reflow — only
+    // opening the panel changes the map, which we defer to drag end).
+    if (ui.setupMode !== "stormLocation") ui.setSetupMode("stormLocation");
     const { hurricane, pressureSystems } = stores.simulation;
     const marker = e.target as Leaflet.Marker;
     const raw = marker.getLatLng();
@@ -40,10 +45,19 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
     }
   }
 
+  // A plain click (no drag) opens the panel + Storm Location section, same as finishing a drag.
+  const handleClick = () => {
+    ui.setLeftPanelOpen(true);
+    ui.setSetupMode("stormLocation");
+  };
+
   const handleDragEnd = (e: Leaflet.DragEndEvent) => {
     const { lat, lng } = (e.target as Leaflet.Marker).getLatLng();
     const startLocation = { lat, lng };
     stores.simulation.setStartLocation(startLocation);
+    // Make sure the Storm Location section is visible in the setup panel.
+    ui.setLeftPanelOpen(true);
+    ui.setSetupMode("stormLocation");
     log("StartLocationChanged", { startLocation });
   }
 
@@ -53,6 +67,9 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
       draggable={draggable}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
+      onClick={draggable ? handleClick : undefined}
+      // Keep the storm above the tracks and their letter labels (which use offsets up to ~50000).
+      zIndexOffset={1000000}
     >
       <HurricaneIcon />
     </LeafletCustomMarker>
@@ -79,13 +96,17 @@ export const HurricaneIcon = observer(function HurricaneIcon() {
   const opacity = hurrStrengthToOpacity(hurricane.strength);
 
   const { hurricaneImage, mapZoom, setupMode } = stores.ui;
-  const dimmed = !!setupMode && !(setupMode === "stormLocation" || setupMode === "stormCategory");
-  const draggable = setupMode === "stormLocation";
+  // Only dim the storm to focus another section's markers while the setup is actually editable. During
+  // a run — or while viewing a finished run — opening a section must NOT fade the storm.
+  const setupEditable = !stores.simulation.simulationStarted && !stores.multiTrack.setupLocked;
+  const dimmed = setupEditable && !!setupMode &&
+    !(setupMode === "stormLocation" || setupMode === "stormCategory");
+  // Show the grab affordance whenever the storm can actually be moved (editable), not only when the
+  // Storm Location section happens to be open.
+  const draggable = !stores.simulation.simulationStarted && !stores.multiTrack.setupLocked;
 
   const { lat, lng } = hurricane.center;
-  const latL = getDirectionLetter(lat, "lat");
-  const lngL = getDirectionLetter(lng, "lng");
-  const label = `${Math.abs(lat).toFixed(2)}°${latL}, ${Math.abs(lng).toFixed(2)}°${lngL}`;
+  const label = formatLatLng(lat, lng);
 
   // Note that the realistic hurricane image should scale with the map. This is simplified scaling that only uses
   // the map zoom. The real one should also take into account the map projection. But since it's a simplified view

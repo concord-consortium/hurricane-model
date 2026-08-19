@@ -1,38 +1,64 @@
 @use "../common" as *;
 
-// Six equal-width category segments mirroring the hurricane scale image in the bottom bar.
-$catStop1: 10%;
-$catStop2: 30%;
-$catStop3: 50%;
-$catStop4: 70%;
-$catStop5: 90%;
-
 .sliderContainer {
-  // Extra horizontal padding so the leftmost / rightmost tick labels don't get clipped.
-  padding: 0 12px;
+  // No extra horizontal padding — the section already provides the panel's standard 15px inset, and
+  // the tick labels sit under chip centers (inset), so they don't clip. The bottom padding reserves
+  // room for the absolutely-positioned tick labels (top: 26px) so the category-name readout below
+  // the slider doesn't collide with them.
+  padding: 0 0 26px;
+  margin-top: -5px; // nudge the slider (rail, thumb, tick labels) up 5px
+
+  // Inset the slider to the middle 83.3% (6 - 1 segments) so the thumb snaps to the CENTER of each
+  // of the six equal color chips (values 0..5 -> 8.3%, 25%, 41.7%, 58.3%, 75%, 91.7%).
+  .sliderRoot {
+    display: block;
+    width: 83.3333%;
+    margin: 0 auto;
+  }
 
   .rail {
+    // Six equal-width category chips (each 1/6). The rail is stretched symmetrically back to the
+    // container's full width (both edges -10% of the inset slider) so the end chips (TS, 5) aren't
+    // half-width and the left/right margins stay balanced.
+    left: -10%;
+    right: -10%;
+    width: auto;
     background: linear-gradient(
       to right,
-      $cat0Color 0 $catStop1,
-      $cat1Color $catStop1 $catStop2,
-      $cat2Color $catStop2 $catStop3,
-      $cat3Color $catStop3 $catStop4,
-      $cat4Color $catStop4 $catStop5,
-      $cat5Color $catStop5 100%
+      $cat0Color 0 16.6667%,
+      $cat1Color 16.6667% 33.3333%,
+      $cat2Color 33.3333% 50%,
+      $cat3Color 50% 66.6667%,
+      $cat4Color 66.6667% 83.3333%,
+      $cat5Color 83.3333% 100%
     );
     border: 1px solid $charcoalMedium;
-    border-radius: 4px;
+    border-radius: 999px; // fully round (pill) ends; caps at half the bar height
     height: 8px;
     opacity: 1;
   }
 
   .thumb {
+    width: 24px;
+    height: 24px;
     background-color: white;
-    border: 2px solid $charcoalMedium;
+    border: 1px solid $charcoalMedium;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35); // matches the MUI switch thumb elevation
     cursor: grab;
 
-    &:active {
+    // Engaged (hover / select / drag): fill with the button hover orange and show the 0.5 white ring
+    // (matches the pressure sliders / buttons, overriding MUI's default grey halo). Cover MUI's
+    // focus/drag classes so it holds while dragging.
+    &:hover, &:active, &:global(.Mui-focusVisible), &:global(.Mui-active) {
+      // currentColor = the current category's color (set via the category class on the thumb), so the
+      // thumb matches the chip it sits on and recolors as it's dragged across the scale. Keep only the
+      // drop-shadow elevation (no white ring — it added little over the colored fill); setting it
+      // explicitly overrides MUI's default grey hover halo.
+      background-color: currentColor;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+    }
+
+    &:active, &:global(.Mui-active) {
       cursor: grabbing;
     }
   }
@@ -42,16 +68,23 @@ $catStop5: 90%;
   }
 
   .markLabel {
-    font-family: $scaleFont;
-    font-size: 12px;
-    font-weight: bold;
+    font-family: inherit; // Lato (the app default), not the Roboto Condensed scale font
+    font-size: 14px;
+    font-weight: 400; // all tick labels are regular; the selected one is bolded (.selectedMarkLabel)
+    color: $charcoal !important; // #222 for every label — overrides MUI's grey inactive-mark colour
     top: 26px;
+  }
+
+  // The label for the currently selected category.
+  .selectedMarkLabel {
+    font-weight: bold;
   }
 }
 
 .categoryName {
-  font-family: $scaleFont;
-  font-size: 12px;
+  font-family: inherit; // Lato (the app default), not the Roboto Condensed scale font
+  font-size: 14px;
   font-weight: bold;
+  margin-top: -3px; // nudge the category-name readout up (net 3px) closer to the tick values
   text-align: center;
 }

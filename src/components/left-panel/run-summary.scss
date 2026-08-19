@@ -1,0 +1,78 @@
+@use "../common" as *;
+
+.runSummary {
+  margin-top: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: $scaleFont; // Roboto Condensed — the app's data/readout font (matches the map labels)
+  font-size: 14px;
+  color: $charcoal;
+
+  .setupHeading {
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $charcoal;
+    margin-bottom: 5px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 16px;
+  }
+
+  .icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .catText {
+    font-weight: 400;
+  }
+
+  // Pressure systems: plain stacked text lines, one per changed system ("H1: moved SSW, 1000 mb"),
+  // or "Default" — same text styling as the other categories.
+  .pressureLines {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  // Each system: label inline with a stacked, left-aligned position / mb, so "Default" and "1028 mb"
+  // line up under each other (label sits on the first line via baseline alignment).
+  .psRow {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .psDetail {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  // System labels (H1, L2…): the map's blue/red, darkened to meet WCAG AA (normal text) on the
+  // card fill #fffaf2. Raw map colors (#327cfc / #fc542d) fail; these pass (~4.9:1 / ~4.8:1).
+  .psHigh { color: #2a69d6; }
+  .psLow  { color: #c93f22; }
+
+  // SST anomalies: plain text stacked (region + signed value), warm = red, cool = blue — matching
+  // the +/- temperature buttons. No pills, so they sit directly on the card fill.
+  .anomList {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .anomVal { white-space: nowrap; }
+
+  .warm { color: $warmColor; }
+  .cool { color: $coldColor; }
+}

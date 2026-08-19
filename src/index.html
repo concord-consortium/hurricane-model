@@ -2,11 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Hurricane Model</title>
-    <meta name="description" content="Hurricane Model">
+    <title>Storm Explorer</title>
+    <meta name="description" content="Storm Explorer">
     <link rel="shortcut icon" href="favicon.ico">
-    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Load the exact weights the app uses: Lato 400/700/900, Roboto Condensed 400/500/600/700.
+         Without explicit weights, Google Fonts serves only 400 and the browser faux-bolds everything. -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Roboto+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       html, body, #app {
         margin: 0;
@@ -16,6 +19,10 @@
       body {
         font-family: 'Lato', sans-serif;
         user-select: none;
+        /* Grayscale antialiasing so text stroke weight matches the Sketch specs (browsers default to
+           a heavier macOS rasterization that reads as slightly bolder). WebKit/macOS only. */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
     </style>
   </head>

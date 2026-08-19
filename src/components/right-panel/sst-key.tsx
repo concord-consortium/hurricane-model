@@ -1,4 +1,4 @@
-import Checkbox from "@mui/material/Checkbox";
+import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import * as React from "react";
 
@@ -37,12 +37,24 @@ const renderTemperatureLabels = (increments: number, tempScaleName: string) => {
   }
   const gradientStyle = { background: `linear-gradient(-180deg, ${keyColorGradientStops.join(", ")})` };
 
+  // Each column carries its own header (°C / °F) so the header centers exactly over that column's
+  // values regardless of their width. The gradient column's header is an empty spacer of equal height
+  // so all three columns line up.
   return <div className={css.scaleContainer}>
-    <div className={css.column}>{celsiusLabels}</div>
-    <div className={css.column}>
-      <div data-test="sea-temp-color-gradient" className={css.scaleGradient} style={gradientStyle} />
+    <div className={css.colWrap}>
+      <div className={css.colHeader}>°C</div>
+      <div className={css.column}>{celsiusLabels}</div>
     </div>
-    <div className={css.column}>{fahrenheitLabels}</div>
+    <div className={css.colWrap}>
+      <div className={css.colHeader} aria-hidden="true" />
+      <div className={css.column}>
+        <div data-test="sea-temp-color-gradient" className={css.scaleGradient} style={gradientStyle} />
+      </div>
+    </div>
+    <div className={css.colWrap}>
+      <div className={css.colHeader}>°F</div>
+      <div className={css.column}>{fahrenheitLabels}</div>
+    </div>
   </div>;
 };
 
@@ -50,7 +62,7 @@ export const SSTKey = observer(function SSTKey() {
   const stores = useStores();
   const { sstOverlay } = stores.ui;
 
-  const toggleAccessibleKey = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const toggleAccessibleKey = (e: React.SyntheticEvent) => {
     const newValue = !sstOverlay.accessibleSSTScale;
     sstOverlay.setAccessibleSSTScale(newValue);
     if (newValue) {
@@ -64,16 +76,28 @@ export const SSTKey = observer(function SSTKey() {
 
   return (
     <div>
-      <div className={`${genericKeyCss.keySubheader} ${css.units}`}><span>°C</span><span>°F</span></div>
       <div className={genericKeyCss.keyContent}>
         { renderTemperatureLabels(9, sstOverlay.sstScaleName) }
       </div>
-      <div className={css.checkbox}>
-        <Checkbox
-          className={css.checkboxElement}
-          checked={sstOverlay.accessibleSSTScale}
-          onClick={toggleAccessibleKey}
-        /> Accessible Key
+      {/* The whole row (box + label) is the control; the MUI Checkbox is presentational (readOnly,
+          no ripple) so the click is handled once here — and it's keyboard-operable. */}
+      <div
+        className={css.checkbox}
+        role="checkbox"
+        aria-checked={sstOverlay.accessibleSSTScale}
+        tabIndex={0}
+        onClick={toggleAccessibleKey}
+        onKeyDown={e => {
+          if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggleAccessibleKey(e); }
+        }}
+      >
+        <span
+          className={clsx(css.box, { [css.boxChecked]: sstOverlay.accessibleSSTScale })}
+          aria-hidden="true"
+        >
+          <span className={css.check} />
+        </span>
+        <span className={css.label}>Accessible Key</span>
       </div>
     </div>
   );

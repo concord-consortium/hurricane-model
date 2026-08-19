@@ -10,6 +10,7 @@ import * as Leaflet from "leaflet";
 
 interface IProps extends IBaseProps {
   model: PressureSystem;
+  systemNumber?: number;
 }
 interface IState {}
 
@@ -21,25 +22,31 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
   };
 
   public render() {
-    const { model } = this.props;
+    const { model, systemNumber } = this.props;
     const { sliderDrag } = this.state;
     const { simulation, ui } = this.stores;
     const { isReportMode, setupMode } = ui;
     const uiDisabled = isReportMode || config.pressureSystemsLocked || ui.thermometerActive ||
       (config.lockSimulationWhileRunning && simulation.simulationStarted);
-    const isStormDisabled = config.mode === "storm" && setupMode !== "pressureSystems";
-    const disabled = uiDisabled || isStormDisabled;
-    const dimmed = setupMode !== undefined && isStormDisabled;
+    // Draggable whenever the setup is editable — no need to open Pressure Systems first; dragging a
+    // marker opens that section (see the drag handlers). Only dim it when another section is active.
+    const disabled = uiDisabled || this.stores.multiTrack.setupLocked;
+    // Only dim to focus another section while the setup is editable. During a run — or while viewing a
+    // finished run — opening a section must NOT fade the H/L markers.
+    const setupEditable = !simulation.simulationStarted && !this.stores.multiTrack.setupLocked;
+    const dimmed = setupEditable && setupMode !== undefined && setupMode !== "pressureSystems";
     return (
       <LeafletCustomMarker
         position={model.center}
         onDrag={this.handlePressureSysDrag}
         onDragEnd={this.handlePressureSysDragEnd}
+        onClick={!disabled ? this.handlePressureSysClick : undefined}
         // Disable dragging when slider is being dragged, so they don't interfere.
         draggable={!sliderDrag && !disabled}
       >
         <PressureSystemIcon
           model={model}
+          systemNumber={systemNumber}
           dimmed={dimmed}
           disabled={disabled}
           onSliderDrag={this.handleDrag}
@@ -51,11 +58,22 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
 
   public handlePressureSysDrag = (e: Leaflet.LeafletMouseEvent) => {
     const { model } = this.props;
+    // Reveal the Pressure Systems section as soon as a marker is being moved.
+    if (this.stores.ui.setupMode !== "pressureSystems") this.stores.ui.setSetupMode("pressureSystems");
     this.stores.simulation.setPressureSysCenter(model, e.latlng);
+  }
+
+  // A plain click (no drag) opens the panel + Pressure Systems section, same as finishing a drag.
+  public handlePressureSysClick = () => {
+    this.stores.ui.setLeftPanelOpen(true);
+    this.stores.ui.setSetupMode("pressureSystems");
   }
 
   public handlePressureSysDragEnd = () => {
     const { model } = this.props;
+    // Make sure the Pressure Systems section is visible in the setup panel.
+    this.stores.ui.setLeftPanelOpen(true);
+    this.stores.ui.setSetupMode("pressureSystems");
     log("PressureSystemMoved", { type: model.type, lat: model.center.lat, lng: model.center.lng });
   }
 

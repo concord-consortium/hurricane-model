@@ -1,0 +1,27 @@
+@use "../common" as *;
+
+// SST anomaly value labels — Roboto Condensed, matching the result read-outs.
+.sstLabel {
+  font-family: $scaleFont;
+}
+
+// The two SST scale images (default + accessible) are stacked; toggling the accessible key fades
+// their opacities so the swap cross-fades instead of hard-cutting.
+.sstLayer {
+  transition: opacity 0.2s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sstLayer {
+    transition: none;
+  }
+}
+
+.thumb {
+  display: block;
+  // 5px wider than the .thumbCrop frame and pulled back so 2.5px is clipped off each side (and ~2px
+  // top/bottom to keep the map's proportions un-squished within the narrower frame). The border,
+  // radius, and ocean fallback live on .thumbCrop so the cropped edges read as a clean rounded box.
+  width: calc(100% + 5px);
+  aspect-ratio: 100 / 78;
+  margin: -2px -2.5px;
+}
