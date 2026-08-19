@@ -15,8 +15,7 @@
   right: 8px;
   padding: 4px;
   background: none;
-  // Transparent, not absent, so dialogButtonFill's active state has a border to recolor.
-  border: 1px solid transparent;
+  border: none;
   border-radius: 4px;
   color: $charcoalMedium;
   cursor: pointer;
