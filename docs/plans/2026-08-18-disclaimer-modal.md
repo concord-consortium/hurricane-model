@@ -4,7 +4,7 @@
 
 **Goal:** Show a blocking "This is a simulation and cannot be used to make a forecast." modal when Storm Explorer loads.
 
-**Architecture:** Reuse the existing `Dialog` component (`src/components/dialog.tsx`), which already wraps MUI's `Dialog` and supplies the darkened backdrop, focus trap, scroll lock and top-right close button. Make its `title` prop optional so the disclaimer can render without one, and restyle its close button's hover/active to match the new "Got it" button. A new `DisclaimerModal` component supplies the icon, message and button as `children`, and `IndexPage` mounts it.
+**Architecture:** Reuse the existing `Dialog` component (`src/components/dialog.tsx`), which already wraps MUI's `Dialog` and supplies the darkened backdrop, focus trap, scroll lock and top-right close button. Three changes to it, all of which apply app-wide: make `title` optional so the disclaimer can render without one, restyle its close button's hover/active to match the new "Got it" button, and stop backdrop clicks from closing it. A new `DisclaimerModal` component supplies the icon, message and button as `children`, and `IndexPage` mounts it.
 
 **Tech Stack:** React 18 + TypeScript, MobX 6 (`mobx-react` `observer`), MUI 5 (`@mui/material`, `@mui/icons-material`), SCSS modules, Jest + React Testing Library, Cypress.
 
@@ -128,7 +128,106 @@ git commit -m "Make Dialog title optional"
 
 ---
 
-## Task 3: Add the shared button-fill mixin
+## Task 3: Stop dialogs closing on a backdrop click
+
+This applies to every dialog in the app — About and Share as well as the disclaimer. A dialog should close because the user chose to close it, not because they clicked slightly wide of it.
+
+Escape still closes. That is an established expectation for modals and, unlike a stray click, it is unambiguously deliberate.
+
+**Files:**
+- Modify: `src/components/dialog.tsx`
+- Test: `src/components/dialog.test.tsx`
+
+**Step 1: Write the failing tests**
+
+Add to `src/components/dialog.test.tsx`, inside the existing `describe`. You will need `userEvent`, so add this import at the top of the file if it is not already there:
+
+```tsx
+import userEvent from "@testing-library/user-event";
+```
+
+Then the tests:
+
+```tsx
+  it("does not close when the backdrop is clicked", async () => {
+    const user = userEvent.setup();
+    const onClose = jest.fn();
+    const { baseElement } = render(
+      <Dialog open={true} onClose={onClose} title="Test Dialog" />
+    );
+    // MUI renders the backdrop in a portal, outside the container the render
+    // helper returns, so query from baseElement rather than container.
+    const backdrop = baseElement.querySelector(".MuiBackdrop-root");
+    expect(backdrop).toBeInTheDocument();
+    await user.click(backdrop!);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("closes when escape is pressed", async () => {
+    const user = userEvent.setup();
+    const onClose = jest.fn();
+    render(<Dialog open={true} onClose={onClose} title="Test Dialog" />);
+    await user.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it("closes when the close button is clicked", async () => {
+    const user = userEvent.setup();
+    const onClose = jest.fn();
+    render(<Dialog open={true} onClose={onClose} title="Test Dialog" />);
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(onClose).toHaveBeenCalled();
+  });
+```
+
+The last two are not strictly new behavior, but without them a later refactor could silently break every way of closing a dialog and still pass.
+
+**Step 2: Run them and watch the first one fail**
+
+Run: `npx jest src/components/dialog.test.tsx`
+Expected: the backdrop test FAILS with `expect(jest.fn()).not.toHaveBeenCalled()` — MUI currently calls `onClose` for backdrop clicks. The escape and close-button tests should already PASS.
+
+**Step 3: Filter the close reason**
+
+In `src/components/dialog.tsx`, add a handler above the `return` and pass it to `MuiDialog` in place of `onClose`:
+
+```tsx
+  // MUI calls onClose for backdrop clicks, escape, and nothing else. Swallow
+  // backdrop clicks so a dialog only closes deliberately; callers keep their
+  // simple `() => void` signature and never see the reason.
+  const handleClose = (event: object, reason: "backdropClick" | "escapeKeyDown") => {
+    if (reason === "backdropClick") return;
+    onClose();
+  };
+```
+
+```tsx
+    <MuiDialog
+      onClose={handleClose}
+```
+
+Leave the close button's own `onClick={onClose}` alone — it does not go through MUI.
+
+**Step 4: Run the tests and watch them pass**
+
+Run: `npx jest src/components/dialog.test.tsx`
+Expected: PASS, 5 tests.
+
+**Step 5: Confirm the other dialogs still close**
+
+Run: `npx jest src/components/top-bar`
+Expected: PASS.
+
+**Step 6: Commit**
+
+```bash
+git add src/components/dialog.tsx src/components/dialog.test.tsx
+git commit -m "Stop dialogs closing on backdrop clicks"
+```
+
+---
+
+## Task 4: Add the shared button-fill mixin
 
 **Files:**
 - Modify: `src/components/common.scss`
@@ -167,7 +266,7 @@ git commit -m "Add dialogButtonFill mixin for shared button hover/active"
 
 ---
 
-## Task 4: Restyle the shared close button
+## Task 5: Restyle the shared close button
 
 This intentionally changes the About and Share dialogs' close buttons too. That was the explicit decision: one close-button treatment across the app.
 
@@ -221,7 +320,7 @@ git commit -m "Give dialog close button a filled hover and active state"
 
 ---
 
-## Task 5: Build the DisclaimerModal component
+## Task 6: Build the DisclaimerModal component
 
 **Files:**
 - Create: `src/components/disclaimer-modal.tsx`
@@ -313,10 +412,20 @@ describe("DisclaimerModal component", () => {
     expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
     expect(logSpy).toHaveBeenCalledWith("DisclaimerDismissed", { source: "close" });
   });
+
+  it("stays open when the backdrop is clicked", async () => {
+    const user = userEvent.setup();
+    const { baseElement } = renderModal();
+    await user.click(baseElement.querySelector(".MuiBackdrop-root")!);
+    expect(screen.getByText(MESSAGE)).toBeInTheDocument();
+    expect(logSpy).not.toHaveBeenCalled();
+  });
 });
 ```
 
 Note `queryByText` returns null when absent, `getByText` throws. Use `queryBy*` for every "should not exist" assertion.
+
+The backdrop test duplicates coverage in `dialog.test.tsx` on purpose. Task 3 proves the shared component swallows backdrop clicks; this proves the disclaimer actually benefits, which is the requirement that matters.
 
 **Step 2: Run the tests and watch them fail**
 
@@ -426,12 +535,12 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
 });
 ```
 
-`onClose` also fires on escape and on backdrop click; both are logged as `"close"` because the shared `Dialog` drops MUI's `reason` argument.
+`onClose` fires for the close button and for escape, both logged as `"close"`. Backdrop clicks never reach it — Task 3 filters them out inside `Dialog`.
 
 **Step 5: Run the tests and watch them pass**
 
 Run: `npx jest src/components/disclaimer-modal.test.tsx`
-Expected: PASS, 6 tests.
+Expected: PASS, 7 tests.
 
 If the "does not show in report mode" test fails, check that you used `ui.isReportMode` and not `ui.readOnly` — the latter does not exist.
 
@@ -444,7 +553,7 @@ git commit -m "Add disclaimer modal component"
 
 ---
 
-## Task 6: Mount the modal in IndexPage
+## Task 7: Mount the modal in IndexPage
 
 **Files:**
 - Modify: `src/components/index-page.tsx`
@@ -469,7 +578,7 @@ Expected: PASS. Those tests do not set `mode=storm`, so the modal stays closed a
 **Step 4: Verify in the browser**
 
 Run: `npm start`, open `http://localhost:8080/?mode=storm`.
-Expected: darkened page, centered modal, warning icon, the message, a "Got it" button, an X top right. Both buttons close it. Hovering either shows the pale orange fill; holding either shows solid orange with no border.
+Expected: darkened page, centered modal, warning icon, the message, a "Got it" button, an X top right. Both buttons close it. Hovering either shows the pale orange fill; holding either shows solid orange with no border. Clicking the darkened area outside the modal does nothing.
 
 Then open `http://localhost:8080/?mode=storm&disclaimer=false` — no modal. And `http://localhost:8080/` — no modal.
 
@@ -484,7 +593,7 @@ git commit -m "Show disclaimer modal on Storm Explorer load"
 
 ---
 
-## Task 7: Document the log event
+## Task 8: Document the log event
 
 **Files:**
 - Modify: `LOGGED-EVENTS.md`
@@ -494,7 +603,7 @@ git commit -m "Show disclaimer modal on Storm Explorer load"
 In the `## Dialogs` table at the end of `LOGGED-EVENTS.md`, add:
 
 ```
-| `DisclaimerDismissed` | `{ source }` | User dismisses the load-time disclaimer modal (`source` is `"gotIt"` for the Got it button, or `"close"` for the close button, escape key or backdrop click) |
+| `DisclaimerDismissed` | `{ source }` | User dismisses the load-time disclaimer modal (`source` is `"gotIt"` for the Got it button, or `"close"` for the close button or escape key) |
 ```
 
 **Step 2: Commit**
@@ -506,7 +615,7 @@ git commit -m "Document DisclaimerDismissed event"
 
 ---
 
-## Task 8: Keep the Cypress specs unblocked
+## Task 9: Keep the Cypress specs unblocked
 
 Only `storm.cy.js` visits with `mode=storm`, so it is the only spec the modal blocks. The others load hurricane mode and never see it.
 
@@ -543,7 +652,7 @@ git commit -m "Skip disclaimer modal in storm Cypress spec"
 
 ---
 
-## Task 9: Full verification
+## Task 10: Full verification
 
 **Step 1: Lint**
 
@@ -577,5 +686,5 @@ Do not claim the work is done until every one of these five has actually been ru
 ## Out of scope
 
 - Persisting dismissal across reloads. The modal shows on every load by design.
-- Requiring explicit acknowledgement. Backdrop click and escape currently dismiss it, per MUI's default. Making the disclaimer un-dismissable except via the two buttons would mean widening `Dialog`'s `onClose` to forward MUI's `reason`. Raise it with the user rather than building it.
+- Blocking the escape key. Task 3 stops backdrop clicks only. Escape still closes every dialog, which is the standard modal expectation.
 - A bespoke warning icon. MUI's `WarningIcon` is a deliberate placeholder.

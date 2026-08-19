@@ -34,7 +34,7 @@ The modal appears only when:
 focus trap, scroll lock and a top-right close button. Reuse it rather than
 building a second modal.
 
-Two changes:
+Three changes:
 
 1. `title` becomes optional. When absent, the title element is not rendered and
    `aria-labelledby` is omitted. The About and Share dialogs still pass a title
@@ -42,6 +42,14 @@ Two changes:
 2. `.closeButton` gains a filled hover and active state (see Button styling).
    This changes the About and Share dialogs' close buttons too, which is
    intended — the app should have one close-button treatment.
+3. Backdrop clicks no longer close any dialog. MUI passes a `reason` to
+   `onClose`; `Dialog` currently discards it and closes on everything. It will
+   instead ignore `"backdropClick"` and forward the rest. This applies to About
+   and Share as well as the disclaimer — a dialog should close because the user
+   chose to close it, not because they clicked slightly wide of it.
+
+   Escape still closes. It is an established expectation for modals and,
+   unlike a stray click, it is unambiguously deliberate.
 
 The icon, message and "Got it" button are passed as `children`. No `icon` or
 `footer` props.
@@ -91,15 +99,10 @@ modal, so they append `disclaimer=false` to their visit URL.
 ## Logging
 
 `log("DisclaimerDismissed", { source })` fires on close, where `source` is
-`"gotIt"` or `"close"`. The shared `Dialog`'s `onClose` is typed `() => void`
-and drops MUI's `reason` argument, so a close-button click, an escape key and a
-backdrop click all arrive as `"close"`. Splitting them would mean widening the
-shared signature for one caller; not worth it. Documented in `LOGGED-EVENTS.md`.
-
-Backdrop click and escape therefore still dismiss the modal, per MUI's default.
-If the disclaimer must require an explicit acknowledgement, `Dialog` would need
-to forward MUI's `reason` so the modal can ignore `"backdropClick"`. Flagged,
-not built.
+`"gotIt"` or `"close"`. `Dialog`'s `onClose` stays typed `() => void`: it now
+inspects MUI's `reason` internally to drop backdrop clicks, but callers do not
+need to know why a dialog closed, so the close button and the escape key both
+arrive as `"close"`. Documented in `LOGGED-EVENTS.md`.
 
 ## Testing
 
@@ -110,5 +113,7 @@ Jest, in `disclaimer-modal.test.tsx`:
 - absent in hurricane mode
 - absent when `ui.isReportMode`
 - each button closes it and logs with the right `source`
+- a backdrop click leaves it open
 
-Existing `dialog.test.tsx` gains a case for the untitled variant.
+Existing `dialog.test.tsx` gains cases for the untitled variant and for
+backdrop clicks not calling `onClose`.
