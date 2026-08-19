@@ -116,6 +116,12 @@ export const KNOWN_PARAMETERS: IParameterDoc[] = [
     description: "Show top bar with reload, share, and about buttons"
   },
   {
+    name: "skipDisclaimer",
+    type: "boolean",
+    validValues: "true, false",
+    description: "Suppress the load-time liability disclaimer modal"
+  },
+  {
     name: "startLocationButton",
     type: "boolean",
     validValues: "true, false",
