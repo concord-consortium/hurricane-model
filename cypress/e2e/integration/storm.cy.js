@@ -8,7 +8,7 @@ const simulation = new Simulation;
 
 context("Test the Hurricane Model app", () => {
   beforeEach(() => {
-    cy.visit("/?mode=storm");
+    cy.visit("/?mode=storm&skipDisclaimer");
   });
 
   it("renders Leaflet map", () => {
