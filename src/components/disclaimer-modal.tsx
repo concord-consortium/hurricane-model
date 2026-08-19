@@ -1,7 +1,7 @@
-import WarningIcon from "@mui/icons-material/Warning";
 import { observer } from "mobx-react";
 import React, { useId, useState } from "react";
 
+import WarningIcon from "../assets/warning.svg";
 import config from "../config";
 import { log } from "../log";
 import { useStores } from "../stores-context";
