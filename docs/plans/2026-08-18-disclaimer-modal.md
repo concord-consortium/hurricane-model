@@ -702,7 +702,13 @@ Expected: no errors.
 **Step 2: Unused-symbol check**
 
 Run: `npm run lint:unused`
-Expected: no errors.
+Expected: exactly one error, pre-existing and identical on `master`:
+
+```
+src/components/bottom-bar/select-button.tsx(65,7): error TS6133: 'OptionalCheck' is declared but its value is never read.
+```
+
+Do not fix it — it is outside this work. Any *other* error is yours.
 
 **Step 3: Full Jest suite**
 
