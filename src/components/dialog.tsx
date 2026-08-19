@@ -13,9 +13,18 @@ interface IProps {
 
 export const Dialog: FC<IProps> = ({ onClose, open, title, ariaDescribedBy, children }) => {
   const titleId = useId();
+
+  // MUI calls onClose for backdrop clicks, escape, and nothing else. Swallow
+  // backdrop clicks so a dialog only closes deliberately; callers keep their
+  // simple `() => void` signature and never see the reason.
+  const handleClose = (event: object, reason: "backdropClick" | "escapeKeyDown") => {
+    if (reason === "backdropClick") return;
+    onClose();
+  };
+
   return (
     <MuiDialog
-      onClose={onClose}
+      onClose={handleClose}
       open={open}
       maxWidth="lg"
       // MUI generates a fallback aria-labelledby id when its own prop is undefined, and that id points
