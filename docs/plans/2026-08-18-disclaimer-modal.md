@@ -336,8 +336,7 @@ Replace the `.closeButton` rule in `src/components/dialog.scss` with:
   right: 8px;
   padding: 4px;
   background: none;
-  // Transparent, not absent, so dialogButtonFill's active state has a border to recolor.
-  border: 1px solid transparent;
+  border: none;
   border-radius: 4px;
   color: $charcoalMedium;
   cursor: pointer;
@@ -503,28 +502,28 @@ Create `src/components/disclaimer-modal.scss`:
     color: $secondaryColor;
     font-size: 48px;
   }
-}
 
-.message {
-  margin: 16px 0 24px;
-  font-size: 16px;
-  line-height: 1.4;
-  color: $charcoal;
-}
+  .message {
+    margin: 16px 0 24px;
+    font-size: 16px;
+    line-height: 1.4;
+    color: $charcoal;
+  }
 
-.gotItButton {
-  padding: 6px 20px;
-  font-family: inherit;
-  font-size: 14px;
-  color: $charcoal;
-  background: none;
-  border: 1px solid $charcoalMedium;
-  border-radius: 4px;
-  cursor: pointer;
-  @include dialogButtonFill;
-  &:focus-visible {
-    outline: 2px solid $charcoal;
-    outline-offset: 2px;
+  .gotItButton {
+    padding: 6px 20px;
+    font-family: inherit;
+    font-size: 14px;
+    color: $charcoal;
+    background: none;
+    border: 1px solid $charcoalMedium;
+    border-radius: 4px;
+    cursor: pointer;
+    @include dialogButtonFill;
+    &:focus-visible {
+      outline: 2px solid $charcoal;
+      outline-offset: 2px;
+    }
   }
 }
 ```
