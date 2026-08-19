@@ -293,7 +293,7 @@ Append to `src/components/common.scss`, **above** the `:export` block at the bot
 
 ```scss
 // Active recolors the border rather than removing it so the button keeps its size.
-@mixin dialogButtonFill {
+@mixin dialogButton {
   &:hover {
     background-color: $secondaryColorHover;
   }
@@ -301,8 +301,14 @@ Append to `src/components/common.scss`, **above** the `:export` block at the bot
     background-color: $secondaryColor;
     border-color: transparent;
   }
+  &:focus-visible {
+    outline: 2px solid $charcoal;
+    outline-offset: 2px;
+  }
 }
 ```
+
+The close button and the "Got it" button are required to behave identically, so every shared interactive state lives here — hover, active and focus ring alike. Neither consumer declares its own `:focus-visible`.
 
 **Step 2: Verify the build still compiles the SCSS**
 
@@ -313,7 +319,7 @@ Expected: PASS. (Jest maps SCSS through a mock, so this only proves nothing brok
 
 ```bash
 git add src/components/common.scss
-git commit -m "Add dialogButtonFill mixin for shared button hover/active"
+git commit -m "Add dialogButton mixin for shared button interactive states"
 ```
 
 ---
@@ -344,11 +350,7 @@ Replace the `.closeButton` rule in `src/components/dialog.scss` with:
   &:hover {
     color: $charcoal;
   }
-  @include dialogButtonFill;
-  &:focus-visible {
-    outline: 2px solid $charcoal;
-    outline-offset: 2px;
-  }
+  @include dialogButton;
 }
 ```
 
@@ -385,7 +387,6 @@ Create `src/components/disclaimer-modal.test.tsx`:
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Provider } from "mobx-react";
 
 import config from "../config";
 import * as logModule from "../log";
@@ -417,11 +418,9 @@ describe("DisclaimerModal component", () => {
   });
 
   const renderModal = () => render(
-    <Provider stores={stores}>
-      <StoresContext value={stores}>
-        <DisclaimerModal />
-      </StoresContext>
-    </Provider>
+    <StoresContext value={stores}>
+      <DisclaimerModal />
+    </StoresContext>
   );
 
   it("shows the disclaimer in storm mode", () => {
@@ -453,6 +452,7 @@ describe("DisclaimerModal component", () => {
     await user.click(screen.getByRole("button", { name: "Got it" }));
     expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
     expect(logSpy).toHaveBeenCalledWith("DisclaimerDismissed", { source: "gotIt" });
+    expect(logSpy).toHaveBeenCalledTimes(1);
   });
 
   it("closes and logs when the close button is clicked", async () => {
@@ -461,6 +461,7 @@ describe("DisclaimerModal component", () => {
     await user.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
     expect(logSpy).toHaveBeenCalledWith("DisclaimerDismissed", { source: "close" });
+    expect(logSpy).toHaveBeenCalledTimes(1);
   });
 
   it("stays open when the backdrop is clicked", async () => {
@@ -519,11 +520,7 @@ Create `src/components/disclaimer-modal.scss`:
     border: 1px solid $charcoalMedium;
     border-radius: 4px;
     cursor: pointer;
-    @include dialogButtonFill;
-    &:focus-visible {
-      outline: 2px solid $charcoal;
-      outline-offset: 2px;
-    }
+    @include dialogButton;
   }
 }
 ```
