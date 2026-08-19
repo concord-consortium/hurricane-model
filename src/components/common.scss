@@ -50,13 +50,17 @@ $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.
 }
 
 // Active recolors the border rather than removing it so the button keeps its size.
-@mixin dialogButtonFill {
+@mixin dialogButton {
   &:hover {
     background-color: $secondaryColorHover;
   }
   &:active {
     background-color: $secondaryColor;
     border-color: transparent;
+  }
+  &:focus-visible {
+    outline: 2px solid $charcoal;
+    outline-offset: 2px;
   }
 }
 
