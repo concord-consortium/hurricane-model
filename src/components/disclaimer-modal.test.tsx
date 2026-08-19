@@ -2,7 +2,6 @@ import * as React from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { backdropClasses } from "@mui/material/Backdrop";
-import { Provider } from "mobx-react";
 
 import config from "../config";
 import * as logModule from "../log";
@@ -34,11 +33,9 @@ describe("DisclaimerModal component", () => {
   });
 
   const renderModal = () => render(
-    <Provider stores={stores}>
-      <StoresContext value={stores}>
-        <DisclaimerModal />
-      </StoresContext>
-    </Provider>
+    <StoresContext value={stores}>
+      <DisclaimerModal />
+    </StoresContext>
   );
 
   it("shows the disclaimer in storm mode", () => {
@@ -84,6 +81,7 @@ describe("DisclaimerModal component", () => {
     // The dialog stays mounted through its closing transition, so wait it out.
     await waitFor(() => expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument());
     expect(logSpy).toHaveBeenCalledWith("DisclaimerDismissed", { source: "gotIt" });
+    expect(logSpy).toHaveBeenCalledTimes(1);
   });
 
   it("closes and logs when the close button is clicked", async () => {
@@ -92,6 +90,7 @@ describe("DisclaimerModal component", () => {
     await user.click(screen.getByRole("button", { name: "Close" }));
     await waitFor(() => expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument());
     expect(logSpy).toHaveBeenCalledWith("DisclaimerDismissed", { source: "close" });
+    expect(logSpy).toHaveBeenCalledTimes(1);
   });
 
   it("stays open when the backdrop is clicked", async () => {
