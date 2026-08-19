@@ -6,7 +6,7 @@ import css from "./dialog.scss";
 interface IProps {
   onClose: () => void;
   open: boolean;
-  title: string;
+  title?: string;
   ariaDescribedBy?: string;
   children?: ReactNode;
 }
@@ -18,11 +18,14 @@ export const Dialog: FC<IProps> = ({ onClose, open, title, ariaDescribedBy, chil
       onClose={onClose}
       open={open}
       maxWidth="lg"
-      aria-labelledby={titleId}
+      // MUI generates a fallback aria-labelledby id when its own prop is undefined, and that id points
+      // at a title element a title-less dialog never renders. Labelling the paper (the element that
+      // carries role="dialog") directly lets undefined mean "no label".
+      slotProps={{ paper: { "aria-labelledby": title ? titleId : undefined } }}
       aria-describedby={ariaDescribedBy}
     >
       <div className={css.dialogBody}>
-        <div id={titleId} className={css.title}>{ title }</div>
+        { title && <div id={titleId} className={css.title}>{ title }</div> }
         <button
           type="button"
           aria-label="Close"
