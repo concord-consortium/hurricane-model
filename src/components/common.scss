@@ -49,6 +49,17 @@ $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.
   border-bottom: 1px solid #ffeeba;
 }
 
+// Active recolors the border rather than removing it so the button keeps its size.
+@mixin dialogButtonFill {
+  &:hover {
+    background-color: $secondaryColorHover;
+  }
+  &:active {
+    background-color: $secondaryColor;
+    border-color: transparent;
+  }
+}
+
 // Exported to JS via the :export block below and consumed by map-view.tsx.
 // Renaming a key or removing the :export block silently yields `undefined` in JS.
 :export {
