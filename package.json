@@ -52,7 +52,7 @@
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "lint:build": "LINT_BUILD=1 eslint 'src/**/*.{ts,tsx}'",
     "lint:fix": "eslint --fix 'src/**/*.{ts,tsx}'",
-    "lint:unused": "tsc --noUnusedLocals --project .",
+    "lint:unused": "tsc --noUnusedLocals --noEmit --project .",
     "test": "jest",
     "test:all": "npm-run-all build test start",
     "test:coverage": "jest --coverage",

@@ -77,6 +77,9 @@ const DEFAULT_CONFIG: any = {
   season: "fall",
   // App mode - "hurricane" for simple original version or "storm" for newer more complex variant
   mode: "hurricane",
+  // Suppresses the liability disclaimer modal, which otherwise shows on every
+  // load in storm mode.
+  skipDisclaimer: false,
   // One of the available maps: "satellite", "relief", "street" or "population".
   map: "satellite",
   enablePopulationMap: false,

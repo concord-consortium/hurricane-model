@@ -74,6 +74,7 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
   const hasRestoredState = useRef(false);
   const seedLoadStarted = useRef(false);
   const [modelLoadError, setModelLoadError] = useState<string | null>(null);
+  const [authoredStateApplied, setAuthoredStateApplied] = useState(false);
 
   // LARA API hooks
   const initMessage = useInitMessage<IHurricaneInteractiveState, IHurricaneAuthoredState>();
@@ -86,7 +87,9 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
     setAuthoredState
   } = useAuthoredState<IHurricaneAuthoredState>();
 
-  const isLoading = !initMessage;
+  // config is a plain object, so components that read it at mount never re-render when
+  // applyAuthoredState mutates it. Hold the app back until that has happened.
+  const isLoading = !initMessage || !authoredStateApplied;
 
   // Auto-height reporting - returns a callback ref for the container
   const containerRef = useAutoHeight({ disabled: isLoading });
@@ -104,9 +107,11 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
   // state always takes precedence (applied in the next useEffect).
   // Must come BEFORE conditional returns to comply with Rules of Hooks.
   useEffect(() => {
-    if (initMessage && stores.ui.mode !== "authoring" && authoredState) {
+    if (!initMessage) return;
+    if (stores.ui.mode !== "authoring" && authoredState) {
       applyAuthoredState(authoredState);
     }
+    setAuthoredStateApplied(true);
     // Intentionally depends only on initMessage:
     // - stores.ui.mode is set synchronously in the previous useEffect from initMessage.mode
     // - authoredState is available from LARA at the same time as initMessage

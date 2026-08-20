@@ -1,28 +1,43 @@
 import React, { FC, ReactNode, useId } from "react";
-import MuiDialog from "@mui/material/Dialog";
+import MuiDialog, { DialogProps } from "@mui/material/Dialog";
 import CloseIcon from "@mui/icons-material/Close";
 import css from "./dialog.scss";
 
 interface IProps {
   onClose: () => void;
   open: boolean;
-  title: string;
+  title?: string;
+  // Accessible name for a dialog with no visible title. Ignored when title is set.
+  ariaLabel?: string;
   ariaDescribedBy?: string;
   children?: ReactNode;
 }
 
-export const Dialog: FC<IProps> = ({ onClose, open, title, ariaDescribedBy, children }) => {
+export const Dialog: FC<IProps> = ({ onClose, open, title, ariaLabel, ariaDescribedBy, children }) => {
   const titleId = useId();
+
+  // Escape is the only MUI-reported reason we honor, so a reason MUI adds later cannot
+  // dismiss a dialog by default.
+  const handleClose: NonNullable<DialogProps["onClose"]> = (_event, reason) => {
+    if (reason !== "escapeKeyDown") return;
+    onClose();
+  };
+
   return (
     <MuiDialog
-      onClose={onClose}
+      onClose={handleClose}
       open={open}
       maxWidth="lg"
-      aria-labelledby={titleId}
+      // MUI's own aria-labelledby prop fabricates a dangling id when undefined. Label the paper
+      // instead: slotProps override MUI's internal value even when explicitly undefined.
+      slotProps={{ paper: {
+        "aria-labelledby": title ? titleId : undefined,
+        "aria-label": title ? undefined : ariaLabel ?? "Untitled Dialog"
+      } }}
       aria-describedby={ariaDescribedBy}
     >
       <div className={css.dialogBody}>
-        <div id={titleId} className={css.title}>{ title }</div>
+        { title && <div id={titleId} className={css.title}>{ title }</div> }
         <button
           type="button"
           aria-label="Close"

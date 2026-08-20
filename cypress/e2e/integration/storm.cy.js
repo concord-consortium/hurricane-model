@@ -1,18 +1,30 @@
 import { BottomBar } from "../../support/elements/bottom-bar";
+import { DisclaimerModal } from "../../support/elements/disclaimer-modal";
 import { SetupPanel } from "../../support/elements/setup-panel";
 import { Simulation } from "../../support/elements/simulation";
 
 const bottomBar = new BottomBar;
+const disclaimerModal = new DisclaimerModal;
 const setupPanel = new SetupPanel;
 const simulation = new Simulation;
 
 context("Test the Hurricane Model app", () => {
   beforeEach(() => {
+    cy.visit("/?mode=storm&skipDisclaimer");
+  });
+
+  // The other tests suppress the disclaimer, so this one re-visits without skipDisclaimer.
+  it("shows the disclaimer on load and dismisses it with Got it", () => {
     cy.visit("/?mode=storm");
+    disclaimerModal.confirmOpen();
+    disclaimerModal.checkMessage("This is a simulation and cannot be used to make a forecast.");
+    disclaimerModal.getGotItButton().click();
+    disclaimerModal.confirmClosed();
+    cy.get(".app--app--__hurr-v1__").find(".leaflet-container").should("be.visible");
   });
 
   it("renders Leaflet map", () => {
-    cy.get(".app--app--__hurr-v1__").get(".leaflet-container").should("be.visible") ;
+    cy.get(".app--app--__hurr-v1__").find(".leaflet-container").should("be.visible") ;
   });
 
   it("does not include start location or season buttons in the bottom bar", () => {

@@ -82,6 +82,12 @@ describe("parse-authored-params", () => {
       expect(result.errors).toEqual([]);
     });
 
+    it("accepts skipDisclaimer written as a bare switch", () => {
+      const result = validateUrlParams("skipDisclaimer");
+      expect(result.valid).toBe(true);
+      expect(result.errors).toEqual([]);
+    });
+
     it("returns error for unknown parameter", () => {
       const result = validateUrlParams("unknownParam=value");
       expect(result.valid).toBe(false);
@@ -172,6 +178,14 @@ describe("parse-authored-params", () => {
       const param = KNOWN_PARAMETERS.find(p => p.name === "topBarVisible");
       expect(param?.type).toBe("boolean");
       expect(param?.description).toContain("top bar");
+    });
+
+    it("includes skipDisclaimer parameter", () => {
+      const names = KNOWN_PARAMETERS.map(p => p.name);
+      expect(names).toContain("skipDisclaimer");
+      const param = KNOWN_PARAMETERS.find(p => p.name === "skipDisclaimer");
+      expect(param?.type).toBe("boolean");
+      expect(param?.description).toContain("disclaimer");
     });
 
     it("all parameters have required fields", () => {
