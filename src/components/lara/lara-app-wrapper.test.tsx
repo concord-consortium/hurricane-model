@@ -5,8 +5,17 @@ import * as interactiveStateModule from "../../models/interactive-state";
 import * as cloudStorage from "../../utils/cloud-storage";
 import config from "../../config";
 
+// Records config.mode as of each AppComponent render, so a test can assert the app
+// never renders while config still holds pre-authored-state values.
+const mockConfigModeAtAppRender: string[] = [];
+
 // Stub heavy children so we only exercise the wrapper's own logic.
-jest.mock("../app", () => ({ AppComponent: () => <div data-test="app-component" /> }));
+jest.mock("../app", () => ({
+  AppComponent: () => {
+    mockConfigModeAtAppRender.push(require("../../config").default.mode);
+    return <div data-test="app-component" />;
+  }
+}));
 jest.mock("./authoring-interface", () => ({ AuthoringInterface: () => <div /> }));
 jest.mock("./loading-indicator", () => ({ LoadingIndicator: () => <div data-test="loading" /> }));
 jest.mock("../../hooks/use-auto-height", () => ({ useAutoHeight: () => () => undefined }));
@@ -84,5 +93,29 @@ describe("LaraAppWrapper model seeding", () => {
     render(<LaraAppWrapper stores={createStores()} />);
 
     await waitFor(() => expect(loadSpy).toHaveBeenCalledWith("seed999"));
+  });
+
+  // config is a plain object, so a component that reads it at mount never re-renders
+  // when applyAuthoredState mutates it afterwards. The app must not mount until then.
+  it("does not render the app until authored state has been applied", async () => {
+    const oldMode = config.mode;
+    mockConfigModeAtAppRender.length = 0;
+    jest.spyOn(interactiveStateModule, "setInteractiveState").mockImplementation(() => undefined);
+
+    (useInitMessage as jest.Mock).mockReturnValue({ mode: "runtime" });
+    (useInteractiveState as jest.Mock).mockReturnValue({ interactiveState: undefined, setInteractiveState: jest.fn() });
+    (useAuthoredState as jest.Mock).mockReturnValue({
+      authoredState: { version: 1, urlParams: "mode=storm" },
+      setAuthoredState: jest.fn()
+    });
+
+    const { findByTestId } = render(<LaraAppWrapper stores={createStores()} />);
+    await findByTestId("app-component");
+
+    expect(mockConfigModeAtAppRender.length).toBeGreaterThan(0);
+    expect(mockConfigModeAtAppRender).not.toContain(oldMode);
+    expect(mockConfigModeAtAppRender.every(mode => mode === "storm")).toBe(true);
+
+    config.mode = oldMode;
   });
 });
