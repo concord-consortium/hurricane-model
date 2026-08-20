@@ -32,7 +32,7 @@ export const Dialog: FC<IProps> = ({ onClose, open, title, ariaLabel, ariaDescri
       // instead: slotProps override MUI's internal value even when explicitly undefined.
       slotProps={{ paper: {
         "aria-labelledby": title ? titleId : undefined,
-        "aria-label": title ? undefined : ariaLabel
+        "aria-label": title ? undefined : ariaLabel ?? "Untitled Dialog"
       } }}
       aria-describedby={ariaDescribedBy}
     >
