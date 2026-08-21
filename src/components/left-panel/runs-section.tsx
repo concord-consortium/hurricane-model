@@ -11,12 +11,14 @@ export const RunsSection = observer(function RunsSection() {
   const { runs, ui } = useStores();
 
   const handleNewRun = () => {
+    if (!runs.canAddRun) return;
     runs.addRun();
     ui.setNorthAtlanticView();
     log("RunAdded", { runId: runs.selectedRunId });
   };
 
   const handleDuplicateLastRun = () => {
+    if (!runs.canAddRun) return;
     const duplicatedRunId = runs.runs[runs.runs.length - 1].id;
     runs.duplicateLastRun();
     ui.setNorthAtlanticView();
@@ -42,7 +44,7 @@ export const RunsSection = observer(function RunsSection() {
             data-test="duplicate-run-button"
             onClick={handleDuplicateLastRun}
           >
-            <span className={css.plusIcon} />
+            <span className={css.plusIcon} aria-hidden="true" />
             Duplicate Last Run
           </button>
           <button
@@ -51,7 +53,7 @@ export const RunsSection = observer(function RunsSection() {
             data-test="new-run-button"
             onClick={handleNewRun}
           >
-            <span className={css.plusIcon} />
+            <span className={css.plusIcon} aria-hidden="true" />
             New Run
           </button>
         </div>}
