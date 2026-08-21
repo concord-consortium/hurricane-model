@@ -59,6 +59,50 @@ export class RunsModel {
     this.addAndSelect(defaultSimulationState());
   }
 
+  @action.bound public duplicateLastRun() {
+    if (!this.canAddRun) return;
+    // Snapshot first so a stale selected-run record can't be duplicated.
+    this.snapshotSelectedRun();
+    const last = this.runs[this.runs.length - 1];
+    this.addAndSelect(extractSetupState(last.simulation));
+  }
+
+  @action.bound public resetSelectedRun() {
+    this.simulation.restart();
+  }
+
+  @action.bound public deleteRun(id: string) {
+    const index = this.runs.findIndex(run => run.id === id);
+    if (index === -1) return;
+    if (this.runs.length === 1) {
+      // There is never zero runs — deleting the sole run resets it to the default setup.
+      const replacement: IRunState = { id: this.makeRunId(), simulation: defaultSimulationState() };
+      this.runs[0] = replacement;
+      this.selectedRunId = replacement.id;
+      applySimulationState(this.simulation, replacement.simulation);
+      return;
+    }
+    const wasSelected = id === this.selectedRunId;
+    this.runs.splice(index, 1);
+    if (wasSelected) {
+      const target = index > 0 ? this.runs[index - 1] : this.runs[this.runs.length - 1];
+      this.selectedRunId = target.id;
+      applySimulationState(this.simulation, cloneSimulationState(target.simulation));
+    }
+  }
+
+  @action.bound public setRuns(runs: IRunState[], selectedRunId?: string) {
+    if (!runs.length) return;
+    this.runs = runs.map(run => ({ id: run.id, simulation: cloneSimulationState(run.simulation) }));
+    const selected = this.runs.find(run => run.id === selectedRunId) ?? this.runs[this.runs.length - 1];
+    this.selectedRunId = selected.id;
+    this.nextRunNumber = this.runs.reduce((max, run) => {
+      const num = parseInt(run.id.replace(/^run-/, ""), 10);
+      return isFinite(num) && num >= max ? num + 1 : max;
+    }, this.nextRunNumber);
+    applySimulationState(this.simulation, cloneSimulationState(selected.simulation));
+  }
+
   private addAndSelect(state: ISimulationState) {
     this.snapshotSelectedRun();
     const run: IRunState = { id: this.makeRunId(), simulation: state };

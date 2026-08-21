@@ -1,4 +1,11 @@
+import { maxRuns } from "./runs";
 import { createStores, IStores } from "./stores";
+
+const completeCurrentRun = (stores: IStores) => {
+  stores.simulation.simulationStarted = true;
+  stores.simulation.simulationFinished = true;
+  stores.simulation.hurricaneTrack.push({ position: { lat: 20, lng: -40 }, category: 2 });
+};
 
 describe("RunsModel", () => {
   let stores: IStores;
@@ -82,6 +89,147 @@ describe("RunsModel", () => {
       runs.selectRun(id);
       expect(runs.selectedRunId).toBe(id);
       expect(runs.runs.length).toBe(1);
+    });
+  });
+
+  describe("addRun", () => {
+    it("is gated on all runs being complete", () => {
+      const { runs } = stores;
+      expect(runs.canAddRun).toBe(false);
+      runs.addRun();
+      expect(runs.runs.length).toBe(1);
+
+      completeCurrentRun(stores);
+      expect(runs.canAddRun).toBe(true);
+      runs.addRun();
+      expect(runs.runs.length).toBe(2);
+      expect(runs.selectedRunId).toBe(runs.runs[1].id);
+    });
+
+    it("refuses to exceed the maximum number of runs", () => {
+      const { runs } = stores;
+      for (let i = 0; i < maxRuns + 4; i++) {
+        completeCurrentRun(stores);
+        runs.addRun();
+      }
+      expect(runs.runs.length).toBe(maxRuns);
+      expect(runs.atMaxRuns).toBe(true);
+      expect(runs.canAddRun).toBe(false);
+    });
+  });
+
+  describe("duplicateLastRun", () => {
+    it("copies the newest run's setup without its outcome", () => {
+      const { runs, simulation } = stores;
+      simulation.season = "winter";
+      simulation.setTemperatureAnomaly("gulf", 2);
+      completeCurrentRun(stores);
+
+      runs.duplicateLastRun();
+
+      expect(runs.runs.length).toBe(2);
+      expect(runs.selectedRunId).toBe(runs.runs[1].id);
+      expect(simulation.season).toBe("winter");
+      expect(simulation.temperatureAnomalyAt("gulf")).toBe(2);
+      expect(simulation.simulationStarted).toBe(false);
+      expect(simulation.simulationFinished).toBe(false);
+      expect(simulation.hurricaneTrack.length).toBe(0);
+    });
+  });
+
+  describe("resetSelectedRun", () => {
+    it("keeps setup and clears the outcome", () => {
+      const { runs, simulation } = stores;
+      simulation.season = "winter";
+      completeCurrentRun(stores);
+      runs.resetSelectedRun();
+      expect(simulation.season).toBe("winter");
+      expect(simulation.simulationStarted).toBe(false);
+      expect(simulation.simulationFinished).toBe(false);
+      expect(simulation.hurricaneTrack.length).toBe(0);
+    });
+  });
+
+  describe("deleteRun", () => {
+    const addCompletedRuns = (count: number) => {
+      for (let i = 0; i < count; i++) {
+        completeCurrentRun(stores);
+        stores.runs.addRun();
+      }
+      completeCurrentRun(stores);
+    };
+
+    it("selects the previous run when the selected run is deleted", () => {
+      const { runs } = stores;
+      addCompletedRuns(2); // runs: [1, 2, 3], 3 selected
+      const [first, second, third] = runs.runs.map(run => run.id);
+      runs.deleteRun(third);
+      expect(runs.runs.map(run => run.id)).toEqual([first, second]);
+      expect(runs.selectedRunId).toBe(second);
+    });
+
+    it("selects the newest remaining run when the first run is deleted", () => {
+      const { runs } = stores;
+      addCompletedRuns(2);
+      const [first, second, third] = runs.runs.map(run => run.id);
+      runs.selectRun(first);
+      runs.deleteRun(first);
+      expect(runs.runs.map(run => run.id)).toEqual([second, third]);
+      expect(runs.selectedRunId).toBe(third);
+    });
+
+    it("keeps the selection when an unselected run is deleted", () => {
+      const { runs } = stores;
+      addCompletedRuns(1);
+      const [first, second] = runs.runs.map(run => run.id);
+      runs.deleteRun(first);
+      expect(runs.runs.map(run => run.id)).toEqual([second]);
+      expect(runs.selectedRunId).toBe(second);
+    });
+
+    it("replaces a sole run with a fresh default run", () => {
+      const { runs, simulation } = stores;
+      const originalId = runs.selectedRunId;
+      simulation.season = "winter";
+      completeCurrentRun(stores);
+      runs.deleteRun(originalId);
+      expect(runs.runs.length).toBe(1);
+      expect(runs.runs[0].id).not.toBe(originalId);
+      expect(runs.selectedRunId).toBe(runs.runs[0].id);
+      expect(simulation.season).not.toBe("winter");
+      expect(simulation.simulationFinished).toBe(false);
+    });
+  });
+
+  describe("setRuns", () => {
+    it("replaces runs, selects the given run, and hydrates the simulation", () => {
+      const { runs, simulation } = stores;
+      const stateA = { ...runs.runs[0].simulation, season: "winter" as const };
+      const stateB = { ...runs.runs[0].simulation, season: "summer" as const, simulationFinished: true };
+      runs.setRuns([
+        { id: "run-1", simulation: stateA },
+        { id: "run-2", simulation: stateB }
+      ], "run-2");
+      expect(runs.runs.length).toBe(2);
+      expect(runs.selectedRunId).toBe("run-2");
+      expect(simulation.season).toBe("summer");
+      expect(simulation.simulationFinished).toBe(true);
+    });
+
+    it("falls back to the newest run when the selected id is unknown", () => {
+      const { runs } = stores;
+      const state = runs.runs[0].simulation;
+      runs.setRuns([{ id: "run-1", simulation: state }, { id: "run-2", simulation: state }], "missing");
+      expect(runs.selectedRunId).toBe("run-2");
+    });
+
+    it("continues run ids without collisions after a restore", () => {
+      const { runs, simulation } = stores;
+      const state = { ...runs.runs[0].simulation, simulationFinished: true };
+      runs.setRuns([{ id: "run-7", simulation: state }], "run-7");
+      simulation.simulationFinished = true;
+      runs.addRun();
+      expect(runs.runs[1].id).toBe("run-8");
     });
   });
 });
