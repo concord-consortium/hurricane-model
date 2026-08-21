@@ -1,7 +1,7 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import { IRunState, ISimulationState } from "../types/interactive-state";
 import {
-  applySimulationState, defaultSimulationState, extractSetupState, serializeSimulation
+  applySimulationState, cloneSimulationState, defaultSimulationState, extractSetupState, serializeSimulation
 } from "./simulation-serialization";
 import { SimulationModel } from "./simulation";
 
@@ -50,7 +50,8 @@ export class RunsModel {
     if (!target) return;
     this.snapshotSelectedRun();
     this.selectedRunId = id;
-    applySimulationState(this.simulation, target.simulation);
+    // Clone so the live sim's arrays don't share element references with the stored record.
+    applySimulationState(this.simulation, cloneSimulationState(target.simulation));
   }
 
   @action.bound public addRun() {
@@ -68,7 +69,7 @@ export class RunsModel {
 
   // An unselected run is always setup-only or complete, so a started-but-unfinished
   // run loses its partial outcome when snapshotted on switch-away.
-  private snapshotSelectedRun() {
+  @action private snapshotSelectedRun() {
     const run = this.selectedRun;
     if (!run) return;
     const state = serializeSimulation(this.simulation);

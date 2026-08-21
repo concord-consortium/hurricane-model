@@ -78,6 +78,7 @@ describe("RunsModel", () => {
       const { runs } = stores;
       const id = runs.selectedRunId;
       runs.selectRun("nope");
+      expect(runs.selectedRunId).toBe(id);
       runs.selectRun(id);
       expect(runs.selectedRunId).toBe(id);
       expect(runs.runs.length).toBe(1);
