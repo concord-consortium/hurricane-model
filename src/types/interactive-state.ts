@@ -82,13 +82,24 @@ export interface IUIState {
 }
 
 /**
+ * Version 1 interactive state (single run). Kept for migration.
+ */
+export interface IHurricaneInteractiveStateV1 {
+  version: 1;
+  mode?: AppMode;
+  simulation: ISimulationState;
+  ui: IUIState;
+}
+
+/**
  * Complete interactive state saved to LARA.
  * This represents student work that can be saved and restored.
  */
 export interface IHurricaneInteractiveState {
-  version: 1;
+  version: 2;
   mode?: AppMode;
-  simulation: ISimulationState;
+  runs: IRunState[];
+  selectedRunId: string;
   ui: IUIState;
 }
 

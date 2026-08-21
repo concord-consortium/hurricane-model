@@ -84,7 +84,8 @@ describe("cloud-storage", () => {
       expect(global.fetch).toHaveBeenCalledWith(
         "https://models-resources.concord.org/hurricane-models/abc123/model.json.gz"
       );
-      expect(state.version).toBe(1);
+      expect(state.version).toBe(2);
+      expect(state.runs).toEqual([{ id: "run-1", simulation: { season: "fall" } }]);
     });
 
     it("throws a descriptive error on a non-ok response", async () => {

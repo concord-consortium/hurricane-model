@@ -1,11 +1,11 @@
-import { runInAction } from "mobx";
+import { runInAction, toJS } from "mobx";
 import config from "../config";
 import { appModes } from "../types";
-import { IHurricaneInteractiveState } from "../types/interactive-state";
-import { applySimulationState, serializeSimulation } from "./simulation-serialization";
+import { IHurricaneInteractiveState, IHurricaneInteractiveStateV1 } from "../types/interactive-state";
+import { serializeSimulation } from "./simulation-serialization";
 import { IStores } from "./stores";
 
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 2;
 
 /**
  * Migrates any saved state to the current version format.
@@ -20,8 +20,8 @@ export function migrateState(state: unknown): IHurricaneInteractiveState | null 
 
   // Handle missing version field (legacy state from before versioning)
   if (!("version" in rawState)) {
-    // Attempt to migrate legacy state
-    return migrateLegacyState(rawState);
+    const legacy = migrateLegacyState(rawState);
+    return legacy ? migrateV1ToV2(legacy) : null;
   }
 
   const version = rawState.version;
@@ -31,10 +31,9 @@ export function migrateState(state: unknown): IHurricaneInteractiveState | null 
     return state as IHurricaneInteractiveState;
   }
 
-  // Future version migrations would go here:
-  // if (version === 1) {
-  //   return migrateV1ToV2(state as IHurricaneInteractiveStateV1);
-  // }
+  if (version === 1) {
+    return migrateV1ToV2(state as IHurricaneInteractiveStateV1);
+  }
 
   // Unknown version - return null to use defaults
   // eslint-disable-next-line no-console
@@ -46,7 +45,7 @@ export function migrateState(state: unknown): IHurricaneInteractiveState | null 
  * Attempts to migrate state saved before versioning was added.
  * Returns null if the state structure is unrecognizable.
  */
-function migrateLegacyState(rawState: Record<string, unknown>): IHurricaneInteractiveState | null {
+function migrateLegacyState(rawState: Record<string, unknown>): IHurricaneInteractiveStateV1 | null {
   // Check for recognizable structure
   if (!rawState.simulation && !rawState.ui) {
     return null;
@@ -55,8 +54,18 @@ function migrateLegacyState(rawState: Record<string, unknown>): IHurricaneIntera
   // Add version field and return
   return {
     version: 1,
-    simulation: rawState.simulation as IHurricaneInteractiveState["simulation"],
-    ui: rawState.ui as IHurricaneInteractiveState["ui"]
+    simulation: rawState.simulation as IHurricaneInteractiveStateV1["simulation"],
+    ui: rawState.ui as IHurricaneInteractiveStateV1["ui"]
+  };
+}
+
+function migrateV1ToV2(state: IHurricaneInteractiveStateV1): IHurricaneInteractiveState {
+  return {
+    version: 2,
+    mode: state.mode,
+    runs: [{ id: "run-1", simulation: state.simulation }],
+    selectedRunId: "run-1",
+    ui: state.ui
   };
 }
 
@@ -71,14 +80,13 @@ export function setInteractiveState(
     return;
   }
 
-  const { simulation, ui } = stores;
-  const { simulation: simState, ui: uiState } = state;
+  const { ui } = stores;
+  const { ui: uiState } = state;
 
   if (state.mode != null && appModes.includes(state.mode)) config.mode = state.mode;
 
-  // Restore simulation state
-  if (simState) {
-    applySimulationState(simulation, simState);
+  if (state.runs?.length) {
+    stores.runs.setRuns(state.runs, state.selectedRunId);
   }
 
   // Restore UI state
@@ -124,12 +132,17 @@ export function setInteractiveState(
  * won't re-run when those observables change, breaking auto-save.
  */
 export function getInteractiveState(stores: IStores): IHurricaneInteractiveState {
-  const { simulation, ui } = stores;
+  const { runs, simulation, ui } = stores;
 
   return {
-    version: 1,
+    version: 2,
     mode: config.mode,
-    simulation: serializeSimulation(simulation),
+    runs: runs.runs.map(run => ({
+      id: run.id,
+      // The selected run's record can be stale; the live simulation is its source of truth.
+      simulation: run.id === runs.selectedRunId ? serializeSimulation(simulation) : toJS(run.simulation)
+    })),
+    selectedRunId: runs.selectedRunId,
     ui: {
       baseMap: ui.baseMap,
       overlay: ui.overlay,

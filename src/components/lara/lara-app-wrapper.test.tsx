@@ -62,8 +62,10 @@ describe("LaraAppWrapper model seeding", () => {
     render(<LaraAppWrapper stores={createStores()} />);
     // give effects a tick
     await waitFor(() => expect(loadSpy).not.toHaveBeenCalled());
-    // The saved interactive state should be restored (migrateState returns version-1 state as-is).
-    expect(setSpy).toHaveBeenCalledWith(expect.anything(), { version: 1, simulation: {}, ui: {} });
+    // The saved interactive state should be restored (migrateState upgrades version-1 state to version 2).
+    expect(setSpy).toHaveBeenCalledWith(expect.anything(), {
+      version: 2, runs: [{ id: "run-1", simulation: {} }], selectedRunId: "run-1", ui: {}
+    });
   });
 
   it("shows the error message when the seed load fails", async () => {

@@ -1,7 +1,40 @@
 import { migrateState, getInteractiveState, setInteractiveState } from "./interactive-state";
 import { createStores } from "./stores";
-import { IHurricaneInteractiveState } from "../types/interactive-state";
+import { IHurricaneInteractiveState, ISimulationState, IUIState } from "../types/interactive-state";
 import config from "../config";
+
+const v1SimulationFixture: ISimulationState = {
+  season: "fall",
+  startLocation: "atlantic",
+  pressureSystems: [],
+  simulationStarted: false,
+  simulationFinished: false,
+  time: 0,
+  hurricane: { center: { lat: 20, lng: -40 }, strength: 30, speed: { u: 0, v: 0 } },
+  hurricaneTrack: [],
+  landfalls: [],
+  strengthChangePositions: [],
+  precipitationPoints: []
+};
+
+const uiFixture: IUIState = {
+  baseMap: "satellite",
+  overlay: "sst",
+  windArrows: true,
+  hurricaneImage: false,
+  accessibleSSTScale: false,
+  categoryChangeMarkers: true,
+  thermometerActive: false,
+  thermometerPositionSaved: null,
+  zoomedInView: false
+};
+
+const makeV2State = (simulation: ISimulationState, ui: IUIState = uiFixture): IHurricaneInteractiveState => ({
+  version: 2,
+  runs: [{ id: "run-1", simulation }],
+  selectedRunId: "run-1",
+  ui
+});
 
 describe("interactive-state", () => {
   describe("migrateState", () => {
@@ -18,35 +51,18 @@ describe("interactive-state", () => {
       expect(migrateState(123)).toBeNull();
     });
 
-    it("returns state unchanged if version is current (1)", () => {
-      const state: IHurricaneInteractiveState = {
-        version: 1,
-        simulation: {
-          season: "fall",
-          startLocation: "atlantic",
-          pressureSystems: [],
-          simulationStarted: false,
-          simulationFinished: false,
-          time: 0,
-          hurricane: { center: { lat: 20, lng: -40 }, strength: 30, speed: { u: 0, v: 0 } },
-          hurricaneTrack: [],
-          landfalls: [],
-          strengthChangePositions: [],
-          precipitationPoints: []
-        },
-        ui: {
-          baseMap: "satellite",
-          overlay: "sst",
-          windArrows: true,
-          hurricaneImage: false,
-          accessibleSSTScale: false,
-          categoryChangeMarkers: true,
-          thermometerActive: false,
-          thermometerPositionSaved: null,
-          zoomedInView: false
-        }
-      };
+    it("returns state unchanged if version is current (2)", () => {
+      const state = makeV2State(v1SimulationFixture);
       expect(migrateState(state)).toEqual(state);
+    });
+
+    it("migrates v1 state by wrapping the simulation as a single run", () => {
+      const v1State = { version: 1, simulation: v1SimulationFixture, ui: uiFixture };
+      const migrated = migrateState(v1State);
+      expect(migrated?.version).toBe(2);
+      expect(migrated?.runs).toEqual([{ id: "run-1", simulation: v1SimulationFixture }]);
+      expect(migrated?.selectedRunId).toBe("run-1");
+      expect(migrated?.ui).toEqual(uiFixture);
     });
 
     it("migrates legacy state without version field", () => {
@@ -56,8 +72,9 @@ describe("interactive-state", () => {
       };
       const migrated = migrateState(legacyState);
       expect(migrated).not.toBeNull();
-      expect(migrated?.version).toBe(1);
-      expect(migrated?.simulation).toEqual({ season: "winter" });
+      expect(migrated?.version).toBe(2);
+      expect(migrated?.runs).toEqual([{ id: "run-1", simulation: { season: "winter" } }]);
+      expect(migrated?.selectedRunId).toBe("run-1");
     });
 
     it("returns null for unrecognized state structure", () => {
@@ -81,10 +98,12 @@ describe("interactive-state", () => {
       const stores = createStores();
       const state = getInteractiveState(stores);
 
-      expect(state.version).toBe(1);
-      expect(state.simulation).toBeDefined();
-      expect(state.simulation.season).toBe(stores.simulation.season);
-      expect(state.simulation.hurricane.center).toEqual(stores.simulation.hurricane.center);
+      expect(state.version).toBe(2);
+      expect(state.runs.length).toBe(1);
+      expect(state.selectedRunId).toBe(stores.runs.selectedRunId);
+      expect(state.runs[0].simulation).toBeDefined();
+      expect(state.runs[0].simulation.season).toBe(stores.simulation.season);
+      expect(state.runs[0].simulation.hurricane.center).toEqual(stores.simulation.hurricane.center);
       expect(state.ui).toBeDefined();
       expect(state.ui.baseMap).toBe(stores.ui.baseMap);
     });
@@ -92,20 +111,21 @@ describe("interactive-state", () => {
     it("includes all required simulation properties", () => {
       const stores = createStores();
       const state = getInteractiveState(stores);
+      const simulation = state.runs[0].simulation;
 
-      expect(state.simulation).toHaveProperty("season");
-      expect(state.simulation).toHaveProperty("startLocation");
-      expect(state.simulation).toHaveProperty("pressureSystems");
-      expect(state.simulation).toHaveProperty("simulationStarted");
-      expect(state.simulation).toHaveProperty("simulationFinished");
-      expect(state.simulation).toHaveProperty("time");
-      expect(state.simulation).toHaveProperty("hurricane");
-      expect(state.simulation).toHaveProperty("hurricaneTrack");
-      expect(state.simulation).toHaveProperty("landfalls");
+      expect(simulation).toHaveProperty("season");
+      expect(simulation).toHaveProperty("startLocation");
+      expect(simulation).toHaveProperty("pressureSystems");
+      expect(simulation).toHaveProperty("simulationStarted");
+      expect(simulation).toHaveProperty("simulationFinished");
+      expect(simulation).toHaveProperty("time");
+      expect(simulation).toHaveProperty("hurricane");
+      expect(simulation).toHaveProperty("hurricaneTrack");
+      expect(simulation).toHaveProperty("landfalls");
       // Internal state for seamless resume
-      expect(state.simulation).toHaveProperty("numberOfStepsOverSea");
-      expect(state.simulation).toHaveProperty("numberOfStepsOverLand");
-      expect(state.simulation).toHaveProperty("consumedExtendedLandfallAreas");
+      expect(simulation).toHaveProperty("numberOfStepsOverSea");
+      expect(simulation).toHaveProperty("numberOfStepsOverLand");
+      expect(simulation).toHaveProperty("consumedExtendedLandfallAreas");
     });
 
     it("serializes cat3SSTThresholdReached in hurricane state", () => {
@@ -113,7 +133,7 @@ describe("interactive-state", () => {
       stores.simulation.hurricane.cat3SSTThresholdReached = true;
       const state = getInteractiveState(stores);
 
-      expect(state.simulation.hurricane.cat3SSTThresholdReached).toBe(true);
+      expect(state.runs[0].simulation.hurricane.cat3SSTThresholdReached).toBe(true);
     });
 
     it("serializes numberOfStepsOverSea and numberOfStepsOverLand", () => {
@@ -122,8 +142,8 @@ describe("interactive-state", () => {
       stores.simulation.numberOfStepsOverLand = 5;
       const state = getInteractiveState(stores);
 
-      expect(state.simulation.numberOfStepsOverSea).toBe(15);
-      expect(state.simulation.numberOfStepsOverLand).toBe(5);
+      expect(state.runs[0].simulation.numberOfStepsOverSea).toBe(15);
+      expect(state.runs[0].simulation.numberOfStepsOverLand).toBe(5);
     });
 
     it("serializes consumed extended landfall areas", () => {
@@ -133,7 +153,14 @@ describe("interactive-state", () => {
         .filter((_, idx) => idx !== 0); // Remove first area (PuertoRico)
       const state = getInteractiveState(stores);
 
-      expect(state.simulation.consumedExtendedLandfallAreas).toContain("PuertoRico");
+      expect(state.runs[0].simulation.consumedExtendedLandfallAreas).toContain("PuertoRico");
+    });
+
+    it("serializes the selected run from the live simulation", () => {
+      const stores = createStores();
+      stores.simulation.season = "winter";
+      const state = getInteractiveState(stores);
+      expect(state.runs[0].simulation.season).toBe("winter");
     });
 
     it("includes all required UI properties", () => {
@@ -160,33 +187,19 @@ describe("interactive-state", () => {
 
     it("restores simulation properties", () => {
       const stores = createStores();
-      const state: IHurricaneInteractiveState = {
-        version: 1,
-        simulation: {
-          season: "winter",
-          startLocation: "gulf",
-          pressureSystems: [{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }],
-          simulationStarted: true,
-          simulationFinished: false,
-          time: 1000,
-          hurricane: { center: { lat: 25, lng: -70 }, strength: 50, speed: { u: 100, v: 50 } },
-          hurricaneTrack: [{ position: { lat: 20, lng: -60 }, category: 2 }],
-          landfalls: [],
-          strengthChangePositions: [0, 100],
-          precipitationPoints: []
-        },
-        ui: {
-          baseMap: "relief",
-          overlay: "precipitation",
-          windArrows: false,
-          hurricaneImage: true,
-          accessibleSSTScale: true,
-          categoryChangeMarkers: false,
-          thermometerActive: true,
-          thermometerPositionSaved: [30, -85],
-          zoomedInView: false
-        }
-      };
+      const state = makeV2State({
+        season: "winter",
+        startLocation: "gulf",
+        pressureSystems: [{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }],
+        simulationStarted: true,
+        simulationFinished: false,
+        time: 1000,
+        hurricane: { center: { lat: 25, lng: -70 }, strength: 50, speed: { u: 100, v: 50 } },
+        hurricaneTrack: [{ position: { lat: 20, lng: -60 }, category: 2 }],
+        landfalls: [],
+        strengthChangePositions: [0, 100],
+        precipitationPoints: []
+      });
 
       setInteractiveState(stores, state);
 
@@ -205,37 +218,23 @@ describe("interactive-state", () => {
       expect(stores.simulation.landfalls).toEqual([]);
       expect(stores.simulation.strengthChangePositions).toEqual([0, 100]);
       expect(stores.simulation.precipitationPoints).toEqual([]);
+      expect(stores.runs.runs.length).toBe(1);
+      expect(stores.runs.selectedRunId).toBe("run-1");
     });
 
     it("restores UI properties", () => {
       const stores = createStores();
-      const state: IHurricaneInteractiveState = {
-        version: 1,
-        simulation: {
-          season: "fall",
-          startLocation: "atlantic",
-          pressureSystems: [],
-          simulationStarted: false,
-          simulationFinished: false,
-          time: 0,
-          hurricane: { center: { lat: 20, lng: -40 }, strength: 30, speed: { u: 0, v: 0 } },
-          hurricaneTrack: [],
-          landfalls: [],
-          strengthChangePositions: [],
-          precipitationPoints: []
-        },
-        ui: {
-          baseMap: "relief",
-          overlay: "precipitation",
-          windArrows: false,
-          hurricaneImage: true,
-          accessibleSSTScale: true,
-          categoryChangeMarkers: false,
-          thermometerActive: true,
-          thermometerPositionSaved: [30, -85],
-          zoomedInView: false
-        }
-      };
+      const state = makeV2State(v1SimulationFixture, {
+        baseMap: "relief",
+        overlay: "precipitation",
+        windArrows: false,
+        hurricaneImage: true,
+        accessibleSSTScale: true,
+        categoryChangeMarkers: false,
+        thermometerActive: true,
+        thermometerPositionSaved: [30, -85],
+        zoomedInView: false
+      });
 
       setInteractiveState(stores, state);
 
@@ -254,38 +253,17 @@ describe("interactive-state", () => {
       const stores = createStores();
       expect(stores.simulation.hurricane.cat3SSTThresholdReached).toBe(false);
 
-      const state: IHurricaneInteractiveState = {
-        version: 1,
-        simulation: {
-          season: "fall",
-          startLocation: "atlantic",
-          pressureSystems: [],
-          simulationStarted: true,
-          simulationFinished: false,
-          time: 500,
-          hurricane: {
-            center: { lat: 20, lng: -40 },
-            strength: 60,
-            speed: { u: 100, v: 50 },
-            cat3SSTThresholdReached: true
-          },
-          hurricaneTrack: [],
-          landfalls: [],
-          strengthChangePositions: [],
-          precipitationPoints: []
-        },
-        ui: {
-          baseMap: "satellite",
-          overlay: "sst",
-          windArrows: true,
-          hurricaneImage: false,
-          accessibleSSTScale: false,
-          categoryChangeMarkers: true,
-          thermometerActive: false,
-          thermometerPositionSaved: null,
-          zoomedInView: false
+      const state = makeV2State({
+        ...v1SimulationFixture,
+        simulationStarted: true,
+        time: 500,
+        hurricane: {
+          center: { lat: 20, lng: -40 },
+          strength: 60,
+          speed: { u: 100, v: 50 },
+          cat3SSTThresholdReached: true
         }
-      };
+      });
 
       setInteractiveState(stores, state);
       expect(stores.simulation.hurricane.cat3SSTThresholdReached).toBe(true);
@@ -296,35 +274,13 @@ describe("interactive-state", () => {
       expect(stores.simulation.numberOfStepsOverSea).toBe(0);
       expect(stores.simulation.numberOfStepsOverLand).toBe(0);
 
-      const state: IHurricaneInteractiveState = {
-        version: 1,
-        simulation: {
-          season: "fall",
-          startLocation: "atlantic",
-          pressureSystems: [],
-          simulationStarted: true,
-          simulationFinished: false,
-          time: 500,
-          hurricane: { center: { lat: 20, lng: -40 }, strength: 50, speed: { u: 0, v: 0 } },
-          hurricaneTrack: [],
-          landfalls: [],
-          strengthChangePositions: [],
-          precipitationPoints: [],
-          numberOfStepsOverSea: 25,
-          numberOfStepsOverLand: 3
-        },
-        ui: {
-          baseMap: "satellite",
-          overlay: "sst",
-          windArrows: true,
-          hurricaneImage: false,
-          accessibleSSTScale: false,
-          categoryChangeMarkers: true,
-          thermometerActive: false,
-          thermometerPositionSaved: null,
-          zoomedInView: false
-        }
-      };
+      const state = makeV2State({
+        ...v1SimulationFixture,
+        simulationStarted: true,
+        time: 500,
+        numberOfStepsOverSea: 25,
+        numberOfStepsOverLand: 3
+      });
 
       setInteractiveState(stores, state);
       expect(stores.simulation.numberOfStepsOverSea).toBe(25);
@@ -335,38 +291,33 @@ describe("interactive-state", () => {
       const stores = createStores();
       const initialAreaCount = stores.simulation.extendedLandfallAreas.length;
 
-      const state: IHurricaneInteractiveState = {
-        version: 1,
-        simulation: {
-          season: "fall",
-          startLocation: "atlantic",
-          pressureSystems: [],
-          simulationStarted: true,
-          simulationFinished: false,
-          time: 500,
-          hurricane: { center: { lat: 20, lng: -40 }, strength: 50, speed: { u: 0, v: 0 } },
-          hurricaneTrack: [],
-          landfalls: [],
-          strengthChangePositions: [],
-          precipitationPoints: [],
-          consumedExtendedLandfallAreas: ["PuertoRico", "FloridaEast1"]
-        },
-        ui: {
-          baseMap: "satellite",
-          overlay: "sst",
-          windArrows: true,
-          hurricaneImage: false,
-          accessibleSSTScale: false,
-          categoryChangeMarkers: true,
-          thermometerActive: false,
-          thermometerPositionSaved: null,
-          zoomedInView: false
-        }
-      };
+      const state = makeV2State({
+        ...v1SimulationFixture,
+        simulationStarted: true,
+        time: 500,
+        consumedExtendedLandfallAreas: ["PuertoRico", "FloridaEast1"]
+      });
 
       setInteractiveState(stores, state);
       // Should have 2 fewer areas after restoration
       expect(stores.simulation.extendedLandfallAreas.length).toBe(initialAreaCount - 2);
+    });
+
+    it("round-trips multiple runs through get/setInteractiveState", () => {
+      const source = createStores();
+      source.simulation.season = "winter";
+      source.simulation.simulationStarted = true;
+      source.simulation.simulationFinished = true;
+      source.runs.addRun();
+      const saved = JSON.parse(JSON.stringify(getInteractiveState(source)));
+      expect(saved.runs.length).toBe(2);
+
+      const target = createStores();
+      setInteractiveState(target, saved);
+      expect(target.runs.runs.map((r: any) => r.id)).toEqual(source.runs.runs.map(r => r.id));
+      expect(target.runs.selectedRunId).toBe(source.runs.selectedRunId);
+      expect(target.runs.runs[0].simulation.season).toBe("winter");
+      expect(target.simulation.simulationFinished).toBe(false); // selected (second) run is fresh
     });
   });
 
@@ -376,13 +327,13 @@ describe("interactive-state", () => {
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
       stores.simulation.adjustTemperatureAnomaly("caribbean", -1);
       const state = getInteractiveState(stores);
-      expect(state.simulation.temperatureAnomalies).toMatchObject({ gulf: 2, caribbean: -1 });
+      expect(state.runs[0].simulation.temperatureAnomalies).toMatchObject({ gulf: 2, caribbean: -1 });
     });
 
     it("restores anomalies into the model", () => {
       const stores = createStores();
       const state = getInteractiveState(stores);
-      state.simulation.temperatureAnomalies = { gulf: 3, coastalAfrica: -2 };
+      state.runs[0].simulation.temperatureAnomalies = { gulf: 3, coastalAfrica: -2 };
       expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(0);
       expect(stores.simulation.temperatureAnomalyAt("coastalAfrica")).toBe(0);
       expect(stores.simulation.temperatureAnomalyAt("caribbean")).toBe(0);
@@ -396,7 +347,7 @@ describe("interactive-state", () => {
       const stores = createStores();
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
       const state = getInteractiveState(stores);
-      delete state.simulation.temperatureAnomalies;
+      delete state.runs[0].simulation.temperatureAnomalies;
       expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(2);
       setInteractiveState(stores, state);
       // Absent field => no override; model keeps whatever it had (here, the prior value).
