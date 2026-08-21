@@ -625,7 +625,7 @@ git commit -m "Add RunsModel with run records and selection"
 
 **Step 1: Write the failing tests**
 
-Append to the `RunsModel` describe block in `src/models/runs.test.ts`. Add this helper at the top of the file:
+Append to the `RunsModel` describe block in `src/models/runs.test.ts`. Add `import { maxRuns } from "./runs";` and this helper at the top of the file:
 
 ```ts
 const completeCurrentRun = (stores: IStores) => {
@@ -653,11 +653,11 @@ describe("addRun", () => {
 
   it("refuses to exceed the maximum number of runs", () => {
     const { runs } = stores;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < maxRuns + 4; i++) {
       completeCurrentRun(stores);
       runs.addRun();
     }
-    expect(runs.runs.length).toBe(6);
+    expect(runs.runs.length).toBe(maxRuns);
     expect(runs.atMaxRuns).toBe(true);
     expect(runs.canAddRun).toBe(false);
   });
@@ -1060,10 +1060,6 @@ Gray tracks for unselected finished runs, below the selected run's live track; h
 `src/components/run-tracks.scss`:
 
 ```scss
-.unselectedTrack {
-  cursor: pointer !important;
-}
-
 :export {
   trackColor: #e8e8e8;
   trackHoverColor: #a8a8a8;
@@ -1071,7 +1067,7 @@ Gray tracks for unselected finished runs, below the selected run's live track; h
 }
 ```
 
-(Colors are exported to JS because Leaflet cannot update a path's `className` after creation — hover styling must go through `pathOptions.color`.)
+(Colors are exported to JS because Leaflet cannot update a path's `className` after creation — hover styling must go through `pathOptions.color`. No cursor rule is needed: Leaflet's own stylesheet already applies `cursor: pointer` to interactive paths via `.leaflet-interactive`.)
 
 **Step 2: Create the component**
 
@@ -1126,7 +1122,6 @@ export const RunTracks = observer(function RunTracks() {
             eventHandlers={eventHandlers(run)}
             pathOptions={{
               bubblingMouseEvents: false,
-              className: css.unselectedTrack,
               color: css.borderColor,
               weight: borderWeight
             }}
@@ -1141,7 +1136,6 @@ export const RunTracks = observer(function RunTracks() {
             eventHandlers={eventHandlers(run)}
             pathOptions={{
               bubblingMouseEvents: false,
-              className: css.unselectedTrack,
               color: hoveredRunId === run.id ? css.trackHoverColor : css.trackColor,
               weight: trackWeight
             }}
@@ -1463,6 +1457,7 @@ git commit -m "Add run panel with reset and delete controls"
 import * as React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 
+import { maxRuns } from "../../models/runs";
 import { createStores, IStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
 import { RunsSection } from "./runs-section";
@@ -1525,14 +1520,14 @@ describe("RunsSection", () => {
   });
 
   it("shows the limit message at the maximum number of complete runs", () => {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < maxRuns - 1; i++) {
       completeCurrentRun(stores);
       stores.runs.addRun();
     }
     completeCurrentRun(stores);
     renderSection(stores);
 
-    expect(screen.getAllByTestId("run-panel").length).toBe(6);
+    expect(screen.getAllByTestId("run-panel").length).toBe(maxRuns);
     expect(screen.getByTestId("runs-message")).toHaveTextContent("Limit reached - delete a run to add another");
     expect(screen.queryByTestId("new-run-button")).toBeNull();
   });
@@ -1568,9 +1563,10 @@ export const RunsSection = observer(function RunsSection() {
   };
 
   const handleDuplicateLastRun = () => {
+    const duplicatedRunId = runs.runs[runs.runs.length - 1].id;
     runs.duplicateLastRun();
     ui.setNorthAtlanticView();
-    log("RunDuplicated", { runId: runs.selectedRunId });
+    log("RunDuplicated", { runId: runs.selectedRunId, duplicatedRunId });
   };
 
   return (
@@ -1695,7 +1691,7 @@ In `LOGGED-EVENTS.md`:
 |-------|-----------|------|
 | `RunSelected` | `{ runId, via: "panel" \| "map" }` | User selects a different run by clicking its setup panel or its track on the map |
 | `RunAdded` | `{ runId }` | User clicks New Run |
-| `RunDuplicated` | `{ runId }` | User clicks Duplicate Last Run (`runId` is the new run) |
+| `RunDuplicated` | `{ runId, duplicatedRunId }` | User clicks Duplicate Last Run (`runId` is the new run, `duplicatedRunId` the run whose setup was copied) |
 | `RunReset` | `{ runId }` | User clicks the reset button on the selected run's panel |
 | `RunDeleted` | `{ runId }` | User clicks the delete button on the selected run's panel |
 ```
