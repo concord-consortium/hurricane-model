@@ -98,7 +98,8 @@ export class RunsModel {
     this.selectedRunId = selected.id;
     this.nextRunNumber = this.runs.reduce((max, run) => {
       const num = parseInt(run.id.replace(/^run-/, ""), 10);
-      return isFinite(num) && num >= max ? num + 1 : max;
+      // The MAX_SAFE_INTEGER cap keeps a corrupted id from saturating the counter into duplicates.
+      return isFinite(num) && num <= Number.MAX_SAFE_INTEGER && num >= max ? num + 1 : max;
     }, this.nextRunNumber);
     applySimulationState(this.simulation, cloneSimulationState(selected.simulation));
   }

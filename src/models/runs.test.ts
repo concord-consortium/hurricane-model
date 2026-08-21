@@ -104,6 +104,7 @@ describe("RunsModel", () => {
       runs.addRun();
       expect(runs.runs.length).toBe(2);
       expect(runs.selectedRunId).toBe(runs.runs[1].id);
+      expect(runs.canAddRun).toBe(false);
     });
 
     it("refuses to exceed the maximum number of runs", () => {
@@ -134,6 +135,30 @@ describe("RunsModel", () => {
       expect(simulation.simulationStarted).toBe(false);
       expect(simulation.simulationFinished).toBe(false);
       expect(simulation.hurricaneTrack.length).toBe(0);
+    });
+
+    it("copies the newest run's setup even when an older run is selected", () => {
+      const { runs, simulation } = stores;
+      const firstId = runs.selectedRunId;
+      simulation.season = "winter";
+      completeCurrentRun(stores);
+      runs.addRun();
+      simulation.season = "summer";
+      completeCurrentRun(stores);
+      runs.selectRun(firstId);
+
+      runs.duplicateLastRun();
+
+      expect(runs.runs.length).toBe(3);
+      expect(runs.selectedRunId).toBe(runs.runs[2].id);
+      expect(simulation.season).toBe("summer");
+      expect(simulation.simulationStarted).toBe(false);
+    });
+
+    it("is a no-op when runs are incomplete", () => {
+      const { runs } = stores;
+      runs.duplicateLastRun();
+      expect(runs.runs.length).toBe(1);
     });
   });
 
@@ -231,5 +256,21 @@ describe("RunsModel", () => {
       runs.addRun();
       expect(runs.runs[1].id).toBe("run-8");
     });
+
+    it("ignores an empty runs array", () => {
+      const { runs } = stores;
+      const originalId = runs.selectedRunId;
+      runs.setRuns([], "x");
+      expect(runs.runs.length).toBe(1);
+      expect(runs.selectedRunId).toBe(originalId);
+    });
+  });
+
+  it("ignores deleteRun with an unknown id", () => {
+    const { runs } = stores;
+    const originalId = runs.selectedRunId;
+    runs.deleteRun("unknown");
+    expect(runs.runs.map(run => run.id)).toEqual([originalId]);
+    expect(runs.selectedRunId).toBe(originalId);
   });
 });
