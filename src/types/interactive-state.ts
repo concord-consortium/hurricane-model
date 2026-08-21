@@ -59,6 +59,14 @@ export interface ISimulationState {
 }
 
 /**
+ * A single simulation run: its setup and (when finished) its outcome, as one serialized state.
+ */
+export interface IRunState {
+  id: string;
+  simulation: ISimulationState;
+}
+
+/**
  * Serialized UI state.
  */
 export interface IUIState {
