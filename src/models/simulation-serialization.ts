@@ -1,9 +1,12 @@
 import { runInAction, toJS } from "mobx";
-import { namedRegions } from "../types";
+import config, { getStartingCategory, startStrengths } from "../config";
+import { hurricaneCategoryInfo } from "../constants";
+import { NamedRegion, isStartLocationName, namedRegions } from "../types";
 import { ISimulationState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
-import { PressureSystem } from "./pressure-system";
-import { SimulationModel, extendedLandfallBounds } from "./simulation";
+import { clampAnomaly } from "../utils/regions";
+import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
+import { SimulationModel, extendedLandfallBounds, resolveStartLocation } from "./simulation";
 
 /**
  * Serializes the live simulation into the shape stored per run and in interactive state.
@@ -131,4 +134,82 @@ export function applySimulationState(simulation: SimulationModel, simState: ISim
     simulation.windKdTreeCache = null;
     simulation.simulationRunning = false;
   });
+}
+
+export const cloneSimulationState = (state: ISimulationState): ISimulationState =>
+  JSON.parse(JSON.stringify(state));
+
+// Mirrors the defaults SimulationModel and Hurricane read from config at construction time.
+// Reads config at call time so authored-state mutations are picked up.
+export function defaultSimulationState(): ISimulationState {
+  const startLocation = config.initialHurricanePosition;
+  const startingCategory = getStartingCategory(config);
+  const strength = startingCategory !== undefined &&
+    hurricaneCategoryInfo[startingCategory]?.startingWindSpeed != null
+    ? hurricaneCategoryInfo[startingCategory].startingWindSpeed
+    : config.hurricaneStrength;
+  const temperatureAnomalies: Partial<Record<NamedRegion, number>> = {};
+  const configAnomalies: Record<string, number> = config.temperatureAnomalies ?? {};
+  for (const key of namedRegions) {
+    const raw = Number(configAnomalies[key]);
+    temperatureAnomalies[key] = isFinite(raw) ? clampAnomaly(raw) : 0;
+  }
+  return {
+    season: config.season,
+    startLocation: safeStartLocation(startLocation),
+    pressureSystems: config.pressureSystems.map((ps: IPressureSystemOptions) => ({
+      type: ps.type || "low",
+      center: { ...ps.center },
+      strength: ps.strength ?? config.pressureSystemStrength
+    })),
+    simulationStarted: false,
+    simulationFinished: false,
+    time: 0,
+    hurricane: {
+      center: resolveStartLocation(startLocation),
+      strength,
+      speed: { ...config.initialHurricaneSpeed },
+      startingCategory,
+      cat3SSTThresholdReached: false
+    },
+    hurricaneTrack: [],
+    landfalls: [],
+    strengthChangePositions: [],
+    precipitationPoints: [],
+    numberOfStepsOverSea: 0,
+    numberOfStepsOverLand: 0,
+    consumedExtendedLandfallAreas: [],
+    temperatureAnomalies
+  };
+}
+
+export function extractSetupState(state: ISimulationState): ISimulationState {
+  const setup = cloneSimulationState(state);
+  setup.simulationStarted = false;
+  setup.simulationFinished = false;
+  setup.time = 0;
+  setup.hurricaneTrack = [];
+  setup.landfalls = [];
+  setup.strengthChangePositions = [];
+  setup.precipitationPoints = [];
+  setup.numberOfStepsOverSea = 0;
+  setup.numberOfStepsOverLand = 0;
+  setup.consumedExtendedLandfallAreas = [];
+  const { startingCategory } = state.hurricane;
+  // Mirrors SimulationModel.restart(): starting strength comes from the category when set,
+  // falling back to the named-location default.
+  let strength = state.hurricane.strength;
+  if (startingCategory !== undefined && hurricaneCategoryInfo[startingCategory]?.startingWindSpeed != null) {
+    strength = hurricaneCategoryInfo[startingCategory].startingWindSpeed;
+  } else if (isStartLocationName(state.startLocation)) {
+    strength = startStrengths[state.startLocation];
+  }
+  setup.hurricane = {
+    center: resolveStartLocation(state.startLocation),
+    strength,
+    speed: { ...config.initialHurricaneSpeed },
+    startingCategory,
+    cat3SSTThresholdReached: false
+  };
+  return setup;
 }

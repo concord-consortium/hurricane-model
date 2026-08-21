@@ -1,4 +1,6 @@
-import { serializeSimulation, applySimulationState } from "./simulation-serialization";
+import {
+  serializeSimulation, applySimulationState, defaultSimulationState, extractSetupState
+} from "./simulation-serialization";
 import { createStores } from "./stores";
 import { PressureSystem } from "./pressure-system";
 
@@ -61,6 +63,54 @@ describe("simulation-serialization", () => {
       expect(simulation.windKdTreeCache).toBeNull();
       expect(simulation.pressureSystemSettings).toEqual([]);
       expect(simulation.simulationRunning).toBe(false);
+    });
+  });
+
+  describe("defaultSimulationState", () => {
+    it("matches a freshly constructed simulation", () => {
+      const { simulation } = createStores();
+      expect(defaultSimulationState()).toEqual(serializeSimulation(simulation));
+    });
+  });
+
+  describe("extractSetupState", () => {
+    it("keeps setup and clears the outcome of a finished run", () => {
+      const { simulation } = createStores();
+      simulation.season = "winter";
+      simulation.setTemperatureAnomaly("gulf", 1.5);
+      const finished = serializeSimulation(simulation);
+      finished.simulationStarted = true;
+      finished.simulationFinished = true;
+      finished.time = 100;
+      finished.hurricaneTrack = [{ position: { lat: 20, lng: -40 }, category: 2 }];
+      finished.landfalls = [{ position: { lat: 25, lng: -80 }, category: 1 }];
+      finished.strengthChangePositions = [0];
+      finished.precipitationPoints = [[20, -40, 0.5, 900000]];
+      finished.numberOfStepsOverSea = 5;
+      finished.consumedExtendedLandfallAreas = ["PuertoRico"];
+      finished.hurricane.center = { lat: 40, lng: -70 };
+      finished.hurricane.strength = 2;
+      finished.hurricane.cat3SSTThresholdReached = true;
+
+      const setup = extractSetupState(finished);
+
+      expect(setup.season).toBe("winter");
+      expect(setup.startLocation).toBe(finished.startLocation);
+      expect(setup.pressureSystems).toEqual(finished.pressureSystems);
+      expect(setup.temperatureAnomalies).toEqual(finished.temperatureAnomalies);
+      expect(setup.simulationStarted).toBe(false);
+      expect(setup.simulationFinished).toBe(false);
+      expect(setup.time).toBe(0);
+      expect(setup.hurricaneTrack).toEqual([]);
+      expect(setup.landfalls).toEqual([]);
+      expect(setup.strengthChangePositions).toEqual([]);
+      expect(setup.precipitationPoints).toEqual([]);
+      expect(setup.numberOfStepsOverSea).toBe(0);
+      expect(setup.consumedExtendedLandfallAreas).toEqual([]);
+      // Hurricane returns to its starting position and strength.
+      expect(setup.hurricane.center).toEqual(defaultSimulationState().hurricane.center);
+      expect(setup.hurricane.strength).toBe(defaultSimulationState().hurricane.strength);
+      expect(setup.hurricane.cat3SSTThresholdReached).toBe(false);
     });
   });
 });
