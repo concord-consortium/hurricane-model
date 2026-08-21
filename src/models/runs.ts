@@ -93,7 +93,10 @@ export class RunsModel {
 
   @action.bound public setRuns(runs: IRunState[], selectedRunId?: string) {
     if (!runs.length) return;
-    this.runs = runs.map(run => ({ id: run.id, simulation: cloneSimulationState(run.simulation) }));
+    // Migrated legacy/corrupt records can lack a simulation; {} restores as defaults.
+    this.runs = runs.map(run => (
+      { id: run.id, simulation: cloneSimulationState(run.simulation ?? {} as ISimulationState) }
+    ));
     const selected = this.runs.find(run => run.id === selectedRunId) ?? this.runs[this.runs.length - 1];
     this.selectedRunId = selected.id;
     this.nextRunNumber = this.runs.reduce((max, run) => {

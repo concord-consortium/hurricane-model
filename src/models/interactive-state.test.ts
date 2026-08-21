@@ -57,9 +57,10 @@ describe("interactive-state", () => {
     });
 
     it("migrates v1 state by wrapping the simulation as a single run", () => {
-      const v1State = { version: 1, simulation: v1SimulationFixture, ui: uiFixture };
+      const v1State = { version: 1, mode: "storm", simulation: v1SimulationFixture, ui: uiFixture };
       const migrated = migrateState(v1State);
       expect(migrated?.version).toBe(2);
+      expect(migrated?.mode).toBe("storm");
       expect(migrated?.runs).toEqual([{ id: "run-1", simulation: v1SimulationFixture }]);
       expect(migrated?.selectedRunId).toBe("run-1");
       expect(migrated?.ui).toEqual(uiFixture);
@@ -301,6 +302,18 @@ describe("interactive-state", () => {
       setInteractiveState(stores, state);
       // Should have 2 fewer areas after restoration
       expect(stores.simulation.extendedLandfallAreas.length).toBe(initialAreaCount - 2);
+    });
+
+    it("restores legacy state with ui only (no simulation) without crashing", () => {
+      const migrated = migrateState({ ui: uiFixture });
+      expect(() => setInteractiveState(createStores(), migrated!)).not.toThrow();
+    });
+
+    it("degrades safely on corrupt v2 state with no runs field", () => {
+      const stores = createStores();
+      const corrupt = { version: 2, ui: uiFixture } as unknown as IHurricaneInteractiveState;
+      expect(() => setInteractiveState(stores, corrupt)).not.toThrow();
+      expect(stores.runs.runs.length).toBe(1);
     });
 
     it("round-trips multiple runs through get/setInteractiveState", () => {
