@@ -1,3 +1,5 @@
+import { runInAction } from "mobx";
+import config from "../config";
 import {
   serializeSimulation, applySimulationState, defaultSimulationState, extractSetupState
 } from "./simulation-serialization";
@@ -71,12 +73,27 @@ describe("simulation-serialization", () => {
       const { simulation } = createStores();
       expect(defaultSimulationState()).toEqual(serializeSimulation(simulation));
     });
+
+    it("matches a fresh simulation in storm mode with an out-of-range starting category", () => {
+      const { mode, startingCategory } = config;
+      try {
+        config.mode = "storm";
+        config.startingCategory = 7.5;
+        const { simulation } = createStores();
+        expect(defaultSimulationState()).toEqual(serializeSimulation(simulation));
+      } finally {
+        config.mode = mode;
+        config.startingCategory = startingCategory;
+      }
+    });
   });
 
   describe("extractSetupState", () => {
     it("keeps setup and clears the outcome of a finished run", () => {
       const { simulation } = createStores();
-      simulation.season = "winter";
+      runInAction(() => {
+        simulation.season = "winter";
+      });
       simulation.setTemperatureAnomaly("gulf", 1.5);
       const finished = serializeSimulation(simulation);
       finished.simulationStarted = true;

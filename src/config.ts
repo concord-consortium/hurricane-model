@@ -1,3 +1,4 @@
+import { hurricaneCategoryInfo } from "./constants";
 import { modeSeasons, StartLocationNames } from "./types";
 
 function getURLParam(name: string) {
@@ -71,7 +72,7 @@ export const startStrengths = {
 // hurricaneStrength / startStrengths logic stays in effect.
 export const getStartingCategory = (cfg: { startingCategory?: number, mode?: string }): number | undefined =>
   cfg.startingCategory != null && isFinite(Number(cfg.startingCategory))
-    ? cfg.startingCategory
+    ? Math.max(0, Math.min(hurricaneCategoryInfo.length - 1, Math.floor(Number(cfg.startingCategory))))
     : (cfg.mode === "storm" ? 0 : undefined);
 
 const DEFAULT_START_LOCATION = "atlantic";

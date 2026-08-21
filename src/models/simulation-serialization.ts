@@ -144,8 +144,7 @@ export const cloneSimulationState = (state: ISimulationState): ISimulationState 
 export function defaultSimulationState(): ISimulationState {
   const startLocation = config.initialHurricanePosition;
   const startingCategory = getStartingCategory(config);
-  const strength = startingCategory !== undefined &&
-    hurricaneCategoryInfo[startingCategory]?.startingWindSpeed != null
+  const strength = startingCategory !== undefined
     ? hurricaneCategoryInfo[startingCategory].startingWindSpeed
     : config.hurricaneStrength;
   const temperatureAnomalies: Partial<Record<NamedRegion, number>> = {};
@@ -166,7 +165,7 @@ export function defaultSimulationState(): ISimulationState {
     simulationFinished: false,
     time: 0,
     hurricane: {
-      center: resolveStartLocation(startLocation),
+      center: { ...resolveStartLocation(startLocation) },
       strength,
       speed: { ...config.initialHurricaneSpeed },
       startingCategory,
@@ -205,7 +204,7 @@ export function extractSetupState(state: ISimulationState): ISimulationState {
     strength = startStrengths[state.startLocation];
   }
   setup.hurricane = {
-    center: resolveStartLocation(state.startLocation),
+    center: { ...resolveStartLocation(state.startLocation) },
     strength,
     speed: { ...config.initialHurricaneSpeed },
     startingCategory,
