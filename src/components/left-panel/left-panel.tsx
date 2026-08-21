@@ -5,6 +5,7 @@ import clsx from "clsx";
 import React from "react";
 
 import { PressureSystemsSection } from "./pressure-systems-section";
+import { RunsSection } from "./runs-section";
 import { SeasonSection } from "./season-section";
 import { SeaSurfaceTemperaturesSection } from "./sea-surface-temperatures-section";
 import { StormCategorySection } from "./storm-category-section";
@@ -46,6 +47,7 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
           <SeasonSection />
           <SeaSurfaceTemperaturesSection />
           <PressureSystemsSection />
+          <RunsSection />
         </List>
       </div>
     </div>
