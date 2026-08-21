@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pane, Polyline } from "react-leaflet";
 
 import { log } from "../log";
@@ -17,6 +17,14 @@ export const RunTracks = observer(function RunTracks() {
 
   const unselectedFinishedRuns = runs.runs.filter(run =>
     run.id !== runs.selectedRunId && run.simulation.simulationFinished);
+
+  // Leaflet fires no mouseout for removed layers, so clear hover state when the
+  // hovered run leaves the list (selection via map or panel, or deletion).
+  useEffect(() => {
+    if (hoveredRunId != null && !unselectedFinishedRuns.some(run => run.id === hoveredRunId)) {
+      setHoveredRunId(null);
+    }
+  }, [hoveredRunId, unselectedFinishedRuns]);
 
   const positions = (run: IRunState) => [
     ...run.simulation.hurricaneTrack.map(point => point.position),
