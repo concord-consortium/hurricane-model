@@ -20,7 +20,7 @@
   }
 
   &.selected {
-    background-color: #fdedd0;
+    background-color: $secondaryColorLight;
     border-color: $secondaryColor;
     cursor: default;
   }

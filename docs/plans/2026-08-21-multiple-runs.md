@@ -1301,6 +1301,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.target !== event.currentTarget) return;
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       handleSelect();
@@ -1644,7 +1645,7 @@ export const RunsSection = observer(function RunsSection() {
     padding: 12px 6px;
 
     &:hover {
-      background-color: #fdedd0;
+      background-color: $secondaryColorLight;
     }
 
     &:focus-visible {

@@ -19,6 +19,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
   const { runs, simulation, ui } = useStores();
   const selected = run.id === runs.selectedRunId;
   const complete = runs.isRunComplete(run);
+  const runNumber = runs.runs.indexOf(run) + 1;
 
   const handleSelect = () => {
     if (selected) return;
@@ -28,6 +29,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.target !== event.currentTarget) return;
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       handleSelect();
@@ -55,6 +57,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
       data-test="run-panel"
       role="button"
       tabIndex={0}
+      aria-label={`Run ${runNumber}`}
       aria-pressed={selected}
       onClick={handleSelect}
       onKeyDown={handleKeyDown}

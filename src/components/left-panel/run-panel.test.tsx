@@ -1,5 +1,6 @@
 import * as React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { createStores, IStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
@@ -62,6 +63,54 @@ describe("RunPanel", () => {
     expect(stores.simulation.simulationFinished).toBe(false);
     expect(stores.simulation.hurricaneTrack.length).toBe(0);
     expect(stores.simulation.season).toBe("winter");
+  });
+
+  it("labels each panel by its run number", () => {
+    completeCurrentRun(stores);
+    stores.runs.addRun();
+    renderPanels(stores);
+
+    const panels = screen.getAllByTestId("run-panel");
+    expect(panels[0]).toHaveAttribute("aria-label", "Run 1");
+    expect(panels[1]).toHaveAttribute("aria-label", "Run 2");
+  });
+
+  it("selects a run with Enter or Space on a focused panel", async () => {
+    const user = userEvent.setup();
+    completeCurrentRun(stores);
+    stores.runs.addRun();
+    renderPanels(stores);
+
+    const firstRunId = stores.runs.runs[0].id;
+    screen.getAllByTestId("run-panel")[0].focus();
+    await user.keyboard("{Enter}");
+    expect(stores.runs.selectedRunId).toBe(firstRunId);
+
+    screen.getAllByTestId("run-panel")[1].focus();
+    await user.keyboard(" ");
+    expect(stores.runs.selectedRunId).toBe(stores.runs.runs[1].id);
+  });
+
+  it("deletes with Enter on the focused delete button", async () => {
+    const user = userEvent.setup();
+    completeCurrentRun(stores);
+    stores.runs.addRun();
+    renderPanels(stores);
+
+    screen.getByTestId("delete-run-button").focus();
+    await user.keyboard("{Enter}");
+    expect(stores.runs.runs.length).toBe(1);
+  });
+
+  it("resets with Space on the focused reset button", async () => {
+    const user = userEvent.setup();
+    completeCurrentRun(stores);
+    renderPanels(stores);
+
+    screen.getByTestId("reset-run-button").focus();
+    await user.keyboard(" ");
+    expect(stores.simulation.simulationFinished).toBe(false);
+    expect(stores.simulation.hurricaneTrack.length).toBe(0);
   });
 
   it("deletes the run", () => {
