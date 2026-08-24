@@ -12,3 +12,6 @@ cypress/screenshots
 # yalc local package linking
 .yalc/
 yalc.lock
+
+# local backup of pre-widen base-map crops (the old crops are recoverable from git history anyway)
+src/assets/basemap-thumbs/OLD maps/

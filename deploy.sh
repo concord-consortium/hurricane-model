@@ -89,7 +89,28 @@ else
   git -C "$WT" push origin "HEAD:refs/heads/$PINNED_BRANCH"
 fi
 
+# ---- Sync SOURCE to the prototype handoff branch ---------------------------------------------
+# Commit any pending source in THIS repo, then push it to the developer's readable-source branch on
+# hurricane-model (the open "do not merge" PR updates automatically). This is a SOURCE branch, NOT a
+# deploy — the app only deploys to concord/demos above. A push failure here is non-fatal (the deploy
+# already succeeded); just re-run the printed command.
+PROTOTYPE_BRANCH="storm-explorer-multirun-prototype"
+echo "==> Syncing source to ${PROTOTYPE_BRANCH}…"
+git -C "$SE_DIR" add -A
+if git -C "$SE_DIR" diff --cached --quiet; then
+  echo "    (no source changes to commit)"
+else
+  git -C "$SE_DIR" commit -q -m "Deploy Storm Explorer Multi-track $VERSION (source)"
+  echo "    committed source on $(git -C "$SE_DIR" branch --show-current)"
+fi
+if git -C "$SE_DIR" push upstream "HEAD:$PROTOTYPE_BRANCH"; then
+  echo "    pushed source -> $PROTOTYPE_BRANCH (PR updates automatically)"
+else
+  echo "    !! source push failed — re-run:  git -C \"$SE_DIR\" push upstream HEAD:$PROTOTYPE_BRANCH"
+fi
+
 echo ""
 echo "==> Done. concord/demos CI is deploying now (~2-3 min):"
 echo "    latest : $BASE_URL/$ROLLING_BRANCH/?mode=storm"
 echo "    $VERSION  : $BASE_URL/$PINNED_BRANCH/?mode=storm"
+echo "    source : github.com/concord-consortium/hurricane-model/tree/$PROTOTYPE_BRANCH (PR auto-updates)"

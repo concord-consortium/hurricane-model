@@ -24,7 +24,11 @@ import css from "./run-thumbnail.scss";
 // The app map, base maps, and SST PNGs are all Web Mercator (EPSG:3857 — see simulation.ts's
 // seaSurfaceTempAt), so the thumbnail projects everything in Mercator too, over this North Atlantic
 // window (a bit wider than the app's map bounds so edge tracks/markers aren't clipped).
-const LAT_MAX = 54, LAT_MIN = 2, LNG_MIN = -90, LNG_MAX = -10;
+// Wide, zoomed-out window over the North Atlantic: full Gulf of Mexico on the left, a good slice of
+// West Africa (and Iberia) on the right, northern South America at the bottom. Latitude is aspect-
+// locked to 100:78 (top fixed, extra height on the bottom). The base-map crops in basemap-thumbs/ are
+// regenerated to EXACTLY these bounds (Esri tiles via the gen-basemaps script), so they change together.
+const LAT_MAX = 56.9429, LAT_MIN = -10.4166, LNG_MIN = -102.6667, LNG_MAX = 0;
 // Normalized Web Mercator (0..1 over the whole world), matching the full-world square SST PNGs.
 const mx = (lng: number) => (lng + 180) / 360;
 const my = (lat: number) => (1 - Math.asinh(Math.tan((lat * Math.PI) / 180)) / Math.PI) / 2;
