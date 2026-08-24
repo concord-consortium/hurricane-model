@@ -26,11 +26,11 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    font-family: inherit;
+    font-family: "Roboto Condensed", Lato, arial, sans-serif;
     font-size: 14px;
     font-weight: bold;
     gap: 8px;
-    padding: 12px 6px;
+    padding: 12px 6px 9px;
 
     &:hover {
       background-color: $secondaryColorLight;
