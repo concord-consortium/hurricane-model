@@ -10,6 +10,7 @@ import DeleteIcon from "../../assets/left-panel/delete.svg";
 import RestartIcon from "../../assets/left-panel/restart.svg";
 
 import css from "./run-panel.scss";
+import runsCss from "./runs-section.scss";
 
 interface IRunPanelProps {
   run: IRunState;
@@ -62,27 +63,32 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
       onClick={handleSelect}
       onKeyDown={handleKeyDown}
     >
-      {selected &&
-        <div className={css.runButtons}>
-          <button
-            type="button"
-            aria-label="Reset run"
-            data-test="reset-run-button"
-            disabled={!complete || simulation.simulationRunning}
-            onClick={handleReset}
-          >
-            <RestartIcon />
-          </button>
-          <button
-            type="button"
-            aria-label="Delete run"
-            data-test="delete-run-button"
-            disabled={simulation.simulationRunning}
-            onClick={handleDelete}
-          >
-            <DeleteIcon />
-          </button>
-        </div>}
+      <div className={css.runPanelHeader}>
+        <div className={css.runLabel} />
+        <div className={runsCss.runsMessage}>Not run yet - editable</div>
+        {selected &&
+          <div className={css.runButtons}>
+            <button
+              type="button"
+              aria-label="Reset run"
+              data-test="reset-run-button"
+              disabled={!complete || simulation.simulationRunning}
+              onClick={handleReset}
+            >
+              <RestartIcon />
+            </button>
+            <button
+              type="button"
+              aria-label="Delete run"
+              data-test="delete-run-button"
+              disabled={simulation.simulationRunning}
+              onClick={handleDelete}
+            >
+              <DeleteIcon />
+            </button>
+          </div>
+        }
+      </div>
     </div>
   );
 });
