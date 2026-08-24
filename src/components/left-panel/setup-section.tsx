@@ -43,7 +43,13 @@ export const SetupSection = observer(function SetupSection({
   const headerClasses = clsx(css.sectionHeader, { [css.openSectionHeader]: open })
   return (
     <>
-      <ListItemButton className={headerClasses} data-test={`${dt}-button`} disableRipple={true} onClick={handleClick}>
+      <ListItemButton
+        className={headerClasses}
+        data-test={`${dt}-button`}
+        disabled={stores.simulation.simulationStarted}
+        disableRipple={true}
+        onClick={handleClick}
+      >
         {Icon && <ListItemIcon className={iconClassName}><Icon /></ListItemIcon>}
         <ListItemText
           primary={title}
