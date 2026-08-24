@@ -14,7 +14,7 @@ const createResource = jest.fn().mockResolvedValue({
 });
 const getReadWriteToken = jest.fn().mockReturnValue("rwtoken");
 const getCredentials = jest.fn().mockResolvedValue({
-  accessKeyId: "AK", secretAccessKey: "SK", sessionToken: "ST"
+  accessKeyId: "AK", secretAccessKey: "SK", sessionToken: "ST", expiration: "2026-08-24T12:00:00.000Z"
 });
 const getPublicS3Path = jest.fn().mockReturnValue("hurricane-models/abc123/model.json.gz");
 jest.mock("@concord-consortium/token-service", () => ({
@@ -54,8 +54,28 @@ describe("cloud-storage", () => {
       expect(mockSend).toHaveBeenCalledTimes(1);
       expect(S3Client).toHaveBeenCalledWith(expect.objectContaining({
         region: "us-east-1",
-        credentials: { accessKeyId: "AK", secretAccessKey: "SK", sessionToken: "ST" }
+        credentials: {
+          accessKeyId: "AK",
+          secretAccessKey: "SK",
+          sessionToken: "ST",
+          expiration: new Date("2026-08-24T12:00:00.000Z")
+        }
       }));
+    });
+
+    // The AWS SDK calls credentials.expiration.getTime(), which throws on the raw JSON string.
+    it("converts the credential expiration to a Date", async () => {
+      await saveModelToCloud(sampleState);
+      const { credentials } = (S3Client as unknown as jest.Mock).mock.calls[0][0];
+      expect(credentials.expiration).toBeInstanceOf(Date);
+      expect(credentials.expiration.getTime()).toBe(Date.parse("2026-08-24T12:00:00.000Z"));
+    });
+
+    it("omits the credential expiration when the service doesn't return one", async () => {
+      getCredentials.mockResolvedValueOnce({ accessKeyId: "AK", secretAccessKey: "SK", sessionToken: "ST" });
+      await saveModelToCloud(sampleState);
+      const { credentials } = (S3Client as unknown as jest.Mock).mock.calls[0][0];
+      expect(credentials.expiration).toBeUndefined();
     });
 
     it("compresses the JSON-serialized state before upload", async () => {
