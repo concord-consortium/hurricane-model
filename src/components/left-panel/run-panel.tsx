@@ -52,6 +52,10 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
     log("RunDeleted", { runId: run.id });
   };
 
+  const statusMessage = complete ? ""
+    : selected && simulation.simulationStarted ? "Running..."
+    : "Not run yet - editable";
+
   return (
     <div
       className={clsx(css.runPanel, { [css.selected]: selected, [css.incomplete]: !complete })}
@@ -65,7 +69,13 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
     >
       <div className={css.runPanelHeader}>
         <div className={css.runLabel} />
-        <div className={runsCss.runsMessage}>Not run yet - editable</div>
+        <div
+          aria-label="Run status"
+          className={runsCss.runsMessage}
+          data-test="run-status"
+        >
+          {statusMessage}
+        </div>
         {selected &&
           <div className={css.runButtons}>
             <button

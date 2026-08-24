@@ -1,6 +1,7 @@
 import * as React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { runInAction } from "mobx";
 
 import { createStores, IStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
@@ -120,5 +121,51 @@ describe("RunPanel", () => {
 
     fireEvent.click(screen.getByTestId("delete-run-button"));
     expect(stores.runs.runs.length).toBe(1);
+  });
+
+  describe("status message", () => {
+    it("says the run is editable before it starts", () => {
+      renderPanels(stores);
+      expect(screen.getByTestId("run-status")).toHaveTextContent("Not run yet - editable");
+    });
+
+    it("says the run is running once the simulation starts", () => {
+      stores.simulation.simulationStarted = true;
+      renderPanels(stores);
+      expect(screen.getByTestId("run-status")).toHaveTextContent("Running...");
+    });
+
+    it("is empty once the run is complete", () => {
+      completeCurrentRun(stores);
+      renderPanels(stores);
+      expect(screen.getByTestId("run-status")).toBeEmptyDOMElement();
+    });
+
+    it("shows the message only on the selected run", () => {
+      completeCurrentRun(stores);
+      stores.runs.addRun();
+      renderPanels(stores);
+
+      const statuses = screen.getAllByTestId("run-status");
+      expect(statuses[0]).toBeEmptyDOMElement();
+      expect(statuses[1]).toHaveTextContent("Not run yet - editable");
+    });
+
+    it("updates as the simulation starts and finishes", () => {
+      renderPanels(stores);
+      const status = screen.getByTestId("run-status");
+      expect(status).toHaveTextContent("Not run yet - editable");
+
+      act(() => runInAction(() => { stores.simulation.simulationStarted = true; }));
+      expect(status).toHaveTextContent("Running...");
+
+      act(() => runInAction(() => { stores.simulation.simulationFinished = true; }));
+      expect(status).toBeEmptyDOMElement();
+    });
+
+    it("is labeled for screen readers", () => {
+      renderPanels(stores);
+      expect(screen.getByTestId("run-status")).toHaveAttribute("aria-label", "Run status");
+    });
   });
 });
