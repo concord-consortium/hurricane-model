@@ -8,7 +8,6 @@ import config from "../../config";
 import { log } from "../../log";
 import { safeStartLocation } from "../../utils/interactive-state";
 import { BaseComponent, IBaseProps } from "../base";
-import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 import { Dialog } from "../dialog";
 import { HurricaneImageToggle } from "./hurricane-image-toggle";
 import { HurricaneScale } from "./hurricane-scale";
@@ -92,7 +91,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     const tempButtonDisabled = overlay !== "sst";
     const isStormMode = config.mode === "storm";
-    const stormSetupButtonDisabled = simulationRunning;
     const startLocationButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && simulationStarted);
     const seasonButtonDisabled = isReportMode ||
@@ -115,7 +113,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             <div className={css.widgetGroup}>
               <Button
                 onClick={this.toggleLeftPanel}
-                disabled={stormSetupButtonDisabled}
                 className={clsx(css.bottomBarButton, css.stormSetupButton, { [css.open]: leftPanelOpen })}
                 data-test="storm-setup-button"
                 disableRipple={true}
