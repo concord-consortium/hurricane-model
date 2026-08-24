@@ -248,28 +248,18 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public toggleLeftPanel = () => {
-    if (this.stores.simulation.simulationStarted) this.restart();
     this.props.toggleLeftPanelOpen();
   }
 
   public handleStartStop = () => {
-    const { simulation, ui } = this.stores;
+    const { simulation } = this.stores;
     if (simulation.simulationRunning) {
       simulation.stop();
       log("SimulationStopped", {
         outcome: simulation.getOutcomeData()
       });
     } else {
-      if (ui.leftPanelOpen) {
-        // Close the setup panel
-        ui.setSetupMode(undefined);
-        ui.setLeftPanelOpen(false);
-
-        // Start after the panel finishes closing
-        this.delayedStart = setTimeout(() => this.start(), LEFT_PANEL_TRANSITION_SECONDS * 1000);
-      } else {
-        this.start();
-      }
+      this.start();
     }
   }
 
