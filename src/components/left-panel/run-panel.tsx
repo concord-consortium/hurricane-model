@@ -7,7 +7,7 @@ import { IRunState } from "../../types/interactive-state";
 import { useStores } from "../../stores-context";
 
 import DeleteIcon from "../../assets/left-panel/delete.svg";
-import RestartIcon from "../../assets/restart.svg";
+import RestartIcon from "../../assets/left-panel/restart.svg";
 
 import css from "./run-panel.scss";
 
@@ -68,7 +68,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
             type="button"
             aria-label="Reset run"
             data-test="reset-run-button"
-            disabled={!complete}
+            disabled={!complete || simulation.simulationRunning}
             onClick={handleReset}
           >
             <RestartIcon />
@@ -77,6 +77,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
             type="button"
             aria-label="Delete run"
             data-test="delete-run-button"
+            disabled={simulation.simulationRunning}
             onClick={handleDelete}
           >
             <DeleteIcon />
