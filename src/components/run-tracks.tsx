@@ -42,12 +42,12 @@ export const RunTracks = observer(function RunTracks() {
     mouseout: () => setHoveredRunId(current => (current === run.id ? null : current))
   });
 
-  // Two panes so every border renders below every track fill. Both sit under
-  // overlayPane (z 400) and shadowPane (z 500), which hold the selected run's track.
+  // Above overlayPane (z 400), which holds the sea surface temperature overlay and the wind canvas
+  // and below the panes holding the selected run's track (z 430) and shadowPane (z 500).
   return (
-    <>
-      <Pane name="unselectedTrackBorders" style={{ zIndex: 380 }}>
-        {unselectedFinishedRuns.map(run =>
+    <Pane name="unselectedTracks" style={{ zIndex: 410 }}>
+      {unselectedFinishedRuns.map(run =>
+        <>
           <Polyline
             key={run.id}
             positions={positions(run)}
@@ -58,10 +58,6 @@ export const RunTracks = observer(function RunTracks() {
               weight: borderWeight
             }}
           />
-        )}
-      </Pane>
-      <Pane name="unselectedTracks" style={{ zIndex: 390 }}>
-        {unselectedFinishedRuns.map(run =>
           <Polyline
             key={run.id}
             positions={positions(run)}
@@ -72,8 +68,8 @@ export const RunTracks = observer(function RunTracks() {
               weight: trackWeight
             }}
           />
-        )}
-      </Pane>
-    </>
+        </>
+      )}
+    </Pane>
   );
 });
