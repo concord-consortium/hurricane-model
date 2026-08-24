@@ -22,7 +22,7 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 |-------|-----------|------|
 | `RunSelected` | `{ runId, via: "panel" \| "map" }` | User selects a different run by clicking its setup panel or its track on the map |
 | `RunAdded` | `{ runId }` | User clicks New Run |
-| `RunDuplicated` | `{ runId, duplicatedRunId }` | User clicks Duplicate Last Run (`runId` is the new run, `duplicatedRunId` the run whose setup was copied) |
+| `RunDuplicated` | `{ runId, duplicatedRunId }` | User clicks Copy Selected Run (`runId` is the new run, `duplicatedRunId` the run whose setup was copied) |
 | `RunReset` | `{ runId }` | User clicks the reset button on the selected run's panel |
 | `RunDeleted` | `{ runId }` | User clicks the delete button on the selected run's panel |
 

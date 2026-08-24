@@ -119,14 +119,14 @@ describe("RunsModel", () => {
     });
   });
 
-  describe("duplicateLastRun", () => {
-    it("copies the newest run's setup without its outcome", () => {
+  describe("duplicateSelectedRun", () => {
+    it("copies the selected run's setup without its outcome", () => {
       const { runs, simulation } = stores;
       simulation.season = "winter";
       simulation.setTemperatureAnomaly("gulf", 2);
       completeCurrentRun(stores);
 
-      runs.duplicateLastRun();
+      runs.duplicateSelectedRun();
 
       expect(runs.runs.length).toBe(2);
       expect(runs.selectedRunId).toBe(runs.runs[1].id);
@@ -137,7 +137,7 @@ describe("RunsModel", () => {
       expect(simulation.hurricaneTrack.length).toBe(0);
     });
 
-    it("copies the newest run's setup even when an older run is selected", () => {
+    it("copies the older run's setup when an older run is selected", () => {
       const { runs, simulation } = stores;
       const firstId = runs.selectedRunId;
       simulation.season = "winter";
@@ -147,17 +147,17 @@ describe("RunsModel", () => {
       completeCurrentRun(stores);
       runs.selectRun(firstId);
 
-      runs.duplicateLastRun();
+      runs.duplicateSelectedRun();
 
       expect(runs.runs.length).toBe(3);
       expect(runs.selectedRunId).toBe(runs.runs[2].id);
-      expect(simulation.season).toBe("summer");
+      expect(simulation.season).toBe("winter");
       expect(simulation.simulationStarted).toBe(false);
     });
 
     it("is a no-op when runs are incomplete", () => {
       const { runs } = stores;
-      runs.duplicateLastRun();
+      runs.duplicateSelectedRun();
       expect(runs.runs.length).toBe(1);
     });
   });

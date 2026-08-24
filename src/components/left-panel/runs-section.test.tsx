@@ -60,7 +60,7 @@ describe("RunsSection", () => {
     expect(mockLog).toHaveBeenCalledWith("RunAdded", { runId: stores.runs.runs[1].id });
   });
 
-  it("duplicates the last run's setup via Duplicate Last Run", () => {
+  it("duplicates the selected run's setup via Copy Selected Run", () => {
     stores.simulation.season = "winter";
     completeCurrentRun(stores);
     renderSection(stores);
@@ -73,18 +73,22 @@ describe("RunsSection", () => {
     expect(mockLog).toHaveBeenCalledWith("RunDuplicated", { runId: stores.runs.runs[1].id, duplicatedRunId });
   });
 
-  it("duplicates the last run even when an earlier run is selected", () => {
+  it("duplicates the earlier run when an earlier run is selected", () => {
     stores.simulation.season = "winter";
     completeCurrentRun(stores);
     stores.runs.addRun();
     stores.simulation.season = "summer";
     completeCurrentRun(stores);
-    stores.runs.selectRun(stores.runs.runs[0].id);
+    const selectedRunId = stores.runs.runs[0].id;
+    stores.runs.selectRun(selectedRunId);
     renderSection(stores);
 
     fireEvent.click(screen.getByTestId("duplicate-run-button"));
     expect(stores.runs.runs.length).toBe(3);
-    expect(stores.simulation.season).toBe("summer");
+    expect(stores.simulation.season).toBe("winter");
+    expect(mockLog).toHaveBeenCalledWith(
+      "RunDuplicated", { runId: stores.runs.runs[2].id, duplicatedRunId: selectedRunId }
+    );
   });
 
   it("shows the limit message at the maximum number of complete runs", () => {

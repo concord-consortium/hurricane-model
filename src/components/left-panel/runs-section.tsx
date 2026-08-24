@@ -17,10 +17,10 @@ export const RunsSection = observer(function RunsSection() {
     log("RunAdded", { runId: runs.selectedRunId });
   };
 
-  const handleDuplicateLastRun = () => {
+  const handleCopySelectedRun = () => {
     if (!runs.canAddRun) return;
-    const duplicatedRunId = runs.runs[runs.runs.length - 1].id;
-    runs.duplicateLastRun();
+    const duplicatedRunId = runs.selectedRunId;
+    runs.duplicateSelectedRun();
     ui.setNorthAtlanticView();
     log("RunDuplicated", { runId: runs.selectedRunId, duplicatedRunId });
   };
@@ -42,10 +42,10 @@ export const RunsSection = observer(function RunsSection() {
             type="button"
             className={css.addRunButton}
             data-test="duplicate-run-button"
-            onClick={handleDuplicateLastRun}
+            onClick={handleCopySelectedRun}
           >
             <span className={css.plusIcon} aria-hidden="true" />
-            Duplicate Last Run
+            Copy Selected Run
           </button>
           <button
             type="button"

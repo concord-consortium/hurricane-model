@@ -59,12 +59,13 @@ export class RunsModel {
     this.addAndSelect(defaultSimulationState());
   }
 
-  @action.bound public duplicateLastRun() {
+  @action.bound public duplicateSelectedRun() {
     if (!this.canAddRun) return;
     // Snapshot first so a stale selected-run record can't be duplicated.
     this.snapshotSelectedRun();
-    const last = this.runs[this.runs.length - 1];
-    this.addAndSelect(extractSetupState(last.simulation));
+    const selected = this.selectedRun;
+    if (!selected) return;
+    this.addAndSelect(extractSetupState(selected.simulation));
   }
 
   @action.bound public resetSelectedRun() {
