@@ -2,7 +2,7 @@
 
 .runPanel {
   background-color: white;
-  border: 2px solid $charcoalMedium;
+  border: 1px solid $charcoalMedium;
   border-radius: 7px;
   cursor: pointer;
   margin: 10px 15px;
@@ -11,7 +11,7 @@
   position: relative;
 
   &:hover:not(.selected) {
-    background-color: $hoverColor;
+    background-color: $secondaryColorHover;
   }
 
   &:focus-visible {
@@ -21,8 +21,12 @@
 
   &.selected {
     background-color: $secondaryColorLight;
-    border-color: $secondaryColor;
+    border: 2px solid $secondaryColor;
     cursor: default;
+  }
+
+  &.incomplete {
+    border-style: dashed;
   }
 
   .runButtons {

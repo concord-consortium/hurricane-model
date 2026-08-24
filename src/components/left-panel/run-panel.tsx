@@ -53,7 +53,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
 
   return (
     <div
-      className={clsx(css.runPanel, { [css.selected]: selected })}
+      className={clsx(css.runPanel, { [css.selected]: selected, [css.incomplete]: !complete })}
       data-test="run-panel"
       role="button"
       tabIndex={0}
