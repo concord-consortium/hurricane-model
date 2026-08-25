@@ -33,7 +33,8 @@ export const RunTracks = observer(function RunTracks() {
 
   const eventHandlers = (run: IRunState) => ({
     click: () => {
-      if (simulation.inProgress || ui.isReadOnly) return;
+      if (ui.isReadOnly) return;
+      if (simulation.inProgress) simulation.restart();
       runs.selectRun(run.id);
       ui.setNorthAtlanticView();
       log("RunSelected", { runId: run.id, via: "map" });
