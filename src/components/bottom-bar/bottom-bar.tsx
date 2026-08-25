@@ -249,14 +249,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public handleStartStop = () => {
-    const { simulation, ui } = this.stores;
+    const { simulation } = this.stores;
     if (simulation.simulationRunning) {
       simulation.stop();
       log("SimulationStopped", {
         outcome: simulation.getOutcomeData()
       });
     } else {
-      ui.setSetupMode(undefined);
       this.start();
     }
   }

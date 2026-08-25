@@ -2,7 +2,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import List from "@mui/material/List";
 import ListSubheader from "@mui/material/ListSubheader";
 import clsx from "clsx";
-import React from "react";
+import { observer } from "mobx-react-lite";
+import React, { useEffect } from "react";
 
 import { PressureSystemsSection } from "./pressure-systems-section";
 import { RunsSection } from "./runs-section";
@@ -12,13 +13,23 @@ import { StormCategorySection } from "./storm-category-section";
 import { StormLocationSection } from "./storm-location-section";
 
 import css from "./left-panel.scss";
+import { useStores } from "../../stores-context";
 
 interface ILeftPanelProps {
   open?: boolean;
   toggleOpen?: () => void;
 }
 
-export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
+export const LeftPanel = observer(function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
+  const { simulation, ui } = useStores();
+
+  // Clear the setup mode selection when the simulation has started, or we switch to a previously completed run.
+  useEffect(() => {
+    if (simulation.simulationStarted) {
+      ui.setSetupMode(undefined);
+    }
+  }, [simulation.simulationStarted, ui]);
+
   const panelClasses = clsx(css.leftPanel, { [css.open]: open });
   return (
     <div className={css.leftPanelContainer}>
@@ -52,4 +63,4 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
       </div>
     </div>
   );
-}
+});
