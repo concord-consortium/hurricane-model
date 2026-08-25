@@ -23,7 +23,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
   const runNumber = runs.runs.indexOf(run) + 1;
 
   const handleSelect = () => {
-    if (selected || (simulation.simulationStarted && !simulation.simulationFinished) || ui.isReadOnly) return;
+    if (selected || simulation.inProgress || ui.isReadOnly) return;
     runs.selectRun(run.id);
     ui.setNorthAtlanticView();
     log("RunSelected", { runId: run.id, via: "panel" });

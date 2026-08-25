@@ -179,6 +179,11 @@ export class SimulationModel {
     return this.seaSurfaceTempData !== null && this.hurricane.active;
   }
 
+  // True when the simulation has started but hasn't completed, whether it's paused or not.
+  @computed get inProgress() {
+    return this.simulationStarted && !this.simulationFinished;
+  }
+
   @computed get loading() {
     return this.seaSurfaceTempData === null;
   }
@@ -308,6 +313,8 @@ export class SimulationModel {
   }
 
   @action.bound public tick(timestamp = window.performance.now()) {
+    if (!this.simulationRunning) return;
+
     if (this.time % benchmarkInterval === 0) {
       this.stepsPerSecond = 1000 / (timestamp - this.previousTimestamp) * benchmarkInterval;
       this.previousTimestamp = timestamp;
