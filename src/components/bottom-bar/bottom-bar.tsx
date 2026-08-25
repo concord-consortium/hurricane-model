@@ -331,6 +331,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     });
     this.stores.simulation.reset();
     this.stores.ui.reset();
+    // Runs are reset last so the sole remaining run mirrors the freshly reset simulation.
+    this.stores.runs.reset();
     log("SimulationReloaded");
     this.setState({ reloadConfirmOpen: false });
   }

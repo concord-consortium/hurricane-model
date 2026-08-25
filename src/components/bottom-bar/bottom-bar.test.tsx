@@ -121,6 +121,23 @@ describe("BottomBar component", () => {
       expect(stores.ui.reset).toHaveBeenCalled();
     });
 
+    it("clears all saved runs when Reload is confirmed", async () => {
+      const user = userEvent.setup();
+      stores.simulation.simulationStarted = true;
+      stores.simulation.simulationFinished = true;
+      stores.runs.addRun();
+      expect(stores.runs.runs.length).toBe(2);
+      render(
+        <Provider stores={stores}>
+          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+        </Provider>
+      );
+      await user.click(screen.getByTestId("reload-button"));
+      await user.click(screen.getByTestId("reload-confirm-button"));
+      expect(stores.runs.runs.length).toBe(1);
+      expect(stores.runs.selectedRunId).toBe(stores.runs.runs[0].id);
+    });
+
     it("logs SimulationEnded with reason SimulationReloaded when Reload is confirmed", async () => {
       const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();

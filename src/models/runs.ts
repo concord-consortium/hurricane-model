@@ -72,6 +72,13 @@ export class RunsModel {
     this.simulation.restart();
   }
 
+  // Discards every saved run and starts over from whatever state the simulation is in.
+  @action.bound public reset() {
+    const first: IRunState = { id: this.makeRunId(), simulation: serializeSimulation(this.simulation) };
+    this.runs = [first];
+    this.selectedRunId = first.id;
+  }
+
   @action.bound public deleteRun(id: string) {
     const index = this.runs.findIndex(run => run.id === id);
     if (index === -1) return;

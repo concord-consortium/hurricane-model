@@ -175,6 +175,24 @@ describe("RunsModel", () => {
     });
   });
 
+  describe("reset", () => {
+    it("discards all saved runs and keeps a single run mirroring the simulation", () => {
+      const { runs, simulation } = stores;
+      completeCurrentRun(stores);
+      runs.addRun();
+      completeCurrentRun(stores);
+      runs.addRun();
+      expect(runs.runs.length).toBe(3);
+
+      simulation.reset();
+      runs.reset();
+      expect(runs.runs.length).toBe(1);
+      expect(runs.selectedRunId).toBe(runs.runs[0].id);
+      expect(runs.runs[0].simulation.simulationFinished).toBe(false);
+      expect(runs.runs[0].simulation.hurricaneTrack.length).toBe(0);
+    });
+  });
+
   describe("deleteRun", () => {
     const addCompletedRuns = (count: number) => {
       for (let i = 0; i < count; i++) {
