@@ -42,8 +42,7 @@ export const RunTracks = observer(function RunTracks() {
     mouseout: () => setHoveredRunId(current => (current === run.id ? null : current))
   });
 
-  // Above overlayPane (z 400), which holds the sea surface temperature overlay and the wind canvas
-  // and below the panes holding the selected run's track (z 430) and shadowPane (z 500).
+  // Above overlayPane (z 400) and below the pane holding the selected run's track (z 430) and shadowPane (z 500).
   return (
     <Pane name="unselectedTracks" style={{ zIndex: 410 }}>
       {unselectedFinishedRuns.map(run =>
