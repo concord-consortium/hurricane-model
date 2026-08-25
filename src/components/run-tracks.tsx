@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Pane, Polyline } from "react-leaflet";
 
 import { log } from "../log";
@@ -33,7 +33,7 @@ export const RunTracks = observer(function RunTracks() {
 
   const eventHandlers = (run: IRunState) => ({
     click: () => {
-      if (simulation.simulationRunning || ui.isReportMode) return;
+      if (simulation.simulationRunning || ui.isReadOnly) return;
       runs.selectRun(run.id);
       ui.setNorthAtlanticView();
       log("RunSelected", { runId: run.id, via: "map" });
@@ -46,9 +46,8 @@ export const RunTracks = observer(function RunTracks() {
   return (
     <Pane name="unselectedTracks" style={{ zIndex: 410 }}>
       {unselectedFinishedRuns.map(run =>
-        <>
+        <Fragment key={run.id}>
           <Polyline
-            key={run.id}
             positions={positions(run)}
             eventHandlers={eventHandlers(run)}
             pathOptions={{
@@ -58,7 +57,6 @@ export const RunTracks = observer(function RunTracks() {
             }}
           />
           <Polyline
-            key={run.id}
             positions={positions(run)}
             eventHandlers={eventHandlers(run)}
             pathOptions={{
@@ -67,7 +65,7 @@ export const RunTracks = observer(function RunTracks() {
               weight: trackWeight
             }}
           />
-        </>
+        </Fragment>
       )}
     </Pane>
   );

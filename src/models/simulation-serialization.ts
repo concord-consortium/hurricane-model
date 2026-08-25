@@ -17,11 +17,13 @@ import { SimulationModel, extendedLandfallBounds, resolveStartLocation } from ".
  * won't re-run when those observables change, breaking auto-save.
  */
 export function serializeSimulation(simulation: SimulationModel): ISimulationState {
-  const { hurricane, startLocation } = simulation;
+  const { hurricane, pressureSystems, pressureSystemSettings, startLocation } = simulation;
+    // Use pressureSystemSettings when present over pressureSystems to serialize the start state over the end state
+  const systems = pressureSystemSettings.length > 0 ? pressureSystemSettings : pressureSystems;
   return {
     season: simulation.season,
     startLocation: safeStartLocation(startLocation),
-    pressureSystems: simulation.pressureSystems.map(ps => ps.serialize()),
+    pressureSystems: systems.map(system => system.serialize()),
     simulationStarted: simulation.simulationStarted,
     simulationFinished: simulation.simulationFinished,
     time: simulation.time,

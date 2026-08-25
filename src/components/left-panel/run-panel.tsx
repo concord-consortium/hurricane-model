@@ -23,7 +23,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
   const runNumber = runs.runs.indexOf(run) + 1;
 
   const handleSelect = () => {
-    if (selected) return;
+    if (selected || (simulation.simulationStarted && !simulation.simulationFinished) || ui.isReadOnly) return;
     runs.selectRun(run.id);
     ui.setNorthAtlanticView();
     log("RunSelected", { runId: run.id, via: "panel" });
@@ -53,7 +53,8 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
   };
 
   const statusMessage = complete ? ""
-    : selected && simulation.simulationStarted ? "Running..."
+    : selected && simulation.simulationRunning ? "Running..."
+    : selected && simulation.simulationStarted ? "Paused"
     : "Not run yet - editable";
 
   return (
@@ -82,7 +83,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
               type="button"
               aria-label="Reset run"
               data-test="reset-run-button"
-              disabled={!complete || simulation.simulationRunning}
+              disabled={!complete || simulation.simulationRunning || ui.isReadOnly}
               onClick={handleReset}
             >
               <RestartIcon />
@@ -91,7 +92,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
               type="button"
               aria-label="Delete run"
               data-test="delete-run-button"
-              disabled={simulation.simulationRunning}
+              disabled={simulation.simulationRunning || ui.isReadOnly}
               onClick={handleDelete}
             >
               <DeleteIcon />

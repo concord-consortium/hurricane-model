@@ -42,6 +42,7 @@ export const RunsSection = observer(function RunsSection() {
             type="button"
             className={css.addRunButton}
             data-test="duplicate-run-button"
+            disabled={ui.isReadOnly}
             onClick={handleCopySelectedRun}
           >
             <span className={css.plusIcon} aria-hidden="true" />
@@ -51,6 +52,7 @@ export const RunsSection = observer(function RunsSection() {
             type="button"
             className={css.addRunButton}
             data-test="new-run-button"
+            disabled={ui.isReadOnly}
             onClick={handleNewRun}
           >
             <span className={css.plusIcon} aria-hidden="true" />

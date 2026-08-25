@@ -130,9 +130,14 @@ describe("RunPanel", () => {
     });
 
     it("says the run is running once the simulation starts", () => {
+      stores.simulation.simulationRunning = true;
       stores.simulation.simulationStarted = true;
       renderPanels(stores);
       expect(screen.getByTestId("run-status")).toHaveTextContent("Running...");
+      act(() => runInAction(() => {
+        stores.simulation.simulationRunning = false;
+      }));
+      expect(screen.getByTestId("run-status")).toHaveTextContent("Paused");
     });
 
     it("is empty once the run is complete", () => {
@@ -156,7 +161,10 @@ describe("RunPanel", () => {
       const status = screen.getByTestId("run-status");
       expect(status).toHaveTextContent("Not run yet - editable");
 
-      act(() => runInAction(() => { stores.simulation.simulationStarted = true; }));
+      act(() => runInAction(() => {
+        stores.simulation.simulationRunning = true;
+        stores.simulation.simulationStarted = true;
+      }));
       expect(status).toHaveTextContent("Running...");
 
       act(() => runInAction(() => { stores.simulation.simulationFinished = true; }));
