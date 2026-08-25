@@ -59,48 +59,50 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
     : "Not run yet - editable";
 
   return (
-    <div
-      className={clsx(css.runPanel, { [css.selected]: selected, [css.incomplete]: !complete })}
-      data-test="run-panel"
-      role="button"
-      tabIndex={0}
-      aria-label={`Run ${runNumber}`}
-      aria-pressed={selected}
-      onClick={handleSelect}
-      onKeyDown={handleKeyDown}
-    >
-      <div className={css.runPanelHeader}>
-        <div className={css.runLabel} />
-        <div
-          aria-label="Run status"
-          className={runsCss.runsMessage}
-          data-test="run-status"
-        >
-          {statusMessage}
-        </div>
-        {selected &&
-          <div className={css.runButtons}>
-            <button
-              type="button"
-              aria-label="Reset run"
-              data-test="reset-run-button"
-              disabled={!complete || simulation.simulationRunning || ui.isReadOnly}
-              onClick={handleReset}
-            >
-              <RestartIcon />
-            </button>
-            <button
-              type="button"
-              aria-label="Delete run"
-              data-test="delete-run-button"
-              disabled={simulation.simulationRunning || ui.isReadOnly}
-              onClick={handleDelete}
-            >
-              <DeleteIcon />
-            </button>
+    <div className={css.runCardContainer}>
+      <div
+        className={clsx(css.runPanel, { [css.selected]: selected, [css.incomplete]: !complete })}
+        data-test="run-panel"
+        role="button"
+        tabIndex={0}
+        aria-label={`Run ${runNumber}`}
+        aria-pressed={selected}
+        onClick={handleSelect}
+        onKeyDown={handleKeyDown}
+      >
+        <div className={css.runPanelHeader}>
+          <div className={css.runLabel} />
+          <div
+            aria-label="Run status"
+            className={clsx(css.runStatus, runsCss.runsMessage)}
+            data-test="run-status"
+          >
+            {statusMessage}
           </div>
-        }
+        </div>
       </div>
+      {selected &&
+        <div className={css.runButtons}>
+          <button
+            type="button"
+            aria-label="Reset run"
+            data-test="reset-run-button"
+            disabled={!complete || simulation.simulationRunning || ui.isReadOnly}
+            onClick={handleReset}
+          >
+            <RestartIcon />
+          </button>
+          <button
+            type="button"
+            aria-label="Delete run"
+            data-test="delete-run-button"
+            disabled={simulation.simulationRunning || ui.isReadOnly}
+            onClick={handleDelete}
+          >
+            <DeleteIcon />
+          </button>
+        </div>
+      }
     </div>
   );
 });
