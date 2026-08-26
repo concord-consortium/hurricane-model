@@ -15,14 +15,14 @@ describe("PressureSystemMarker component", () => {
     render(
       <Provider stores={stores}>
         <MapContainer center={[0, 0]} zoom={10}>
-          <PressureSystemMarker model={stores.simulation.pressureSystems[0]}/>
+          <PressureSystemMarker model={stores.simulation.pressureSystemsSetup[0]}/>
         </MapContainer>
       </Provider>
     );
   });
 
   it("updates pressure center position via setPressureSysCenter", () => {
-    const model = stores.simulation.pressureSystems[0];
+    const model = stores.simulation.pressureSystemsSetup[0];
     stores.simulation.setPressureSysCenter(model, { lat: 20, lng: 30 });
     expect(model.center).toEqual({ lat: 20, lng: 30 });
 

@@ -208,7 +208,7 @@ export class MapView extends BaseComponent<IProps, IState> {
             )
           }
           {
-            sim.pressureSystems.map((ps, idx) =>
+            sim.activePressureSystems.map((ps, idx) =>
               <PressureSystemMarker
                 key={idx}
                 model={ps}

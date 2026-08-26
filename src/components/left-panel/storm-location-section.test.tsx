@@ -43,7 +43,7 @@ describe("StormLocationSection", () => {
 
     act(() => {
       // Simulate the drag handler updating just hurricane.center.
-      stores.simulation.hurricane.setCenter({ lat: 25.123, lng: -75.987 }, stores.simulation.pressureSystems);
+      stores.simulation.hurricane.setCenter({ lat: 25.123, lng: -75.987 }, stores.simulation.activePressureSystems);
     });
 
     expect(latInput().value).toBe("25.12");

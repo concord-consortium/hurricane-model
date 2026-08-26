@@ -117,6 +117,7 @@ describe("interactive-state", () => {
       expect(simulation).toHaveProperty("season");
       expect(simulation).toHaveProperty("startLocation");
       expect(simulation).toHaveProperty("pressureSystems");
+      expect(simulation).toHaveProperty("pressureSystemsSetup");
       expect(simulation).toHaveProperty("simulationStarted");
       expect(simulation).toHaveProperty("simulationFinished");
       expect(simulation).toHaveProperty("time");
@@ -213,6 +214,9 @@ describe("interactive-state", () => {
       expect(stores.simulation.pressureSystems.length).toBe(1);
       expect(stores.simulation.pressureSystems[0].type).toBe("high");
       expect(stores.simulation.pressureSystems[0].center.lat).toBe(30);
+      // This state predates pressureSystemsSetup, so the setup falls back to pressureSystems.
+      expect(stores.simulation.pressureSystemsSetup.map(ps => ps.serialize()))
+        .toEqual([{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }]);
       expect(stores.simulation.simulationFinished).toBe(false);
       expect(stores.simulation.hurricaneTrack.length).toBe(1);
       expect(stores.simulation.hurricaneTrack[0].category).toBe(2);

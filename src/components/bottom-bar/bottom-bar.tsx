@@ -280,7 +280,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       overlay: ui.overlay,
       accessibleSSTScale: ui.sstOverlay.accessibleSSTScale,
       thermometerActive: ui.thermometerActive,
-      pressureSystems: sim.pressureSystems.map(ps => ({
+      pressureSystems: sim.activePressureSystems.map(ps => ({
         type: ps.type,
         center: { lat: ps.center.lat, lng: ps.center.lng },
         strength: ps.strength

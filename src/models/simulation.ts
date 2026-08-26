@@ -125,7 +125,9 @@ export class SimulationModel {
   @observable public precipitationPoints: IPrecipitationPoint[] = [];
   // It gets set to true when simulation stops automatically after the hurricane naturally dissipates.
   @observable public simulationFinished = false;
-  // Pressure systems affect winds.
+  // The run's setup: what the student arranges before starting the simulation.
+  @observable public pressureSystemsSetup: PressureSystem[] = [];
+  // The running simulation's own pressure systems, which the run can mutate.
   @observable public pressureSystems: PressureSystem[] = [];
   @observable public hurricane: Hurricane = new Hurricane({
     center: resolveStartLocation(config.initialHurricanePosition),
@@ -143,7 +145,6 @@ export class SimulationModel {
   public numberOfStepsOverLand = 0;
   public extendedLandfallAreas: LatLngBounds[] = Object.values(extendedLandfallBounds);
   public windKdTreeCache: any;
-  public pressureSystemSettings: PressureSystem[] = [];
   // Callback used by tests.
   public _seaSurfaceTempDataParsed: null | (() => void) = null;
 
@@ -156,7 +157,7 @@ export class SimulationModel {
     }
     this.startLocation = options.startLocation || config.initialHurricanePosition;
     this.season = options.season || config.season;
-    this.pressureSystems = (options.pressureSystems || config.pressureSystems).map(
+    this.pressureSystemsSetup = (options.pressureSystems || config.pressureSystems).map(
       (o: IPressureSystemOptions) => new PressureSystem(o)
     );
     makeObservable(this);
@@ -198,6 +199,12 @@ export class SimulationModel {
     return windData[this.season];
   }
 
+  // The pressure systems everything should read: the setup before a run begins, the run's own
+  // systems after the run starts. Returns the live array, so callers may mutate it in place.
+  @computed get activePressureSystems() {
+    return this.simulationStarted ? this.pressureSystems : this.pressureSystemsSetup;
+  }
+
   // Wind data affected by custom pressure systems.
   @computed get wind() {
     const result: IWindPoint[] = [];
@@ -209,7 +216,7 @@ export class SimulationModel {
       }
       const pressureSysWinds: IWindPoint[] = [];
       const pressureSysWeights: number[] = [];
-      this.pressureSystems.forEach(ps => {
+      this.activePressureSystems.forEach(ps => {
         const dist = distanceTo(ps.center, w);
         if (dist < ps.range) {
           pressureSysWinds.push(ps.applyToWindPoint(w));
@@ -294,10 +301,10 @@ export class SimulationModel {
   @action.bound public setStartLocation(startLocation: StartLocation) {
     this.startLocation = startLocation;
     const coordinates = resolveStartLocation(startLocation);
-    this.hurricane.setCenter(coordinates, this.pressureSystems);
+    this.hurricane.setCenter(coordinates, this.activePressureSystems);
 
     if (isStartLocationName(startLocation)) {
-      this.pressureSystems = selectPressureSystems(startLocation).map(
+      this.pressureSystemsSetup = selectPressureSystems(startLocation).map(
         (o: IPressureSystemOptions) => new PressureSystem(o)
       );
       this.hurricane.setStrength(startStrengths[startLocation]);
@@ -309,7 +316,7 @@ export class SimulationModel {
   }
 
   @action.bound public setPressureSysCenter(pressureSystem: PressureSystem, center: ICoordinates) {
-    pressureSystem.setCenter(center, this.pressureSystems.filter(ps => ps !== pressureSystem));
+    pressureSystem.setCenter(center, this.activePressureSystems.filter(ps => ps !== pressureSystem));
   }
 
   @action.bound public tick(timestamp = window.performance.now()) {
@@ -377,7 +384,7 @@ export class SimulationModel {
 
     this.time += config.timestep;
 
-    this.pressureSystems.filter(ps => ps.type === "low").forEach(lps => {
+    this.activePressureSystems.filter(ps => ps.type === "low").forEach(lps => {
       if (distanceTo(lps.center, this.hurricane.center) < config.minPressureSystemMergeDistance) {
         // Weaker system gets merged into stronger one. In most cases it will be low pressure system getting
         // merged into hurricane.
@@ -459,11 +466,12 @@ export class SimulationModel {
     this.simulationRunning = value;
   }
 
+  // Initial start and resume from pause
   @action.bound public start() {
     this.simulationRunning = true;
-    this.pressureSystemSettings = [...this.pressureSystems];
     if (!this.simulationStarted) {
       this.simulationStarted = true;
+      this.pressureSystems = this.pressureSystemsSetup.map(ps => new PressureSystem(ps.serialize()));
       // Remove wind data kd tree cache, as pressure system could have been moved by the user.
       this.windKdTreeCache = null;
     }
@@ -487,9 +495,10 @@ export class SimulationModel {
     this.numberOfStepsOverSea = 0;
     this.numberOfStepsOverLand = 0;
     this.extendedLandfallAreas = Object.values(extendedLandfallBounds);
+    this.pressureSystems = [];
     this.hurricane.reset();
     const coordinates = resolveStartLocation(this.startLocation);
-    this.hurricane.setCenter(coordinates, this.pressureSystems);
+    this.hurricane.setCenter(coordinates, this.activePressureSystems);
     if (
       this.hurricane.startingCategory !== undefined &&
       hurricaneCategoryInfo[this.hurricane.startingCategory]?.startingWindSpeed != null
@@ -497,9 +506,6 @@ export class SimulationModel {
       this.hurricane.setStrength(hurricaneCategoryInfo[this.hurricane.startingCategory].startingWindSpeed);
     } else if (isStartLocationName(this.startLocation)) {
       this.hurricane.setStrength(startStrengths[this.startLocation]);
-    }
-    if (this.pressureSystemSettings.length) {
-      this.pressureSystems = this.pressureSystemSettings;
     }
   }
 
@@ -510,9 +516,9 @@ export class SimulationModel {
     this.startLocation = this.initialState.startLocation;
     this.season = this.initialState.season;
     const coordinates = resolveStartLocation(this.startLocation);
-    this.hurricane.setCenter(coordinates, this.pressureSystems);
+    this.hurricane.setCenter(coordinates, this.activePressureSystems);
     if (isStartLocationName(this.startLocation)) {
-      this.pressureSystems = selectPressureSystems(this.startLocation).map(
+      this.pressureSystemsSetup = selectPressureSystems(this.startLocation).map(
         (o: IPressureSystemOptions) => new PressureSystem(o)
       );
     }
@@ -548,9 +554,10 @@ export class SimulationModel {
   }
 
   @action.bound public removePressureSystem(ps: PressureSystem) {
-    const idx = this.pressureSystems.indexOf(ps);
+    const systems = this.activePressureSystems;
+    const idx = systems.indexOf(ps);
     if (idx !== -1) {
-      this.pressureSystems.splice(idx, 1);
+      systems.splice(idx, 1);
     }
   }
 

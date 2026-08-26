@@ -17,13 +17,14 @@ import { SimulationModel, extendedLandfallBounds, resolveStartLocation } from ".
  * won't re-run when those observables change, breaking auto-save.
  */
 export function serializeSimulation(simulation: SimulationModel): ISimulationState {
-  const { hurricane, pressureSystems, pressureSystemSettings, startLocation } = simulation;
-    // Use pressureSystemSettings when present over pressureSystems to serialize the start state over the end state
-  const systems = pressureSystemSettings.length > 0 ? pressureSystemSettings : pressureSystems;
+  const { hurricane, pressureSystems, pressureSystemsSetup, startLocation } = simulation;
   return {
     season: simulation.season,
     startLocation: safeStartLocation(startLocation),
-    pressureSystems: systems.map(system => system.serialize()),
+    // Setup and run state are stored separately: the setup is what restart and duplicate rewind to,
+    // the run state is what a finished run displays alongside its track.
+    pressureSystemsSetup: pressureSystemsSetup.map(system => system.serialize()),
+    pressureSystems: pressureSystems.map(system => system.serialize()),
     simulationStarted: simulation.simulationStarted,
     simulationFinished: simulation.simulationFinished,
     time: simulation.time,
@@ -62,11 +63,10 @@ export function applySimulationState(simulation: SimulationModel, simState: ISim
     }
 
     // Pressure systems - recreate from serialized state
-    if (simState.pressureSystems) {
-      simulation.pressureSystems = simState.pressureSystems.map(
-        ps => new PressureSystem(ps)
-      );
-    }
+    simulation.pressureSystems = (simState.pressureSystems ?? []).map(ps => new PressureSystem(ps));
+    // Runs saved before the setup/run split kept their setup in pressureSystems, so fall back to it.
+    simulation.pressureSystemsSetup =
+      (simState.pressureSystemsSetup ?? simState.pressureSystems ?? []).map(ps => new PressureSystem(ps));
 
     // Simulation progress state
     simulation.simulationStarted = simState.simulationStarted ?? false;
@@ -130,7 +130,6 @@ export function applySimulationState(simulation: SimulationModel, simState: ISim
     }
 
     // Run switching swaps the whole simulation, so per-run caches must not leak across runs.
-    simulation.pressureSystemSettings = [];
     simulation.windKdTreeCache = null;
     simulation.simulationRunning = false;
   });
@@ -152,6 +151,8 @@ export function normalizeSimulationState(state?: Partial<ISimulationState>): ISi
     ...present,
     season: present.season ?? defaults.season,
     startLocation: present.startLocation ?? defaults.startLocation,
+    // A legacy run's setup lives in pressureSystems, so seed the setup from it when it's missing.
+    pressureSystemsSetup: present.pressureSystemsSetup ?? present.pressureSystems ?? defaults.pressureSystemsSetup,
     pressureSystems: present.pressureSystems ?? defaults.pressureSystems,
     simulationStarted: present.simulationStarted ?? defaults.simulationStarted,
     simulationFinished: present.simulationFinished ?? defaults.simulationFinished,
@@ -181,11 +182,12 @@ export function defaultSimulationState(): ISimulationState {
   return {
     season: config.season,
     startLocation: safeStartLocation(startLocation),
-    pressureSystems: config.pressureSystems.map((ps: IPressureSystemOptions) => ({
+    pressureSystemsSetup: config.pressureSystems.map((ps: IPressureSystemOptions) => ({
       type: ps.type || "low",
       center: { ...ps.center },
       strength: ps.strength ?? config.pressureSystemStrength
     })),
+    pressureSystems: [],
     simulationStarted: false,
     simulationFinished: false,
     time: 0,
@@ -209,6 +211,9 @@ export function defaultSimulationState(): ISimulationState {
 
 export function extractSetupState(state: ISimulationState): ISimulationState {
   const setup = cloneSimulationState(state);
+  // A legacy run has no separate setup; its pressureSystems are the setup.
+  setup.pressureSystemsSetup = setup.pressureSystemsSetup ?? setup.pressureSystems;
+  setup.pressureSystems = [];
   setup.simulationStarted = false;
   setup.simulationFinished = false;
   setup.time = 0;

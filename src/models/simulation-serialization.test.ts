@@ -14,7 +14,9 @@ describe("simulation-serialization", () => {
 
       expect(state.season).toBe(simulation.season);
       expect(state.startLocation).toBe(simulation.startLocation);
-      expect(state.pressureSystems).toEqual(simulation.pressureSystems.map(ps => ps.serialize()));
+      expect(state.pressureSystemsSetup).toEqual(simulation.pressureSystemsSetup.map(ps => ps.serialize()));
+      // The run hasn't started, so it has no pressure systems of its own yet.
+      expect(state.pressureSystems).toEqual([]);
       expect(state.simulationStarted).toBe(false);
       expect(state.simulationFinished).toBe(false);
       expect(state.time).toBe(0);
@@ -57,14 +59,48 @@ describe("simulation-serialization", () => {
     it("clears stale per-run caches", () => {
       const { simulation } = createStores();
       simulation.windKdTreeCache = {};
-      simulation.pressureSystemSettings = [new PressureSystem({ center: { lat: 30, lng: -40 } })];
       simulation.simulationRunning = true;
 
       applySimulationState(simulation, serializeSimulation(simulation));
 
       expect(simulation.windKdTreeCache).toBeNull();
-      expect(simulation.pressureSystemSettings).toEqual([]);
       expect(simulation.simulationRunning).toBe(false);
+    });
+
+    it("round-trips the setup and the run's own pressure systems separately", () => {
+      const source = createStores().simulation;
+      source.pressureSystemsSetup = [
+        new PressureSystem({ type: "low", center: { lat: 30, lng: -40 }, strength: 10 }),
+        new PressureSystem({ type: "high", center: { lat: 20, lng: -60 }, strength: 8 })
+      ];
+      source.start();
+      source.stop();
+      // The run merged the low into the hurricane.
+      source.removePressureSystem(source.activePressureSystems[0]);
+
+      const target = createStores().simulation;
+      applySimulationState(target, serializeSimulation(source));
+
+      expect(target.pressureSystemsSetup.map(ps => ps.serialize())).toEqual([
+        { type: "low", center: { lat: 30, lng: -40 }, strength: 10 },
+        { type: "high", center: { lat: 20, lng: -60 }, strength: 8 }
+      ]);
+      expect(target.pressureSystems.map(ps => ps.serialize())).toEqual([
+        { type: "high", center: { lat: 20, lng: -60 }, strength: 8 }
+      ]);
+      // A restored started run displays what the run did, not the setup.
+      expect(target.activePressureSystems).toBe(target.pressureSystems);
+    });
+
+    it("seeds the setup from pressureSystems for runs saved before the split", () => {
+      const { simulation } = createStores();
+      const legacy = serializeSimulation(simulation);
+      delete legacy.pressureSystemsSetup;
+      legacy.pressureSystems = [{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }];
+
+      applySimulationState(simulation, legacy);
+
+      expect(simulation.pressureSystemsSetup.map(ps => ps.serialize())).toEqual(legacy.pressureSystems);
     });
   });
 
@@ -113,7 +149,8 @@ describe("simulation-serialization", () => {
 
       expect(setup.season).toBe("winter");
       expect(setup.startLocation).toBe(finished.startLocation);
-      expect(setup.pressureSystems).toEqual(finished.pressureSystems);
+      expect(setup.pressureSystemsSetup).toEqual(finished.pressureSystemsSetup);
+      expect(setup.pressureSystems).toEqual([]);
       expect(setup.temperatureAnomalies).toEqual(finished.temperatureAnomalies);
       expect(setup.simulationStarted).toBe(false);
       expect(setup.simulationFinished).toBe(false);
@@ -128,6 +165,20 @@ describe("simulation-serialization", () => {
       expect(setup.hurricane.center).toEqual(defaultSimulationState().hurricane.center);
       expect(setup.hurricane.strength).toBe(defaultSimulationState().hurricane.strength);
       expect(setup.hurricane.cat3SSTThresholdReached).toBe(false);
+    });
+
+    it("keeps the setup of a legacy run that stored it in pressureSystems", () => {
+      const { simulation } = createStores();
+      const legacy = serializeSimulation(simulation);
+      delete legacy.pressureSystemsSetup;
+      legacy.pressureSystems = [{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }];
+      legacy.simulationStarted = true;
+      legacy.simulationFinished = true;
+
+      const setup = extractSetupState(legacy);
+
+      expect(setup.pressureSystemsSetup).toEqual([{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }]);
+      expect(setup.pressureSystems).toEqual([]);
     });
   });
 });

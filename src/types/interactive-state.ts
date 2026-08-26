@@ -33,6 +33,9 @@ export interface ISimulationState {
   // Core settings
   season: Season;
   startLocation: StartLocation;
+  // What the student arranged before pressing start. The source of truth for the run's setup.
+  pressureSystemsSetup?: IPressureSystemState[];
+  // The running simulation's own systems, which the run can mutate.
   pressureSystems: IPressureSystemState[];
 
   // Simulation progress

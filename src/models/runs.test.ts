@@ -1,5 +1,21 @@
 import { maxRuns } from "./runs";
 import { createStores, IStores } from "./stores";
+import { PressureSystem } from "./pressure-system";
+
+// Runs the simulation for a tick, then merges the low into the hurricane the way tick() does.
+const runAndMergeTheLow = (stores: IStores) => {
+  const { simulation } = stores;
+  simulation.pressureSystemsSetup = [
+    new PressureSystem({ type: "low", center: { lat: 30, lng: -40 }, strength: 10 }),
+    new PressureSystem({ type: "high", center: { lat: 20, lng: -60 }, strength: 8 })
+  ];
+  simulation.start();
+  simulation.stop();
+  simulation.removePressureSystem(simulation.activePressureSystems[0]);
+  simulation.simulationFinished = true;
+};
+
+const systemTypes = (stores: IStores) => stores.simulation.activePressureSystems.map(ps => ps.type);
 
 const completeCurrentRun = (stores: IStores) => {
   stores.simulation.simulationStarted = true;
@@ -159,6 +175,48 @@ describe("RunsModel", () => {
       const { runs } = stores;
       runs.duplicateSelectedRun();
       expect(runs.runs.length).toBe(1);
+    });
+
+    it("copies the setup, not the systems the run merged away", () => {
+      const { runs } = stores;
+      runAndMergeTheLow(stores);
+
+      runs.duplicateSelectedRun();
+
+      expect(systemTypes(stores)).toEqual(["low", "high"]);
+    });
+  });
+
+  describe("pressure systems across runs", () => {
+    it("shows a finished run's own systems, and rewinds to the setup on reset", () => {
+      const { runs, simulation } = stores;
+      runAndMergeTheLow(stores);
+      const firstId = runs.selectedRunId;
+
+      runs.addRun();
+      runs.selectRun(firstId);
+      // Reselecting the finished run shows the systems that produced its track, not its setup.
+      expect(systemTypes(stores)).toEqual(["high"]);
+
+      runs.resetSelectedRun();
+      expect(simulation.simulationStarted).toBe(false);
+      expect(systemTypes(stores)).toEqual(["low", "high"]);
+    });
+
+    it("keeps each run's systems separate when switching between them", () => {
+      const { runs } = stores;
+      runAndMergeTheLow(stores);
+      const firstId = runs.selectedRunId;
+
+      runs.addRun();
+      // The new run starts from the default setup and hasn't run.
+      expect(systemTypes(stores)).not.toEqual(["high"]);
+      const secondSetup = systemTypes(stores);
+
+      runs.selectRun(firstId);
+      expect(systemTypes(stores)).toEqual(["high"]);
+      runs.selectRun(runs.runs[1].id);
+      expect(systemTypes(stores)).toEqual(secondSetup);
     });
   });
 
