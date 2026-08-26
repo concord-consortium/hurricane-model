@@ -23,7 +23,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   const runNumber = runs.runs.indexOf(run) + 1;
 
   const handleSelect = () => {
-    if (selected || ui.isReadOnly) return;
+    if (selected) return;
     if (simulation.inProgress) simulation.restart();
     runs.selectRun(run.id);
     ui.setNorthAtlanticView();
