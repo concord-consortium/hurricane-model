@@ -133,6 +133,7 @@ export function setInteractiveState(
  */
 export function getInteractiveState(stores: IStores): IHurricaneInteractiveState {
   const { runs, simulation, ui } = stores;
+  const liveSimulation = serializeSimulation(simulation);
 
   return {
     version: 2,
@@ -140,7 +141,7 @@ export function getInteractiveState(stores: IStores): IHurricaneInteractiveState
     runs: runs.runs.map(run => ({
       id: run.id,
       // The selected run's record can be stale; the live simulation is its source of truth.
-      simulation: run.id === runs.selectedRunId ? serializeSimulation(simulation) : toJS(run.simulation)
+      simulation: run.id === runs.selectedRunId ? liveSimulation : toJS(run.simulation)
     })),
     selectedRunId: runs.selectedRunId,
     ui: {
