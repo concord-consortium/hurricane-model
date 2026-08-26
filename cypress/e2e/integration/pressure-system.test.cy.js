@@ -6,7 +6,7 @@ context("Pressure System", () => {
       // Limit number of pressure systems to 1.
       win.stores.simulation.pressureSystems.length = 1;
 
-      const oldStrength = win.stores.simulation.pressureSystems[0].strength;
+      const oldStrength = win.stores.simulation.activePressureSystems[0].strength;
       cy.get("[data-test='pressure-system-slider'] svg").first()
         .trigger('pointerdown', { which: 1, button: 0, pointerType: 'mouse' });
       cy.get(".leaflet-container")
@@ -14,7 +14,7 @@ context("Pressure System", () => {
         .trigger('pointermove', { pageY: 0, clientY: 0, pointerType: 'mouse' })
         .trigger('pointerup', { pointerType: 'mouse', force: true })
         .then(() => {
-          expect(win.stores.simulation.pressureSystems[0].strength).to.not.eql(oldStrength);
+          expect(win.stores.simulation.activePressureSystems[0].strength).to.not.eql(oldStrength);
         });
     });
   });
@@ -35,15 +35,15 @@ context("Pressure System", () => {
     cy.visit(`/?pressureSystems=${encodeURIComponent(JSON.stringify(pressureSystems))}`);
     // cy.window().then((win: any) => {
     cy.window().then((win) => {
-      expect(win.stores.simulation.pressureSystems.length).to.eql(pressureSystems.length);
-      expect(win.stores.simulation.pressureSystems[0].type).to.eql("high");
-      expect(win.stores.simulation.pressureSystems[0].center.lat).to.eql(10);
-      expect(win.stores.simulation.pressureSystems[0].center.lng).to.eql(-20);
-      expect(win.stores.simulation.pressureSystems[0].strength).to.eql(5);
-      expect(win.stores.simulation.pressureSystems[1].type).to.eql("low");
-      expect(win.stores.simulation.pressureSystems[1].center.lat).to.eql(30);
-      expect(win.stores.simulation.pressureSystems[1].center.lng).to.eql(-40);
-      expect(win.stores.simulation.pressureSystems[1].strength).to.eql(7);
+      expect(win.stores.simulation.activePressureSystems.length).to.eql(pressureSystems.length);
+      expect(win.stores.simulation.activePressureSystems[0].type).to.eql("high");
+      expect(win.stores.simulation.activePressureSystems[0].center.lat).to.eql(10);
+      expect(win.stores.simulation.activePressureSystems[0].center.lng).to.eql(-20);
+      expect(win.stores.simulation.activePressureSystems[0].strength).to.eql(5);
+      expect(win.stores.simulation.activePressureSystems[1].type).to.eql("low");
+      expect(win.stores.simulation.activePressureSystems[1].center.lat).to.eql(30);
+      expect(win.stores.simulation.activePressureSystems[1].center.lng).to.eql(-40);
+      expect(win.stores.simulation.activePressureSystems[1].strength).to.eql(7);
       cy.get("[data-test='pressure-system-slider']").should('have.length', 2);
     });
   });
