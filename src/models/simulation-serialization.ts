@@ -1,10 +1,10 @@
 import { runInAction, toJS } from "mobx";
 import config, { getStartingCategory, startStrengths } from "../config";
 import { hurricaneCategoryInfo } from "../constants";
-import { NamedRegion, isStartLocationName, namedRegions } from "../types";
+import { isStartLocationName, namedRegions } from "../types";
 import { ISimulationState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
-import { clampAnomaly } from "../utils/regions";
+import { seedTemperatureAnomalies } from "../utils/regions";
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 import { SimulationModel, extendedLandfallBounds, resolveStartLocation } from "./simulation";
 
@@ -173,12 +173,6 @@ export function defaultSimulationState(): ISimulationState {
   const strength = startingCategory !== undefined
     ? hurricaneCategoryInfo[startingCategory].startingWindSpeed
     : config.hurricaneStrength;
-  const temperatureAnomalies: Partial<Record<NamedRegion, number>> = {};
-  const configAnomalies: Record<string, number> = config.temperatureAnomalies ?? {};
-  for (const key of namedRegions) {
-    const raw = Number(configAnomalies[key]);
-    temperatureAnomalies[key] = isFinite(raw) ? clampAnomaly(raw) : 0;
-  }
   return {
     season: config.season,
     startLocation: safeStartLocation(startLocation),
@@ -205,7 +199,7 @@ export function defaultSimulationState(): ISimulationState {
     numberOfStepsOverSea: 0,
     numberOfStepsOverLand: 0,
     consumedExtendedLandfallAreas: [],
-    temperatureAnomalies
+    temperatureAnomalies: seedTemperatureAnomalies()
   };
 }
 

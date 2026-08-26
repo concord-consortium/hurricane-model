@@ -18,7 +18,7 @@ import {
   StartLocation, StartLocationNames, isStartLocationName, isCoordinates, NamedRegion, namedRegions
 } from "../types";
 import { signedDistanceToRegion, featherWeight } from "../utils/region";
-import { clampAnomaly, temperatureAnomalyRegions } from "../utils/regions";
+import { clampAnomaly, seedTemperatureAnomalies, temperatureAnomalyRegions } from "../utils/regions";
 import { Hurricane } from "./hurricane";
 import { PressureSystem, IPressureSystemOptions } from "./pressure-system";
 
@@ -630,13 +630,7 @@ export class SimulationModel {
   }
 
   private seedTemperatureAnomalies() {
-    const fromConfig: Record<string, number> = config.temperatureAnomalies ?? {};
-    const next = new Map<NamedRegion, number>();
-    for (const key of namedRegions) {
-      const raw = Number(fromConfig[key]);
-      next.set(key, isFinite(raw) ? clampAnomaly(raw) : 0);
-    }
-    this.temperatureAnomalies.replace(next);
+    this.temperatureAnomalies.replace(seedTemperatureAnomalies());
   }
 
   public temperatureAnomalyAt(key: NamedRegion): number {
