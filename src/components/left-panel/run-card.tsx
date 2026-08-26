@@ -90,7 +90,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
             disabled={!complete || simulation.simulationRunning || ui.isReadOnly}
             onClick={handleReset}
           >
-            <RestartIcon />
+            <RestartIcon aria-hidden={true} />
           </button>
           <button
             type="button"
@@ -99,7 +99,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
             disabled={simulation.simulationRunning || ui.isReadOnly}
             onClick={handleDelete}
           >
-            <DeleteIcon />
+            <DeleteIcon aria-hidden={true} />
           </button>
         </div>
       }
