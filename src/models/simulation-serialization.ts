@@ -88,9 +88,7 @@ export function applySimulationState(simulation: SimulationModel, simState: ISim
         simulation.hurricane.speed = { ...hurState.speed };
       }
       simulation.hurricane.startingCategory = hurState.startingCategory;
-      if (hurState.cat3SSTThresholdReached !== undefined) {
-        simulation.hurricane.cat3SSTThresholdReached = hurState.cat3SSTThresholdReached;
-      }
+      simulation.hurricane.cat3SSTThresholdReached = hurState.cat3SSTThresholdReached ?? false;
     }
 
     // Restore additional simulation state needed for resumption
