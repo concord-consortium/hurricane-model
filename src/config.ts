@@ -67,12 +67,16 @@ export const startStrengths = {
   gulf: 40
 } as const;
 
+export function clampCategory(category: number) {
+  return Math.max(0, Math.min(hurricaneCategoryInfo.length - 1, Math.floor(category)));
+}
+
 // In storm mode, default to category 0 when no value was provided so the category slider
 // always has a value to show; in other modes leave it undefined so existing
 // hurricaneStrength / startStrengths logic stays in effect.
 export const getStartingCategory = (cfg: { startingCategory?: number, mode?: string }): number | undefined =>
   cfg.startingCategory != null && isFinite(Number(cfg.startingCategory))
-    ? Math.max(0, Math.min(hurricaneCategoryInfo.length - 1, Math.floor(Number(cfg.startingCategory))))
+    ? clampCategory(Number(cfg.startingCategory))
     : (cfg.mode === "storm" ? 0 : undefined);
 
 const DEFAULT_START_LOCATION = "atlantic";
