@@ -12,6 +12,7 @@ const fs = require("fs");
 import { PressureSystem } from "./pressure-system";
 
 const options: ISimulationOptions = {
+  forceTicks: true,
   startLocation: "atlantic",
   // Ensure that the initial season is always the same.
   season: "fall",

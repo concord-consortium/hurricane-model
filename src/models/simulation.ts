@@ -36,6 +36,8 @@ import * as septWind from "../../wind-data-json/sep-simple.json";
 type IWindDataset = Record<Season, IWindPoint[]>
 
 export interface ISimulationOptions {
+  // When true, the simulation can be ticked manually without being started. Used by tests.
+  forceTicks?: boolean;
   startLocation?: StartLocation;
   season?: Season;
   pressureSystems?: IPressureSystemOptions[];
@@ -147,6 +149,7 @@ export class SimulationModel {
   public windKdTreeCache: any;
   // Callback used by tests.
   public _seaSurfaceTempDataParsed: null | (() => void) = null;
+  private forceTicks: boolean;
 
   protected initialState: SimulationModel;
   private previousTimestamp = 0;
@@ -155,6 +158,7 @@ export class SimulationModel {
     if (!options) {
       options = {};
     }
+    this.forceTicks = options.forceTicks ?? false;
     this.startLocation = options.startLocation || config.initialHurricanePosition;
     this.season = options.season || config.season;
     this.pressureSystemsSetup = (options.pressureSystems || config.pressureSystems).map(
@@ -320,7 +324,7 @@ export class SimulationModel {
   }
 
   @action.bound public tick(timestamp = window.performance.now()) {
-    if (!this.simulationRunning) return;
+    if (!this.forceTicks && !this.simulationRunning) return;
 
     if (this.time % benchmarkInterval === 0) {
       this.stepsPerSecond = 1000 / (timestamp - this.previousTimestamp) * benchmarkInterval;

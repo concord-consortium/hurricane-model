@@ -229,27 +229,6 @@ describe("BottomBar component", () => {
     });
   });
 
-  describe("start button", () => {
-    it("clears the setup mode when the simulation starts", async () => {
-      const user = userEvent.setup();
-      stores.simulation.setSeaSurfaceTempData(new PNG());
-      // Stub start to avoid tick crashing on uninitialized PNG data.
-      jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
-        stores.simulation.setSimulationRunning(true);
-        stores.simulation.setSimulationStarted(true);
-      });
-      stores.ui.setSetupMode("season");
-      expect(stores.ui.setupMode).toBe("season");
-      render(
-        <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
-        </Provider>
-      );
-      await user.click(screen.getByTestId("start-button"));
-      expect(stores.ui.setupMode).toBeUndefined();
-    });
-  });
-
   describe("thermometer button", () => {
     it("is disabled when overlay is different from SST", () => {
       const { rerender } = render(

@@ -1,5 +1,5 @@
 import { RunsModel } from "./runs";
-import { SimulationModel } from "./simulation";
+import { ISimulationOptions, SimulationModel } from "./simulation";
 import { UIModel } from "./ui";
 
 export interface IStores {
@@ -8,8 +8,8 @@ export interface IStores {
   runs: RunsModel;
 }
 
-export function createStores(): IStores {
-  const simulation = new SimulationModel();
+export function createStores(simOptions?: ISimulationOptions): IStores {
+  const simulation = new SimulationModel(simOptions);
   const ui = new UIModel(simulation);
   const runs = new RunsModel(simulation);
   return { ui, simulation, runs };
