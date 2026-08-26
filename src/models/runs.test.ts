@@ -275,6 +275,21 @@ describe("RunsModel", () => {
       expect(runs.runs[1].id).toBe("run-8");
     });
 
+    it("fills partial and missing simulation records from the defaults", () => {
+      const { runs } = stores;
+      runs.setRuns([
+        { id: "run-1", simulation: { simulationStarted: true, simulationFinished: true } as any },
+        { id: "run-2", simulation: undefined as any }
+      ], "run-2");
+      const [first, second] = runs.runs;
+      expect(first.simulation.simulationFinished).toBe(true);
+      expect(first.simulation.hurricaneTrack).toEqual([]);
+      expect(first.simulation.landfalls).toEqual([]);
+      expect(first.simulation.hurricane.center).toBeDefined();
+      expect(second.simulation.simulationFinished).toBe(false);
+      expect(second.simulation.hurricane.center).toBeDefined();
+    });
+
     it("ignores an empty runs array", () => {
       const { runs } = stores;
       const originalId = runs.selectedRunId;

@@ -139,6 +139,31 @@ export function applySimulationState(simulation: SimulationModel, simState: ISim
 export const cloneSimulationState = (state: ISimulationState): ISimulationState =>
   JSON.parse(JSON.stringify(state));
 
+// Restored records can be absent, partial or truncated. Filling the required fields from the
+// defaults here lets every consumer read a run's simulation state without guarding field by field.
+export function normalizeSimulationState(state?: Partial<ISimulationState>): ISimulationState {
+  const defaults = defaultSimulationState();
+  const clone = state ? cloneSimulationState(state as ISimulationState) : {};
+  const present = Object.fromEntries(
+    Object.entries(clone).filter(([, value]) => value != null)
+  ) as Partial<ISimulationState>;
+  return {
+    // Optional fields ride along as-is; every required field below falls back to its default.
+    ...present,
+    season: present.season ?? defaults.season,
+    startLocation: present.startLocation ?? defaults.startLocation,
+    pressureSystems: present.pressureSystems ?? defaults.pressureSystems,
+    simulationStarted: present.simulationStarted ?? defaults.simulationStarted,
+    simulationFinished: present.simulationFinished ?? defaults.simulationFinished,
+    time: present.time ?? defaults.time,
+    hurricane: { ...defaults.hurricane, ...present.hurricane },
+    hurricaneTrack: present.hurricaneTrack ?? defaults.hurricaneTrack,
+    landfalls: present.landfalls ?? defaults.landfalls,
+    strengthChangePositions: present.strengthChangePositions ?? defaults.strengthChangePositions,
+    precipitationPoints: present.precipitationPoints ?? defaults.precipitationPoints
+  };
+}
+
 // Mirrors the defaults SimulationModel and Hurricane read from config at construction time.
 // Reads config at call time so authored-state mutations are picked up.
 export function defaultSimulationState(): ISimulationState {

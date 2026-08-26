@@ -1,7 +1,8 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import { IRunState, ISimulationState } from "../types/interactive-state";
 import {
-  applySimulationState, cloneSimulationState, defaultSimulationState, extractSetupState, serializeSimulation
+  applySimulationState, cloneSimulationState, defaultSimulationState, extractSetupState,
+  normalizeSimulationState, serializeSimulation
 } from "./simulation-serialization";
 import { SimulationModel } from "./simulation";
 
@@ -101,10 +102,8 @@ export class RunsModel {
 
   @action.bound public setRuns(runs: IRunState[], selectedRunId?: string) {
     if (!runs.length) return;
-    // Migrated legacy/corrupt records can lack a simulation; {} restores as defaults.
-    this.runs = runs.map(run => (
-      { id: run.id, simulation: cloneSimulationState(run.simulation ?? {} as ISimulationState) }
-    ));
+    // Migrated legacy/corrupt records can be missing or partial; normalizing fills them from defaults.
+    this.runs = runs.map(run => ({ id: run.id, simulation: normalizeSimulationState(run.simulation) }));
     const selected = this.runs.find(run => run.id === selectedRunId) ?? this.runs[this.runs.length - 1];
     this.selectedRunId = selected.id;
     this.nextRunNumber = this.runs.reduce((max, run) => {
