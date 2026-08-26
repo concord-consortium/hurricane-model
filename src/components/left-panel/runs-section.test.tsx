@@ -34,7 +34,7 @@ describe("RunsSection", () => {
 
   it("shows the incomplete message while any run is unfinished", () => {
     renderSection(stores);
-    expect(screen.getByTestId("run-panel")).toBeInTheDocument();
+    expect(screen.getByTestId("run-card")).toBeInTheDocument();
     expect(screen.getByTestId("runs-message")).toHaveTextContent("Complete run(s) above to add another run");
     expect(screen.queryByTestId("new-run-button")).toBeNull();
   });
@@ -99,7 +99,7 @@ describe("RunsSection", () => {
     completeCurrentRun(stores);
     renderSection(stores);
 
-    expect(screen.getAllByTestId("run-panel").length).toBe(maxRuns);
+    expect(screen.getAllByTestId("run-card").length).toBe(maxRuns);
     expect(screen.getByTestId("runs-message")).toHaveTextContent("Limit reached - delete a run to add another");
     expect(screen.queryByTestId("new-run-button")).toBeNull();
   });

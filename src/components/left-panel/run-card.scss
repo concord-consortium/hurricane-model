@@ -4,7 +4,7 @@
   margin: 10px 15px;
   position: relative;
 
-  .runPanel {
+  .runCard {
     background-color: white;
     border: 1px solid $charcoalMedium;
     border-radius: 7px;
@@ -27,7 +27,7 @@
       border: 2px solid $secondaryColor;
       cursor: default;
 
-      .runPanelHeader {
+      .runCardHeader {
         .runLabel {
           background-color: $secondaryColor;
         }
@@ -38,7 +38,7 @@
       border-style: dashed;
     }
 
-    .runPanelHeader {
+    .runCardHeader {
       align-items: center;
       display: flex;
 

@@ -5,12 +5,12 @@ import { runInAction } from "mobx";
 
 import { createStores, IStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
-import { RunPanel } from "./run-panel";
+import { RunCard } from "./run-card";
 
 const renderPanels = (stores: IStores) =>
   render(
     <StoresContext value={stores}>
-      {stores.runs.runs.map(run => <RunPanel key={run.id} run={run} />)}
+      {stores.runs.runs.map(run => <RunCard key={run.id} run={run} />)}
     </StoresContext>
   );
 
@@ -20,7 +20,7 @@ const completeCurrentRun = (stores: IStores) => {
   stores.simulation.hurricaneTrack.push({ position: { lat: 20, lng: -40 }, category: 2 });
 };
 
-describe("RunPanel", () => {
+describe("RunCard", () => {
   let stores: IStores;
 
   beforeEach(() => {
@@ -32,7 +32,7 @@ describe("RunPanel", () => {
     stores.runs.addRun();
     renderPanels(stores);
 
-    const panels = screen.getAllByTestId("run-panel");
+    const panels = screen.getAllByTestId("run-card");
     expect(panels.length).toBe(2);
     expect(panels[0]).not.toHaveClass("selected");
     expect(panels[1]).toHaveClass("selected");
@@ -46,7 +46,7 @@ describe("RunPanel", () => {
     renderPanels(stores);
 
     expect(stores.runs.selectedRunId).toBe(stores.runs.runs[1].id);
-    fireEvent.click(screen.getAllByTestId("run-panel")[0]);
+    fireEvent.click(screen.getAllByTestId("run-card")[0]);
     expect(stores.runs.selectedRunId).toBe(stores.runs.runs[0].id);
   });
 
@@ -71,7 +71,7 @@ describe("RunPanel", () => {
     stores.runs.addRun();
     renderPanels(stores);
 
-    const panels = screen.getAllByTestId("run-panel");
+    const panels = screen.getAllByTestId("run-card");
     expect(panels[0]).toHaveAttribute("aria-label", "Run 1");
     expect(panels[1]).toHaveAttribute("aria-label", "Run 2");
   });
@@ -83,11 +83,11 @@ describe("RunPanel", () => {
     renderPanels(stores);
 
     const firstRunId = stores.runs.runs[0].id;
-    screen.getAllByTestId("run-panel")[0].focus();
+    screen.getAllByTestId("run-card")[0].focus();
     await user.keyboard("{Enter}");
     expect(stores.runs.selectedRunId).toBe(firstRunId);
 
-    screen.getAllByTestId("run-panel")[1].focus();
+    screen.getAllByTestId("run-card")[1].focus();
     await user.keyboard(" ");
     expect(stores.runs.selectedRunId).toBe(stores.runs.runs[1].id);
   });

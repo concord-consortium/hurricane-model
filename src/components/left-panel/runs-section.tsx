@@ -3,7 +3,7 @@ import React from "react";
 
 import { log } from "../../log";
 import { useStores } from "../../stores-context";
-import { RunPanel } from "./run-panel";
+import { RunCard } from "./run-card";
 
 import css from "./runs-section.scss";
 
@@ -27,7 +27,7 @@ export const RunsSection = observer(function RunsSection() {
 
   return (
     <div className={css.runsSection} data-test="runs-section">
-      {runs.runs.map(run => <RunPanel key={run.id} run={run} />)}
+      {runs.runs.map(run => <RunCard key={run.id} run={run} />)}
       {!runs.allComplete &&
         <div className={css.runsMessage} data-test="runs-message">
           Complete run(s) above to add another run

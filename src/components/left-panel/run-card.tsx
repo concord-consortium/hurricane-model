@@ -9,14 +9,14 @@ import { useStores } from "../../stores-context";
 import DeleteIcon from "../../assets/left-panel/delete.svg";
 import RestartIcon from "../../assets/left-panel/restart.svg";
 
-import css from "./run-panel.scss";
+import css from "./run-card.scss";
 import runsCss from "./runs-section.scss";
 
-interface IRunPanelProps {
+interface IRunCardProps {
   run: IRunState;
 }
 
-export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
+export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   const { runs, simulation, ui } = useStores();
   const selected = run.id === runs.selectedRunId;
   const complete = runs.isRunComplete(run);
@@ -61,8 +61,8 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
   return (
     <div className={css.runCardContainer}>
       <div
-        className={clsx(css.runPanel, { [css.selected]: selected, [css.incomplete]: !complete })}
-        data-test="run-panel"
+        className={clsx(css.runCard, { [css.selected]: selected, [css.incomplete]: !complete })}
+        data-test="run-card"
         role="button"
         tabIndex={0}
         aria-label={`Run ${runNumber}`}
@@ -70,7 +70,7 @@ export const RunPanel = observer(function RunPanel({ run }: IRunPanelProps) {
         onClick={handleSelect}
         onKeyDown={handleKeyDown}
       >
-        <div className={css.runPanelHeader}>
+        <div className={css.runCardHeader}>
           <div className={css.runLabel} />
           <div
             aria-label="Run status"
