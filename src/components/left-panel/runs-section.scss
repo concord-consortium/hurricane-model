@@ -6,7 +6,7 @@
 
 .runsMessage {
   color: #a35a12;
-  font-family: "Roboto Condensed", Lato, arial, sans-serif;
+  font-family: $scaleFont;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: .02em;
@@ -28,7 +28,7 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    font-family: "Roboto Condensed", Lato, arial, sans-serif;
+    font-family: $scaleFont;
     font-size: 14px;
     font-weight: bold;
     gap: 8px;

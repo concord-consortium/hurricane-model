@@ -1,6 +1,7 @@
 @use "../common.scss" as *;
 
 .runCardContainer {
+  font-family: $scaleFont;
   margin: 10px 15px;
   position: relative;
 
@@ -45,6 +46,7 @@
       .runLabel {
         background-color: #ccc;
         border-radius: 5px;
+        font-family: $mainFont;
         height: 28px;
         width: 28px;
       }
