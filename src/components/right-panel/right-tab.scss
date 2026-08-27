@@ -29,7 +29,7 @@ $tabPadding: 4px;
     }
 
     &.settings {
-      background-color: #f7ce8b;
+      background-color: $tabSettingsLight;
     }
 
     &.active {
