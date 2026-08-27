@@ -4,6 +4,7 @@ import * as React from "react";
 import config from "../../config";
 import { log } from "../../log";
 import { RightTabType } from "../../models/ui";
+import { changeHurricaneImage, changeWindArrows } from "../../utils/ui";
 import { BaseComponent, IBaseProps } from "../base";
 import { RightTab } from "./right-tab";
 import { MapButton } from "./map-button";
@@ -167,12 +168,10 @@ export class RightPanel extends BaseComponent<IProps, IState> {
   }
 
   public handleWindArrowsChange = (checked: boolean) => {
-    this.stores.ui.setWindArrows(checked);
-    log(checked ? "WindArrowsShown" : "WindArrowsHidden");
+    changeWindArrows(this.stores.ui, checked);
   }
 
   public handleHurricaneImageChange = (checked: boolean) => {
-    this.stores.ui.setHurricaneImage(checked);
-    log(checked ? "HurricaneImageShown" : "HurricaneImageHidden");
+    changeHurricaneImage(this.stores.ui, checked);
   }
 }
