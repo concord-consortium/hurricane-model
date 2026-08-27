@@ -21,6 +21,16 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
   const panelClasses = clsx(css.leftPanel, { [css.open]: open });
   return (
     <div className={css.leftPanelContainer}>
+      <button
+        type="button"
+        className={clsx(css.stormSetupTab, { [css.open]: open })}
+        data-test="storm-setup-tab"
+        onClick={toggleOpen}
+        tabIndex={open ? -1 : 0}
+        aria-hidden={open}
+      >
+        Storm Setup
+      </button>
       <div className={panelClasses} data-test="left-panel">
         <List
           aria-labelledby="left-panel-title"
