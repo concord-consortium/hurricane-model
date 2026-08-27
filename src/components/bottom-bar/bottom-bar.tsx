@@ -101,6 +101,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       startLocationButtonHoveredClass,
       { hoverable: !startLocationButtonDisabled }
     );
+
     const tempButton = (
       <div className={`${css.widgetGroup} ${tempButtonDisabled ? "" : "hoverable"}`}>
         <IconButton
@@ -113,6 +114,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         />
       </div>
     );
+
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -171,7 +173,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               disabled={simulationControlsDisabled}
               disableRipple={true}
             >
-              <span><ReloadIcon/> {isStormMode ? "Clear All" : "Reload"}</span>
+              <span>
+                <ReloadIcon/>
+                <span className={css.buttonLabel}>{isStormMode ? "Clear All" : "Reload"}</span>
+              </span>
             </Button>
             <Button
               className={clsx(css.bottomBarButton, css.playbackButton)}
@@ -180,7 +185,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               disabled={simulationControlsDisabled}
               disableRipple={true}
             >
-              <span><RestartIcon/> {isStormMode ? "Restart/Edit" : "Restart"}</span>
+              <span>
+                <RestartIcon/>
+                <span className={css.buttonLabel}>{isStormMode ? "Restart/Edit" : "Restart"}</span>
+              </span>
             </Button>
           </div>
           <div className={`${css.widgetGroup} ${css.stopStart}`}>
