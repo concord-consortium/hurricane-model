@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { log } from "../../log";
 import { mapLayer, MapTilesName } from "../../map-layer-tiles";
-import { Overlay, RightTab } from "../../models/ui";
+import { Overlay, RightTabType } from "../../models/ui";
 import { BaseComponent, IBaseProps } from "../base";
 import { MapButtonKey } from "./map-button-key";
 
@@ -20,7 +20,7 @@ import css from "./map-button.scss";
 interface IProps extends IBaseProps {
   label: string;
   value: MapTilesName | Overlay;
-  mapType: Exclude<RightTab, "settings">;
+  mapType: Exclude<RightTabType, "settings">;
   disabled?: boolean;
 }
 interface IState {}

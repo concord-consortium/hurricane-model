@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React from "react";
-import { RightTab } from "../../models/ui";
-import css from "./map-tab.scss";
+import { RightTabType } from "../../models/ui";
+import css from "./right-tab.scss";
 import baseMapTabImg from "../../assets/base-map-tab.png";
 import overlayTabImg from "../../assets/overlay-tab.png";
 
@@ -17,11 +17,11 @@ const tabSettings: Record<string, ITabSettings> = {
 };
 
 interface IProps {
-  tabType: RightTab;
+  tabType: RightTabType;
   active: boolean;
 }
 
-export function MapTab({ active, tabType }: IProps) {
+export function RightTab({ active, tabType }: IProps) {
   const { style, text, image } = tabSettings[tabType];
   return (
     <div className={clsx(css.mapTab, style)} data-test="map-tab">

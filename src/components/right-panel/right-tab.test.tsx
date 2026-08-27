@@ -2,7 +2,7 @@ import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import { createStores } from "../../models/stores";
 import { Provider } from "mobx-react";
-import { MapTab } from "./map-tab";
+import { RightTab } from "./right-tab";
 
 describe("MapTab component", () => {
   let stores = createStores();
@@ -13,7 +13,7 @@ describe("MapTab component", () => {
   it("renders basic components", () => {
     render(
       <Provider stores={stores}>
-        <MapTab tabType="base" active={true} />
+        <RightTab tabType="base" active={true} />
       </Provider>
     );
     expect(screen.getByTestId("map-tab")).toBeInTheDocument();
@@ -22,7 +22,7 @@ describe("MapTab component", () => {
   it("renders a text-only settings tab", () => {
     render(
       <Provider stores={stores}>
-        <MapTab tabType="settings" active={true} />
+        <RightTab tabType="settings" active={true} />
       </Provider>
     );
     expect(screen.getByText("Settings")).toBeInTheDocument();

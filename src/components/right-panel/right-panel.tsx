@@ -3,9 +3,9 @@ import * as React from "react";
 
 import config from "../../config";
 import { log } from "../../log";
-import { RightTab } from "../../models/ui";
+import { RightTabType } from "../../models/ui";
 import { BaseComponent, IBaseProps } from "../base";
-import { MapTab } from "./map-tab";
+import { RightTab } from "./right-tab";
 import { MapButton } from "./map-button";
 import { LabeledSwitch } from "./labeled-switch";
 
@@ -14,7 +14,7 @@ import css from "./right-panel.scss";
 interface IProps extends IBaseProps { }
 interface IState {
   open: boolean;
-  selectedTab: RightTab;
+  selectedTab: RightTabType;
 }
 
 const overlayTabVisible = () => {
@@ -52,7 +52,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
           <ul className={css.rightPanelTabs}>
             <li>
               <div id="base" data-test="tab-base" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
-                <MapTab tabType="base" active={selectedTab === "base" || !open} />
+                <RightTab tabType="base" active={selectedTab === "base" || !open} />
               </div>
             </li>
             {
@@ -64,7 +64,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                   className={css.rightPanelTab}
                   onClick={this.handleToggleDrawer}
                 >
-                  <MapTab tabType="overlay" active={selectedTab === "overlay" || !open} />
+                  <RightTab tabType="overlay" active={selectedTab === "overlay" || !open} />
                 </div>
               </li>
             }
@@ -77,7 +77,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                   className={css.rightPanelTab}
                   onClick={this.handleToggleDrawer}
                 >
-                  <MapTab tabType="settings" active={selectedTab === "settings" || !open} />
+                  <RightTab tabType="settings" active={selectedTab === "settings" || !open} />
                 </div>
               </li>
             }
@@ -151,7 +151,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
 
   public handleToggleDrawer = (e: React.SyntheticEvent) => {
     const { selectedTab } = this.state;
-    const tab = e.currentTarget.id as RightTab;
+    const tab = e.currentTarget.id as RightTabType;
     if (tab !== selectedTab) {
       this.setState({ open: true, selectedTab: tab });
       log("MapTabOpened", { type: tab });
