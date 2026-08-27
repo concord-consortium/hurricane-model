@@ -23,12 +23,12 @@ interface IProps {
 
 export function RightTab({ active, tabType }: IProps) {
   const { style, text, image } = tabSettings[tabType];
+  const imageStyle = image ? { backgroundImage: `url(${image})` } : undefined;
   return (
-    <div className={clsx(css.mapTab, style)} data-test="map-tab">
+    <div className={clsx(css.mapTab, style)} data-test="right-tab">
       <div className={clsx(css.mapTabBack, style, { [css.active]: active })}>
-        {image &&
-          <div className={clsx(css.mapTabImage, style)} style={{ backgroundImage: `url(${image})` }}/>}
-        <div className={clsx(css.mapTabContent, { [css.noImage]: !image })}>{text}</div>
+        <div className={clsx(css.mapTabImage, style)} style={imageStyle}/>
+        <div className={css.mapTabContent}>{text}</div>
       </div>
     </div>
   );

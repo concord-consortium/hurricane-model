@@ -4,6 +4,7 @@ $mapTabHeight: 52px;
 $tabPadding: 4px;
 
 .mapTab {
+  cursor: pointer;
   display: inline-block;
   width: $mapTabWidth;
   height: $mapTabHeight;
@@ -28,11 +29,7 @@ $tabPadding: 4px;
     }
 
     &.settings {
-      background-color: #fff;
-      border-color: $secondaryColor;
-      border-width: 2px;
-      border-right: 0;
-      cursor: pointer;
+      background-color: #f7ce8b;
     }
 
     &.active {
@@ -40,6 +37,7 @@ $tabPadding: 4px;
     }
 
     .mapTabImage {
+      background-color: white;
       position: absolute;
       width: 64px;
       height: 44px;
@@ -51,13 +49,15 @@ $tabPadding: 4px;
       padding-right: 0;
       background-repeat: no-repeat;
       background-size: contain;
-      cursor: pointer;
       &:hover {
         opacity: 0.75;
       }
     }
 
     .mapTabContent {
+      align-items: center;
+      display: flex;
+      justify-content: center;
       position: relative;
       width: 64px;
       top: 5px;
@@ -73,16 +73,6 @@ $tabPadding: 4px;
       color: $charcoal;
       padding-top: 6px;
       pointer-events: none;
-
-      &.noImage {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 100%;
-        left: 0;
-        padding-top: 0;
-        height: auto;
-      }
     }
   }
 }
