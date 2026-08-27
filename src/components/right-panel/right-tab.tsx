@@ -28,7 +28,7 @@ export function RightTab({ active, tabType }: IProps) {
       <div className={clsx(css.mapTabBack, style, { [css.active]: active })}>
         {image &&
           <div className={clsx(css.mapTabImage, style)} style={{ backgroundImage: `url(${image})` }}/>}
-        <div className={clsx(css.mapTabContent, { [css.noImage]: !!image })}>{text}</div>
+        <div className={clsx(css.mapTabContent, { [css.noImage]: !image })}>{text}</div>
       </div>
     </div>
   );

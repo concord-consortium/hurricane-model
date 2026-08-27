@@ -28,5 +28,15 @@ describe("MapTab component", () => {
     expect(screen.getByText("Settings")).toBeInTheDocument();
     // no map image for the settings tab
     expect(document.querySelector("[class*='mapTabImage']")).not.toBeInTheDocument();
+    expect(screen.getByText("Settings")).toHaveClass("noImage");
+  });
+
+  it("does not apply noImage styling to tabs with images", () => {
+    render(
+      <Provider stores={stores}>
+        <RightTab tabType="base" active={true} />
+      </Provider>
+    );
+    expect(screen.getByText("Base Maps")).not.toHaveClass("noImage");
   });
 });
