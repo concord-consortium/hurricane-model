@@ -1,4 +1,8 @@
 export class SetupPanel {
+  getStormSetupTab() {
+    return cy.get(`[data-test="storm-setup-tab"]`);
+  }
+
   getPanel() {
     return cy.get(`[data-test="left-panel"]`);
   }

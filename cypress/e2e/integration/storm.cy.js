@@ -36,9 +36,9 @@ context("Test the Hurricane Model app", () => {
     const section1 = "storm-location";
     const section2 = "storm-category";
     const sections = [section1, section2, "season", "sea-surface-temperatures", "pressure-systems"];
-    bottomBar.stormSetupButton().contains("Storm Setup");
+    setupPanel.getStormSetupTab().contains("Storm Setup");
     setupPanel.confirmClosed();
-    bottomBar.stormSetupButton().click();
+    setupPanel.getStormSetupTab().click();
     setupPanel.confirmOpen();
 
     cy.log("All sections have buttons and start closed");
@@ -61,15 +61,13 @@ context("Test the Hurricane Model app", () => {
     setupPanel.confirmSectionOpen(section2);
     setupPanel.confirmSectionClosed(section1);
 
-    cy.log("Setup button closes panel");
-    bottomBar.stormSetupButton().click();
-    setupPanel.confirmClosed();
+    cy.log("Setup tab is hidden behind the open panel");
+    setupPanel.getStormSetupTab().should("have.attr", "aria-hidden", "true");
 
     cy.log("X button closes panel");
-    bottomBar.stormSetupButton().click();
-    setupPanel.confirmOpen();
     setupPanel.getCloseButton().click();
     setupPanel.confirmClosed();
+    setupPanel.getStormSetupTab().should("have.attr", "aria-hidden", "false");
   });
 
   it("lets user start and stop the model", () => {
@@ -94,7 +92,7 @@ context("Test the Hurricane Model app", () => {
     simulation.pressureSystemIsNotDimmed(0);
 
     // HM enabled, not dimmed, PS disabled, dimmed when in storm location setup mode
-    bottomBar.stormSetupButton().click();
+    setupPanel.getStormSetupTab().click();
     setupPanel.getSectionButton("storm-location").click();
     simulation.hurricaneMarkerIsEnabled();
     simulation.hurricaneMarkerIsNotDimmed();
