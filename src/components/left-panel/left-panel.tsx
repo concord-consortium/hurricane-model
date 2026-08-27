@@ -28,6 +28,7 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
         onClick={toggleOpen}
         tabIndex={open ? -1 : 0}
         aria-hidden={open}
+        aria-expanded={open}
       >
         Storm Setup
       </button>

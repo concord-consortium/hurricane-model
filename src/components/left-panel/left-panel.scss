@@ -3,6 +3,7 @@
 
 $leftPanelContainerWidth: calc($leftPanelWidth + 2px);
 $leftPanelBorderRadius: 5px;
+$stormSetupTabWidth: 76px;
 
 .leftPanelContainer {
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
@@ -34,10 +35,10 @@ $leftPanelBorderRadius: 5px;
     top: 50%;
     transform: translateY(-50%);
     transition: $leftPanelTransition;
-    width: 76px;
+    width: $stormSetupTabWidth;
 
     &.open {
-      left: calc(#{$leftPanelContainerWidth} - 76px);
+      left: calc(#{$leftPanelContainerWidth} - #{$stormSetupTabWidth});
     }
   }
 

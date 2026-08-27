@@ -34,12 +34,14 @@ describe("LeftPanel component", () => {
       const tab = screen.getByTestId("storm-setup-tab");
       expect(tab).not.toHaveClass("open");
       expect(tab).not.toHaveAttribute("tabindex", "-1");
+      expect(tab).toHaveAttribute("aria-hidden", "false");
       unmount();
 
       renderPanel(true);
       const openTab = screen.getByTestId("storm-setup-tab");
       expect(openTab).toHaveClass("open");
       expect(openTab).toHaveAttribute("tabindex", "-1");
+      expect(openTab).toHaveAttribute("aria-hidden", "true");
     });
   });
 });
