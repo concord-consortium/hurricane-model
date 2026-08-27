@@ -3,9 +3,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import config from "../../config";
+import * as logModule from "../../log";
 import { createStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
 import { RightPanel } from "./right-panel";
+
+jest.spyOn(logModule, "log").mockImplementation(() => undefined);
 
 describe("Right Panel component", () => {
   let stores = createStores();
@@ -130,5 +133,73 @@ describe("Right Panel component", () => {
     expect(screen.queryByTestId("tab-overlay")).not.toBeInTheDocument();
 
     config.availableOverlays = defValue;
+  });
+
+  describe("settings tab", () => {
+    let originalMode: typeof config.mode;
+    let originalWindArrows: boolean;
+    let originalHurricaneImage: boolean;
+    beforeEach(() => {
+      originalMode = config.mode;
+      originalWindArrows = config.windArrowsToggle;
+      originalHurricaneImage = config.hurricaneImageToggle;
+      config.mode = "storm";
+      config.windArrowsToggle = true;
+      config.hurricaneImageToggle = true;
+    });
+    afterEach(() => {
+      config.mode = originalMode;
+      config.windArrowsToggle = originalWindArrows;
+      config.hurricaneImageToggle = originalHurricaneImage;
+    });
+
+    it("is not rendered in hurricane mode", () => {
+      config.mode = "hurricane";
+      renderPanel();
+      expect(screen.queryByTestId("tab-settings")).not.toBeInTheDocument();
+    });
+
+    it("is not rendered when both toggles are disabled", () => {
+      config.windArrowsToggle = false;
+      config.hurricaneImageToggle = false;
+      renderPanel();
+      expect(screen.queryByTestId("tab-settings")).not.toBeInTheDocument();
+    });
+
+    it("opens the settings panel and shows controls per config flags", async () => {
+      const user = userEvent.setup();
+      const { unmount } = renderPanel();
+      await user.click(screen.getByTestId("tab-settings"));
+      expect(screen.getByTestId("right-panel")).toHaveClass("open");
+      expect(screen.getByTestId("settings-panel")).toBeInTheDocument();
+      expect(screen.getByTestId("wind-arrows-setting")).toBeInTheDocument();
+      expect(screen.getByTestId("hurricane-image-setting")).toBeInTheDocument();
+      unmount();
+
+      config.hurricaneImageToggle = false;
+      renderPanel();
+      await user.click(screen.getByTestId("tab-settings"));
+      expect(screen.getByTestId("wind-arrows-setting")).toBeInTheDocument();
+      expect(screen.queryByTestId("hurricane-image-setting")).not.toBeInTheDocument();
+    });
+
+    it("toggles update the ui store and log", async () => {
+      const user = userEvent.setup();
+      renderPanel();
+      await user.click(screen.getByTestId("tab-settings"));
+      (logModule.log as jest.Mock).mockClear();
+
+      // windArrows defaults to true, so clicking hides the arrows
+      const windSwitch = screen.getByTestId("wind-arrows-setting").querySelector("input") as HTMLInputElement;
+      await user.click(windSwitch);
+      expect(stores.ui.windArrows).toBe(false);
+      expect(logModule.log).toHaveBeenCalledWith("WindArrowsHidden");
+
+      // hurricaneImage defaults to false, so clicking shows the image
+      const imageSwitch = screen.getByTestId("hurricane-image-setting").querySelector("input") as HTMLInputElement;
+      await user.click(imageSwitch);
+      expect(stores.ui.hurricaneImage).toBe(true);
+      expect(logModule.log).toHaveBeenCalledWith("HurricaneImageShown");
+    });
   });
 });

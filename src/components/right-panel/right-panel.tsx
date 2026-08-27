@@ -7,6 +7,7 @@ import { RightTab } from "../../models/ui";
 import { BaseComponent, IBaseProps } from "../base";
 import { MapTab } from "./map-tab";
 import { MapButton } from "./map-button";
+import { LabeledSwitch } from "./labeled-switch";
 
 import css from "./right-panel.scss";
 
@@ -18,6 +19,10 @@ interface IState {
 
 const overlayTabVisible = () => {
   return config.availableOverlays && config.availableOverlays.length > 0;
+};
+
+const settingsTabVisible = () => {
+  return config.mode === "storm" && (config.windArrowsToggle || config.hurricaneImageToggle);
 };
 
 const getAvailableOverlays = (): {[key: string]: boolean} => {
@@ -63,6 +68,19 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                 </div>
               </li>
             }
+            {
+              settingsTabVisible() &&
+              <li>
+                <div
+                  id="settings"
+                  data-test="tab-settings"
+                  className={css.rightPanelTab}
+                  onClick={this.handleToggleDrawer}
+                >
+                  <MapTab tabType="settings" active={selectedTab === "settings" || !open} />
+                </div>
+              </li>
+            }
 
           </ul>
           {
@@ -98,6 +116,34 @@ export class RightPanel extends BaseComponent<IProps, IState> {
                 </div>
             </div>
           }
+          {
+            selectedTab === "settings" &&
+            <div className={`${css.tabContentBack} ${css.settings}`} data-test="settings-panel">
+              <div className={css.tabContent}>
+                <div className={css.drawerTitle}>Settings</div>
+                {
+                  config.windArrowsToggle &&
+                  <LabeledSwitch
+                    title="Wind Direction and Speed" offLabel="Hide" onLabel="Show"
+                    checked={this.stores.ui.windArrows} dataTest="wind-arrows-setting"
+                    onChange={this.handleWindArrowsChange}
+                  />
+                }
+                {
+                  config.windArrowsToggle && config.hurricaneImageToggle &&
+                  <hr className={css.divider} />
+                }
+                {
+                  config.hurricaneImageToggle &&
+                  <LabeledSwitch
+                    title="Hurricane Image" offLabel="Icon" onLabel="Image"
+                    checked={this.stores.ui.hurricaneImage} dataTest="hurricane-image-setting"
+                    onChange={this.handleHurricaneImageChange}
+                  />
+                }
+              </div>
+            </div>
+          }
         </div>
       </div>
     );
@@ -105,18 +151,28 @@ export class RightPanel extends BaseComponent<IProps, IState> {
 
   public handleToggleDrawer = (e: React.SyntheticEvent) => {
     const { selectedTab } = this.state;
-    const mapType = e.currentTarget.id as RightTab;
-    if (mapType !== selectedTab) {
-      this.setState({ open: true, selectedTab: mapType });
-      log("MapTabOpened", { type: mapType });
+    const tab = e.currentTarget.id as RightTab;
+    if (tab !== selectedTab) {
+      this.setState({ open: true, selectedTab: tab });
+      log("MapTabOpened", { type: tab });
     } else {
       const newState = !this.state.open;
       this.setState({ open: newState });
       if (newState) {
-        log("MapTabOpened", { type: mapType });
+        log("MapTabOpened", { type: tab });
       } else {
-        log("MapTabClosed", { type: mapType });
+        log("MapTabClosed", { type: tab });
       }
     }
+  }
+
+  public handleWindArrowsChange = (checked: boolean) => {
+    this.stores.ui.setWindArrows(checked);
+    log(checked ? "WindArrowsShown" : "WindArrowsHidden");
+  }
+
+  public handleHurricaneImageChange = (checked: boolean) => {
+    this.stores.ui.setHurricaneImage(checked);
+    log(checked ? "HurricaneImageShown" : "HurricaneImageHidden");
   }
 }

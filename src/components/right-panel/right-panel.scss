@@ -65,6 +65,10 @@ $mapTabVerticalSpacing: 10px;
         background-color: $tabImpactLight;
       }
 
+      &.settings {
+        background-color: $secondaryColorHover;
+      }
+
       .tabContent {
         pointer-events: all;
         position: absolute;
@@ -91,6 +95,12 @@ $mapTabVerticalSpacing: 10px;
           letter-spacing: normal;
           text-align: center;
           color: $charcoal;
+        }
+
+        .divider {
+          border: 0;
+          border-top: 2px solid $secondaryColor;
+          margin: 15px 10px;
         }
       }
     }

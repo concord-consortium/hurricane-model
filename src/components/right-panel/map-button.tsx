@@ -20,7 +20,7 @@ import css from "./map-button.scss";
 interface IProps extends IBaseProps {
   label: string;
   value: MapTilesName | Overlay;
-  mapType: RightTab;
+  mapType: Exclude<RightTab, "settings">;
   disabled?: boolean;
 }
 interface IState {}
