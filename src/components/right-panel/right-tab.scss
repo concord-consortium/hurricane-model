@@ -18,15 +18,15 @@ $tabPadding: 4px;
     border: 1px solid $charcoalMedium;
     border-right: 0;
     margin-left: -2px;
-  
+
     &.geoMaps {
       background-color: $tabGeoLight;
     }
-  
+
     &.impactMaps {
       background-color: $tabImpactLight;
     }
-  
+
     &.settings {
       background-color: #fff;
       border-color: $secondaryColor;
@@ -34,7 +34,7 @@ $tabPadding: 4px;
       border-right: 0;
       cursor: pointer;
     }
-  
+
     &.active {
       width: $mapTabWidth + 1px; // to cover border on the right side
     }
@@ -56,7 +56,7 @@ $tabPadding: 4px;
         opacity: 0.75;
       }
     }
-  
+
     .mapTabContent {
       position: relative;
       width: 64px;
@@ -73,7 +73,7 @@ $tabPadding: 4px;
       color: $charcoal;
       padding-top: 6px;
       pointer-events: none;
-      
+
       &.noImage {
         position: absolute;
         top: 50%;

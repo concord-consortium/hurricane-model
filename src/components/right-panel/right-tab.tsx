@@ -10,7 +10,7 @@ interface ITabSettings {
   style: string;
   text: string;
 }
-const tabSettings: Record<string, ITabSettings> = {
+const tabSettings: Record<RightTabType, ITabSettings> = {
   base: { style: css.geoMaps, text: "Base Maps", image: baseMapTabImg },
   overlay: { style: css.impactMaps, text: "Map Overlays", image: overlayTabImg },
   settings: { style: css.settings, text: "Settings" }
