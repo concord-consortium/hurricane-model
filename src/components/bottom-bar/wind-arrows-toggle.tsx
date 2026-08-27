@@ -1,34 +1,24 @@
-import { inject, observer } from "mobx-react";
-import * as React from "react";
-import { BaseComponent, IBaseProps } from "../base";
+import { observer } from "mobx-react";
+import React from "react";
+import { changeWindArrows } from "../../utils/ui";
 import Switch from "@mui/material/Switch";
-import { log } from "../../log";
 import css from "./wind-arrows-toggle.scss";
+import { useStores } from "../../stores-context";
 
-interface IProps extends IBaseProps {}
-interface IState {}
+export const WindArrowsToggle = observer(function WindArrowsToggle() {
+  const { ui } = useStores();
+  const checked = ui.windArrows;
 
-@inject("stores")
-@observer
-export class WindArrowsToggle extends BaseComponent<IProps, IState> {
-  public render() {
-    const checked = this.stores.ui.windArrows;
-    return (
-      <div className={css.windArrowsToggle}>
-        <div className={css.label}>Wind Direction and Speed</div>
-        <div className={css.toggleContainer}>
-          <Switch disableRipple={true} color="secondary" checked={checked} onChange={this.handleChange} />
-        </div>
+  const handleChange = (e: any, checked: boolean) => {
+    changeWindArrows(ui, checked);
+  }
+
+  return (
+    <div className={css.windArrowsToggle}>
+      <div className={css.label}>Wind Direction and Speed</div>
+      <div className={css.toggleContainer}>
+        <Switch disableRipple={true} color="secondary" checked={checked} onChange={handleChange} />
       </div>
-    );
-  }
-
-  public handleChange = (e: any, checked: boolean) => {
-    this.stores.ui.setWindArrows(checked);
-    if (checked) {
-      log("WindArrowsShown");
-    } else {
-      log("WindArrowsHidden");
-    }
-  }
-}
+    </div>
+  );
+});

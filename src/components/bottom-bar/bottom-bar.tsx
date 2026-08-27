@@ -17,7 +17,6 @@ import { SeasonButton } from "./season-button";
 import { StartLocationButton } from "./start-location-button";
 import { WindArrowsToggle } from "./wind-arrows-toggle";
 
-import SetupIcon from "../../assets/bottom-bar/setup-icon.svg";
 import CCLogo from "../../assets/cc-logo.svg";
 import CCLogoSmall from "../../assets/cc-logo-small.svg";
 import PauseIcon from "../../assets/pause.svg";
@@ -86,13 +85,12 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public render() {
     const { ready, simulationRunning, simulationStarted } = this.stores.simulation;
-    const { isReportMode, leftPanelOpen, overlay, thermometerActive } = this.stores.ui;
+    const { isReportMode, overlay, thermometerActive } = this.stores.ui;
     const { isSeasonMenuOpen, isStartLocationMenuOpen } = this.state;
     const startLocationButtonHoveredClass = isStartLocationMenuOpen ? css.hovered : "";
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
     const tempButtonDisabled = overlay !== "sst";
     const isStormMode = config.mode === "storm";
-    const stormSetupButtonDisabled = simulationRunning;
     const startLocationButtonDisabled = isReportMode ||
       (config.lockSimulationWhileRunning && simulationStarted);
     const seasonButtonDisabled = isReportMode ||
@@ -103,6 +101,18 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       startLocationButtonHoveredClass,
       { hoverable: !startLocationButtonDisabled }
     );
+    const tempButton = (
+      <div className={`${css.widgetGroup} ${tempButtonDisabled ? "" : "hoverable"}`}>
+        <IconButton
+          disabled={tempButtonDisabled}
+          active={thermometerActive}
+          buttonText="Temp"
+          dataTest="temp-button"
+          icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
+          onClick={this.handleThermometerToggle}
+        />
+      </div>
+    );
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -110,20 +120,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           <CCLogoSmall className={css.logoSmall} />
         </div>
         <div className={css.mainContainer}>
-          {
-            isStormMode &&
-            <div className={css.widgetGroup}>
-              <Button
-                onClick={this.toggleLeftPanel}
-                disabled={stormSetupButtonDisabled}
-                className={clsx(css.bottomBarButton, css.stormSetupButton, { [css.open]: leftPanelOpen })}
-                data-test="storm-setup-button"
-                disableRipple={true}
-              >
-                <span><SetupIcon/>Storm Setup</span>
-              </Button>
-            </div>
-          }
           {
             config.startLocationButton && !isStormMode &&
             <div className={startLocationButtonClasses}>
@@ -148,28 +144,25 @@ export class BottomBar extends BaseComponent<IProps, IState> {
                 }} />
             </div>
           }
-          <div className={`${css.widgetGroup} hoverable`}>
-            {
-              config.windArrowsToggle &&
-              <WindArrowsToggle />
-            }
-          </div>
-          <div className={`${css.widgetGroup} hoverable`}>
-            {
-              config.hurricaneImageToggle &&
-              <HurricaneImageToggle />
-            }
-          </div>
-          <div className={`${css.widgetGroup} ${tempButtonDisabled ? "" : "hoverable"}`}>
-            <IconButton
-              disabled={tempButtonDisabled}
-              active={thermometerActive}
-              buttonText="Temp"
-              dataTest="temp-button"
-              icon={<ThermometerIcon />} highlightIcon={<ThermometerHoverIcon />}
-              onClick={this.handleThermometerToggle}
-            />
-          </div>
+          {
+            !isStormMode &&
+            <div className={`${css.widgetGroup} hoverable`}>
+              {
+                config.windArrowsToggle &&
+                <WindArrowsToggle />
+              }
+            </div>
+          }
+          {
+            !isStormMode &&
+            <div className={`${css.widgetGroup} hoverable`}>
+              {
+                config.hurricaneImageToggle &&
+                <HurricaneImageToggle />
+              }
+            </div>
+          }
+          { !isStormMode && tempButton }
           <div className={`${css.widgetGroup} ${css.reloadRestart}`}>
             <Button
               className={clsx(css.bottomBarButton, css.playbackButton)}
@@ -178,7 +171,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               disabled={simulationControlsDisabled}
               disableRipple={true}
             >
-              <span><ReloadIcon/> Reload</span>
+              <span><ReloadIcon/> {isStormMode ? "Clear All" : "Reload"}</span>
             </Button>
             <Button
               className={clsx(css.bottomBarButton, css.playbackButton)}
@@ -187,7 +180,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               disabled={simulationControlsDisabled}
               disableRipple={true}
             >
-              <span><RestartIcon/> Restart</span>
+              <span><RestartIcon/> {isStormMode ? "Restart/Edit" : "Restart"}</span>
             </Button>
           </div>
           <div className={`${css.widgetGroup} ${css.stopStart}`}>
@@ -201,6 +194,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               { simulationRunning ? <span><PauseIcon/> Stop</span> : <span><StartIcon /> Start</span> }
             </Button>
           </div>
+          { isStormMode && tempButton }
           <div className={css.widgetGroup}>
             <HurricaneScale />
           </div>
@@ -215,11 +209,13 @@ export class BottomBar extends BaseComponent<IProps, IState> {
         <Dialog
           onClose={this.cancelReload}
           open={this.state.reloadConfirmOpen}
-          title="Reload Model"
+          title={isStormMode ? "Clear All" : "Reload Model"}
           ariaDescribedBy="reload-confirm-message"
         >
           <p id="reload-confirm-message">
-            Are you sure you want to reload the model? You will lose all of your current settings.
+            {isStormMode
+              ? "Are you sure you want to clear everything? You will lose all of your current settings."
+              : "Are you sure you want to reload the model? You will lose all of your current settings."}
           </p>
           <div className={css.confirmActions}>
             <Button
@@ -235,7 +231,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               onClick={this.confirmReload}
               disableRipple={true}
             >
-              Reload
+              {isStormMode ? "Clear All" : "Reload"}
             </Button>
           </div>
         </Dialog>
@@ -245,11 +241,6 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
   public fullscreenChange = () => {
     this.setState({ fullscreen: screenfull && screenfull.isFullscreen });
-  }
-
-  public toggleLeftPanel = () => {
-    if (this.stores.simulation.simulationStarted) this.restart();
-    this.props.toggleLeftPanelOpen();
   }
 
   public handleStartStop = () => {
@@ -325,6 +316,10 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     });
     this.restart();
     log("SimulationRestarted");
+    if (config.mode === "storm") {
+      this.stores.ui.setSetupMode(undefined);
+      this.stores.ui.setLeftPanelOpen(true);
+    }
   }
 
   public handleReload = () => {

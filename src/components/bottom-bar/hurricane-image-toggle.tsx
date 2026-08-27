@@ -1,34 +1,24 @@
-import { inject, observer } from "mobx-react";
-import * as React from "react";
-import { BaseComponent, IBaseProps } from "../base";
+import { observer } from "mobx-react";
+import React from "react";
 import Switch from "@mui/material/Switch";
-import { log } from "../../log";
 import css from "./hurricane-image-toggle.scss";
+import { useStores } from "../../stores-context";
+import { changeHurricaneImage } from "../../utils/ui";
 
-interface IProps extends IBaseProps {}
-interface IState {}
+export const HurricaneImageToggle = observer(function HurricaneImageToggle() {
+  const { ui } = useStores();
+  const checked = ui.hurricaneImage;
 
-@inject("stores")
-@observer
-export class HurricaneImageToggle extends BaseComponent<IProps, IState> {
-  public render() {
-    const checked = this.stores.ui.hurricaneImage;
-    return (
-      <div className={css.hurricaneImageToggle}>
-        <div className={css.label}>Hurricane Image</div>
-        <div className={css.toggleContainer}>
-          <Switch disableRipple={true} color="secondary" checked={checked} onChange={this.handleChange} />
-        </div>
+  const handleChange = (e: any, checked: boolean) => {
+    changeHurricaneImage(ui, checked);
+  }
+
+  return (
+    <div className={css.hurricaneImageToggle}>
+      <div className={css.label}>Hurricane Image</div>
+      <div className={css.toggleContainer}>
+        <Switch disableRipple={true} color="secondary" checked={checked} onChange={handleChange} />
       </div>
-    );
-  }
-
-  public handleChange = (e: any, checked: boolean) => {
-    this.stores.ui.setHurricaneImage(checked);
-    if (checked) {
-      log("HurricaneImageShown");
-    } else {
-      log("HurricaneImageHidden");
-    }
-  }
-}
+    </div>
+  );
+});

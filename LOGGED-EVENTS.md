@@ -12,8 +12,8 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 | `SimulationStarted` | `{ startLocation, season, windArrows, hurricaneImage, baseMap, overlay, accessibleSSTScale, thermometerActive, pressureSystems: [{ type, center: { lat, lng }, strength }], hurricane: { strength, center: { lat, lng } }, deterministic, timestep, pressureSystemsLocked, lockSimulationWhileRunning, seaSurfaceTempOpacity, markLandfalls }` | User clicks Start — logged before `start()` to capture pre-simulation state |
 | `SimulationStopped` | `{ outcome: { initialPosition, finalPosition, strengthChanges, landfalls, trackPointCount } }` | User clicks Stop/Pause |
 | `SimulationEnded` | `{ reason: "ByItself" \| "SimulationRestarted" \| "SimulationReloaded" \| "TopBarReloadButtonClicked", outcome: { initialPosition, finalPosition, strengthChanges, landfalls, trackPointCount } }` | Simulation ends naturally (hurricane dissipates) or user triggers restart/reload |
-| `SimulationRestarted` | — | User clicks Restart (bottom bar) |
-| `SimulationReloaded` | — | User clicks Reload (bottom bar) |
+| `SimulationRestarted` | — | User clicks Restart (bottom bar; labeled "Restart/Edit" in storm mode) |
+| `SimulationReloaded` | — | User clicks Reload (bottom bar; labeled "Clear All" in storm mode) |
 | `TopBarReloadButtonClicked` | — | User clicks Reload (top bar) |
 
 ## Mouse Interaction

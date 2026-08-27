@@ -214,7 +214,7 @@ describe("BottomBar component", () => {
     });
   });
 
-  describe("storm setup button", () => {
+  describe("storm mode", () => {
     let originalMode: string;
     beforeEach(() => {
       originalMode = config.mode;
@@ -224,22 +224,56 @@ describe("BottomBar component", () => {
       config.mode = originalMode;
     });
 
-    it("restarts the simulation when clicked after the simulation has started", async () => {
+    const renderBar = () => render(
+      <Provider stores={stores}>
+        <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+      </Provider>
+    );
+
+    it("does not render the toggles", () => {
+      renderBar();
+      expect(screen.queryByText("Wind Direction and Speed")).not.toBeInTheDocument();
+      expect(screen.queryByText("Hurricane Image")).not.toBeInTheDocument();
+    });
+
+    it("renames Reload to Clear All and Restart to Restart/Edit", () => {
+      renderBar();
+      expect(screen.getByTestId("reload-button")).toHaveTextContent("Clear All");
+      expect(screen.getByTestId("restart-button")).toHaveTextContent("Restart/Edit");
+    });
+
+    it("places the temp button after the start button", () => {
+      renderBar();
+      const startButton = screen.getByTestId("start-button");
+      const tempButton = screen.getByTestId("temp-button");
+      expect(startButton.compareDocumentPosition(tempButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it("Restart/Edit restarts the simulation and opens the setup panel", async () => {
       const user = userEvent.setup();
-      const toggleLeftPanelOpenMock = jest.fn();
       jest.spyOn(stores.simulation, "restart");
+      jest.spyOn(stores.ui, "setLeftPanelOpen");
+      renderBar();
+      await user.click(screen.getByTestId("restart-button"));
+      expect(stores.simulation.restart).toHaveBeenCalled();
+      expect(stores.ui.setLeftPanelOpen).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe("hurricane mode", () => {
+    it("has the original button labels and order", () => {
       render(
         <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpenMock} />
+          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
         </Provider>
       );
-      act(() => {
-        stores.simulation.setSimulationStarted(true);
-      });
-
-      await user.click(screen.getByTestId("storm-setup-button"));
-      expect(stores.simulation.restart).toHaveBeenCalled();
-      expect(toggleLeftPanelOpenMock).toHaveBeenCalled();
+      expect(screen.getByTestId("reload-button")).toHaveTextContent("Reload");
+      expect(screen.getByTestId("restart-button")).toHaveTextContent(/^\s*Restart\s*$/);
+      const startButton = screen.getByTestId("start-button");
+      const tempButton = screen.getByTestId("temp-button");
+      expect(tempButton.compareDocumentPosition(startButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(screen.getByText("Wind Direction and Speed")).toBeInTheDocument();
+      expect(screen.getByText("Hurricane Image")).toBeInTheDocument();
     });
   });
 
