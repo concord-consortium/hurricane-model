@@ -18,4 +18,15 @@ describe("MapTab component", () => {
     );
     expect(screen.getByTestId("map-tab")).toBeInTheDocument();
   });
+
+  it("renders a text-only settings tab", () => {
+    render(
+      <Provider stores={stores}>
+        <MapTab tabType="settings" active={true} />
+      </Provider>
+    );
+    expect(screen.getByText("Settings")).toBeInTheDocument();
+    // no map image for the settings tab
+    expect(document.querySelector("[class*='mapTabImage']")).not.toBeInTheDocument();
+  });
 });

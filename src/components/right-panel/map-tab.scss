@@ -24,6 +24,13 @@ $tabPadding: 4px;
     &.impactMaps {
       background-color: $tabImpactLight;
     }
+    &.settings {
+      background-color: #fff;
+      border-color: $secondaryColor;
+      border-width: 2px;
+      border-right: 0;
+      cursor: pointer;
+    }
     &.active {
       width: $mapTabWidth + 1px; // to cover border on the right side
     }
@@ -61,6 +68,15 @@ $tabPadding: 4px;
       color: $charcoal;
       padding-top: 6px;
       pointer-events: none;
+    }
+    .mapTabContent.noImage {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      left: 0;
+      padding-top: 0;
+      height: auto;
     }
   }
 }

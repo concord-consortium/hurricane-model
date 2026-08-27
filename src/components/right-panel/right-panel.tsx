@@ -3,18 +3,17 @@ import * as React from "react";
 
 import config from "../../config";
 import { log } from "../../log";
+import { RightTab } from "../../models/ui";
 import { BaseComponent, IBaseProps } from "../base";
 import { MapTab } from "./map-tab";
 import { MapButton } from "./map-button";
 
 import css from "./right-panel.scss";
 
-export type MapType = "base" | "overlay";
-
 interface IProps extends IBaseProps { }
 interface IState {
   open: boolean;
-  selectedTab: MapType;
+  selectedTab: RightTab;
 }
 
 const overlayTabVisible = () => {
@@ -106,7 +105,7 @@ export class RightPanel extends BaseComponent<IProps, IState> {
 
   public handleToggleDrawer = (e: React.SyntheticEvent) => {
     const { selectedTab } = this.state;
-    const mapType = e.currentTarget.id as MapType;
+    const mapType = e.currentTarget.id as RightTab;
     if (mapType !== selectedTab) {
       this.setState({ open: true, selectedTab: mapType });
       log("MapTabOpened", { type: mapType });
