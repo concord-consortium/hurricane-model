@@ -203,7 +203,7 @@ describe("BottomBar component", () => {
       expect(screen.queryByText("Hurricane Image")).not.toBeInTheDocument();
     });
 
-    it("renames Reload to Clear All and Restart to Restart/Edit", () => {
+    it("uses 'Clear All' for Reload and 'Restart/Edit' for Restart", () => {
       renderBottomBar();
       expect(screen.getByTestId("reload-button")).toHaveTextContent("Clear All");
       expect(screen.getByTestId("restart-button")).toHaveTextContent("Restart/Edit");
