@@ -1,14 +1,16 @@
 export class SetupPanel {
   getStormSetupTab() {
-    return cy.get(`[data-test="tab-setup"]`);
+    // Target the tab back rather than the wrapper: the wrapper inherits
+    // pointer-events: none from the panel container, so Cypress refuses to click it.
+    return cy.get(`[data-test="tab-setup"] .tab--tabBack--__hurr-v1__`);
   }
 
   confirmTabBehindPanel() {
-    this.getStormSetupTab().find(".tab--active--__hurr-v1__").should("exist");
+    this.getStormSetupTab().should("have.class", "tab--active--__hurr-v1__");
   }
 
   confirmTabVisible() {
-    this.getStormSetupTab().find(".tab--active--__hurr-v1__").should("not.exist");
+    this.getStormSetupTab().should("not.have.class", "tab--active--__hurr-v1__");
   }
 
   getPanel() {
