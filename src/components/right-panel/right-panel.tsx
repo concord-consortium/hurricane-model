@@ -1,11 +1,10 @@
-import { inject, observer } from "mobx-react";
-import * as React from "react";
+import React, { useState } from "react";
 
 import config from "../../config";
 import { log } from "../../log";
 import { RightTabType } from "../../models/ui";
+import { useStores } from "../../stores-context";
 import { changeHurricaneImage, changeWindArrows } from "../../utils/ui";
-import { BaseComponent, IBaseProps } from "../base";
 import { Tab } from "../tab";
 import { MapButton } from "./map-button";
 import { LabeledSwitch } from "./labeled-switch";
@@ -16,20 +15,6 @@ import overlayTabImg from "../../assets/overlay-tab.png";
 import tabCss from "../tab.scss";
 import css from "./right-panel.scss";
 
-interface IProps extends IBaseProps { }
-interface IState {
-  open: boolean;
-  selectedTab: RightTabType;
-}
-
-const overlayTabVisible = () => {
-  return config.availableOverlays && config.availableOverlays.length > 0;
-};
-
-const settingsTabVisible = () => {
-  return config.mode === "storm" && (config.windArrowsToggle || config.hurricaneImageToggle);
-};
-
 const getAvailableOverlays = (): {[key: string]: boolean} => {
   return (config.availableOverlays || []).reduce((res: { [key: string]: boolean }, o: string) => {
     res[o] = true;
@@ -37,142 +22,23 @@ const getAvailableOverlays = (): {[key: string]: boolean} => {
   }, {});
 };
 
-@inject("stores")
-@observer
-export class RightPanel extends BaseComponent<IProps, IState> {
-  constructor(props: IProps) {
-    super(props);
-    this.state = {
-      open: false,
-      selectedTab: "base"
-    };
-  }
+export function RightPanel() {
+  const { ui } = useStores();
+  const [open, setOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("base");
+  const availableOverlays = getAvailableOverlays();
 
-  public render() {
-    const { open, selectedTab } = this.state;
-    const availableOverlays = getAvailableOverlays();
-    return (
-      <div className={css.rightPanelContainer}>
-        <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
-          <ul className={css.rightPanelTabs}>
-            <li>
-              <Tab
-                active={selectedTab === "base" || !open}
-                className={tabCss.geoMaps}
-                dataTest="tab-base"
-                id="base"
-                image={baseMapTabImg}
-                onClick={this.handleToggleDrawer}
-                side="right"
-                text="Base Maps"
-              />
-            </li>
-            {
-              overlayTabVisible() &&
-              <li>
-                <Tab
-                  active={selectedTab === "overlay" || !open}
-                  className={tabCss.impactMaps}
-                  dataTest="tab-overlay"
-                  id="overlay"
-                  image={overlayTabImg}
-                  onClick={this.handleToggleDrawer}
-                  side="right"
-                  text="Map Overlays"
-                />
-              </li>
-            }
-            {
-              settingsTabVisible() &&
-              <li>
-                <Tab
-                  active={selectedTab === "settings" || !open}
-                  className={tabCss.settings}
-                  dataTest="tab-settings"
-                  id="settings"
-                  onClick={this.handleToggleDrawer}
-                  side="right"
-                  text="Settings"
-                />
-              </li>
-            }
+  const overlayTabVisible = config.availableOverlays && config.availableOverlays.length > 0;
+  const settingsTabVisible = config.mode === "storm" && (config.windArrowsToggle || config.hurricaneImageToggle);
 
-          </ul>
-          {
-            selectedTab === "base" &&
-            <div className={`${css.tabContentBack} ${css.geoMaps}`} data-test="base-panel">
-              <div className={css.tabContent}>
-                <div className={css.drawerTitle}>Base Maps</div>
-                <MapButton label="Satellite" value="satellite" mapType="base" />
-                <MapButton label="Relief" value="relief" mapType="base" />
-                <MapButton label="Street" value="street" mapType="base" />
-                {config.enablePopulationMap &&
-                  <MapButton label="Population" value="population" mapType="base" />}
-              </div>
-            </div>
-          }
-          {
-            selectedTab === "overlay" &&
-            <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="overlay-panel">
-                <div className={css.tabContent}>
-                  <div className={css.drawerTitle}>Map Overlays</div>
-                  {
-                    availableOverlays.sst &&
-                    <MapButton label="Sea Surface Temp" value="sst" mapType="overlay" />
-                  }
-                  {
-                    availableOverlays.precipitation &&
-                    <MapButton label="Precipitation" value="precipitation" mapType="overlay" />
-                  }
-                  {
-                    availableOverlays.stormSurge &&
-                    <MapButton label="Storm Surge" value="stormSurge" mapType="overlay" />
-                  }
-                </div>
-            </div>
-          }
-          {
-            selectedTab === "settings" &&
-            <div className={`${css.tabContentBack} ${css.settings}`} data-test="settings-panel">
-              <div className={css.tabContent}>
-                <div className={css.drawerTitle}>Settings</div>
-                {
-                  config.windArrowsToggle &&
-                  <LabeledSwitch
-                    title="Wind Direction and Speed" offLabel="Hide" onLabel="Show"
-                    checked={this.stores.ui.windArrows} dataTest="wind-arrows-setting"
-                    onChange={this.handleWindArrowsChange}
-                  />
-                }
-                {
-                  config.windArrowsToggle && config.hurricaneImageToggle &&
-                  <hr className={css.divider} />
-                }
-                {
-                  config.hurricaneImageToggle &&
-                  <LabeledSwitch
-                    title="Hurricane Image" offLabel="Icon" onLabel="Image"
-                    checked={this.stores.ui.hurricaneImage} dataTest="hurricane-image-setting"
-                    onChange={this.handleHurricaneImageChange}
-                  />
-                }
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-    );
-  }
-
-  public handleToggleDrawer = (e: React.SyntheticEvent) => {
-    const { selectedTab } = this.state;
-    const tab = e.currentTarget.id as RightTabType;
+  const handleToggleDrawer = (tab: RightTabType) => {
     if (tab !== selectedTab) {
-      this.setState({ open: true, selectedTab: tab });
+      setOpen(true);
+      setSelectedTab(tab);
       log("MapTabOpened", { type: tab });
     } else {
-      const newState = !this.state.open;
-      this.setState({ open: newState });
+      const newState = !open;
+      setOpen(newState);
       if (newState) {
         log("MapTabOpened", { type: tab });
       } else {
@@ -181,11 +47,120 @@ export class RightPanel extends BaseComponent<IProps, IState> {
     }
   }
 
-  public handleWindArrowsChange = (checked: boolean) => {
-    changeWindArrows(this.stores.ui, checked);
+  const handleWindArrowsChange = (checked: boolean) => {
+    changeWindArrows(ui, checked);
   }
 
-  public handleHurricaneImageChange = (checked: boolean) => {
-    changeHurricaneImage(this.stores.ui, checked);
+  const handleHurricaneImageChange = (checked: boolean) => {
+    changeHurricaneImage(ui, checked);
   }
+
+  return (
+    <div className={css.rightPanelContainer}>
+      <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
+        <ul className={css.rightPanelTabs}>
+          <li>
+            <Tab
+              active={selectedTab === "base" || !open}
+              className={tabCss.geoMaps}
+              dataTest="tab-base"
+              image={baseMapTabImg}
+              onClick={() => handleToggleDrawer("base")}
+              side="right"
+              text="Base Maps"
+            />
+          </li>
+          {
+            overlayTabVisible &&
+            <li>
+              <Tab
+                active={selectedTab === "overlay" || !open}
+                className={tabCss.impactMaps}
+                dataTest="tab-overlay"
+                image={overlayTabImg}
+                onClick={() => handleToggleDrawer("overlay")}
+                side="right"
+                text="Map Overlays"
+              />
+            </li>
+          }
+          {
+            settingsTabVisible &&
+            <li>
+              <Tab
+                active={selectedTab === "settings" || !open}
+                className={tabCss.settings}
+                dataTest="tab-settings"
+                onClick={() => handleToggleDrawer("settings")}
+                side="right"
+                text="Settings"
+              />
+            </li>
+          }
+
+        </ul>
+        {
+          selectedTab === "base" &&
+          <div className={`${css.tabContentBack} ${css.geoMaps}`} data-test="base-panel">
+            <div className={css.tabContent}>
+              <div className={css.drawerTitle}>Base Maps</div>
+              <MapButton label="Satellite" value="satellite" mapType="base" />
+              <MapButton label="Relief" value="relief" mapType="base" />
+              <MapButton label="Street" value="street" mapType="base" />
+              {config.enablePopulationMap &&
+                <MapButton label="Population" value="population" mapType="base" />}
+            </div>
+          </div>
+        }
+        {
+          selectedTab === "overlay" &&
+          <div className={`${css.tabContentBack} ${css.impactMaps}`} data-test="overlay-panel">
+              <div className={css.tabContent}>
+                <div className={css.drawerTitle}>Map Overlays</div>
+                {
+                  availableOverlays.sst &&
+                  <MapButton label="Sea Surface Temp" value="sst" mapType="overlay" />
+                }
+                {
+                  availableOverlays.precipitation &&
+                  <MapButton label="Precipitation" value="precipitation" mapType="overlay" />
+                }
+                {
+                  availableOverlays.stormSurge &&
+                  <MapButton label="Storm Surge" value="stormSurge" mapType="overlay" />
+                }
+              </div>
+          </div>
+        }
+        {
+          selectedTab === "settings" &&
+          <div className={`${css.tabContentBack} ${css.settings}`} data-test="settings-panel">
+            <div className={css.tabContent}>
+              <div className={css.drawerTitle}>Settings</div>
+              {
+                config.windArrowsToggle &&
+                <LabeledSwitch
+                  title="Wind Direction and Speed" offLabel="Hide" onLabel="Show"
+                  checked={ui.windArrows} dataTest="wind-arrows-setting"
+                  onChange={handleWindArrowsChange}
+                />
+              }
+              {
+                config.windArrowsToggle && config.hurricaneImageToggle &&
+                <hr className={css.divider} />
+              }
+              {
+                config.hurricaneImageToggle &&
+                <LabeledSwitch
+                  title="Hurricane Image" offLabel="Icon" onLabel="Image"
+                  checked={ui.hurricaneImage} dataTest="hurricane-image-setting"
+                  onChange={handleHurricaneImageChange}
+                />
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  );
 }

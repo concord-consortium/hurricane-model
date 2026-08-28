@@ -27,7 +27,6 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
         active={open}
         className={tabCss.setup}
         dataTest="tab-setup"
-        id="setup"
         onClick={toggleOpen}
         side="left"
         text="Storm Setup"
