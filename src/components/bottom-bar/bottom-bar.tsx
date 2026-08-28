@@ -115,6 +115,9 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       </div>
     );
 
+    const reloadLabel = isStormMode ? "Clear All" : "Reload";
+    const reloadVerb = isStormMode ? "clear everything" : "reload the model";
+
     return (
       <div className={css.bottomBar}>
         <div className={css.leftContainer}>
@@ -175,7 +178,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
             >
               <span>
                 <ReloadIcon/>
-                <span className={css.buttonLabel}>{isStormMode ? "Clear All" : "Reload"}</span>
+                <span className={css.buttonLabel}>{reloadLabel}</span>
               </span>
             </Button>
             <Button
@@ -221,9 +224,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           ariaDescribedBy="reload-confirm-message"
         >
           <p id="reload-confirm-message">
-            {isStormMode
-              ? "Are you sure you want to clear everything? You will lose all of your current settings."
-              : "Are you sure you want to reload the model? You will lose all of your current settings."}
+            {`Are you sure you want to ${reloadVerb}? You will lose all of your current settings.`}
           </p>
           <div className={css.confirmActions}>
             <Button
@@ -239,7 +240,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               onClick={this.confirmReload}
               disableRipple={true}
             >
-              {isStormMode ? "Clear All" : "Reload"}
+              {reloadLabel}
             </Button>
           </div>
         </Dialog>

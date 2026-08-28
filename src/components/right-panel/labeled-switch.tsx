@@ -6,7 +6,7 @@ import css from "./labeled-switch.scss";
 
 interface IProps {
   title: string;
-  title2?: string;
+  title2?: string; // Additional title on a second line.
   offLabel: string;
   onLabel: string;
   checked: boolean;
@@ -26,7 +26,7 @@ export function LabeledSwitch({ title, title2, offLabel, onLabel, checked, dataT
           color="secondary"
           checked={checked}
           onChange={handleChange}
-          slotProps={{ input: { "aria-label": title } }}
+          slotProps={{ input: { "aria-label": `${title}${title2 ? ` ${title2}` : ""}` } }}
         />
         <span className={clsx(css.sideLabel, { [css.active]: checked })}>{onLabel}</span>
       </div>
