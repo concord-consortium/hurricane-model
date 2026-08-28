@@ -220,9 +220,11 @@ describe("BottomBar component", () => {
       const user = userEvent.setup();
       jest.spyOn(stores.simulation, "restart");
       jest.spyOn(stores.ui, "setLeftPanelOpen");
+      jest.spyOn(stores.ui, "setSetupMode");
       renderBottomBar();
       await user.click(screen.getByTestId("restart-button"));
       expect(stores.simulation.restart).toHaveBeenCalled();
+      expect(stores.ui.setSetupMode).toHaveBeenCalledWith(undefined);
       expect(stores.ui.setLeftPanelOpen).toHaveBeenCalledWith(true);
     });
   });
