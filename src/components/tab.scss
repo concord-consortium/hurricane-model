@@ -6,6 +6,23 @@ $tabInsideWidth: calc($tabWidth - 4px);
 $setupInsideWidth: calc($setupTabWidth - 4px);
 
 .panelTab {
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 0;
+
+  &.left {
+    transition: $leftPanelTransition;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    &.active {
+      left: calc(#{$leftPanelContainerWidth} - #{$setupTabWidth});
+    }
+  }
+
   &.right {
     margin-top: $rightTabVerticalSpacing;
   }
@@ -28,16 +45,7 @@ $setupInsideWidth: calc($setupTabWidth - 4px);
         border-bottom-left-radius: 0;
         border-top-left-radius: 0;
         border-left: 0;
-        transition: $leftPanelTransition;
-        left: 0;
         pointer-events: all;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-
-        &.active {
-          left: calc(#{$leftPanelContainerWidth} - #{$setupTabWidth});
-        }
 
         .tabImage {
           border-bottom-left-radius: 0;
