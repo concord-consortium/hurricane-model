@@ -141,7 +141,7 @@ export const RightPanel = observer(function RightPanel() {
               {
                 config.windArrowsToggle &&
                 <LabeledSwitch
-                  title="Wind Direction and Speed" offLabel="Hide" onLabel="Show"
+                  title="Wind Direction" title2="and Speed" offLabel="Hide" onLabel="Show"
                   checked={ui.windArrows} dataTest="wind-arrows-setting"
                   onChange={handleWindArrowsChange}
                 />

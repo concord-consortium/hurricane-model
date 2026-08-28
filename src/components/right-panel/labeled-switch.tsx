@@ -6,6 +6,7 @@ import css from "./labeled-switch.scss";
 
 interface IProps {
   title: string;
+  title2?: string;
   offLabel: string;
   onLabel: string;
   checked: boolean;
@@ -13,11 +14,11 @@ interface IProps {
   onChange: (checked: boolean) => void;
 }
 
-export function LabeledSwitch({ title, offLabel, onLabel, checked, dataTest, onChange }: IProps) {
+export function LabeledSwitch({ title, title2, offLabel, onLabel, checked, dataTest, onChange }: IProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, value: boolean) => onChange(value);
   return (
     <div className={css.labeledSwitch} data-test={dataTest}>
-      <div className={css.title}>{title}</div>
+      <div className={css.title}>{title}{title2 && <><br/>{title2}</>}</div>
       <div className={css.switchRow}>
         <span className={clsx(css.sideLabel, { [css.active]: !checked })}>{offLabel}</span>
         <Switch

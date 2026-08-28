@@ -17,6 +17,7 @@ $rightPanelInnerWidth: 151px;
   overflow-y: hidden;
 
   .rightPanel {
+    color: #222;
     position: absolute;
     right: -$rightPanelWidth;
     top: 0;
@@ -94,7 +95,7 @@ $rightPanelInnerWidth: 151px;
 
         .divider {
           border: 0;
-          border-top: 2px solid $secondaryColor;
+          border-top: 1px solid $secondaryColor;
           margin: 15px 10px;
         }
       }
