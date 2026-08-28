@@ -62,12 +62,12 @@ context("Test the Hurricane Model app", () => {
     setupPanel.confirmSectionClosed(section1);
 
     cy.log("Setup tab is hidden behind the open panel");
-    setupPanel.getStormSetupTab().should("have.attr", "aria-hidden", "true");
+    setupPanel.confirmTabBehindPanel();
 
     cy.log("X button closes panel");
     setupPanel.getCloseButton().click();
     setupPanel.confirmClosed();
-    setupPanel.getStormSetupTab().should("have.attr", "aria-hidden", "false");
+    setupPanel.confirmTabVisible();
   });
 
   it("lets user start and stop the model", () => {

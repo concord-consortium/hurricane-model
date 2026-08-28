@@ -193,12 +193,14 @@ describe("Right Panel component", () => {
       const windSwitch = screen.getByTestId("wind-arrows-setting").querySelector("input") as HTMLInputElement;
       await user.click(windSwitch);
       expect(stores.ui.windArrows).toBe(false);
+      expect(windSwitch).not.toBeChecked();
       expect(logModule.log).toHaveBeenCalledWith("WindArrowsHidden");
 
       // hurricaneImage defaults to false, so clicking shows the image
       const imageSwitch = screen.getByTestId("hurricane-image-setting").querySelector("input") as HTMLInputElement;
       await user.click(imageSwitch);
       expect(stores.ui.hurricaneImage).toBe(true);
+      expect(imageSwitch).toBeChecked();
       expect(logModule.log).toHaveBeenCalledWith("HurricaneImageShown");
     });
   });

@@ -1,6 +1,14 @@
 export class SetupPanel {
   getStormSetupTab() {
-    return cy.get(`[data-test="storm-setup-tab"]`);
+    return cy.get(`[data-test="tab-setup"]`);
+  }
+
+  confirmTabBehindPanel() {
+    this.getStormSetupTab().find(".tab--active--__hurr-v1__").should("exist");
+  }
+
+  confirmTabVisible() {
+    this.getStormSetupTab().find(".tab--active--__hurr-v1__").should("not.exist");
   }
 
   getPanel() {

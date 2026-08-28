@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import React, { useState } from "react";
 
 import config from "../../config";
@@ -22,10 +23,10 @@ const getAvailableOverlays = (): {[key: string]: boolean} => {
   }, {});
 };
 
-export function RightPanel() {
+export const RightPanel = observer(function RightPanel() {
   const { ui } = useStores();
   const [open, setOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("base");
+  const [selectedTab, setSelectedTab] = useState<RightTabType>("base");
   const availableOverlays = getAvailableOverlays();
 
   const overlayTabVisible = config.availableOverlays && config.availableOverlays.length > 0;
@@ -163,4 +164,4 @@ export function RightPanel() {
       </div>
     </div>
   );
-}
+});

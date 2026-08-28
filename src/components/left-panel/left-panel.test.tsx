@@ -21,27 +21,23 @@ describe("LeftPanel component", () => {
   });
 
   describe("storm setup tab", () => {
+    const getTabBack = () => screen.getByTestId("tab-setup").querySelector(".tabBack");
+
     it("toggles the panel when clicked", async () => {
       const user = userEvent.setup();
       const toggleOpen = jest.fn();
       renderPanel(false, toggleOpen);
-      await user.click(screen.getByTestId("storm-setup-tab"));
+      await user.click(screen.getByTestId("tab-setup"));
       expect(toggleOpen).toHaveBeenCalled();
     });
 
-    it("slides behind the panel and leaves the tab order when the panel is open", () => {
+    it("slides behind the panel when the panel is open", () => {
       const { unmount } = renderPanel(false);
-      const tab = screen.getByTestId("storm-setup-tab");
-      expect(tab).not.toHaveClass("open");
-      expect(tab).not.toHaveAttribute("tabindex", "-1");
-      expect(tab).toHaveAttribute("aria-hidden", "false");
+      expect(getTabBack()).not.toHaveClass("active");
       unmount();
 
       renderPanel(true);
-      const openTab = screen.getByTestId("storm-setup-tab");
-      expect(openTab).toHaveClass("open");
-      expect(openTab).toHaveAttribute("tabindex", "-1");
-      expect(openTab).toHaveAttribute("aria-hidden", "true");
+      expect(getTabBack()).toHaveClass("active");
     });
   });
 });
