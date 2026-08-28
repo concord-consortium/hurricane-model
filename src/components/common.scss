@@ -31,15 +31,19 @@ $tabImpactTransparent: rgba(0,153,255,0.5);
 $tabImpactLight: #7fccff;
 $tabImpactLightTransparent: rgba(127,204,255,0.75);
 $tabSettingsLight: #f7ce8b;
+$tabSetupLight: #f19e39;
 
 $coldColor: #2255cc;
 $warmColor: #c62828;
 
 $tabContents: rgba(255, 255, 255, 0.9);
 
-$mapTabWidth: 68px;
+$rightTabVerticalSpacing: 10px;
+$tabWidth: 68px;
+$setupTabWidth: 76px;
 
 $leftPanelWidth: 296px;
+$leftPanelContainerWidth: calc($leftPanelWidth + 2px);
 $leftPanelTransitionSeconds: 0.35s;
 $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.7, 1.0);
 

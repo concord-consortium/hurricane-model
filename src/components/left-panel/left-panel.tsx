@@ -4,12 +4,14 @@ import ListSubheader from "@mui/material/ListSubheader";
 import clsx from "clsx";
 import React from "react";
 
+import { Tab } from "../tab";
 import { PressureSystemsSection } from "./pressure-systems-section";
 import { SeasonSection } from "./season-section";
 import { SeaSurfaceTemperaturesSection } from "./sea-surface-temperatures-section";
 import { StormCategorySection } from "./storm-category-section";
 import { StormLocationSection } from "./storm-location-section";
 
+import tabCss from "../tab.scss";
 import css from "./left-panel.scss";
 
 interface ILeftPanelProps {
@@ -21,17 +23,15 @@ export function LeftPanel({ open, toggleOpen }: ILeftPanelProps) {
   const panelClasses = clsx(css.leftPanel, { [css.open]: open });
   return (
     <div className={css.leftPanelContainer}>
-      <button
-        type="button"
-        className={clsx(css.stormSetupTab, { [css.open]: open })}
-        data-test="storm-setup-tab"
+      <Tab
+        active={open}
+        className={tabCss.setup}
+        dataTest="tab-setup"
+        id="setup"
         onClick={toggleOpen}
-        tabIndex={open ? -1 : 0}
-        aria-hidden={open}
-        aria-expanded={open}
-      >
-        Storm Setup
-      </button>
+        side="left"
+        text="Storm Setup"
+      />
       <div className={panelClasses} data-test="left-panel">
         <List
           aria-labelledby="left-panel-title"

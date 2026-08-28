@@ -1,7 +1,6 @@
 @use "../common" as *;
 @use "./left-panel-common" as *;
 
-$leftPanelContainerWidth: calc($leftPanelWidth + 2px);
 $leftPanelBorderRadius: 5px;
 $stormSetupTabWidth: 76px;
 
@@ -15,32 +14,6 @@ $stormSetupTabWidth: 76px;
   top: $topBarHeight;
   width: $leftPanelContainerWidth;
   z-index: 1000;
-
-  .stormSetupTab {
-    background-color: #fff;
-    border: 2px solid $secondaryColor;
-    border-left: 0;
-    border-radius: 9px;
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
-    color: $charcoal;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: bold;
-    left: 0;
-    padding: 8px 10px;
-    pointer-events: all;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: $leftPanelTransition;
-    width: $stormSetupTabWidth;
-
-    &.open {
-      left: calc(#{$leftPanelContainerWidth} - #{$stormSetupTabWidth});
-    }
-  }
 
   .leftPanel {
     background-color: #fdf5e8;

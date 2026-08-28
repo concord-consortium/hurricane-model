@@ -1,0 +1,138 @@
+@use "./common" as *;
+
+$tabPadding: 4px;
+$tabHeight: 52px;
+$tabInsideWidth: calc($tabWidth - 4px);
+$setupInsideWidth: calc($setupTabWidth - 4px);
+
+.panelTab {
+  &.right {
+    margin-top: $rightTabVerticalSpacing;
+  }
+
+  .tab {
+    cursor: pointer;
+    display: inline-block;
+    height: $tabHeight;
+    width: $tabWidth;
+
+    .tabBack {
+      width: $tabWidth;
+      height: $tabHeight;
+      border-radius: 9px;
+      position: relative;
+      border: 1px solid $charcoalMedium;
+      margin-left: -2px;
+
+      &.left {
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+        border-left: 0;
+        transition: $leftPanelTransition;
+        left: 0;
+        pointer-events: all;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+
+        &.active {
+          left: calc(#{$leftPanelContainerWidth} - #{$setupTabWidth});
+        }
+
+        .tabImage {
+          border-bottom-left-radius: 0;
+          border-top-left-radius: 0;
+          left: 0;
+        }
+
+        .tabContent {
+          border-bottom-left-radius: 0;
+          border-top-left-radius: 0;
+          left: 0;
+        }
+      }
+
+      &.right {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right: 0;
+
+        &.active {
+          width: $tabWidth + 1px; // to cover border on the right side
+        }
+
+        .tabImage {
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+
+        .tabContent {
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
+      }
+
+      &.geoMaps {
+        background-color: $tabGeoLight;
+      }
+
+      &.impactMaps {
+        background-color: $tabImpactLight;
+      }
+
+      &.settings {
+        background-color: $tabSettingsLight;
+      }
+
+      &.setup {
+        background-color: $tabSetupLight;
+        width: $setupTabWidth;
+
+        .tabImage {
+          width: $setupInsideWidth;
+        }
+
+        .tabContent {
+          width: $setupInsideWidth;
+        }
+      }
+
+      .tabImage {
+        background-color: white;
+        position: absolute;
+        width: $tabInsideWidth;
+        height: 44px;
+        border-radius: 6px;
+        top: $tabPadding;
+        left: $tabPadding;
+        padding-right: 0;
+        background-repeat: no-repeat;
+        background-size: contain;
+        &:hover {
+          opacity: 0.75;
+        }
+      }
+
+      .tabContent {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        width: $tabInsideWidth;
+        top: 5px;
+        left: $tabPadding;
+        height: 30px;
+        font-size: 14px;
+        font-weight: bold;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1;
+        letter-spacing: normal;
+        text-align: center;
+        color: $charcoal;
+        padding-top: 6px;
+        pointer-events: none;
+      }
+    }
+  }
+}

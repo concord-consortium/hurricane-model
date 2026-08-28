@@ -6,10 +6,14 @@ import { log } from "../../log";
 import { RightTabType } from "../../models/ui";
 import { changeHurricaneImage, changeWindArrows } from "../../utils/ui";
 import { BaseComponent, IBaseProps } from "../base";
-import { RightTab } from "./right-tab";
+import { Tab } from "../tab";
 import { MapButton } from "./map-button";
 import { LabeledSwitch } from "./labeled-switch";
 
+import baseMapTabImg from "../../assets/base-map-tab.png";
+import overlayTabImg from "../../assets/overlay-tab.png";
+
+import tabCss from "../tab.scss";
 import css from "./right-panel.scss";
 
 interface IProps extends IBaseProps { }
@@ -52,34 +56,44 @@ export class RightPanel extends BaseComponent<IProps, IState> {
         <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-test="right-panel">
           <ul className={css.rightPanelTabs}>
             <li>
-              <div id="base" data-test="tab-base" className={css.rightPanelTab} onClick={this.handleToggleDrawer}>
-                <RightTab tabType="base" active={selectedTab === "base" || !open} />
-              </div>
+              <Tab
+                active={selectedTab === "base" || !open}
+                className={tabCss.geoMaps}
+                dataTest="tab-base"
+                id="base"
+                image={baseMapTabImg}
+                onClick={this.handleToggleDrawer}
+                side="right"
+                text="Base Maps"
+              />
             </li>
             {
               overlayTabVisible() &&
               <li>
-                <div
+                <Tab
+                  active={selectedTab === "overlay" || !open}
+                  className={tabCss.impactMaps}
+                  dataTest="tab-overlay"
                   id="overlay"
-                  data-test="tab-overlay"
-                  className={css.rightPanelTab}
+                  image={overlayTabImg}
                   onClick={this.handleToggleDrawer}
-                >
-                  <RightTab tabType="overlay" active={selectedTab === "overlay" || !open} />
-                </div>
+                  side="right"
+                  text="Map Overlays"
+                />
               </li>
             }
             {
               settingsTabVisible() &&
               <li>
-                <div
+                <Tab
+                  active={selectedTab === "settings" || !open}
+                  className={tabCss.settings}
+                  dataTest="tab-settings"
                   id="settings"
-                  data-test="tab-settings"
-                  className={css.rightPanelTab}
                   onClick={this.handleToggleDrawer}
-                >
-                  <RightTab tabType="settings" active={selectedTab === "settings" || !open} />
-                </div>
+                  side="right"
+                  text="Settings"
+                />
               </li>
             }
 
