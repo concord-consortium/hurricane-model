@@ -56,7 +56,12 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
 
   public handlePressureSysDragEnd = () => {
     const { model } = this.props;
-    log("PressureSystemMoved", { type: model.type, lat: model.center.lat, lng: model.center.lng });
+    log("PressureSystemMoved", {
+      type: model.type,
+      label: model.label,
+      lat: model.center.lat,
+      lng: model.center.lng
+    });
   }
 
   private handleDrag = () => {

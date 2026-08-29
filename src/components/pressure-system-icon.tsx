@@ -132,6 +132,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     }
     log("PressureSystemStrengthUpdated", {
       type: model.type,
+      label: model.label,
       lat: model.center.lat,
       lng: model.center.lng,
       value: getPressureLabel(model)

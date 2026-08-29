@@ -274,6 +274,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       thermometerActive: ui.thermometerActive,
       pressureSystems: sim.activePressureSystems.map(ps => ({
         type: ps.type,
+        label: ps.label,
         center: { lat: ps.center.lat, lng: ps.center.lng },
         strength: ps.strength
       })),

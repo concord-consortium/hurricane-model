@@ -9,7 +9,7 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 
 | Event | Parameters | When |
 |-------|-----------|------|
-| `SimulationStarted` | `{ startLocation, season, windArrows, hurricaneImage, baseMap, overlay, accessibleSSTScale, thermometerActive, pressureSystems: [{ type, center: { lat, lng }, strength }], hurricane: { strength, center: { lat, lng } }, deterministic, timestep, pressureSystemsLocked, lockSimulationWhileRunning, seaSurfaceTempOpacity, markLandfalls }` | User clicks Start — logged before `start()` to capture pre-simulation state |
+| `SimulationStarted` | `{ startLocation, season, windArrows, hurricaneImage, baseMap, overlay, accessibleSSTScale, thermometerActive, pressureSystems: [{ type, label, center: { lat, lng }, strength }], hurricane: { strength, center: { lat, lng } }, deterministic, timestep, pressureSystemsLocked, lockSimulationWhileRunning, seaSurfaceTempOpacity, markLandfalls }` | User clicks Start — logged before `start()` to capture pre-simulation state |
 | `SimulationStopped` | `{ outcome: { initialPosition, finalPosition, strengthChanges, landfalls, trackPointCount } }` | User clicks Stop/Pause |
 | `SimulationEnded` | `{ reason: "ByItself" \| "SimulationRestarted" \| "SimulationReloaded" \| "TopBarReloadButtonClicked" \| "RunReset", outcome: { initialPosition, finalPosition, strengthChanges, landfalls, trackPointCount } }` | Simulation ends naturally (hurricane dissipates) or user triggers restart/reload |
 | `SimulationRestarted` | — | User clicks Restart (bottom bar) |
@@ -74,8 +74,10 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 
 | Event | Parameters | When |
 |-------|-----------|------|
-| `PressureSystemMoved` | `{ type, lat, lng }` | User drags a pressure system to a new position |
-| `PressureSystemStrengthUpdated` | `{ type, lat, lng, value }` | User adjusts pressure system strength via slider |
+| `PressureSystemMoved` | `{ type, label, lat, lng }` | User drags a pressure system to a new position |
+| `PressureSystemStrengthUpdated` | `{ type, label, lat, lng, value }` | User adjusts pressure system strength via slider |
+
+`label` is the number shown on the system's icon (`"1"`, `"2"`), or `""` when it has none. Together with `type` it identifies which system an event refers to.
 
 ## Dialogs
 
