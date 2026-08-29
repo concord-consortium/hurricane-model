@@ -553,8 +553,8 @@ describe("SimulationModel store", () => {
 
       expect(sim.activePressureSystems).toBe(sim.pressureSystemsSetup);
       expect(sim.activePressureSystems.map(ps => ps.serialize())).toEqual([
-        { type: "low", center: { lat: 30, lng: -40 }, strength: 10 },
-        { type: "high", center: { lat: 20, lng: -60 }, strength: 8 }
+        { type: "low", center: { lat: 30, lng: -40 }, strength: 10, label: "" },
+        { type: "high", center: { lat: 20, lng: -60 }, strength: 8, label: "" }
       ]);
     });
 

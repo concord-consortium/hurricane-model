@@ -7,6 +7,37 @@
   transform-origin: center center;
 }
 
+.labelBadge {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-75%, -75%);
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  font-family: $scaleFont;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 22px;
+  text-align: center;
+  pointer-events: none;
+  text-shadow: #000 0px 1px;
+
+  &.low {
+    background-color: #fc542d;
+  }
+
+  &.high {
+    background-color: #327cfc;
+  }
+}
+
 .sliderContainer {
   display: inline-block;
   margin-left: 8px;

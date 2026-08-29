@@ -15,7 +15,8 @@ function getURLParam(name: string) {
 const sharedLowPressure = {
   type: "low",
   center: {lat: 47, lng: -60},
-  strength: 7
+  strength: 7,
+  label: "2"
 } as const;
 
 // Start position-specific pressure systems
@@ -24,34 +25,40 @@ const pressureSystems = {
     {
       type: "high",
       center: {lat: 28, lng: -30},
-      strength: 19.5
+      strength: 19.5,
+      label: "1"
     },
     {
       type: "high",
       center: {lat: 28.8, lng: -62.4},
-      strength: 13.6
+      strength: 13.6,
+      label: "2"
     },
     {
       type: "low",
       center: {lat: 45, lng: -82},
-      strength: 6
+      strength: 6,
+      label: "1"
     }
   ],
   gulf: [
     {
       type: "high",
       center: {lat: 37, lng: -107.1},
-      strength: 15.5
+      strength: 15.5,
+      label: "2"
     },
     {
       type: "high",
       center: {lat: 33, lng: -67.5},
-      strength: 9.54
+      strength: 9.54,
+      label: "1"
     },
     {
       type: "low",
       center: {lat: 39.15, lng: -91},
-      strength: 15
+      strength: 15,
+      label: "1"
     }
   ]
 } as const;

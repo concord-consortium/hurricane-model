@@ -45,6 +45,28 @@ describe("PressureSystemIcon component", () => {
     expect(screen.getByText(expected)).toBeInTheDocument();
   });
 
+  it("renders the label badge when the model has a label", () => {
+    const model = stores.simulation.pressureSystemsSetup[0];
+    model.label = "2";
+    render(
+      <Provider stores={stores}>
+        <PressureSystemIcon model={model}/>
+      </Provider>
+    );
+    expect(screen.getByTestId("pressure-system-label")).toHaveTextContent("2");
+  });
+
+  it("does not render the label badge when the label is empty", () => {
+    const model = stores.simulation.pressureSystemsSetup[0];
+    model.label = "";
+    render(
+      <Provider stores={stores}>
+        <PressureSystemIcon model={model}/>
+      </Provider>
+    );
+    expect(screen.queryByTestId("pressure-system-label")).not.toBeInTheDocument();
+  });
+
   it("icon is disabled when disabled prop is true", () => {
     render(
       <Provider stores={stores}>

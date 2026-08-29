@@ -82,11 +82,11 @@ describe("simulation-serialization", () => {
       applySimulationState(target, serializeSimulation(source));
 
       expect(target.pressureSystemsSetup.map(ps => ps.serialize())).toEqual([
-        { type: "low", center: { lat: 30, lng: -40 }, strength: 10 },
-        { type: "high", center: { lat: 20, lng: -60 }, strength: 8 }
+        { type: "low", center: { lat: 30, lng: -40 }, strength: 10, label: "" },
+        { type: "high", center: { lat: 20, lng: -60 }, strength: 8, label: "" }
       ]);
       expect(target.pressureSystems.map(ps => ps.serialize())).toEqual([
-        { type: "high", center: { lat: 20, lng: -60 }, strength: 8 }
+        { type: "high", center: { lat: 20, lng: -60 }, strength: 8, label: "" }
       ]);
       // A restored started run displays what the run did, not the setup.
       expect(target.activePressureSystems).toBe(target.pressureSystems);
@@ -100,7 +100,9 @@ describe("simulation-serialization", () => {
 
       applySimulationState(simulation, legacy);
 
-      expect(simulation.pressureSystemsSetup.map(ps => ps.serialize())).toEqual(legacy.pressureSystems);
+      // The legacy state has no label, so it is restored as an empty one.
+      expect(simulation.pressureSystemsSetup.map(ps => ps.serialize()))
+        .toEqual(legacy.pressureSystems!.map(ps => ({ ...ps, label: "" })));
     });
   });
 

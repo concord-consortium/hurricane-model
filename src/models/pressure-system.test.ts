@@ -19,7 +19,17 @@ describe("PressureSystem store", () => {
       strength: 5.5
     };
     const pressureSystem = new PressureSystem(options);
-    expect(pressureSystem.serialize()).toEqual(options);
+    expect(pressureSystem.serialize()).toEqual({ ...options, label: "" });
+  });
+
+  it("serializes its label", () => {
+    const options: IPressureSystemOptions = {
+      center: {lat: 12, lng: -13},
+      type: "low",
+      strength: 5.5,
+      label: "1"
+    };
+    expect(new PressureSystem(options).serialize()).toEqual(options);
   });
 
   describe("reset", () => {
@@ -27,12 +37,14 @@ describe("PressureSystem store", () => {
       const options: IPressureSystemOptions = {
         center: {lat: 10, lng: 10},
         strength: 45,
-        type: "low"
+        type: "low",
+        label: "2"
       };
       const pressureSystem = new PressureSystem(options);
       pressureSystem.center.lat = 50;
       pressureSystem.strength = 123;
       pressureSystem.type = "high";
+      pressureSystem.label = "9";
 
       pressureSystem.reset();
 
@@ -40,6 +52,7 @@ describe("PressureSystem store", () => {
       expect(pressureSystem.center).not.toBe(options.center);
       expect(pressureSystem.strength).toEqual(options.strength);
       expect(pressureSystem.type).toEqual(options.type);
+      expect(pressureSystem.label).toEqual(options.label);
     });
   });
 

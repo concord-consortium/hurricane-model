@@ -12,6 +12,8 @@ export interface IPressureSystemOptions {
   // Strength represents a max wind speed in a given pressure system, in m/s.
   // Typical range is between 5-25m/s. Stronger pressure system might be considered a storm or a hurricane.
   strength?: number;
+  // Short label shown on the icon so systems of the same type can be told apart, e.g. "1" or "2".
+  label?: string;
 }
 
 const minDistToOtherSystems = (center: ICoordinates, otherSystems: PressureSystem[]) => {
@@ -37,6 +39,7 @@ export class PressureSystem {
   @observable public type: PressureSystemType;
   @observable public center: ICoordinates;
   @observable public strength = config.pressureSystemStrength;
+  @observable public label: string;
   protected initialState: PressureSystem;
   protected minLat = 15; // Limit pressure systems only to the northern hemisphere.
   protected keepDistanceFromOtherSystems = true;
@@ -49,6 +52,7 @@ export class PressureSystem {
   constructor(props: IPressureSystemOptions) {
     this.type = props.type || "low";
     this.center = Object.assign({}, props.center);
+    this.label = props.label ?? "";
     if (props.strength !== undefined) {
       this.strength = props.strength;
     }
@@ -86,7 +90,8 @@ export class PressureSystem {
         lat: this.center.lat,
         lng: this.center.lng
       },
-      strength: this.strength
+      strength: this.strength,
+      label: this.label
     };
   }
 
@@ -123,5 +128,6 @@ export class PressureSystem {
     this.center = Object.assign({}, this.initialState.center);
     this.strength = this.initialState.strength;
     this.type = this.initialState.type;
+    this.label = this.initialState.label;
   }
 }

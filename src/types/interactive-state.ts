@@ -13,6 +13,7 @@ export interface IPressureSystemState {
   type: PressureSystemType;
   center: ICoordinates;
   strength: number;
+  label?: string;
 }
 
 /**

@@ -179,7 +179,8 @@ export function defaultSimulationState(): ISimulationState {
     pressureSystemsSetup: config.pressureSystems.map((ps: IPressureSystemOptions) => ({
       type: ps.type || "low",
       center: { ...ps.center },
-      strength: ps.strength ?? config.pressureSystemStrength
+      strength: ps.strength ?? config.pressureSystemStrength,
+      label: ps.label ?? ""
     })),
     pressureSystems: [],
     simulationStarted: false,

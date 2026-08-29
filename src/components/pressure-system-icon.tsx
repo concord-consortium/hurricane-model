@@ -1,4 +1,5 @@
 import * as React from "react";
+import { clsx } from "clsx";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { PressureSystem } from "../models/pressure-system";
@@ -67,6 +68,15 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
           model.type === "high" ?
             <High className={css.letter} style={letterStyle} /> :
             <Low className={css.letter} style={letterStyle} />
+        }
+        {
+          config.mode === "storm" && model.label &&
+          <div
+            className={clsx(css.labelBadge, model.type === "high" ? css.high : css.low)}
+            data-test="pressure-system-label"
+          >
+            {model.label}
+          </div>
         }
         {
           !config.pressureSystemsLocked &&
