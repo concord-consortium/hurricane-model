@@ -1,5 +1,5 @@
 module.exports = {
-  leftPanelWidth: "296px",
+  leftPanelWidth: "302px",
   leftPanelTransitionSeconds: "0.35s",
   fontColor: "#434343",
   coldColor: "#2255cc",

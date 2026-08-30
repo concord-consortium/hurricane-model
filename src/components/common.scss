@@ -38,9 +38,13 @@ $warmColor: #c62828;
 
 $tabContents: rgba(255, 255, 255, 0.9);
 
+$leftPanelFill: #fffaf2;
+
 $mapTabWidth: 68px;
 
-$leftPanelWidth: 296px;
+$leftPanelContentWidth: 296px;
+$leftPanelBandWidth: 6px;
+$leftPanelWidth: $leftPanelContentWidth + $leftPanelBandWidth;
 $leftPanelTransitionSeconds: 0.35s;
 $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.7, 1.0);
 

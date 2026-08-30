@@ -34,32 +34,38 @@ export const LeftPanel = observer(function LeftPanel({ open, toggleOpen }: ILeft
   return (
     <div className={css.leftPanelContainer}>
       <div className={panelClasses} data-test="left-panel">
-        <List
-          aria-labelledby="left-panel-title"
-          subheader={
-            <ListSubheader component="div" className={css.leftPanelHeader}>
-              <div id="left-panel-title" className={css.leftPanelTitle}>
-                Storm Setup
-              </div>
-              <button
-                type="button"
-                aria-label="Close"
-                className={css.leftPanelCloseButton}
-                data-test="left-panel-close-button"
-                onClick={toggleOpen}
-              >
-                <CloseIcon />
-              </button>
-            </ListSubheader>
-          }
-        >
-          <StormLocationSection />
-          <StormCategorySection />
-          <SeasonSection />
-          <SeaSurfaceTemperaturesSection />
-          <PressureSystemsSection />
-          <RunsSection />
-        </List>
+        {/* Orange backing + narrower content = the color band on the map-facing edge. */}
+        <div className={css.panelBack}>
+          <div className={css.panelContent}>
+            <List
+              aria-labelledby="left-panel-title"
+              className={css.setupSectionList}
+              subheader={
+                <ListSubheader component="div" className={css.leftPanelHeader}>
+                  <div id="left-panel-title" className={css.leftPanelTitle}>
+                    Storm Setup
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Close"
+                    className={css.leftPanelCloseButton}
+                    data-test="left-panel-close-button"
+                    onClick={toggleOpen}
+                  >
+                    <CloseIcon />
+                  </button>
+                </ListSubheader>
+              }
+            >
+              <StormLocationSection />
+              <StormCategorySection />
+              <SeasonSection />
+              <SeaSurfaceTemperaturesSection />
+              <PressureSystemsSection />
+            </List>
+            <RunsSection />
+          </div>
+        </div>
       </div>
     </div>
   );
