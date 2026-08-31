@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, comparer, computed, makeObservable, observable } from "mobx";
 import { IRunState, ISimulationState } from "../types/interactive-state";
 import {
   applySimulationState, cloneSimulationState, defaultSimulationState, extractSetupState,
@@ -46,6 +46,14 @@ export class RunsModel {
 
   @computed public get canAddRun(): boolean {
     return this.allComplete && !this.atMaxRuns;
+  }
+
+  // True while there is nothing to clear: a single, unstarted run still holding the default setup.
+  @computed public get isPristine(): boolean {
+    const { simulation } = this;
+    if (this.runs.length > 1) return false;
+    if (simulation.simulationStarted || simulation.simulationFinished) return false;
+    return comparer.structural(serializeSimulation(simulation), defaultSimulationState());
   }
 
   @action.bound public selectRun(id: string) {

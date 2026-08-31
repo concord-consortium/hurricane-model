@@ -283,6 +283,55 @@ describe("RunsModel", () => {
     });
   });
 
+  describe("isPristine", () => {
+    it("is true for a freshly created set of runs", () => {
+      expect(stores.runs.isPristine).toBe(true);
+    });
+
+    it("is false once the setup differs from the defaults", () => {
+      const { runs, simulation } = stores;
+      simulation.setSeason("winter");
+      expect(runs.isPristine).toBe(false);
+    });
+
+    it("is false once a pressure system is moved", () => {
+      const { runs, simulation } = stores;
+      const [first] = simulation.activePressureSystems;
+      simulation.setPressureSysCenter(first, { lat: first.center.lat + 5, lng: first.center.lng + 5 });
+      expect(runs.isPristine).toBe(false);
+    });
+
+    it("is false once a temperature anomaly is set", () => {
+      const { runs, simulation } = stores;
+      simulation.setTemperatureAnomaly("caribbean", 2);
+      expect(runs.isPristine).toBe(false);
+    });
+
+    it("is false once the simulation has started", () => {
+      const { runs, simulation } = stores;
+      simulation.setSimulationStarted(true);
+      expect(runs.isPristine).toBe(false);
+    });
+
+    it("is false when there is more than one run", () => {
+      const { runs } = stores;
+      completeCurrentRun(stores);
+      runs.addRun();
+      expect(runs.runs.length).toBe(2);
+      expect(runs.isPristine).toBe(false);
+    });
+
+    it("is true again after everything is reset", () => {
+      const { runs, simulation } = stores;
+      simulation.setSeason("winter");
+      completeCurrentRun(stores);
+      runs.addRun();
+      simulation.reset();
+      runs.reset();
+      expect(runs.isPristine).toBe(true);
+    });
+  });
+
   describe("deleteRun", () => {
     const addCompletedRuns = (count: number) => {
       for (let i = 0; i < count; i++) {

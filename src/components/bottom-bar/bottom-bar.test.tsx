@@ -221,6 +221,30 @@ describe("BottomBar component", () => {
       expect(screen.getByTestId("restart-button")).toHaveTextContent("Restart/Edit");
     });
 
+    describe("Clear All button", () => {
+      beforeEach(() => {
+        // Stores are created before the mode is set, so recreate them with the storm-mode defaults.
+        stores = createStores();
+      });
+
+      it("is disabled until the user changes something", () => {
+        renderBottomBar();
+        expect(screen.getByTestId("reload-button")).toBeDisabled();
+      });
+
+      it("is enabled once the setup differs from the defaults", () => {
+        renderBottomBar();
+        act(() => stores.simulation.setSeason("winter"));
+        expect(screen.getByTestId("reload-button")).not.toBeDisabled();
+      });
+
+      it("is enabled once the simulation has started", () => {
+        renderBottomBar();
+        act(() => stores.simulation.setSimulationStarted(true));
+        expect(screen.getByTestId("reload-button")).not.toBeDisabled();
+      });
+    });
+
     it("places the temp button after the start button", () => {
       renderBottomBar();
       const startButton = screen.getByTestId("start-button");
@@ -234,6 +258,7 @@ describe("BottomBar component", () => {
       jest.spyOn(stores.ui, "setLeftPanelOpen");
       jest.spyOn(stores.ui, "setSetupMode");
       renderBottomBar();
+      act(() => stores.simulation.setSimulationStarted(true));
       await user.click(screen.getByTestId("restart-button"));
       expect(stores.simulation.restart).toHaveBeenCalled();
       expect(stores.ui.setSetupMode).toHaveBeenCalledWith(undefined);

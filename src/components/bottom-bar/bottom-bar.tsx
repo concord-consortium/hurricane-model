@@ -92,7 +92,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
     const seasonButtonDisabled = isReadOnly ||
       (config.lockSimulationWhileRunning && simulationStarted);
     const simulationControlsDisabled = isReadOnly;
-    const reloadDisabled = simulationControlsDisabled || (isStormMode && !simulationStarted);
+    const restartDisabled = simulationControlsDisabled || (isStormMode && !simulationStarted);
+    const clearAllDisabled = simulationControlsDisabled || (isStormMode && this.stores.runs.isPristine);
     const startLocationButtonClasses = clsx(
       css.widgetGroup,
       startLocationButtonHoveredClass,
@@ -170,7 +171,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               className={clsx(css.bottomBarButton, css.playbackButton)}
               data-test="reload-button"
               onClick={this.handleReload}
-              disabled={simulationControlsDisabled}
+              disabled={clearAllDisabled}
               disableRipple={true}
             >
               <span>
@@ -182,7 +183,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               className={clsx(css.bottomBarButton, css.playbackButton)}
               data-test="restart-button"
               onClick={this.handleRestart}
-              disabled={reloadDisabled}
+              disabled={restartDisabled}
               disableRipple={true}
             >
               <span>
