@@ -1,5 +1,6 @@
 import * as React from "react";
-import { render, waitFor } from "@testing-library/react";
+import { act, render, waitFor } from "@testing-library/react";
+import { runInAction } from "mobx";
 import { createStores } from "../../models/stores";
 import * as interactiveStateModule from "../../models/interactive-state";
 import * as cloudStorage from "../../utils/cloud-storage";
@@ -62,8 +63,10 @@ describe("LaraAppWrapper model seeding", () => {
     render(<LaraAppWrapper stores={createStores()} />);
     // give effects a tick
     await waitFor(() => expect(loadSpy).not.toHaveBeenCalled());
-    // The saved interactive state should be restored (migrateState returns version-1 state as-is).
-    expect(setSpy).toHaveBeenCalledWith(expect.anything(), { version: 1, simulation: {}, ui: {} });
+    // The saved interactive state should be restored (migrateState upgrades version-1 state to version 2).
+    expect(setSpy).toHaveBeenCalledWith(expect.anything(), {
+      version: 2, runs: [{ id: "run-1", simulation: {} }], selectedRunId: "run-1", ui: {}
+    });
   });
 
   it("shows the error message when the seed load fails", async () => {
@@ -97,6 +100,52 @@ describe("LaraAppWrapper model seeding", () => {
 
   // config is a plain object, so a component that reads it at mount never re-renders
   // when applyAuthoredState mutates it afterwards. The app must not mount until then.
+  // A teacher's report view is read-only: nothing it does may be written back over student work.
+  describe("interactive state saving by mode", () => {
+    const savedState = { version: 2, runs: [{ id: "run-1", simulation: {} }], selectedRunId: "run-1", ui: {} };
+
+    const renderInMode = (mode: string) => {
+      const saveInteractiveState = jest.fn();
+      (useInitMessage as jest.Mock).mockReturnValue({ mode });
+      (useInteractiveState as jest.Mock).mockReturnValue({
+        interactiveState: savedState, setInteractiveState: saveInteractiveState
+      });
+      (useAuthoredState as jest.Mock).mockReturnValue({ authoredState: null, setAuthoredState: jest.fn() });
+      const stores = createStores();
+      render(<LaraAppWrapper stores={stores} />);
+      return { saveInteractiveState, stores };
+    };
+
+    // The save reaction is debounced by 500ms.
+    const changeSimulationAndFlush = (stores: ReturnType<typeof createStores>) => {
+      act(() => {
+        runInAction(() => { stores.simulation.simulationFinished = true; });
+        jest.advanceTimersByTime(600);
+      });
+    };
+
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
+    it("saves simulation changes in runtime mode", () => {
+      const { saveInteractiveState, stores } = renderInMode("runtime");
+      changeSimulationAndFlush(stores);
+      expect(saveInteractiveState).toHaveBeenCalled();
+    });
+
+    it("does NOT save in report mode", () => {
+      const { saveInteractiveState, stores } = renderInMode("report");
+      changeSimulationAndFlush(stores);
+      expect(saveInteractiveState).not.toHaveBeenCalled();
+    });
+
+    it("does NOT save in reportItem mode", () => {
+      const { saveInteractiveState, stores } = renderInMode("reportItem");
+      changeSimulationAndFlush(stores);
+      expect(saveInteractiveState).not.toHaveBeenCalled();
+    });
+  });
+
   it("does not render the app until authored state has been applied", async () => {
     const oldMode = config.mode;
     mockConfigModeAtAppRender.length = 0;

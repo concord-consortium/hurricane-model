@@ -30,11 +30,11 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
   const draggable = ui.setupMode === "stormLocation" && !simulationStarted;
 
   const handleDrag = (e: Leaflet.LeafletEvent) => {
-    const { hurricane, pressureSystems } = stores.simulation;
+    const { hurricane, activePressureSystems } = stores.simulation;
     const marker = e.target as Leaflet.Marker;
     const raw = marker.getLatLng();
     const clamped = clampToRegion({ lat: raw.lat, lng: raw.lng }, stormPlacementRegion);
-    hurricane.setCenter(clamped, pressureSystems);
+    hurricane.setCenter(clamped, activePressureSystems);
     if (clamped.lat !== raw.lat || clamped.lng !== raw.lng) {
       marker.setLatLng(clamped);
     }

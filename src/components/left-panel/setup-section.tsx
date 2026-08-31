@@ -28,22 +28,28 @@ interface ISetupSectionProps {
 export const SetupSection = observer(function SetupSection({
   children, dataTest, hint, Icon, iconClassName, postscript, setupMode, tip, title
 }: ISetupSectionProps) {
-  const stores = useStores();
-  const open = stores.ui.setupMode === setupMode;
+  const { simulation, ui } = useStores();
+  const open = ui.setupMode === setupMode;
   const dt = dataTest || title;
 
   const handleClick = () => {
     if (open) {
-      stores.ui.setSetupMode(undefined);
+      ui.setSetupMode(undefined);
     } else {
-      stores.ui.setSetupMode(setupMode);
+      ui.setSetupMode(setupMode);
     }
   };
 
   const headerClasses = clsx(css.sectionHeader, { [css.openSectionHeader]: open })
   return (
     <>
-      <ListItemButton className={headerClasses} data-test={`${dt}-button`} disableRipple={true} onClick={handleClick}>
+      <ListItemButton
+        className={headerClasses}
+        data-test={`${dt}-button`}
+        disabled={simulation.simulationStarted || ui.isReadOnly}
+        disableRipple={true}
+        onClick={handleClick}
+      >
         {Icon && <ListItemIcon className={iconClassName}><Icon /></ListItemIcon>}
         <ListItemText
           primary={title}

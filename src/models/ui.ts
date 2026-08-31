@@ -85,6 +85,10 @@ export class UIModel {
     return this.mode === "report" || this.mode === "reportItem";
   }
 
+  @computed public get isReadOnly(): boolean {
+    return this.isReportMode;
+  }
+
   @action.bound public setMode(mode: InteractiveMode) {
     this.mode = mode;
   }

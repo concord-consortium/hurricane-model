@@ -12,6 +12,7 @@ const fs = require("fs");
 import { PressureSystem } from "./pressure-system";
 
 const options: ISimulationOptions = {
+  forceTicks: true,
   startLocation: "atlantic",
   // Ensure that the initial season is always the same.
   season: "fall",
@@ -507,7 +508,7 @@ describe("SimulationModel store", () => {
         season: "fall"
       });
       sim.hurricane.reset = jest.fn();
-      sim.pressureSystems[0].reset = jest.fn();
+      sim.pressureSystemsSetup[0].reset = jest.fn();
       sim.time = 123;
       sim.hurricane.center = {lat: 33, lng: 123};
       sim.hurricane.speed = {u: 123, v: 123};
@@ -528,8 +529,50 @@ describe("SimulationModel store", () => {
       expect(sim.simulationStarted).toEqual(false);
       expect(sim.hurricane.reset).toHaveBeenCalled();
       // These properties shouldn't be reset:
-      expect(sim.pressureSystems[0].reset).not.toHaveBeenCalled();
+      expect(sim.pressureSystemsSetup[0].reset).not.toHaveBeenCalled();
       expect(sim.season).toEqual("winter");
+    });
+
+    it("rewinds to the setup, discarding what the run did to its pressure systems", () => {
+      const sim = new SimulationModel({
+        startLocation: "atlantic",
+        season: "fall",
+        pressureSystems: [
+          { type: "low", center: { lat: 30, lng: -40 }, strength: 10 },
+          { type: "high", center: { lat: 20, lng: -60 }, strength: 8 }
+        ]
+      });
+      sim.start();
+      sim.stop();
+      // Mid-run: the student drags one system and the sim merges the other into the hurricane.
+      sim.setPressureSysCenter(sim.activePressureSystems[1], { lat: 45, lng: -20 });
+      sim.removePressureSystem(sim.activePressureSystems[0]);
+      expect(sim.activePressureSystems.length).toEqual(1);
+
+      sim.restart();
+
+      expect(sim.activePressureSystems).toBe(sim.pressureSystemsSetup);
+      expect(sim.activePressureSystems.map(ps => ps.serialize())).toEqual([
+        { type: "low", center: { lat: 30, lng: -40 }, strength: 10, label: "" },
+        { type: "high", center: { lat: 20, lng: -60 }, strength: 8, label: "" }
+      ]);
+    });
+
+    it("keeps the setup intact when the run is resumed after a pause", () => {
+      const sim = new SimulationModel({
+        startLocation: "atlantic",
+        season: "fall",
+        pressureSystems: [{ type: "low", center: { lat: 30, lng: -40 }, strength: 10 }]
+      });
+      sim.start();
+      sim.stop();
+      sim.setPressureSysCenter(sim.activePressureSystems[0], { lat: 45, lng: -20 });
+      // Resuming must not re-copy the setup over the run's own systems.
+      sim.start();
+      sim.stop();
+
+      expect(sim.activePressureSystems[0].center).toEqual({ lat: 45, lng: -20 });
+      expect(sim.pressureSystemsSetup[0].center).toEqual({ lat: 30, lng: -40 });
     });
   });
 
@@ -541,9 +584,9 @@ describe("SimulationModel store", () => {
       });
       jest.spyOn(sim, "restart");
       sim.setSeason("winter");
-      const initialPressureSystems = [...sim.pressureSystems];
+      const initialPressureSystems = [...sim.pressureSystemsSetup];
       // Modify the pressure systems
-      sim.pressureSystems = [
+      sim.pressureSystemsSetup = [
         new PressureSystem({
           type: "low",
           center: {lat: 20, lng: -20},
@@ -553,10 +596,10 @@ describe("SimulationModel store", () => {
       sim.reset();
       expect(sim.restart).toHaveBeenCalled();
       expect(sim.season).toEqual("fall");
-      expect(sim.pressureSystems.length).toEqual(initialPressureSystems.length);
-      expect(sim.pressureSystems[0].type).toEqual(initialPressureSystems[0].type);
-      expect(sim.pressureSystems[0].center).toEqual(initialPressureSystems[0].center);
-      expect(sim.pressureSystems[0].strength).toEqual(initialPressureSystems[0].strength);
+      expect(sim.pressureSystemsSetup.length).toEqual(initialPressureSystems.length);
+      expect(sim.pressureSystemsSetup[0].type).toEqual(initialPressureSystems[0].type);
+      expect(sim.pressureSystemsSetup[0].center).toEqual(initialPressureSystems[0].center);
+      expect(sim.pressureSystemsSetup[0].strength).toEqual(initialPressureSystems[0].strength);
     });
   });
 
@@ -607,10 +650,13 @@ describe("SimulationModel store", () => {
       sim.hurricane.center.lat = 20;
       sim.hurricane.center.lng = -19.9;
       sim.hurricane.strength = 40;
-      expect(sim.pressureSystems.length).toEqual(1);
-      sim.tick();
-      expect(sim.pressureSystems.length).toEqual(0);
+      expect(sim.activePressureSystems.length).toEqual(1);
+      sim.start(); // ticks once
+      sim.stop();
+      expect(sim.activePressureSystems.length).toEqual(0);
       expect(sim.hurricane.strength).toBeGreaterThan(40); // around ~ 40 + 7
+      // The merge belongs to the run; the setup still holds the system.
+      expect(sim.pressureSystemsSetup.length).toEqual(1);
     });
 
     test("hurricane gets inactive if it's weaker than low pressure system", () => {
@@ -627,9 +673,12 @@ describe("SimulationModel store", () => {
       sim.hurricane.center.lng = -19.9;
       sim.hurricane.strength = 11;
       expect(sim.hurricane.active).toEqual(true);
-      sim.tick();
+      sim.start(); // ticks once
+      sim.stop();
       expect(sim.hurricane.active).toEqual(false);
-      expect(sim.pressureSystems[0].strength).toBeGreaterThan(15); // around ~ 15 + 11
+      expect(sim.activePressureSystems[0].strength).toBeGreaterThan(15); // around ~ 15 + 11
+      // The strength the low absorbed belongs to the run, not the setup.
+      expect(sim.pressureSystemsSetup[0].strength).toEqual(15);
     });
   });
 

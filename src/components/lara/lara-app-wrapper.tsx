@@ -159,8 +159,8 @@ export const LaraAppWrapper: React.FC<ILaraAppWrapperProps> = ({ stores }) => {
 
   // Save state whenever simulation changes (debounced via MobX reaction)
   useEffect(() => {
-    // Skip saving in authoring mode
-    if (stores.ui.mode === "authoring") {
+    // Skip saving in authoring and read only modes.
+    if (stores.ui.mode === "authoring" || stores.ui.isReadOnly) {
       return;
     }
 

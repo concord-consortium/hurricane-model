@@ -5,9 +5,7 @@ import { createStores } from "../../models/stores";
 import { Provider } from "mobx-react";
 import { BottomBar } from "./bottom-bar";
 import { PNG } from "pngjs";
-import config from "../../config";
 import * as logModule from "../../log";
-import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
 
@@ -123,6 +121,23 @@ describe("BottomBar component", () => {
       expect(stores.ui.reset).toHaveBeenCalled();
     });
 
+    it("clears all saved runs when Reload is confirmed", async () => {
+      const user = userEvent.setup();
+      stores.simulation.simulationStarted = true;
+      stores.simulation.simulationFinished = true;
+      stores.runs.addRun();
+      expect(stores.runs.runs.length).toBe(2);
+      render(
+        <Provider stores={stores}>
+          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+        </Provider>
+      );
+      await user.click(screen.getByTestId("reload-button"));
+      await user.click(screen.getByTestId("reload-confirm-button"));
+      expect(stores.runs.runs.length).toBe(1);
+      expect(stores.runs.selectedRunId).toBe(stores.runs.runs[0].id);
+    });
+
     it("logs SimulationEnded with reason SimulationReloaded when Reload is confirmed", async () => {
       const user = userEvent.setup();
       (logModule.log as jest.Mock).mockClear();
@@ -211,80 +226,6 @@ describe("BottomBar component", () => {
       expect(params.hurricane).toHaveProperty("center");
       expect(params).toHaveProperty("deterministic");
       expect(params).toHaveProperty("timestep");
-    });
-  });
-
-  describe("storm setup button", () => {
-    let originalMode: string;
-    beforeEach(() => {
-      originalMode = config.mode;
-      config.mode = "storm";
-    });
-    afterEach(() => {
-      config.mode = originalMode;
-    });
-
-    it("restarts the simulation when clicked after the simulation has started", async () => {
-      const user = userEvent.setup();
-      const toggleLeftPanelOpenMock = jest.fn();
-      jest.spyOn(stores.simulation, "restart");
-      render(
-        <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpenMock} />
-        </Provider>
-      );
-      act(() => {
-        stores.simulation.setSimulationStarted(true);
-      });
-
-      await user.click(screen.getByTestId("storm-setup-button"));
-      expect(stores.simulation.restart).toHaveBeenCalled();
-      expect(toggleLeftPanelOpenMock).toHaveBeenCalled();
-    });
-  });
-
-  describe("start button while the setup panel is open", () => {
-    beforeEach(() => {
-      jest.useFakeTimers();
-    });
-
-    afterEach(() => {
-      jest.useRealTimers();
-    });
-
-    it("closes the setup panel and starts the simulation after the panel animation finishes", async () => {
-      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime.bind(jest) });
-      stores.simulation.setSeaSurfaceTempData(new PNG());
-      jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
-        stores.simulation.setSimulationRunning(true);
-        stores.simulation.setSimulationStarted(true);
-      });
-
-      act(() => {
-        stores.ui.setLeftPanelOpen(true);
-      });
-
-      jest.spyOn(stores.ui, "setLeftPanelOpen");
-      jest.spyOn(stores.ui, "setSetupMode");
-
-      render(
-        <Provider stores={stores}>
-          <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
-        </Provider>
-      );
-
-      await user.click(screen.getByTestId("start-button"));
-
-      // Panel is closed immediately, but the simulation hasn't started yet.
-      expect(stores.ui.setSetupMode).toHaveBeenCalledWith(undefined);
-      expect(stores.ui.setLeftPanelOpen).toHaveBeenCalledWith(false);
-      expect(stores.simulation.start).not.toHaveBeenCalled();
-
-      // After the left-panel transition completes, the simulation starts.
-      act(() => {
-        jest.advanceTimersByTime(LEFT_PANEL_TRANSITION_SECONDS * 1000);
-      });
-      expect(stores.simulation.start).toHaveBeenCalled();
     });
   });
 
