@@ -77,7 +77,7 @@ describe("RunCard", () => {
     expect(stores.simulation.time).toBe(50);
   });
 
-  it("disables reset until the run is complete", () => {
+  it("disables reset until the run has started", () => {
     renderPanels(stores);
     expect(screen.getByTestId("reset-run-button")).toBeDisabled();
   });
