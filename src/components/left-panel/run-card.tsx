@@ -57,6 +57,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
     : selected && simulation.simulationRunning ? "Running..."
     : selected && simulation.simulationStarted ? "Paused"
     : "Not run yet - editable";
+  const labelStatusMessage = statusMessage ? `, ${statusMessage}` : "";
 
   return (
     <div className={css.runCardContainer}>
@@ -65,7 +66,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
         data-test="run-card"
         role="button"
         tabIndex={0}
-        aria-label={`Run ${runNumber}`}
+        aria-label={`Run ${runNumber}${labelStatusMessage}`}
         aria-pressed={selected}
         onClick={handleSelect}
         onKeyDown={handleKeyDown}
