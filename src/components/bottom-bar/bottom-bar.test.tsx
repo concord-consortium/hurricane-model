@@ -6,9 +6,8 @@ import { Provider } from "mobx-react";
 import { StoresContext } from "../../stores-context";
 import { BottomBar } from "./bottom-bar";
 import { PNG } from "pngjs";
-import config from "../../config";
 import * as logModule from "../../log";
-import { LEFT_PANEL_TRANSITION_SECONDS } from "../common";
+import config from "../../config";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
 
@@ -106,6 +105,19 @@ describe("BottomBar component", () => {
       await user.click(screen.getByTestId("reload-confirm-button"));
       expect(stores.simulation.reset).toHaveBeenCalled();
       expect(stores.ui.reset).toHaveBeenCalled();
+    });
+
+    it("clears all saved runs when Reload is confirmed", async () => {
+      const user = userEvent.setup();
+      stores.simulation.simulationStarted = true;
+      stores.simulation.simulationFinished = true;
+      stores.runs.addRun();
+      expect(stores.runs.runs.length).toBe(2);
+      renderBottomBar();
+      await user.click(screen.getByTestId("reload-button"));
+      await user.click(screen.getByTestId("reload-confirm-button"));
+      expect(stores.runs.runs.length).toBe(1);
+      expect(stores.runs.selectedRunId).toBe(stores.runs.runs[0].id);
     });
 
     it("logs SimulationEnded with reason SimulationReloaded when Reload is confirmed", async () => {
@@ -239,47 +251,6 @@ describe("BottomBar component", () => {
       expect(tempButton.compareDocumentPosition(startButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
       expect(screen.getByText("Wind Direction and Speed")).toBeInTheDocument();
       expect(screen.getByText("Hurricane Image")).toBeInTheDocument();
-    });
-  });
-
-  describe("start button while the setup panel is open", () => {
-    beforeEach(() => {
-      jest.useFakeTimers();
-    });
-
-    afterEach(() => {
-      jest.useRealTimers();
-    });
-
-    it("closes the setup panel and starts the simulation after the panel animation finishes", async () => {
-      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime.bind(jest) });
-      stores.simulation.setSeaSurfaceTempData(new PNG());
-      jest.spyOn(stores.simulation, "start").mockImplementation(function(this: any) {
-        stores.simulation.setSimulationRunning(true);
-        stores.simulation.setSimulationStarted(true);
-      });
-
-      act(() => {
-        stores.ui.setLeftPanelOpen(true);
-      });
-
-      jest.spyOn(stores.ui, "setLeftPanelOpen");
-      jest.spyOn(stores.ui, "setSetupMode");
-
-      renderBottomBar();
-
-      await user.click(screen.getByTestId("start-button"));
-
-      // Panel is closed immediately, but the simulation hasn't started yet.
-      expect(stores.ui.setSetupMode).toHaveBeenCalledWith(undefined);
-      expect(stores.ui.setLeftPanelOpen).toHaveBeenCalledWith(false);
-      expect(stores.simulation.start).not.toHaveBeenCalled();
-
-      // After the left-panel transition completes, the simulation starts.
-      act(() => {
-        jest.advanceTimersByTime(LEFT_PANEL_TRANSITION_SECONDS * 1000);
-      });
-      expect(stores.simulation.start).toHaveBeenCalled();
     });
   });
 

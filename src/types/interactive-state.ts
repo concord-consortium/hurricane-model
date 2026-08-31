@@ -13,6 +13,7 @@ export interface IPressureSystemState {
   type: PressureSystemType;
   center: ICoordinates;
   strength: number;
+  label?: string;
 }
 
 /**
@@ -33,6 +34,9 @@ export interface ISimulationState {
   // Core settings
   season: Season;
   startLocation: StartLocation;
+  // What the student arranged before pressing start. The source of truth for the run's setup.
+  pressureSystemsSetup?: IPressureSystemState[];
+  // The running simulation's own systems, which the run can mutate.
   pressureSystems: IPressureSystemState[];
 
   // Simulation progress
@@ -59,6 +63,20 @@ export interface ISimulationState {
 }
 
 /**
+ * A simulation state with every top-level optional field filled in.
+ * Required<> is shallow, so hurricane's own optional fields are unaffected.
+ */
+export type INormalizedSimulationState = Required<ISimulationState>;
+
+/**
+ * A single simulation run: its setup and (when finished) its outcome, as one serialized state.
+ */
+export interface IRunState {
+  id: string;
+  simulation: ISimulationState;
+}
+
+/**
  * Serialized UI state.
  */
 export interface IUIState {
@@ -74,13 +92,24 @@ export interface IUIState {
 }
 
 /**
+ * Version 1 interactive state (single run). Kept for migration.
+ */
+export interface IHurricaneInteractiveStateV1 {
+  version: 1;
+  mode?: AppMode;
+  simulation: ISimulationState;
+  ui: IUIState;
+}
+
+/**
  * Complete interactive state saved to LARA.
  * This represents student work that can be saved and restored.
  */
 export interface IHurricaneInteractiveState {
-  version: 1;
+  version: 2;
   mode?: AppMode;
-  simulation: ISimulationState;
+  runs: IRunState[];
+  selectedRunId: string;
   ui: IUIState;
 }
 

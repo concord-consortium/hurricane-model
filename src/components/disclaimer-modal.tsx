@@ -17,7 +17,7 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
   const messageId = useId();
 
   // Derived, not initial state: LaraAppWrapper sets ui.mode after the first render.
-  const open = !dismissed && !config.skipDisclaimer && config.mode === "storm" && !ui.isReportMode;
+  const open = !dismissed && !config.skipDisclaimer && config.mode === "storm" && !ui.isReadOnly;
 
   const dismiss = (source: DismissSource) => {
     setDismissed(true);

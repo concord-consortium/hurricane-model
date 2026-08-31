@@ -1,5 +1,6 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
+import config from "../config";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { PressureSystemIcon, minStrength, maxStrength, mbLabelRange } from "./pressure-system-icon";
@@ -13,14 +14,14 @@ describe("PressureSystemIcon component", () => {
   it("renders Slider", () => {
     render(
       <Provider stores={stores}>
-        <PressureSystemIcon model={stores.simulation.pressureSystems[0]}/>
+        <PressureSystemIcon model={stores.simulation.pressureSystemsSetup[0]}/>
       </Provider>
     );
     expect(screen.getByTestId("pressure-system-slider")).toBeInTheDocument();
   });
 
   it("label renders pressure in mb (high)", () => {
-    const model = stores.simulation.pressureSystems[0];
+    const model = stores.simulation.pressureSystemsSetup[0];
     model.setStrength(1500000);
     model.type = "high";
     render(
@@ -33,7 +34,7 @@ describe("PressureSystemIcon component", () => {
   });
 
   it("label renders pressure in mb (low)", () => {
-    const model = stores.simulation.pressureSystems[0];
+    const model = stores.simulation.pressureSystemsSetup[0];
     model.setStrength(1000000);
     model.type = "low";
     render(
@@ -45,10 +46,53 @@ describe("PressureSystemIcon component", () => {
     expect(screen.getByText(expected)).toBeInTheDocument();
   });
 
+  describe("label badge", () => {
+    const originalMode = config.mode;
+    afterEach(() => {
+      config.mode = originalMode;
+    });
+
+    it("renders in storm mode when the model has a label", () => {
+      config.mode = "storm";
+      const model = stores.simulation.pressureSystemsSetup[0];
+      model.label = "2";
+      render(
+        <Provider stores={stores}>
+          <PressureSystemIcon model={model}/>
+        </Provider>
+      );
+      expect(screen.getByTestId("pressure-system-label")).toHaveTextContent("2");
+    });
+
+    it("does not render when the label is empty", () => {
+      config.mode = "storm";
+      const model = stores.simulation.pressureSystemsSetup[0];
+      model.label = "";
+      render(
+        <Provider stores={stores}>
+          <PressureSystemIcon model={model}/>
+        </Provider>
+      );
+      expect(screen.queryByTestId("pressure-system-label")).not.toBeInTheDocument();
+    });
+
+    it("does not render outside of storm mode", () => {
+      config.mode = "hurricane";
+      const model = stores.simulation.pressureSystemsSetup[0];
+      model.label = "2";
+      render(
+        <Provider stores={stores}>
+          <PressureSystemIcon model={model}/>
+        </Provider>
+      );
+      expect(screen.queryByTestId("pressure-system-label")).not.toBeInTheDocument();
+    });
+  });
+
   it("icon is disabled when disabled prop is true", () => {
     render(
       <Provider stores={stores}>
-        <PressureSystemIcon model={stores.simulation.pressureSystems[0]} disabled={true}/>
+        <PressureSystemIcon model={stores.simulation.pressureSystemsSetup[0]} disabled={true}/>
       </Provider>
     );
     expect(screen.getByTestId("pressure-system-icon")).toHaveClass("disabled");
@@ -57,7 +101,7 @@ describe("PressureSystemIcon component", () => {
   it("icon is enabled when disabled prop is false", () => {
     render(
       <Provider stores={stores}>
-        <PressureSystemIcon model={stores.simulation.pressureSystems[0]} disabled={false}/>
+        <PressureSystemIcon model={stores.simulation.pressureSystemsSetup[0]} disabled={false}/>
       </Provider>
     );
     expect(screen.getByTestId("pressure-system-icon")).not.toHaveClass("disabled");
@@ -66,7 +110,7 @@ describe("PressureSystemIcon component", () => {
   it("icon is enabled by default when disabled prop is not provided", () => {
     render(
       <Provider stores={stores}>
-        <PressureSystemIcon model={stores.simulation.pressureSystems[0]}/>
+        <PressureSystemIcon model={stores.simulation.pressureSystemsSetup[0]}/>
       </Provider>
     );
     expect(screen.getByTestId("pressure-system-icon")).not.toHaveClass("disabled");

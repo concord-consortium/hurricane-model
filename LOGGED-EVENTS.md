@@ -9,12 +9,22 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 
 | Event | Parameters | When |
 |-------|-----------|------|
-| `SimulationStarted` | `{ startLocation, season, windArrows, hurricaneImage, baseMap, overlay, accessibleSSTScale, thermometerActive, pressureSystems: [{ type, center: { lat, lng }, strength }], hurricane: { strength, center: { lat, lng } }, deterministic, timestep, pressureSystemsLocked, lockSimulationWhileRunning, seaSurfaceTempOpacity, markLandfalls }` | User clicks Start — logged before `start()` to capture pre-simulation state |
+| `SimulationStarted` | `{ startLocation, season, windArrows, hurricaneImage, baseMap, overlay, accessibleSSTScale, thermometerActive, pressureSystems: [{ type, label, center: { lat, lng }, strength }], hurricane: { strength, center: { lat, lng } }, deterministic, timestep, pressureSystemsLocked, lockSimulationWhileRunning, seaSurfaceTempOpacity, markLandfalls }` | User clicks Start — logged before `start()` to capture pre-simulation state |
 | `SimulationStopped` | `{ outcome: { initialPosition, finalPosition, strengthChanges, landfalls, trackPointCount } }` | User clicks Stop/Pause |
-| `SimulationEnded` | `{ reason: "ByItself" \| "SimulationRestarted" \| "SimulationReloaded" \| "TopBarReloadButtonClicked", outcome: { initialPosition, finalPosition, strengthChanges, landfalls, trackPointCount } }` | Simulation ends naturally (hurricane dissipates) or user triggers restart/reload |
+| `SimulationEnded` | `{ reason: "ByItself" \| "SimulationRestarted" \| "SimulationReloaded" \| "TopBarReloadButtonClicked" \| "RunReset", outcome: { initialPosition, finalPosition, strengthChanges, landfalls, trackPointCount } }` | Simulation ends naturally (hurricane dissipates) or user triggers restart/reload |
 | `SimulationRestarted` | — | User clicks Restart (bottom bar; labeled "Restart/Edit" in storm mode) |
 | `SimulationReloaded` | — | User clicks Reload (bottom bar; labeled "Clear All" in storm mode) |
 | `TopBarReloadButtonClicked` | — | User clicks Reload (top bar) |
+
+## Run Management
+
+| Event | Parameters | When |
+|-------|-----------|------|
+| `RunSelected` | `{ runId, via: "panel" \| "map" }` | User selects a different run by clicking its setup panel or its track on the map |
+| `RunAdded` | `{ runId }` | User clicks New Run |
+| `RunDuplicated` | `{ runId, duplicatedRunId }` | User clicks Copy Selected Run (`runId` is the new run, `duplicatedRunId` the run whose setup was copied) |
+| `RunReset` | `{ runId }` | User clicks the reset button on the selected run's panel |
+| `RunDeleted` | `{ runId }` | User clicks the delete button on the selected run's panel |
 
 ## Mouse Interaction
 
@@ -64,8 +74,10 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 
 | Event | Parameters | When |
 |-------|-----------|------|
-| `PressureSystemMoved` | `{ type, lat, lng }` | User drags a pressure system to a new position |
-| `PressureSystemStrengthUpdated` | `{ type, lat, lng, value }` | User adjusts pressure system strength via slider |
+| `PressureSystemMoved` | `{ type, label, lat, lng }` | User drags a pressure system to a new position |
+| `PressureSystemStrengthUpdated` | `{ type, label, lat, lng, value }` | User adjusts pressure system strength via slider |
+
+`label` is the number shown on the system's icon (`"1"`, `"2"`), or `""` when it has none. Together with `type` it identifies which system an event refers to.
 
 ## Dialogs
 

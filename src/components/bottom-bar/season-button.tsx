@@ -27,7 +27,7 @@ export class SeasonButton extends BaseComponent<IProps, IState> {
     const sim = this.stores.simulation;
     const ui = this.stores.ui;
     // If set to lock the UI while the simulation is running, lock UI once the sim is started until it is reset
-    const uiDisabled = ui.isReportMode ||
+    const uiDisabled = ui.isReadOnly ||
       (config.lockSimulationWhileRunning && sim.simulationStarted);
     return (
       <SelectButton

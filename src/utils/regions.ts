@@ -2,8 +2,9 @@ import { FeatureCollection } from "geojson";
 import { scaleLinear } from "d3-scale";
 
 import { coldColor, warmColor } from "../components/common";
+import config from "../config";
 import { temperatureAnomalyMax, temperatureAnomalyMin } from "../constants";
-import { ICoordinates, NamedRegion } from "../types";
+import { ICoordinates, NamedRegion, namedRegions } from "../types";
 import { Region, createRegion } from "./region";
 
 import gulfData from "../data/regions/gulf-temp-anomaly-region.json";
@@ -53,4 +54,14 @@ export function anomalyFillColor(anomaly: number): string {
 
 export function clampAnomaly(value: number) {
   return Math.max(temperatureAnomalyMin, Math.min(temperatureAnomalyMax, value));
+}
+
+export function seedTemperatureAnomalies(): Partial<Record<NamedRegion, number>> {
+  const fromConfig: Record<string, number> = config.temperatureAnomalies ?? {};
+  const next: Partial<Record<NamedRegion, number>> = {};
+  for (const key of namedRegions) {
+    const raw = Number(fromConfig[key]);
+    next[key] = isFinite(raw) ? clampAnomaly(raw) : 0;
+  }
+  return next;
 }

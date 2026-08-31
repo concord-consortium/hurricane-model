@@ -38,5 +38,6 @@ if (container) {
 // Provide a function that serialize current pressure systems settings to an URL parameter that can be used later.
 (window as any).serializePressureSystems = () => {
   const sim = stores.simulation;
-  return "pressureSystems=" + encodeURIComponent(JSON.stringify(sim.pressureSystems.map(ps => ps.serialize())));
+  return "pressureSystems=" +
+    encodeURIComponent(JSON.stringify(sim.pressureSystemsSetup.map(ps => ps.serialize())));
 };

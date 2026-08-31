@@ -24,8 +24,8 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     const { model } = this.props;
     const { sliderDrag } = this.state;
     const { simulation, ui } = this.stores;
-    const { isReportMode, setupMode } = ui;
-    const uiDisabled = isReportMode || config.pressureSystemsLocked || ui.thermometerActive ||
+    const { isReadOnly, setupMode } = ui;
+    const uiDisabled = isReadOnly || config.pressureSystemsLocked || ui.thermometerActive ||
       (config.lockSimulationWhileRunning && simulation.simulationStarted);
     const isStormDisabled = config.mode === "storm" && setupMode !== "pressureSystems";
     const disabled = uiDisabled || isStormDisabled;
@@ -56,7 +56,12 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
 
   public handlePressureSysDragEnd = () => {
     const { model } = this.props;
-    log("PressureSystemMoved", { type: model.type, lat: model.center.lat, lng: model.center.lng });
+    log("PressureSystemMoved", {
+      type: model.type,
+      label: model.label,
+      lat: model.center.lat,
+      lng: model.center.lng
+    });
   }
 
   private handleDrag = () => {

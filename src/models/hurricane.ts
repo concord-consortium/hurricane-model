@@ -1,5 +1,5 @@
 import { action, computed, extendObservable, override } from "mobx";
-import config from "../config";
+import config, { clampCategory } from "../config";
 import { latLngPlusVector } from "../math-utils";
 import { random } from "../seedrandom";
 import { IVector } from "../types";
@@ -53,7 +53,7 @@ export class Hurricane extends PressureSystem {
     const categoryNum = Number(category);
     if (!Number.isFinite(categoryNum)) return;
 
-    const clamped = Math.max(0, Math.min(hurricaneCategoryInfo.length - 1, Math.floor(categoryNum)));
+    const clamped = clampCategory(categoryNum);
     this.startingCategory = clamped;
     this.setStrength(hurricaneCategoryInfo[clamped].startingWindSpeed);
   }
