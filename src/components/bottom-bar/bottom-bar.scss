@@ -161,6 +161,11 @@ $overflowHeight: 11px;
     &:hover {
       background-color: $secondaryColorHover;
     }
+
+    &:active {
+      background-color: $secondaryColor;
+      border: none;
+    }
   }
 }
 
