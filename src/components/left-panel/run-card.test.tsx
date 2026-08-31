@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { runInAction } from "mobx";
 
+import { defaultSimulationState } from "../../models/simulation-serialization";
 import { createStores, IStores } from "../../models/stores";
 import { StoresContext } from "../../stores-context";
 import { RunCard } from "./run-card";
@@ -50,6 +51,32 @@ describe("RunCard", () => {
     expect(stores.runs.selectedRunId).toBe(stores.runs.runs[0].id);
   });
 
+  // A teacher opening a report must not destroy a run the student left mid-simulation.
+  it("keeps an in-progress run intact when another panel is clicked in report mode", () => {
+    const inProgress = defaultSimulationState();
+    inProgress.simulationStarted = true;
+    inProgress.time = 50;
+    inProgress.hurricaneTrack = [{ position: { lat: 20, lng: -40 }, category: 2 }] as any;
+    const finished = defaultSimulationState();
+    finished.simulationStarted = true;
+    finished.simulationFinished = true;
+    stores.runs.setRuns(
+      [{ id: "run-1", simulation: finished }, { id: "run-2", simulation: inProgress }], "run-2"
+    );
+    stores.ui.setMode("report");
+    renderPanels(stores);
+
+    fireEvent.click(screen.getAllByTestId("run-card")[0]);
+    expect(stores.runs.selectedRunId).toBe("run-1");
+    expect(stores.runs.runs[1].simulation.hurricaneTrack.length).toBe(1);
+
+    fireEvent.click(screen.getAllByTestId("run-card")[1]);
+    expect(stores.simulation.simulationStarted).toBe(true);
+    expect(stores.simulation.simulationFinished).toBe(false);
+    expect(stores.simulation.hurricaneTrack.length).toBe(1);
+    expect(stores.simulation.time).toBe(50);
+  });
+
   it("disables reset until the run is complete", () => {
     renderPanels(stores);
     expect(screen.getByTestId("reset-run-button")).toBeDisabled();
@@ -73,7 +100,7 @@ describe("RunCard", () => {
 
     const panels = screen.getAllByTestId("run-card");
     expect(panels[0]).toHaveAttribute("aria-label", "Run 1");
-    expect(panels[1]).toHaveAttribute("aria-label", "Run 2");
+    expect(panels[1]).toHaveAttribute("aria-label", "Run 2, Not run yet - editable");
   });
 
   it("selects a run with Enter or Space on a focused panel", async () => {

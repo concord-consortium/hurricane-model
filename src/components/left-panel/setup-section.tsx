@@ -28,15 +28,15 @@ interface ISetupSectionProps {
 export const SetupSection = observer(function SetupSection({
   children, dataTest, hint, Icon, iconClassName, note, setupMode, tip, title
 }: ISetupSectionProps) {
-  const stores = useStores();
-  const open = stores.ui.setupMode === setupMode;
+  const { simulation, ui } = useStores();
+  const open = ui.setupMode === setupMode;
   const dt = dataTest || title;
 
   const handleClick = () => {
     if (open) {
-      stores.ui.setSetupMode(undefined);
+      ui.setSetupMode(undefined);
     } else {
-      stores.ui.setSetupMode(setupMode);
+      ui.setSetupMode(setupMode);
     }
   };
 
@@ -46,7 +46,7 @@ export const SetupSection = observer(function SetupSection({
       <ListItemButton
         className={headerClasses}
         data-test={`${dt}-button`}
-        disabled={stores.simulation.simulationStarted}
+        disabled={simulation.simulationStarted || ui.isReadOnly}
         disableRipple={true}
         onClick={handleClick}
       >

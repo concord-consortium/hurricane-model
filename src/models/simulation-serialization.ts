@@ -2,7 +2,7 @@ import { runInAction, toJS } from "mobx";
 import config, { getStartingCategory, startStrengths } from "../config";
 import { hurricaneCategoryInfo } from "../constants";
 import { isStartLocationName, namedRegions } from "../types";
-import { ISimulationState } from "../types/interactive-state";
+import { INormalizedSimulationState, ISimulationState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
 import { seedTemperatureAnomalies } from "../utils/regions";
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
@@ -51,82 +51,51 @@ export function serializeSimulation(simulation: SimulationModel): ISimulationSta
 }
 
 export function applySimulationState(simulation: SimulationModel, simState: ISimulationState): void {
-  const { hurricane: hurState, startLocation } = simState;
+  const state = normalizeSimulationState(simState);
+  const hurState = state.hurricane;
   // Use runInAction to batch all MobX updates
   runInAction(() => {
     // Basic properties
-    if (simState.season) {
-      simulation.season = simState.season;
-    }
-    if (startLocation) {
-      simulation.startLocation = safeStartLocation(startLocation);
-    }
+    simulation.season = state.season;
+    simulation.startLocation = safeStartLocation(state.startLocation);
 
     // Pressure systems - recreate from serialized state
-    simulation.pressureSystems = (simState.pressureSystems ?? []).map(ps => new PressureSystem(ps));
-    // Runs saved before the setup/run split kept their setup in pressureSystems, so fall back to it.
-    simulation.pressureSystemsSetup =
-      (simState.pressureSystemsSetup ?? simState.pressureSystems ?? []).map(ps => new PressureSystem(ps));
+    simulation.pressureSystems = state.pressureSystems.map(ps => new PressureSystem(ps));
+    simulation.pressureSystemsSetup = state.pressureSystemsSetup.map(ps => new PressureSystem(ps));
 
     // Simulation progress state
-    simulation.simulationStarted = simState.simulationStarted ?? false;
-    simulation.simulationFinished = simState.simulationFinished ?? false;
+    simulation.simulationStarted = state.simulationStarted;
+    simulation.simulationFinished = state.simulationFinished;
 
     // Track data - these are plain objects, safe to assign directly
-    if (simState.hurricaneTrack) {
-      simulation.hurricaneTrack = simState.hurricaneTrack.slice();
-    }
-    if (simState.landfalls) {
-      simulation.landfalls = simState.landfalls.slice();
-    }
+    simulation.hurricaneTrack = state.hurricaneTrack.slice();
+    simulation.landfalls = state.landfalls.slice();
 
-    // Restore hurricane state if simulation was in progress
-    if (hurState) {
-      simulation.hurricane.center = { ...hurState.center };
-      simulation.hurricane.strength = hurState.strength;
-      if (hurState.speed) {
-        simulation.hurricane.speed = { ...hurState.speed };
-      }
-      simulation.hurricane.startingCategory = hurState.startingCategory;
-      simulation.hurricane.cat3SSTThresholdReached = hurState.cat3SSTThresholdReached ?? false;
-    }
+    simulation.hurricane.center = { ...hurState.center };
+    simulation.hurricane.strength = hurState.strength;
+    simulation.hurricane.speed = { ...hurState.speed };
+    simulation.hurricane.startingCategory = hurState.startingCategory;
+    simulation.hurricane.cat3SSTThresholdReached = hurState.cat3SSTThresholdReached ?? false;
 
     // Restore additional simulation state needed for resumption
-    if (simState.time !== undefined) {
-      simulation.time = simState.time;
-    }
-    if (simState.strengthChangePositions) {
-      simulation.strengthChangePositions = simState.strengthChangePositions.slice();
-    }
-    if (simState.precipitationPoints) {
-      simulation.precipitationPoints = simState.precipitationPoints.slice();
-    }
+    simulation.time = state.time;
+    simulation.strengthChangePositions = state.strengthChangePositions.slice();
+    simulation.precipitationPoints = state.precipitationPoints.slice();
 
     // Restore internal state for seamless resume
-    if (simState.numberOfStepsOverSea !== undefined) {
-      simulation.numberOfStepsOverSea = simState.numberOfStepsOverSea;
-    }
-    if (simState.numberOfStepsOverLand !== undefined) {
-      simulation.numberOfStepsOverLand = simState.numberOfStepsOverLand;
-    }
-    if (simState.consumedExtendedLandfallAreas) {
-      // Reconstruct available landfall areas by filtering out consumed ones.
-      // We store consumed area keys (not the remaining areas) because:
-      // 1. LatLngBounds objects don't serialize cleanly to JSON
-      // 2. Storing keys is more compact and version-resilient if bounds change
-      // 3. The full set of areas is defined in extendedLandfallBounds
-      simulation.extendedLandfallAreas = Object.entries(extendedLandfallBounds)
-        .filter(([key]) => !simState.consumedExtendedLandfallAreas!.includes(key))
-        .map(([, bounds]) => bounds);
-    }
+    simulation.numberOfStepsOverSea = state.numberOfStepsOverSea;
+    simulation.numberOfStepsOverLand = state.numberOfStepsOverLand;
+    // Reconstruct available landfall areas by filtering out consumed ones.
+    // We store consumed area keys (not the remaining areas) because:
+    // 1. LatLngBounds objects don't serialize cleanly to JSON
+    // 2. Storing keys is more compact and version-resilient if bounds change
+    // 3. The full set of areas is defined in extendedLandfallBounds
+    simulation.extendedLandfallAreas = Object.entries(extendedLandfallBounds)
+      .filter(([key]) => !state.consumedExtendedLandfallAreas.includes(key))
+      .map(([, bounds]) => bounds);
 
-    if (simState.temperatureAnomalies) {
-      for (const key of namedRegions) {
-        const value = simState.temperatureAnomalies[key];
-        if (typeof value === "number") {
-          simulation.setTemperatureAnomaly(key, value);
-        }
-      }
+    for (const key of namedRegions) {
+      simulation.setTemperatureAnomaly(key, state.temperatureAnomalies[key] ?? 0);
     }
 
     // Run switching swaps the whole simulation, so per-run caches must not leak across runs.
@@ -138,16 +107,15 @@ export function applySimulationState(simulation: SimulationModel, simState: ISim
 export const cloneSimulationState = (state: ISimulationState): ISimulationState =>
   JSON.parse(JSON.stringify(state));
 
-// Restored records can be absent, partial or truncated. Filling the required fields from the
-// defaults here lets every consumer read a run's simulation state without guarding field by field.
-export function normalizeSimulationState(state?: Partial<ISimulationState>): ISimulationState {
+// Restored records can be absent, partial or truncated. Filling every field from the defaults here
+// lets consumers read a run's simulation state without guarding field by field.
+export function normalizeSimulationState(state?: Partial<ISimulationState>): INormalizedSimulationState {
   const defaults = defaultSimulationState();
   const clone = state ? cloneSimulationState(state as ISimulationState) : {};
   const present = Object.fromEntries(
     Object.entries(clone).filter(([, value]) => value != null)
   ) as Partial<ISimulationState>;
   return {
-    // Optional fields ride along as-is; every required field below falls back to its default.
     ...present,
     season: present.season ?? defaults.season,
     startLocation: present.startLocation ?? defaults.startLocation,
@@ -161,13 +129,18 @@ export function normalizeSimulationState(state?: Partial<ISimulationState>): ISi
     hurricaneTrack: present.hurricaneTrack ?? defaults.hurricaneTrack,
     landfalls: present.landfalls ?? defaults.landfalls,
     strengthChangePositions: present.strengthChangePositions ?? defaults.strengthChangePositions,
-    precipitationPoints: present.precipitationPoints ?? defaults.precipitationPoints
+    precipitationPoints: present.precipitationPoints ?? defaults.precipitationPoints,
+    numberOfStepsOverSea: present.numberOfStepsOverSea ?? defaults.numberOfStepsOverSea,
+    numberOfStepsOverLand: present.numberOfStepsOverLand ?? defaults.numberOfStepsOverLand,
+    consumedExtendedLandfallAreas:
+      present.consumedExtendedLandfallAreas ?? defaults.consumedExtendedLandfallAreas,
+    temperatureAnomalies: { ...defaults.temperatureAnomalies, ...present.temperatureAnomalies }
   };
 }
 
 // Mirrors the defaults SimulationModel and Hurricane read from config at construction time.
 // Reads config at call time so authored-state mutations are picked up.
-export function defaultSimulationState(): ISimulationState {
+export function defaultSimulationState(): INormalizedSimulationState {
   const startLocation = config.initialHurricanePosition;
   const startingCategory = getStartingCategory(config);
   const strength = startingCategory !== undefined

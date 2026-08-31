@@ -5,6 +5,7 @@ import {
   normalizeSimulationState, serializeSimulation
 } from "./simulation-serialization";
 import { SimulationModel } from "./simulation";
+import { UIModel } from "./ui";
 
 export const maxRuns = 6;
 
@@ -12,11 +13,13 @@ export class RunsModel {
   @observable public runs: IRunState[] = [];
   @observable public selectedRunId = "";
   private simulation: SimulationModel;
+  private ui: UIModel;
   private nextRunNumber = 1;
 
-  constructor(simulation: SimulationModel) {
+  constructor(simulation: SimulationModel, ui: UIModel) {
     makeObservable(this);
     this.simulation = simulation;
+    this.ui = ui;
     const first: IRunState = { id: this.makeRunId(), simulation: serializeSimulation(simulation) };
     this.runs.push(first);
     this.selectedRunId = first.id;
@@ -49,7 +52,7 @@ export class RunsModel {
     if (id === this.selectedRunId) return;
     const target = this.runs.find(run => run.id === id);
     if (!target) return;
-    this.snapshotSelectedRun();
+    if (!this.ui.isReadOnly) this.snapshotSelectedRun();
     this.selectedRunId = id;
     // Clone so the live sim's arrays don't share element references with the stored record.
     applySimulationState(this.simulation, cloneSimulationState(target.simulation));
