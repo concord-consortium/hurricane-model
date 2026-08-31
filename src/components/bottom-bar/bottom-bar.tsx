@@ -222,7 +222,9 @@ export class BottomBar extends BaseComponent<IProps, IState> {
           ariaDescribedBy="reload-confirm-message"
         >
           <p id="reload-confirm-message">
-            {`Are you sure you want to ${reloadVerb}? You will lose all of your current settings.`}
+            {`Are you sure you want to ${reloadVerb}?`}
+            <br/>
+            {`You will lose all of your current settings${isStormMode ? " and saved runs" : ""}.`}
           </p>
           <div className={css.confirmActions}>
             <Button
