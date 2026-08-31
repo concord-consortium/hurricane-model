@@ -100,7 +100,7 @@ describe("RunCard", () => {
 
     const panels = screen.getAllByTestId("run-card");
     expect(panels[0]).toHaveAttribute("aria-label", "Run 1");
-    expect(panels[1]).toHaveAttribute("aria-label", "Run 2");
+    expect(panels[1]).toHaveAttribute("aria-label", "Run 2, Not run yet - editable");
   });
 
   it("selects a run with Enter or Space on a focused panel", async () => {
