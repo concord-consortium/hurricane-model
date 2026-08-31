@@ -97,6 +97,38 @@ describe("RunsModel", () => {
       expect(second.simulation.time).toBe(0);
     });
 
+    // A teacher browsing a report must not destroy a run the student left mid-simulation.
+    it("keeps a started-but-unfinished run intact when switching away in read-only mode", () => {
+      const { runs, simulation, ui } = stores;
+      // Mirrors a restored report: run-2 was saved mid-simulation and is selected.
+      runs.setRuns([
+        { id: "run-1", simulation: { simulationStarted: true, simulationFinished: true } as any },
+        {
+          id: "run-2",
+          simulation: {
+            simulationStarted: true,
+            simulationFinished: false,
+            time: 50,
+            hurricaneTrack: [{ position: { lat: 20, lng: -40 }, category: 2 }]
+          } as any
+        }
+      ], "run-2");
+      ui.setMode("report");
+
+      runs.selectRun("run-1");
+
+      const partial = runs.runs.find(run => run.id === "run-2")!;
+      expect(partial.simulation.simulationStarted).toBe(true);
+      expect(partial.simulation.hurricaneTrack.length).toBe(1);
+      expect(partial.simulation.time).toBe(50);
+
+      runs.selectRun("run-2");
+      expect(simulation.simulationStarted).toBe(true);
+      expect(simulation.simulationFinished).toBe(false);
+      expect(simulation.hurricaneTrack.length).toBe(1);
+      expect(simulation.time).toBe(50);
+    });
+
     it("ignores unknown ids and reselection of the current run", () => {
       const { runs } = stores;
       const id = runs.selectedRunId;

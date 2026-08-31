@@ -11,6 +11,6 @@ export interface IStores {
 export function createStores(simOptions?: ISimulationOptions): IStores {
   const simulation = new SimulationModel(simOptions);
   const ui = new UIModel(simulation);
-  const runs = new RunsModel(simulation);
+  const runs = new RunsModel(simulation, ui);
   return { ui, simulation, runs };
 }

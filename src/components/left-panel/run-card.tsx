@@ -24,7 +24,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
 
   const handleSelect = () => {
     if (selected) return;
-    if (simulation.inProgress) simulation.restart();
+    if (simulation.inProgress && !ui.isReadOnly) simulation.restart();
     runs.selectRun(run.id);
     ui.setNorthAtlanticView();
     log("RunSelected", { runId: run.id, via: "panel" });
