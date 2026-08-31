@@ -4,7 +4,7 @@ import { SetupSection } from "./setup-section";
 
 import ThermometerIcon from "../../assets/left-panel/thermometer.svg";
 
-const hint = "Adjust sea surface temperature of each labeled region on the map by up to ±3°C.";
+const hint = "Adjust the sea surface temperature of each labeled region on the map by up to ±3°C.";
 
 export function SeaSurfaceTemperaturesSection() {
   return (

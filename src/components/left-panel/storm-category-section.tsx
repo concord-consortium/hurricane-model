@@ -11,7 +11,7 @@ import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
 import categoryCss from "../hurricane-category.scss";
 import css from "./storm-category-section.scss";
 
-const hint = "Drag the slider to set the storm's starting strength. The storm icon updates in real time.";
+const hint = "Drag the slider to set the storm’s starting strength.";
 
 const marks = hurricaneCategoryInfo.map((info, idx) => ({ value: idx, label: info.nameShort }));
 const maxCategory = hurricaneCategoryInfo.length - 1;
