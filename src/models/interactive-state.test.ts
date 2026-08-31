@@ -360,15 +360,15 @@ describe("interactive-state", () => {
       expect(stores.simulation.temperatureAnomalyAt("caribbean")).toBe(0);
     });
 
-    it("does not override current state when the field is absent (legacy state)", () => {
+    it("restores the defaults when the field is absent (legacy state)", () => {
       const stores = createStores();
       stores.simulation.adjustTemperatureAnomaly("gulf", 2);
       const state = getInteractiveState(stores);
       delete state.runs[0].simulation.temperatureAnomalies;
       expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(2);
       setInteractiveState(stores, state);
-      // Absent field => no override; model keeps whatever it had (here, the prior value).
-      expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(2);
+      // A run without anomalies has none: keeping the live value would leak it between runs.
+      expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(0);
     });
   });
 

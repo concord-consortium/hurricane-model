@@ -5,6 +5,7 @@ import {
 } from "./simulation-serialization";
 import { createStores } from "./stores";
 import { PressureSystem } from "./pressure-system";
+import { extendedLandfallBounds } from "./simulation";
 
 describe("simulation-serialization", () => {
   describe("serializeSimulation", () => {
@@ -90,6 +91,30 @@ describe("simulation-serialization", () => {
       ]);
       // A restored started run displays what the run did, not the setup.
       expect(target.activePressureSystems).toBe(target.pressureSystems);
+    });
+
+    it("resets fields the incoming state omits instead of keeping the previous run's values", () => {
+      const { simulation } = createStores();
+      simulation.setTemperatureAnomaly("gulf", 2);
+      runInAction(() => {
+        simulation.numberOfStepsOverSea = 7;
+        simulation.numberOfStepsOverLand = 3;
+        simulation.extendedLandfallAreas = [];
+      });
+      const partial = serializeSimulation(simulation);
+      delete partial.numberOfStepsOverSea;
+      delete partial.numberOfStepsOverLand;
+      delete partial.consumedExtendedLandfallAreas;
+      delete partial.temperatureAnomalies;
+
+      applySimulationState(simulation, partial);
+
+      const defaults = defaultSimulationState();
+      expect(simulation.numberOfStepsOverSea).toBe(0);
+      expect(simulation.numberOfStepsOverLand).toBe(0);
+      expect(simulation.extendedLandfallAreas.length)
+        .toBe(Object.keys(extendedLandfallBounds).length);
+      expect(simulation.temperatureAnomalyAt("gulf")).toBe(defaults.temperatureAnomalies.gulf);
     });
 
     it("seeds the setup from pressureSystems for runs saved before the split", () => {

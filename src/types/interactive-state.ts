@@ -63,6 +63,12 @@ export interface ISimulationState {
 }
 
 /**
+ * A simulation state with every top-level optional field filled in.
+ * Required<> is shallow, so hurricane's own optional fields are unaffected.
+ */
+export type INormalizedSimulationState = Required<ISimulationState>;
+
+/**
  * A single simulation run: its setup and (when finished) its outcome, as one serialized state.
  */
 export interface IRunState {
