@@ -124,12 +124,13 @@ git commit -m "Add compact region labels for run cards."
 
 ### Task 3: `strengthToMb` in a new `utils/pressure.ts` (single source for mb mapping)
 
-The mb mapping currently lives privately in `src/components/pressure-system-icon.tsx` (`getPressureLabel`). Move it to a util both the map icon and the run cards share. `pressure-system-icon.test.tsx` imports `minStrength`/`maxStrength`/`mbLabelRange` from the icon module, so keep re-exports there.
+The mb mapping currently lives privately in `src/components/pressure-system-icon.tsx` (`getPressureLabel`). Move it to a util both the map icon and the run cards share. No re-exports — every consumer imports the constants from `utils/pressure` directly, including `pressure-system-icon.test.tsx`.
 
 **Files:**
 - Create: `src/utils/pressure.ts`
 - Create: `src/utils/pressure.test.ts`
 - Modify: `src/components/pressure-system-icon.tsx:15-17` (constants) and `:40-47` (`getPressureLabel`)
+- Modify: `src/components/pressure-system-icon.test.tsx:6` (import the constants from `../utils/pressure`)
 
 **Step 1: Write the failing test**
 
@@ -171,7 +172,7 @@ import { PressureSystemType } from "../models/pressure-system";
 
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
 // High pressure reads 1015..1028 mb (stronger = higher); low reads 1010..997 mb (stronger = lower).
-// Single source of truth for this mapping — pressure-system-icon.tsx re-exports the constants.
+// Single source of truth for this mapping.
 export const minStrength = 3;
 export const maxStrength = 20;
 export const mbLabelRange = 13;
@@ -188,14 +189,19 @@ In `src/components/pressure-system-icon.tsx`, delete the three constant declarat
 
 ```ts
 import { maxStrength, minStrength, strengthToMb } from "../utils/pressure";
-
-export { maxStrength, mbLabelRange, minStrength } from "../utils/pressure";
 ```
 
 and replace `getPressureLabel` with:
 
 ```ts
 const getPressureLabel = (model: PressureSystem) => strengthToMb(model.type, model.strength) + "mb";
+```
+
+In `src/components/pressure-system-icon.test.tsx`, update the import at line 6 — the constants now come from the util:
+
+```ts
+import { PressureSystemIcon } from "./pressure-system-icon";
+import { maxStrength, mbLabelRange, minStrength } from "../utils/pressure";
 ```
 
 **Step 4: Run tests to verify they pass**
@@ -206,7 +212,7 @@ Expected: PASS (both files — icon behavior unchanged).
 **Step 5: Commit**
 
 ```bash
-git add src/utils/pressure.ts src/utils/pressure.test.ts src/components/pressure-system-icon.tsx
+git add src/utils/pressure.ts src/utils/pressure.test.ts src/components/pressure-system-icon.tsx src/components/pressure-system-icon.test.tsx
 git commit -m "Extract strengthToMb into a shared pressure util."
 ```
 
