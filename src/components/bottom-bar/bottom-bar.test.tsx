@@ -11,8 +11,6 @@ import config from "../../config";
 
 jest.spyOn(logModule, "log").mockImplementation(() => undefined);
 
-const toggleLeftPanelOpen = () => null;
-
 describe("BottomBar component", () => {
   let stores = createStores();
   beforeEach(() => {
@@ -22,7 +20,7 @@ describe("BottomBar component", () => {
   const renderBottomBar = () => render(
     <StoresContext value={stores}>
       <Provider stores={stores}>
-        <BottomBar toggleLeftPanelOpen={toggleLeftPanelOpen} />
+        <BottomBar />
       </Provider>
     </StoresContext>
   );

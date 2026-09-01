@@ -28,7 +28,6 @@ import ThermometerHoverIcon from "../../assets/thermometer-hover.svg";
 import css from "./bottom-bar.scss";
 
 interface IProps extends IBaseProps {
-  toggleLeftPanelOpen: () => void;
 }
 interface IState {
   fullscreen: boolean;
