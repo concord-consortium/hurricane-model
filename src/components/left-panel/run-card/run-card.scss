@@ -56,6 +56,25 @@
         width: 156px;
       }
     }
+
+    .runCardBody {
+      display: flex;
+      gap: 10px;
+      margin-top: 7px;
+
+      .cardColumn {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      .cardColumnHeading {
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 5px;
+      }
+    }
   }
 
   .runButtons {

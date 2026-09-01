@@ -150,6 +150,48 @@ describe("RunCard", () => {
     expect(stores.runs.runs.length).toBe(1);
   });
 
+  describe("setup and result columns", () => {
+    it("renders SETUP and RESULT column headings", () => {
+      renderPanels(stores);
+      expect(screen.getByText("Setup")).toBeInTheDocument();
+      expect(screen.getByText("Result")).toBeInTheDocument();
+    });
+
+    it("summarizes the selected run from the live simulation", () => {
+      stores.simulation.season = "winter";
+      renderPanels(stores);
+      expect(screen.getByTestId("setup-season")).toHaveTextContent("Winter");
+    });
+
+    it("updates the selected run's summary as the setup is edited", () => {
+      renderPanels(stores);
+      expect(screen.getByTestId("setup-anomalies")).toHaveTextContent("Baseline");
+      act(() => runInAction(() => { stores.simulation.setTemperatureAnomaly("caribbean", 2); }));
+      expect(screen.getByTestId("setup-anomalies")).toHaveTextContent("Caribbean +2 °C");
+    });
+
+    it("summarizes an unselected run from its stored record", () => {
+      stores.simulation.season = "winter";
+      completeCurrentRun(stores);
+      stores.runs.addRun();
+      renderPanels(stores);
+      // First card (unselected) keeps winter; second (selected) shows the new run's default season.
+      const seasons = screen.getAllByTestId("setup-season");
+      expect(seasons[0]).toHaveTextContent("Winter");
+      expect(seasons[1]).not.toHaveTextContent("Winter");
+    });
+
+    it("summarizes pressure systems from the setup, not the run's mutated systems", () => {
+      completeCurrentRun(stores);
+      stores.runs.addRun();
+      // Corrupt the stored run's live systems; the setup systems stay at their defaults.
+      const stored = stores.runs.runs[0].simulation;
+      stored.pressureSystems = stored.pressureSystems.map(ps => ({ ...ps, strength: 3 }));
+      renderPanels(stores);
+      expect(screen.getAllByTestId("setup-pressure-systems")[0]).toHaveTextContent("H1: Default, 1028 mb");
+    });
+  });
+
   describe("status message", () => {
     it("says the run is editable before it starts", () => {
       renderPanels(stores);

@@ -3,8 +3,10 @@ import { observer } from "mobx-react";
 import React from "react";
 
 import { log } from "../../../log";
+import { namedRegions } from "../../../types";
 import { IRunState } from "../../../types/interactive-state";
 import { useStores } from "../../../stores-context";
+import { IRunSetup, RunSetupSummary } from "./run-setup-summary";
 
 import DeleteIcon from "../../../assets/left-panel/delete.svg";
 import RestartIcon from "../../../assets/left-panel/restart.svg";
@@ -21,6 +23,18 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   const selected = run.id === runs.selectedRunId;
   const complete = runs.isRunComplete(run);
   const runNumber = runs.runs.indexOf(run) + 1;
+
+  // The selected run's stored record can be stale — the live simulation is its source of truth.
+  const { season, startLocation, hurricane } = selected ? simulation : run.simulation;
+  const pressureSystems = selected
+    ? simulation.pressureSystems.map(ps => ps.serialize())
+    : run.simulation.pressureSystemsSetup ?? run.simulation.pressureSystems;
+  const temperatureAnomalies = selected
+    ? Object.fromEntries(namedRegions.map(r => [r, simulation.temperatureAnomalyAt(r)]))
+    : run.simulation.temperatureAnomalies;
+  const setup: IRunSetup = {
+    season, startLocation, startingCategory: hurricane.startingCategory, pressureSystems, temperatureAnomalies
+  };
 
   const handleSelect = () => {
     if (selected) return;
@@ -79,6 +93,15 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
             data-test="run-status"
           >
             {statusMessage}
+          </div>
+        </div>
+        <div className={css.runCardBody}>
+          <div className={css.cardColumn}>
+            <div className={css.cardColumnHeading}>Setup</div>
+            <RunSetupSummary setup={setup} />
+          </div>
+          <div className={css.cardColumn}>
+            <div className={css.cardColumnHeading}>Result</div>
           </div>
         </div>
       </div>
