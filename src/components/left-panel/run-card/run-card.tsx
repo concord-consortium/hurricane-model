@@ -27,7 +27,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   // The selected run's stored record can be stale — the live simulation is its source of truth.
   const { season, startLocation, hurricane } = selected ? simulation : run.simulation;
   const pressureSystems = selected
-    ? simulation.pressureSystems.map(ps => ps.serialize())
+    ? simulation.pressureSystemsSetup.map(ps => ps.serialize())
     : run.simulation.pressureSystemsSetup ?? run.simulation.pressureSystems;
   const temperatureAnomalies = selected
     ? Object.fromEntries(namedRegions.map(r => [r, simulation.temperatureAnomalyAt(r)]))
