@@ -189,15 +189,15 @@ describe("Right Panel component", () => {
       await user.click(screen.getByTestId("tab-settings"));
       (logModule.log as jest.Mock).mockClear();
 
-      // windArrows defaults to true, so clicking hides the arrows
       const windSwitch = screen.getByTestId("wind-arrows-setting").querySelector("input") as HTMLInputElement;
+      expect(windSwitch).toBeChecked();
       await user.click(windSwitch);
       expect(stores.ui.windArrows).toBe(false);
       expect(windSwitch).not.toBeChecked();
       expect(logModule.log).toHaveBeenCalledWith("WindArrowsHidden");
 
-      // hurricaneImage defaults to false, so clicking shows the image
       const imageSwitch = screen.getByTestId("hurricane-image-setting").querySelector("input") as HTMLInputElement;
+      expect(imageSwitch).not.toBeChecked();
       await user.click(imageSwitch);
       expect(stores.ui.hurricaneImage).toBe(true);
       expect(imageSwitch).toBeChecked();

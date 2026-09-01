@@ -7,7 +7,8 @@ import { SSTOverlayModel } from "./sst-overlay";
 
 export type InteractiveMode = "runtime" | "authoring" | "report" | "reportItem";
 export type SetupMode = "stormLocation" | "stormCategory" | "season" | "seaSurfaceTemperatures" | "pressureSystems";
-export type RightTabType = "base" | "overlay" | "settings";
+export type MapTabType = "base" | "overlay";
+export type RightTabType = MapTabType | "settings";
 
 // Storm surge data bounds is limited to very specify area (Texas to Maine).
 // See: https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1

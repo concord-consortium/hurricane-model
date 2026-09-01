@@ -50,8 +50,8 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 | `BaseMapSet` | `{ type }` | User selects a base map (satellite, relief, street, population) |
 | `MapOverlaySet` | `{ type }` | User enables a map overlay (sst, precipitation, stormSurge) |
 | `MapOverlayDisabled` | — | User disables the active map overlay |
-| `MapTabOpened` | `{ type }` | User opens a tab in the right panel |
-| `MapTabClosed` | `{ type }` | User closes a tab in the right panel |
+| `MapTabOpened` | `{ type: "base" \| "overlay" \| "settings" }` | User opens a tab in the right panel |
+| `MapTabClosed` | `{ type: "base" \| "overlay" \| "settings" }` | User closes a tab in the right panel |
 | `ViewportUpdated` | `{ zoom, east, west, north, south }` | User pans or zooms the map (not programmatic) |
 | `ResetMapViewClicked` | — | User clicks the reset view button |
 | `FullscreenEnabled` | — | User enters fullscreen mode |

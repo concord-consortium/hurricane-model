@@ -27,13 +27,13 @@ export function Tab({ active, className, dataTest, image, onClick, side, text }:
       inert={inert}
       onClick={onClick}
     >
-      <div className={clsx(css.tab, className)}>
+      <div className={css.tab}>
         <div
           className={clsx(css.tabBack, sideClass, className, activeClass)}
           data-test={`${dataTest}-back`}
           data-active={!!active}
         >
-          <div className={clsx(css.tabImage, className)} style={imageStyle}/>
+          <div className={css.tabImage} style={imageStyle}/>
           <div className={css.tabContent}>{text}</div>
         </div>
       </div>
