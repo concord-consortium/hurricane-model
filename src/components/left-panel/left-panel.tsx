@@ -34,7 +34,6 @@ export const LeftPanel = observer(function LeftPanel({ open, toggleOpen }: ILeft
   return (
     <div className={css.leftPanelContainer}>
       <div className={panelClasses} data-test="left-panel">
-        {/* Orange backing + narrower content = the color band on the map-facing edge. */}
         <div className={css.panelBack}>
           <div className={css.panelContent}>
             <List
