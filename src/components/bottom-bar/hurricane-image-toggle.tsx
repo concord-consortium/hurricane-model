@@ -11,7 +11,7 @@ export const HurricaneImageToggle = observer(function HurricaneImageToggle() {
 
   const handleChange = (e: any, checked: boolean) => {
     changeHurricaneImage(ui, checked);
-  }
+  };
 
   return (
     <div className={css.hurricaneImageToggle}>

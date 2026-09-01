@@ -11,7 +11,7 @@ export const WindArrowsToggle = observer(function WindArrowsToggle() {
 
   const handleChange = (e: any, checked: boolean) => {
     changeWindArrows(ui, checked);
-  }
+  };
 
   return (
     <div className={css.windArrowsToggle}>

@@ -115,6 +115,8 @@ export class BottomBar extends BaseComponent<IProps, IState> {
 
     const reloadLabel = isStormMode ? "Clear All" : "Reload";
     const reloadVerb = isStormMode ? "clear everything" : "reload the model";
+    const StartButtonIcon = simulationRunning ? PauseIcon : StartIcon;
+    const startButtonLabel = simulationRunning ? "Stop" : "Start";
 
     return (
       <div className={css.bottomBar}>
@@ -200,7 +202,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
               data-test="start-button"
               disableRipple={true}
             >
-              { simulationRunning ? <span><PauseIcon/> Stop</span> : <span><StartIcon /> Start</span> }
+              <span><StartButtonIcon /><span className={css.buttonLabel}>{startButtonLabel}</span></span>
             </Button>
           </div>
           { isStormMode && tempButton }

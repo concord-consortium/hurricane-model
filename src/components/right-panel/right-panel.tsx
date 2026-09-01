@@ -46,15 +46,15 @@ export const RightPanel = observer(function RightPanel() {
         log("MapTabClosed", { type: tab });
       }
     }
-  }
+  };
 
   const handleWindArrowsChange = (checked: boolean) => {
     changeWindArrows(ui, checked);
-  }
+  };
 
   const handleHurricaneImageChange = (checked: boolean) => {
     changeHurricaneImage(ui, checked);
-  }
+  };
 
   return (
     <div className={css.rightPanelContainer}>
