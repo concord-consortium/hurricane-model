@@ -80,6 +80,10 @@ describe("RunCard", () => {
   it("disables reset until the run has started", () => {
     renderPanels(stores);
     expect(screen.getByTestId("reset-run-button")).toBeDisabled();
+    act(() => stores.simulation.setSimulationStarted(true));
+    expect(screen.getByTestId("reset-run-button")).toBeEnabled();
+    act(() => stores.simulation.setSimulationRunning(true));
+    expect(screen.getByTestId("reset-run-button")).toBeEnabled();
   });
 
   it("resets a completed run, keeping its setup", () => {

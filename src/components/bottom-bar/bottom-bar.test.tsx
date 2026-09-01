@@ -258,7 +258,9 @@ describe("BottomBar component", () => {
       jest.spyOn(stores.ui, "setLeftPanelOpen");
       jest.spyOn(stores.ui, "setSetupMode");
       renderBottomBar();
+      expect(screen.getByTestId("restart-button")).toBeDisabled();
       act(() => stores.simulation.setSimulationStarted(true));
+      expect(screen.getByTestId("restart-button")).toBeEnabled();
       await user.click(screen.getByTestId("restart-button"));
       expect(stores.simulation.restart).toHaveBeenCalled();
       expect(stores.ui.setSetupMode).toHaveBeenCalledWith(undefined);

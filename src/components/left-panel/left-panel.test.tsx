@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import { createStores } from "../../models/stores";
@@ -22,6 +22,20 @@ describe("LeftPanel component", () => {
 
   describe("storm setup tab", () => {
     const getTabBack = () => screen.getByTestId("tab-setup").querySelector(".tabBack");
+
+    it("renders the setup sections", () => {
+      renderPanel(true);
+      expect(screen.getByTestId("left-panel")).toBeInTheDocument();
+      expect(screen.getByTestId("season-button")).toBeInTheDocument();
+    });
+
+    it("clears the setup mode when the simulation starts", () => {
+      stores.ui.setSetupMode("season");
+      renderPanel(true);
+      expect(stores.ui.setupMode).toBe("season");
+      act(() => stores.simulation.setSimulationStarted(true));
+      expect(stores.ui.setupMode).toBeUndefined();
+    });
 
     it("toggles the panel when clicked", async () => {
       const user = userEvent.setup();
