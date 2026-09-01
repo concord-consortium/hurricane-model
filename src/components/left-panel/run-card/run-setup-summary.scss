@@ -8,8 +8,8 @@
   color: $charcoal;
 
   .categoryRow {
+    align-items: center;
     display: flex;
-    align-items: flex-start;
     gap: 7px;
     min-height: 16px;
   }
