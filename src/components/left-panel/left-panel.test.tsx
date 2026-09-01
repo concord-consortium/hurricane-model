@@ -45,6 +45,17 @@ describe("LeftPanel component", () => {
       expect(toggleOpen).toHaveBeenCalled();
     });
 
+    // jsdom renders the inert attribute but doesn't implement its behavior, so the attribute
+    // itself is what can be asserted here — the browser enforces the rest.
+    it("is inert while the panel is open, so the hidden tab can't be clicked or tabbed to", () => {
+      const { unmount } = renderPanel(false);
+      expect(screen.getByTestId("tab-setup")).not.toHaveAttribute("inert");
+      unmount();
+
+      renderPanel(true);
+      expect(screen.getByTestId("tab-setup")).toHaveAttribute("inert");
+    });
+
     it("slides behind the panel when the panel is open", () => {
       const { unmount } = renderPanel(false);
       expect(getTabBack()).not.toHaveClass("active");

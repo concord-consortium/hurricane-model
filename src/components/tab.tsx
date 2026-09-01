@@ -16,9 +16,17 @@ export function Tab({ active, className, dataTest, image, onClick, side, text }:
   const imageStyle = image ? { backgroundImage: `url(${image})` } : undefined;
   const sideClass = side === "right" ? css.right : css.left;
   const activeClass = { [css.active]: active };
+  // The setup tab (the only left tab) is hidden when the left panel is open.
+  const inert = side === "left" && active;
 
   return (
-    <button type="button" data-test={dataTest} className={clsx(css.panelTab, sideClass, activeClass)} onClick={onClick}>
+    <button
+      type="button"
+      data-test={dataTest}
+      className={clsx(css.panelTab, sideClass, activeClass)}
+      inert={inert}
+      onClick={onClick}
+    >
       <div className={clsx(css.tab, className)}>
         <div
           className={clsx(css.tabBack, sideClass, className, activeClass)}
