@@ -400,7 +400,9 @@ describe("RunsModel", () => {
     it("replaces runs, selects the given run, and hydrates the simulation", () => {
       const { runs, simulation } = stores;
       const stateA = { ...runs.runs[0].simulation, season: "winter" as const };
-      const stateB = { ...runs.runs[0].simulation, season: "summer" as const, simulationFinished: true };
+      const stateB = {
+        ...runs.runs[0].simulation, season: "summer" as const, simulationStarted: true, simulationFinished: true
+      };
       runs.setRuns([
         { id: "run-1", simulation: stateA },
         { id: "run-2", simulation: stateB }

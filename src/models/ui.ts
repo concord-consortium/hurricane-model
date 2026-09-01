@@ -1,4 +1,4 @@
-import { action, observable, computed, makeObservable } from "mobx";
+import { action, comparer, observable, computed, makeObservable } from "mobx";
 import { LatLngExpression, Map, Point, LatLngBoundsLiteral, LatLngBounds } from "leaflet";
 import config from "../config";
 import { mapLayer, MapTilesName, mapTilesNames } from "../map-layer-tiles";
@@ -84,6 +84,19 @@ export class UIModel {
 
   @computed public get isReportMode(): boolean {
     return this.mode === "report" || this.mode === "reportItem";
+  }
+
+  // True while reset() would be a no-op, so it must cover exactly the fields reset() restores.
+  @computed public get isPristine(): boolean {
+    return comparer.structural(this.initialBounds, config.initialBounds) &&
+      this.zoomedInView === false &&
+      !this.mapModifiedByUser &&
+      this.windArrows === this.initialState.windArrows &&
+      this.baseMap === this.initialState.baseMap &&
+      this.overlay === this.initialState.overlay &&
+      !this.thermometerActive &&
+      this.thermometerPositionSaved === null &&
+      this.thermometerPositionHover === null;
   }
 
   @computed public get isReadOnly(): boolean {

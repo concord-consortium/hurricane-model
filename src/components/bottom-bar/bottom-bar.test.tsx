@@ -243,6 +243,12 @@ describe("BottomBar component", () => {
         act(() => stores.simulation.setSimulationStarted(true));
         expect(screen.getByTestId("reload-button")).not.toBeDisabled();
       });
+
+      it("is enabled once a UI setting the reload would restore has changed", () => {
+        renderBottomBar();
+        act(() => stores.ui.setOverlay("precipitation"));
+        expect(screen.getByTestId("reload-button")).not.toBeDisabled();
+      });
     });
 
     it("places the temp button after the start button", () => {

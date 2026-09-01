@@ -80,8 +80,9 @@ export class BottomBar extends BaseComponent<IProps, IState> {
   }
 
   public render() {
-    const { ready, simulationRunning, simulationStarted } = this.stores.simulation;
-    const { isReadOnly, overlay, thermometerActive } = this.stores.ui;
+    const { runs, simulation, ui } = this.stores;
+    const { ready, simulationRunning, simulationStarted } = simulation;
+    const { isReadOnly, overlay, thermometerActive } = ui;
     const { isSeasonMenuOpen, isStartLocationMenuOpen } = this.state;
     const startLocationButtonHoveredClass = isStartLocationMenuOpen ? css.hovered : "";
     const seasonButtonHoveredClass = isSeasonMenuOpen ? css.hovered : "";
@@ -93,7 +94,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       (config.lockSimulationWhileRunning && simulationStarted);
     const simulationControlsDisabled = isReadOnly;
     const restartDisabled = simulationControlsDisabled || (isStormMode && !simulationStarted);
-    const clearAllDisabled = simulationControlsDisabled || (isStormMode && this.stores.runs.isPristine);
+    const clearAllDisabled = simulationControlsDisabled || (isStormMode && runs.isPristine && ui.isPristine);
     const startLocationButtonClasses = clsx(
       css.widgetGroup,
       startLocationButtonHoveredClass,
