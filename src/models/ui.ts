@@ -20,7 +20,7 @@ export class UIModel {
   @observable public sstOverlay: SSTOverlayModel;
   @observable public mode: InteractiveMode = "runtime";
   @observable public setupMode: SetupMode | undefined = undefined;
-  @observable public leftPanelOpen = true;
+  @observable public leftPanelOpen = config.mode === "storm";
   @observable public initialBounds = config.initialBounds;
   @observable public mapSize = { x: 0, y: 0 };
   @observable public zoomedInView: ZoomedInViewProps = false;
