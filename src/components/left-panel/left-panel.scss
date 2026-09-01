@@ -2,7 +2,6 @@
 @use "./left-panel-common" as *;
 
 $leftPanelBorderRadius: 5px;
-$stormSetupTabWidth: 76px;
 
 .leftPanelContainer {
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
