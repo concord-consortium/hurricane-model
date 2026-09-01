@@ -15,11 +15,13 @@ export class RunsModel {
   private simulation: SimulationModel;
   private ui: UIModel;
   private nextRunNumber = 1;
+  private initialSimulationState: ISimulationState;
 
   constructor(simulation: SimulationModel, ui: UIModel) {
     makeObservable(this);
     this.simulation = simulation;
     this.ui = ui;
+    this.initialSimulationState = serializeSimulation(simulation);
     const first: IRunState = { id: this.makeRunId(), simulation: serializeSimulation(simulation) };
     this.runs.push(first);
     this.selectedRunId = first.id;
@@ -53,7 +55,7 @@ export class RunsModel {
     const { simulation } = this;
     if (this.runs.length > 1) return false;
     if (simulation.simulationStarted || simulation.simulationFinished) return false;
-    return comparer.structural(serializeSimulation(simulation), defaultSimulationState());
+    return comparer.structural(serializeSimulation(simulation), this.initialSimulationState);
   }
 
   @action.bound public selectRun(id: string) {

@@ -1,3 +1,4 @@
+import config from "../config";
 import { maxRuns } from "./runs";
 import { createStores, IStores } from "./stores";
 import { PressureSystem } from "./pressure-system";
@@ -286,6 +287,18 @@ describe("RunsModel", () => {
   describe("isPristine", () => {
     it("is true for a freshly created set of runs", () => {
       expect(stores.runs.isPristine).toBe(true);
+    });
+
+    it("is true when config changes after the stores were created", () => {
+      // The LARA authored-state path mutates config in place long after createStores(),
+      // so the baseline has to be the construction-time snapshot, not a fresh read of config.
+      const originalSeason = config.season;
+      try {
+        config.season = config.season === "winter" ? "summer" : "winter";
+        expect(stores.runs.isPristine).toBe(true);
+      } finally {
+        config.season = originalSeason;
+      }
     });
 
     it("is false once the setup differs from the defaults", () => {
