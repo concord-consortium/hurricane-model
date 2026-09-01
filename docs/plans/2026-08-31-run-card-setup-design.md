@@ -22,7 +22,7 @@ from the setup-section components.
 
 ## New utilities
 
-- `src/utils/pressure.ts` — ported from the prototype: `strengthToMb`, `perTypeNumbers`,
+- `src/utils/pressure.ts` — ported from the prototype: `strengthToMb`,
   `pressureDeltas` (moved detection + 16-point compass direction via the existing
   `geolocation-utils` dep), `pressureReport`. The `minStrength` / `maxStrength` / `mbLabelRange`
   constants move here; `pressure-system-icon.tsx` imports them from here so map labels and cards
@@ -53,6 +53,6 @@ content comes later). Header, status message, and reset/delete buttons stay as t
 
 ## Testing
 
-- Unit tests for `pressure.ts`: mb mapping, moved/default detection, per-type numbering.
+- Unit tests for `pressure.ts`: mb mapping, moved/default detection, label fallback (bare H/L when a system has no label).
 - `run-card.test.tsx`: setup rows render, selected card reads live sim (stale-record case),
   RESULT heading present.

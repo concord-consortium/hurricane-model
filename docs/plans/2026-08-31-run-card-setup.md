@@ -220,7 +220,7 @@ git commit -m "Extract strengthToMb into a shared pressure util."
 
 ### Task 4: `pressureDeltas` + `pressureReport`
 
-Compares a run's *setup* systems to their per-start-location defaults and produces the card lines ("H1: Default, 1028 mb" / "H2: Moved SW, 1023 mb"). Labels come from each system's own `label` field (matches the "H1"/"L2" badges on the map), falling back to per-type numbering when absent.
+Compares a run's *setup* systems to their per-start-location defaults and produces the card lines ("H1: Default, 1028 mb" / "H2: Moved SW, 1023 mb"). Labels come from each system's own `label` field (matches the "H1"/"L2" badges on the map); a system without a label renders as plain "H" or "L".
 
 **Files:**
 - Modify: `src/utils/pressure.ts`
@@ -262,9 +262,9 @@ describe("pressureReport", () => {
     expect(pressureReport("atlantic", systems)[0].mb).toBe("1015 mb");
   });
 
-  it("numbers unlabeled systems per type", () => {
+  it("renders a bare H or L for unlabeled systems", () => {
     const systems = defaultSetup().map(ps => ({ ...ps, label: undefined }));
-    expect(pressureReport("atlantic", systems).map(r => r.label)).toEqual(["H1", "H2", "L1", "L2"]);
+    expect(pressureReport("atlantic", systems).map(r => r.label)).toEqual(["H", "H", "L", "L"]);
   });
 
   it("baselines a custom-coordinate start against the Atlantic defaults", () => {
@@ -294,12 +294,6 @@ import { IPressureSystemState } from "../types/interactive-state";
 ```
 
 ```ts
-// Numbers each system within its type (H1, H2, L1, L2…) — fallback when a system has no label.
-export function perTypeNumbers(systems: { type: PressureSystemType }[]): number[] {
-  const counts: Record<PressureSystemType, number> = { high: 0, low: 0 };
-  return systems.map(s => (counts[s.type] += 1));
-}
-
 // 16-point compass label for a heading in degrees (0 = N, clockwise), e.g. "SSW".
 const COMPASS = [
   "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
@@ -328,7 +322,6 @@ export interface IPressureReport {
 // a custom-coordinate start is baselined against the Atlantic defaults — a known approximation.
 export function pressureReport(startLocation: StartLocation, systems: IPressureSystemState[]): IPressureReport[] {
   const defaults = selectPressureSystems(isStartLocationName(startLocation) ? startLocation : "atlantic");
-  const nums = perTypeNumbers(systems);
   return systems.map((ps, i) => {
     const def = defaults[i];
     let position = "Default";
@@ -341,7 +334,7 @@ export function pressureReport(startLocation: StartLocation, systems: IPressureS
     }
     return {
       type: ps.type,
-      label: `${ps.type === "high" ? "H" : "L"}${ps.label || nums[i]}`,
+      label: `${ps.type === "high" ? "H" : "L"}${ps.label ?? ""}`,
       position,
       // Non-breaking space so the value and its "mb" unit never split across a wrap.
       mb: `${strengthToMb(ps.type, ps.strength)} mb`
@@ -530,8 +523,8 @@ export function RunSetupSummary({ setup }: IProps) {
       <div className={css.row} data-test="setup-pressure-systems">
         <PressureSystemIcon aria-hidden={true} className={css.icon} />
         <span className={css.stackedLines}>
-          {report.map(r => (
-            <span key={r.label} className={css.pressureSystem}>
+          {report.map((r, i) => (
+            <span key={i} className={css.pressureSystem}>
               <span className={r.type === "high" ? css.high : css.low}>{r.label}:</span>
               <span className={css.pressureDetail}>
                 <span>{r.position},</span>
