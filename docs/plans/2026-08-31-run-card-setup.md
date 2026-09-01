@@ -365,19 +365,19 @@ git commit -m "Add pressureReport for run card setup readouts."
 Presentational component: five icon rows in the setup-section order from `left-panel.tsx` (location, category, season, SST anomalies, pressure systems). No heading — the card renders the SETUP/RESULT column headings (Task 6).
 
 **Files:**
-- Create: `src/components/left-panel/run-setup-summary.tsx`
-- Create: `src/components/left-panel/run-setup-summary.scss`
-- Create: `src/components/left-panel/run-setup-summary.test.tsx`
+- Create: `src/components/left-panel/run-card/run-setup-summary.tsx`
+- Create: `src/components/left-panel/run-card/run-setup-summary.scss`
+- Create: `src/components/left-panel/run-card/run-setup-summary.test.tsx`
 
 **Step 1: Write the failing test**
 
-Create `src/components/left-panel/run-setup-summary.test.tsx`:
+Create `src/components/left-panel/run-card/run-setup-summary.test.tsx`:
 
 ```tsx
 import { render, screen } from "@testing-library/react";
 import React from "react";
 
-import { selectPressureSystems } from "../../config";
+import { selectPressureSystems } from "../../../config";
 import { IRunSetup, RunSetupSummary } from "./run-setup-summary";
 
 const baseSetup = (): IRunSetup => ({
@@ -443,32 +443,32 @@ Note: `toHaveTextContent` normalizes whitespace, so the ` ` in "1028 mb" and "+
 
 **Step 2: Run test to verify it fails**
 
-Run: `npx jest src/components/left-panel/run-setup-summary.test.tsx`
+Run: `npx jest src/components/left-panel/run-card/run-setup-summary.test.tsx`
 Expected: FAIL — module not found.
 
 **Step 3: Write the implementation**
 
-Create `src/components/left-panel/run-setup-summary.tsx`:
+Create `src/components/left-panel/run-card/run-setup-summary.tsx`:
 
 ```tsx
 import { clsx } from "clsx";
 import React from "react";
 
-import { clampCategory } from "../../config";
-import { resolveStartLocation } from "../../models/simulation";
-import { NamedRegion, namedRegions, Season, seasonLabels, StartLocation } from "../../types";
-import { IPressureSystemState } from "../../types/interactive-state";
-import { formatLatLng } from "../../utils/lat-long";
-import { pressureReport } from "../../utils/pressure";
-import { temperatureAnomalyRegions } from "../../utils/regions";
+import { clampCategory } from "../../../config";
+import { resolveStartLocation } from "../../../models/simulation";
+import { NamedRegion, namedRegions, Season, seasonLabels, StartLocation } from "../../../types";
+import { IPressureSystemState } from "../../../types/interactive-state";
+import { formatLatLng } from "../../../utils/lat-long";
+import { pressureReport } from "../../../utils/pressure";
+import { temperatureAnomalyRegions } from "../../../utils/regions";
 
-import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
-import PressureSystemIcon from "../../assets/left-panel/pressure-system.svg";
-import SeasonIcon from "../../assets/left-panel/season.svg";
-import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
-import ThermometerIcon from "../../assets/left-panel/thermometer.svg";
+import HurricaneIcon from "../../../assets/left-panel/hurricane.svg";
+import PressureSystemIcon from "../../../assets/left-panel/pressure-system.svg";
+import SeasonIcon from "../../../assets/left-panel/season.svg";
+import StormLocationIcon from "../../../assets/left-panel/storm-location.svg";
+import ThermometerIcon from "../../../assets/left-panel/thermometer.svg";
 
-import categoryCss from "../hurricane-category.scss";
+import categoryCss from "../../hurricane-category.scss";
 import css from "./run-setup-summary.scss";
 
 // The subset of a run's setup that a card summarizes.
@@ -540,10 +540,10 @@ export function RunSetupSummary({ setup }: IProps) {
 }
 ```
 
-Create `src/components/left-panel/run-setup-summary.scss`:
+Create `src/components/left-panel/run-card/run-setup-summary.scss`:
 
 ```scss
-@use "../common.scss" as *;
+@use "../../common.scss" as *;
 
 .runSetupSummary {
   display: flex;
@@ -599,7 +599,7 @@ Create `src/components/left-panel/run-setup-summary.scss`:
 
 **Step 4: Run test to verify it passes**
 
-Run: `npx jest src/components/left-panel/run-setup-summary.test.tsx`
+Run: `npx jest src/components/left-panel/run-card/run-setup-summary.test.tsx`
 Expected: PASS (8 tests). If an SVG import renders oddly under Jest, the existing `__mocks__` asset mocks already cover `.svg` — no new mock needed.
 
 **Step 5: Check the category icon classes**
@@ -609,7 +609,7 @@ Expected: PASS (8 tests). If an SVG import renders oddly under Jest, the existin
 **Step 6: Commit**
 
 ```bash
-git add src/components/left-panel/run-setup-summary.tsx src/components/left-panel/run-setup-summary.scss src/components/left-panel/run-setup-summary.test.tsx
+git add src/components/left-panel/run-card/run-setup-summary.tsx src/components/left-panel/run-card/run-setup-summary.scss src/components/left-panel/run-card/run-setup-summary.test.tsx
 git commit -m "Add RunSetupSummary readout component."
 ```
 
@@ -618,13 +618,13 @@ git commit -m "Add RunSetupSummary readout component."
 ### Task 6: Wire SETUP/RESULT columns into `RunCard`
 
 **Files:**
-- Modify: `src/components/left-panel/run-card.tsx`
-- Modify: `src/components/left-panel/run-card.scss`
-- Modify: `src/components/left-panel/run-card.test.tsx`
+- Modify: `src/components/left-panel/run-card/run-card.tsx`
+- Modify: `src/components/left-panel/run-card/run-card.scss`
+- Modify: `src/components/left-panel/run-card/run-card.test.tsx`
 
 **Step 1: Write the failing tests**
 
-Append to the top-level `describe("RunCard", ...)` in `src/components/left-panel/run-card.test.tsx`:
+Append to the top-level `describe("RunCard", ...)` in `src/components/left-panel/run-card/run-card.test.tsx`:
 
 ```tsx
   describe("setup and result columns", () => {
@@ -674,17 +674,17 @@ Check the default season first: `defaultSimulationState()` derives from config �
 
 **Step 2: Run test to verify it fails**
 
-Run: `npx jest src/components/left-panel/run-card.test.tsx`
+Run: `npx jest src/components/left-panel/run-card/run-card.test.tsx`
 Expected: FAIL — no "Setup"/"Result" text, no `setup-season` test ids.
 
 **Step 3: Implement**
 
-In `src/components/left-panel/run-card.tsx`:
+In `src/components/left-panel/run-card/run-card.tsx`:
 
 Add imports:
 
 ```tsx
-import { namedRegions } from "../../types";
+import { namedRegions } from "../../../types";
 import { IRunSetup, RunSetupSummary } from "./run-setup-summary";
 ```
 
@@ -722,7 +722,7 @@ After the `runCardHeader` div (inside `runCard`), add the columns:
 </div>
 ```
 
-In `src/components/left-panel/run-card.scss`, inside `.runCard` (after `.runCardHeader`):
+In `src/components/left-panel/run-card/run-card.scss`, inside `.runCard` (after `.runCardHeader`):
 
 ```scss
     .runCardBody {
@@ -747,7 +747,7 @@ In `src/components/left-panel/run-card.scss`, inside `.runCard` (after `.runCard
 
 **Step 4: Run tests to verify they pass**
 
-Run: `npx jest src/components/left-panel/run-card.test.tsx`
+Run: `npx jest src/components/left-panel/run-card/run-card.test.tsx`
 Expected: PASS — the 5 new tests plus all existing ones (the existing aria-label/status tests must not break; the columns are additive).
 
 **Step 5: Visual check**
@@ -757,7 +757,7 @@ Run: `npm start` and open the app; confirm cards show SETUP rows matching the mo
 **Step 6: Commit**
 
 ```bash
-git add src/components/left-panel/run-card.tsx src/components/left-panel/run-card.scss src/components/left-panel/run-card.test.tsx
+git add src/components/left-panel/run-card/run-card.tsx src/components/left-panel/run-card/run-card.scss src/components/left-panel/run-card/run-card.test.tsx
 git commit -m "Add SETUP and RESULT columns to run cards."
 ```
 

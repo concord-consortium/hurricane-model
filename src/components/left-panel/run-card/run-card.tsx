@@ -2,15 +2,15 @@ import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React from "react";
 
-import { log } from "../../log";
-import { IRunState } from "../../types/interactive-state";
-import { useStores } from "../../stores-context";
+import { log } from "../../../log";
+import { IRunState } from "../../../types/interactive-state";
+import { useStores } from "../../../stores-context";
 
-import DeleteIcon from "../../assets/left-panel/delete.svg";
-import RestartIcon from "../../assets/left-panel/restart.svg";
+import DeleteIcon from "../../../assets/left-panel/delete.svg";
+import RestartIcon from "../../../assets/left-panel/restart.svg";
 
 import css from "./run-card.scss";
-import runsCss from "./runs-section.scss";
+import runsCss from "../runs-section.scss";
 
 interface IRunCardProps {
   run: IRunState;

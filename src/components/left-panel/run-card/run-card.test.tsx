@@ -3,9 +3,9 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { runInAction } from "mobx";
 
-import { defaultSimulationState } from "../../models/simulation-serialization";
-import { createStores, IStores } from "../../models/stores";
-import { StoresContext } from "../../stores-context";
+import { defaultSimulationState } from "../../../models/simulation-serialization";
+import { createStores, IStores } from "../../../models/stores";
+import { StoresContext } from "../../../stores-context";
 import { RunCard } from "./run-card";
 
 const renderPanels = (stores: IStores) =>

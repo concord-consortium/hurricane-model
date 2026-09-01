@@ -3,7 +3,7 @@ import React from "react";
 
 import { log } from "../../log";
 import { useStores } from "../../stores-context";
-import { RunCard } from "./run-card";
+import { RunCard } from "./run-card/run-card";
 
 import css from "./runs-section.scss";
 
