@@ -10,11 +10,8 @@ import Low from "../assets/low.svg";
 import config from "../config";
 import { log } from "../log";
 import { DraggableMapIcon } from "./draggable-map-icon";
+import { maxStrength, minStrength, strengthToMb } from "../utils/pressure";
 import css from "./pressure-system-icon.scss";
-
-export const minStrength = 3;
-export const maxStrength = 20;
-export const mbLabelRange = 13;
 
 const VerticalThumb = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
   (props, ref) => {
@@ -37,14 +34,7 @@ interface IProps extends IBaseProps {
 }
 interface IState {}
 
-const getPressureLabel = (model: PressureSystem) => {
-  const normalizedStrength = (model.strength - minStrength) / (maxStrength - minStrength);
-  if (model.type === "high") {
-    return Math.round(1015 + normalizedStrength * mbLabelRange) + "mb";
-  } else {
-    return Math.round(1010 - normalizedStrength * mbLabelRange) + "mb";
-  }
-};
+const getPressureLabel = (ps: PressureSystem) => strengthToMb(ps.type, ps.strength) + "mb";
 
 @inject("stores")
 @observer
