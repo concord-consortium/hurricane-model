@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import config from "../config";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
-import { maxStrength, mbLabelRange, minStrength } from "../utils/pressure";
+import { maxStrength, mbLabelRange, minStrength } from "../utils/pressure-systems";
 import { PressureSystemIcon } from "./pressure-system-icon";
 
 describe("PressureSystemIcon component", () => {

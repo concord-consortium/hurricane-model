@@ -30,22 +30,22 @@ function toCompass(deg: number): Compass {
   return COMPASS[i];
 }
 
-// Report even the tiniest drag: an untouched system sits exactly at its default (distance 0), so
-// this epsilon only absorbs floating-point noise.
 const MOVED_THRESHOLD_M = 1;
 
-export interface IPressureReport {
+export interface IPressureSystemReport {
   type: PressureSystemType;
-  label: string;    // e.g. "H1" (colored per type on the card)
-  position: string; // "Default" (unmoved) or "Moved <dir>"
-  mb: string;       // e.g. "1028 mb"
+  label: string;
+  position: string;
+  mb: string;
 }
 
 // Run-card readout for a run's setup pressure systems: one entry per system, compared to its
 // per-start-location default (matched by slot order). The mb value is always shown, so an
 // unchanged system reads "H1: Default, 1028 mb". Defaults exist only for named start locations;
 // a custom-coordinate start is baselined against the Atlantic defaults — a known approximation.
-export function pressureReport(startLocation: StartLocation, systems: IPressureSystemState[]): IPressureReport[] {
+export function pressureSystemReport(
+  startLocation: StartLocation, systems: IPressureSystemState[]
+): IPressureSystemReport[] {
   const defaults = selectPressureSystems(isStartLocationName(startLocation) ? startLocation : "atlantic");
   return systems.map((ps, i) => {
     const def = defaults[i];

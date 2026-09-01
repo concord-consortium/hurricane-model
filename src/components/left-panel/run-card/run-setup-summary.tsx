@@ -6,7 +6,7 @@ import { resolveStartLocation } from "../../../models/simulation";
 import { NamedRegion, namedRegions, Season, seasonLabels, StartLocation } from "../../../types";
 import { IPressureSystemState } from "../../../types/interactive-state";
 import { formatLatLng } from "../../../utils/lat-long";
-import { pressureReport } from "../../../utils/pressure";
+import { pressureSystemReport } from "../../../utils/pressure-systems";
 import { temperatureAnomalyRegions } from "../../../utils/regions";
 
 import HurricaneIcon from "../../../assets/left-panel/hurricane.svg";
@@ -44,7 +44,7 @@ export function RunSetupSummary({ setup }: IProps) {
       value: setup.temperatureAnomalies?.[region] ?? 0
     }))
     .filter(a => a.value !== 0);
-  const report = pressureReport(setup.startLocation, setup.pressureSystems);
+  const report = pressureSystemReport(setup.startLocation, setup.pressureSystems);
 
   return (
     <div className={css.runSetupSummary} data-test="run-setup-summary">

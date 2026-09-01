@@ -10,7 +10,7 @@ import Low from "../assets/low.svg";
 import config from "../config";
 import { log } from "../log";
 import { DraggableMapIcon } from "./draggable-map-icon";
-import { maxStrength, minStrength, strengthToMb } from "../utils/pressure";
+import { maxStrength, minStrength, strengthToMb } from "../utils/pressure-systems";
 import css from "./pressure-system-icon.scss";
 
 const VerticalThumb = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
