@@ -26,13 +26,13 @@ const pressureSystems = {
       type: "high",
       center: {lat: 28, lng: -30},
       strength: 19.5,
-      label: "1"
+      label: "2"
     },
     {
       type: "high",
       center: {lat: 28.8, lng: -62.4},
       strength: 13.6,
-      label: "2"
+      label: "1"
     },
     {
       type: "low",
@@ -46,13 +46,13 @@ const pressureSystems = {
       type: "high",
       center: {lat: 37, lng: -107.1},
       strength: 15.5,
-      label: "2"
+      label: "1"
     },
     {
       type: "high",
       center: {lat: 33, lng: -67.5},
       strength: 9.54,
-      label: "1"
+      label: "2"
     },
     {
       type: "low",
