@@ -46,7 +46,7 @@ export function RunSetupSummary({ setup }: IProps) {
       value: setup.temperatureAnomalies?.[region] ?? 0
     }))
     .filter(a => a.value !== 0);
-  const report = pressureSystemReport(setup.startLocation, setup.pressureSystems);
+  const report = pressureSystemReport(setup.pressureSystems);
 
   const rowClasses = clsx(cardCss.categoryRow, css.categoryRow);
 

@@ -6,6 +6,11 @@ import config from "../config";
 
 export type PressureSystemType = "high" | "low";
 
+export interface IPressureSystemInitialState {
+  center: ICoordinates;
+  strength: number;
+}
+
 export interface IPressureSystemOptions {
   type?: PressureSystemType;
   center: ICoordinates;
@@ -14,6 +19,9 @@ export interface IPressureSystemOptions {
   strength?: number;
   // Short label shown on the icon so systems of the same type can be told apart, e.g. "1" or "2".
   label?: string;
+  // The system's pre-edit defaults. Passed when restoring a saved system so its true baseline
+  // survives; when omitted (a freshly placed default) the constructor snapshots the system itself.
+  initialState?: IPressureSystemInitialState;
 }
 
 const minDistToOtherSystems = (center: ICoordinates, otherSystems: PressureSystem[]) => {
@@ -40,7 +48,7 @@ export class PressureSystem {
   @observable public center: ICoordinates;
   @observable public strength = config.pressureSystemStrength;
   @observable public label: string;
-  protected initialState: PressureSystem;
+  protected initialState: Required<Pick<IPressureSystemOptions, "type" | "center" | "strength" | "label">>;
   protected minLat = 15; // Limit pressure systems only to the northern hemisphere.
   protected keepDistanceFromOtherSystems = true;
 
@@ -57,7 +65,12 @@ export class PressureSystem {
       this.strength = props.strength;
     }
     makeObservable(this);
-    this.initialState = JSON.parse(JSON.stringify(this));
+    this.initialState = {
+      type: this.type,
+      center: { ...(props.initialState?.center ?? this.center) },
+      strength: props.initialState?.strength ?? this.strength,
+      label: this.label
+    };
   }
 
   public applyToWindPoint = (wind: IWindPoint) => {
@@ -91,7 +104,11 @@ export class PressureSystem {
         lng: this.center.lng
       },
       strength: this.strength,
-      label: this.label
+      label: this.label,
+      initialState: {
+        center: { ...this.initialState.center },
+        strength: this.initialState.strength
+      }
     };
   }
 

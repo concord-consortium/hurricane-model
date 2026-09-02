@@ -18,12 +18,29 @@ describe("strengthToMb", () => {
   });
 });
 
-const defaultSetup = (): IPressureSystemState[] =>
-  selectPressureSystems("atlantic").map(ps => ({ ...ps, center: { ...ps.center } }));
+const defaultSetup = (): IPressureSystemState[] => {
+  return selectPressureSystems("atlantic").map(ps => {
+    const center = { ...ps.center };
+    return { ...ps, center, initialState: { center, strength: ps.strength } }
+  });
+}
 
 describe("pressureReport", () => {
+  it("baselines a system against its own initial state when present", () => {
+    const systems = defaultSetup();
+    // Current position matches the Atlantic slot default, but the system started somewhere else.
+    systems[0].initialState = { center: { lat: systems[0].center.lat - 5, lng: systems[0].center.lng }, strength: 10 };
+    // Moved relative to the Atlantic default, but that IS this system's initial position.
+    systems[1].center = { lat: systems[1].center.lat + 5, lng: systems[1].center.lng };
+    systems[1].initialState = { center: { ...systems[1].center }, strength: systems[1].strength };
+
+    const report = pressureSystemReport(systems);
+    expect(report[0].position).toBe("Moved N");
+    expect(report[1].position).toBe("Default");
+  });
+
   it("reports every default Atlantic system as Default with its mb value", () => {
-    const report = pressureSystemReport("atlantic", defaultSetup());
+    const report = pressureSystemReport(defaultSetup());
     expect(report.map(r => `${r.label}: ${r.position}, ${r.mb}`)).toEqual([
       "H1: Default, 1028 mb",
       "H2: Default, 1023 mb",
@@ -36,22 +53,17 @@ describe("pressureReport", () => {
   it("reports a moved system with its compass direction", () => {
     const systems = defaultSetup();
     systems[1].center = { lat: systems[1].center.lat - 2, lng: systems[1].center.lng - 2 };
-    expect(pressureSystemReport("atlantic", systems)[1].position).toBe("Moved SW");
+    expect(pressureSystemReport(systems)[1].position).toBe("Moved SW");
   });
 
   it("reports a strength change through the mb value", () => {
     const systems = defaultSetup();
     systems[0].strength = minStrength;
-    expect(pressureSystemReport("atlantic", systems)[0].mb).toBe("1015 mb");
+    expect(pressureSystemReport(systems)[0].mb).toBe("1015 mb");
   });
 
   it("renders a bare H or L for unlabeled systems", () => {
     const systems = defaultSetup().map(ps => ({ ...ps, label: undefined }));
-    expect(pressureSystemReport("atlantic", systems).map(r => r.label)).toEqual(["H", "H", "L", "L"]);
-  });
-
-  it("baselines a custom-coordinate start against the Atlantic defaults", () => {
-    const report = pressureSystemReport({ lat: 10, lng: -20 }, defaultSetup());
-    expect(report.every(r => r.position === "Default")).toBe(true);
+    expect(pressureSystemReport(systems).map(r => r.label)).toEqual(["H", "H", "L", "L"]);
   });
 });

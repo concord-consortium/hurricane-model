@@ -153,7 +153,11 @@ export function defaultSimulationState(): INormalizedSimulationState {
       type: ps.type || "low",
       center: { ...ps.center },
       strength: ps.strength ?? config.pressureSystemStrength,
-      label: ps.label ?? ""
+      label: ps.label ?? "",
+      initialState: {
+        center: { ...ps.center },
+        strength: ps.strength ?? config.pressureSystemStrength
+      }
     })),
     pressureSystems: [],
     simulationStarted: false,

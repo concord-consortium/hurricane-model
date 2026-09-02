@@ -1,8 +1,6 @@
 import { distanceTo, headingTo } from "geolocation-utils";
 
-import { selectPressureSystems } from "../config";
 import { PressureSystemType } from "../models/pressure-system";
-import { isStartLocationName, StartLocation } from "../types";
 import { IPressureSystemState } from "../types/interactive-state";
 
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
@@ -39,19 +37,12 @@ export interface IPressureSystemReport {
   mb: string;
 }
 
-// Run-card readout for a run's setup pressure systems: one entry per system, compared to its
-// per-start-location default (matched by slot order). The mb value is always shown, so an
-// unchanged system reads "H1: Default, 1028 mb". Defaults exist only for named start locations;
-// a custom-coordinate start is baselined against the Atlantic defaults — a known approximation.
-export function pressureSystemReport(
-  startLocation: StartLocation, systems: IPressureSystemState[]
-): IPressureSystemReport[] {
-  const defaults = selectPressureSystems(isStartLocationName(startLocation) ? startLocation : "atlantic");
+export function pressureSystemReport(systems: IPressureSystemState[]): IPressureSystemReport[] {
   return systems.map((ps, i) => {
-    const def = defaults[i];
+    const baselineCenter = ps.initialState?.center;
     let position = "Default";
-    if (def) {
-      const from = { lat: def.center.lat, lon: def.center.lng };
+    if (baselineCenter) {
+      const from = { lat: baselineCenter.lat, lon: baselineCenter.lng };
       const to = { lat: ps.center.lat, lon: ps.center.lng };
       if (distanceTo(from, to) > MOVED_THRESHOLD_M) {
         position = `Moved ${toCompass(headingTo(from, to))}`;
