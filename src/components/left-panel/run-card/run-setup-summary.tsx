@@ -2,6 +2,7 @@ import { clsx } from "clsx";
 import React from "react";
 
 import { clampCategory } from "../../../config";
+import { categoryLabel } from "../../../utils/hurricane-categories";
 import { resolveStartLocation } from "../../../models/simulation";
 import { NamedRegion, namedRegions, Season, seasonLabels, StartLocation } from "../../../types";
 import { IPressureSystemState } from "../../../types/interactive-state";
@@ -54,7 +55,7 @@ export function RunSetupSummary({ setup }: IProps) {
       </div>
       <div className={css.categoryRow} data-test="setup-category">
         <HurricaneIcon aria-hidden={true} className={clsx(css.icon, categoryCss["category" + category])} />
-        <span>{category === 0 ? "TS" : `Cat ${category}`}</span>
+        <span>{categoryLabel(category)}</span>
       </div>
       <div className={css.categoryRow} data-test="setup-season">
         <SeasonIcon aria-hidden={true} className={css.icon} />
