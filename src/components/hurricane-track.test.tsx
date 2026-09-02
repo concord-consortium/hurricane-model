@@ -36,8 +36,8 @@ describe("HurricaneTrack component", () => {
     stores = createStores();
   });
 
-  // One polyline per track point makes every animation frame O(track length), which is what
-  // slows the model down as a storm runs.
+  // One polyline per track point would make every animation frame O(track length), which would
+  // slow the model down as a storm runs.
   it("draws one polyline per category run plus the live tail, not one per track point", () => {
     const { container } = renderTrack(stores);
 
