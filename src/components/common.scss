@@ -77,6 +77,12 @@ $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.
 // Renaming a key or removing the :export block silently yields `undefined` in JS.
 :export {
   fontColor: $charcoal;
+  cat0Color: $cat0Color;
+  cat1Color: $cat1Color;
+  cat2Color: $cat2Color;
+  cat3Color: $cat3Color;
+  cat4Color: $cat4Color;
+  cat5Color: $cat5Color;
   coldColor: $coldColor;
   warmColor: $warmColor;
   leftPanelWidth: $leftPanelWidth;
