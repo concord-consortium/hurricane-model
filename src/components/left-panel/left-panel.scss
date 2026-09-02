@@ -50,13 +50,14 @@ $leftPanelContainerWidth: $leftPanelOuterWidth + 1px;
       height: 100%;
       left: 0;
       overflow-x: hidden;
-      overflow-y: auto;
+      overflow-y: hidden;
       position: absolute;
       top: 0;
       width: $leftPanelContentWidth;
 
       .setupSectionList {
         border-bottom: $leftPanelBorder;
+        flex-shrink: 0;
         padding-bottom: 0;
       }
     }
