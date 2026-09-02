@@ -62,7 +62,7 @@ export function pressureSystemReport(
       label: `${ps.type === "high" ? "H" : "L"}${ps.label ?? ""}`,
       position,
       // Non-breaking space so the value and its "mb" unit never split across a wrap.
-      mb: `${strengthToMb(ps.type, ps.strength)} mb`
+      mb: `${strengthToMb(ps.type, ps.strength)}\u00A0mb`
     };
   });
 }

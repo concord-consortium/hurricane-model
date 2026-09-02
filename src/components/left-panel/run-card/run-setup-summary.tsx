@@ -30,7 +30,7 @@ export interface IRunSetup {
 }
 
 function anomalyText(value: number): string {
-  return `${value > 0 ? "+" : "−"}${Math.abs(value)} °C`;
+  return `${value > 0 ? "+" : "−"}${Math.abs(value)}\u00A0°C`;
 }
 
 interface IProps {
