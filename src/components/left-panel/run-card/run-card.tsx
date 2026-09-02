@@ -114,10 +114,11 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
           </div>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Result</div>
-            {resultSim &&
-              <div className={css.thumbnailCrop}>
-                <RunThumbnail sim={resultSim} />
-              </div>
+            {resultSim
+              ? <div className={css.thumbnailCrop}>
+                  <RunThumbnail sim={resultSim} />
+                </div>
+              : <div className={css.resultPlaceholder}>Run to see result</div>
             }
             <RunResult sim={resultSim} runId={run.id} maxDuration={maxDuration} />
           </div>
