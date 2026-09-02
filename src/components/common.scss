@@ -58,6 +58,7 @@ $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.
 $thumbnailWidth: 100;
 // Thumbnail height is computed using a formula saved in run-thumbnail.tsx
 $thumbnailHeight: 78;
+$thumbnailAspectRatio: #{$thumbnailWidth} / #{$thumbnailHeight};
 
 $sparklineHeight: 22;
 

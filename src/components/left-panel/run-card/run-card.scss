@@ -74,6 +74,18 @@
         letter-spacing: 0.04em;
         margin-bottom: 5px;
       }
+
+      // Frame for the result mini-map. The thumbnail SVG inside overhangs it slightly (see
+      // run-thumbnail.scss) so the map edges are cropped by this rounded box instead of squished.
+      .thumbnailCrop {
+        width: 100%;
+        aspect-ratio: $thumbnailAspectRatio;
+        box-sizing: border-box;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        border-radius: 4px;
+        background: #14304a;
+      }
     }
   }
 

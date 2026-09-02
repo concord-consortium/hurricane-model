@@ -15,11 +15,11 @@ const SPARK_STROKE = ["#9a9a9a", "#c9a400", "#e0a020", "#d97a1e", "#c85a10", "#e
 
 interface ICategorySparklineProps {
   series: number[];
-  uid: string;
+  runId: string;
   widthPx: number;
 }
 
-export function CategorySparkline({ series, uid, widthPx }: ICategorySparklineProps) {
+export function CategorySparkline({ series, runId, widthPx }: ICategorySparklineProps) {
   const seqRef = useRef<number>(0); // 0 = unassigned; the counter starts at 1
 
   const { length } = series;
@@ -32,8 +32,8 @@ export function CategorySparkline({ series, uid, widthPx }: ICategorySparklinePr
   const y = (category: number) => height - pad - (category / 5) * (height - 2 * pad);
   const points = series.map((category, i) => `${x(i).toFixed(1)},${y(category).toFixed(1)}`).join(" ");
   const area = `${pad},${height - pad} ${points} ${(width - pad)},${height - pad}`;
-  const strokeId = `spk-s-${uid}-${seqRef.current}`;
-  const fillId = `spk-f-${uid}-${seqRef.current}`;
+  const strokeId = `spk-s-${runId}-${seqRef.current}`;
+  const fillId = `spk-f-${runId}-${seqRef.current}`;
 
   const stopColor = (palette: string[], category: number) =>
     palette[Math.max(0, Math.min(palette.length - 1, Math.round(category)))];

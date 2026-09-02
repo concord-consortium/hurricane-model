@@ -20,13 +20,13 @@ const fallbackSparklineWidth = 83;
 interface IRunResultProps {
   // A completed run's captured state; null before the run completes (every value reads "—").
   sim: ISimulationState | null;
-  uid: string;
+  runId: string;
   // The longest run's duration across all runs, used to scale this sparkline's width so the cards
   // read relative to one another. When omitted the sparkline uses the full slot width.
   maxDuration?: number;
 }
 
-export function RunResult({ sim, uid, maxDuration }: IRunResultProps) {
+export function RunResult({ sim, runId, maxDuration }: IRunResultProps) {
   const peak = sim ? peakCategory(sim) : null;
   const landfalls = sim ? landfallSummary(sim) : null;
   const series = sim ? intensitySeries(sim) : [];
@@ -68,7 +68,7 @@ export function RunResult({ sim, uid, maxDuration }: IRunResultProps) {
       <div className={clsx(rowClasses, css.sparklineRow)} data-test="result-category-over-time">
         <CategoryOverTimeIcon aria-hidden={true} className={clsx(cardCss.icon, css.fillWhite)} />
         <span ref={slotRef} className={css.sparklineSlot}>
-          {series.length > 0 ? <CategorySparkline series={series} uid={uid} widthPx={sparklineWidth} /> : dash}
+          {series.length > 0 ? <CategorySparkline series={series} runId={runId} widthPx={sparklineWidth} /> : dash}
         </span>
       </div>
     </div>

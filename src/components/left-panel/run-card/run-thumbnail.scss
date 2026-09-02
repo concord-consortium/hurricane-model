@@ -16,7 +16,7 @@
   // 5px wider than the .thumbCrop frame and pulled back so ~2.5px is clipped off each side, keeping
   // the map's proportions un-squished in the narrower frame. Border/radius live on .thumbCrop.
   width: calc(100% + 5px);
-  aspect-ratio: #{$thumbnailWidth} / #{$thumbnailHeight};
+  aspect-ratio: $thumbnailAspectRatio;
   margin: -2px -2.5px;
 }
 

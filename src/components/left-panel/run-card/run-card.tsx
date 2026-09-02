@@ -3,10 +3,13 @@ import { observer } from "mobx-react";
 import React from "react";
 
 import { log } from "../../../log";
+import { serializeSimulation } from "../../../models/simulation-serialization";
 import { namedRegions } from "../../../types";
 import { IRunState } from "../../../types/interactive-state";
 import { useStores } from "../../../stores-context";
+import { RunResult } from "./run-result";
 import { IRunSetup, RunSetupSummary } from "./run-setup-summary";
+import { RunThumbnail } from "./run-thumbnail";
 
 import DeleteIcon from "../../../assets/left-panel/delete.svg";
 import RestartIcon from "../../../assets/left-panel/restart.svg";
@@ -35,6 +38,15 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   const setup: IRunSetup = {
     season, startLocation, startingCategory: hurricane.startingCategory, pressureSystems, temperatureAnomalies
   };
+
+  // A completed run's outcome for the result column; null until the run completes.
+  const resultSim = !complete ? null
+    : selected ? serializeSimulation(simulation)
+    : run.simulation;
+  // The longest run's duration, so every card's sparkline width is comparable.
+  const maxDuration = Math.max(...runs.runs.map(r =>
+    (r.id === runs.selectedRunId ? simulation.hurricaneTrack : r.simulation.hurricaneTrack).length
+  ));
 
   const handleSelect = () => {
     if (selected) return;
@@ -102,6 +114,12 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
           </div>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Result</div>
+            {resultSim &&
+              <div className={css.thumbnailCrop}>
+                <RunThumbnail sim={resultSim} />
+              </div>
+            }
+            <RunResult sim={resultSim} runId={run.id} maxDuration={maxDuration} />
           </div>
         </div>
       </div>

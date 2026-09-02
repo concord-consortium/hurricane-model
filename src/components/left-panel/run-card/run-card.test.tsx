@@ -190,6 +190,29 @@ describe("RunCard", () => {
       renderPanels(stores);
       expect(screen.getAllByTestId("setup-pressure-systems")[0]).toHaveTextContent("H1: Default, 1028 mb");
     });
+
+    it("shows dashes in the result column before the run completes", () => {
+      renderPanels(stores);
+      expect(screen.getAllByText("—").length).toBe(3);
+      expect(screen.queryByRole("img", { name: "Run result map" })).not.toBeInTheDocument();
+    });
+
+    it("shows the thumbnail and results once the run is complete", () => {
+      completeCurrentRun(stores);
+      renderPanels(stores);
+      expect(screen.getByRole("img", { name: "Run result map" })).toBeInTheDocument();
+      expect(screen.getByTestId("result-peak-category")).toHaveTextContent("Cat 2");
+      expect(screen.getByTestId("result-landfalls")).toHaveTextContent("None");
+    });
+
+    it("summarizes an unselected run's result from its stored record", () => {
+      completeCurrentRun(stores);
+      stores.runs.addRun();
+      renderPanels(stores);
+      const peaks = screen.getAllByTestId("result-peak-category");
+      expect(peaks[0]).toHaveTextContent("Cat 2");
+      expect(peaks[1]).toHaveTextContent("—");
+    });
   });
 
   describe("status message", () => {
