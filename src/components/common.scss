@@ -39,6 +39,10 @@ $warmColor: #c62828;
 $highPressureColor: #2a69d6;
 $lowPressureColor: #c93f22;
 
+// The map markers' raw H/L colors (the *PressureColor vars above are these, darkened for text).
+$highPressureMapColor: #327cfc;
+$lowPressureMapColor: #fc542d;
+
 $tabContents: rgba(255, 255, 255, 0.9);
 
 $leftPanelFill: #fffaf2;
@@ -50,6 +54,10 @@ $leftPanelBandWidth: 6px;
 $leftPanelWidth: $leftPanelContentWidth + $leftPanelBandWidth;
 $leftPanelTransitionSeconds: 0.35s;
 $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.7, 1.0);
+
+$thumbnailWidth: 100;
+// Thumbnail height is computed using a formula saved in run-thumbnail.tsx
+$thumbnailHeight: 78;
 
 .error {
   padding: 8px 12px;
@@ -83,8 +91,12 @@ $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.
   cat3Color: $cat3Color;
   cat4Color: $cat4Color;
   cat5Color: $cat5Color;
+  highPressureMapColor: $highPressureMapColor;
+  lowPressureMapColor: $lowPressureMapColor;
   coldColor: $coldColor;
   warmColor: $warmColor;
   leftPanelWidth: $leftPanelWidth;
   leftPanelTransitionSeconds: $leftPanelTransitionSeconds;
+  thumbnailWidth: $thumbnailWidth;
+  thumbnailHeight: $thumbnailHeight;
 }

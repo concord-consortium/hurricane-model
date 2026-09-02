@@ -30,11 +30,11 @@
   text-shadow: #000 0px 1px;
 
   &.low {
-    background-color: #fc542d;
+    background-color: $lowPressureMapColor;
   }
 
   &.high {
-    background-color: #327cfc;
+    background-color: $highPressureMapColor;
   }
 }
 
