@@ -25,15 +25,30 @@ export class RunsModel {
     this.selectedRunId = first.id;
   }
 
-  @computed public get selectedRun(): IRunState | undefined {
-    return this.runs.find(run => run.id === this.selectedRunId);
+  public isSelected(runId: string) {
+    return runId === this.selectedRunId;
   }
 
-  // The selected run's record can be stale — the live simulation is its source of truth.
+  @computed public get selectedRun(): IRunState | undefined {
+    return this.runs.find(run => this.isSelected(run.id));
+  }
+
+  // The selected run's simulation can be stale — the live simulation is its source of truth.
+  public getSimulation(run: IRunState): ISimulationState {
+    return this.isSelected(run.id) ? serializeSimulation(this.simulation) : run.simulation;
+  }
+
+  // Avoids a trip through serializeSimulation for clients that don't care if they're getting a model or state.
+  private getRawSimulation(run: IRunState): SimulationModel | ISimulationState {
+    return this.isSelected(run.id) ? this.simulation : run.simulation;
+  }
+
   public isRunComplete(run: IRunState): boolean {
-    return run.id === this.selectedRunId
-      ? this.simulation.simulationFinished
-      : !!run.simulation.simulationFinished;
+    return this.getRawSimulation(run).simulationFinished;
+  }
+
+  public trackLength(run: IRunState): number {
+    return this.getRawSimulation(run).hurricaneTrack.length;
   }
 
   @computed public get allComplete(): boolean {
@@ -46,6 +61,11 @@ export class RunsModel {
 
   @computed public get canAddRun(): boolean {
     return this.allComplete && !this.atMaxRuns;
+  }
+
+  // Returns the length of the longest track.
+  @computed public get maxDuration(): number {
+    return Math.max(...this.runs.map(run => this.trackLength(run)));
   }
 
   @action.bound public selectRun(id: string) {

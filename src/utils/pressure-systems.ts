@@ -5,7 +5,6 @@ import { IPressureSystemState } from "../types/interactive-state";
 
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
 // High pressure reads 1015..1028 mb (stronger = higher); low reads 1010..997 mb (stronger = lower).
-// Single source of truth for this mapping.
 export const minStrength = 3;
 export const maxStrength = 20;
 export const mbLabelRange = 13;
@@ -38,9 +37,9 @@ export interface IPressureSystemReport {
 }
 
 export function pressureSystemReport(systems: IPressureSystemState[]): IPressureSystemReport[] {
-  return systems.map((ps, i) => {
-    const baselineCenter = ps.initialState?.center;
+  return systems.map(ps => {
     let position = "Default";
+    const baselineCenter = ps.initialState?.center;
     if (baselineCenter) {
       const from = { lat: baselineCenter.lat, lon: baselineCenter.lng };
       const to = { lat: ps.center.lat, lon: ps.center.lng };

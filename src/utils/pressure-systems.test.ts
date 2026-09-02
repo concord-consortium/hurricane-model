@@ -39,7 +39,7 @@ describe("pressureReport", () => {
     expect(report[1].position).toBe("Default");
   });
 
-  it("reports every default Atlantic system as Default with its mb value", () => {
+  it("reports every unmoved system as Default with its mb value", () => {
     const report = pressureSystemReport(defaultSetup());
     expect(report.map(r => `${r.label}: ${r.position}, ${r.mb}`)).toEqual([
       "H1: Default, 1028 mb",

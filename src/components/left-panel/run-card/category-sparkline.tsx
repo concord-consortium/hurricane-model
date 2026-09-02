@@ -54,14 +54,7 @@ export function CategorySparkline({ series, runId, widthPx }: ICategorySparkline
         {grad(fillId, categoryColors)}
       </defs>
       <polygon points={area} fill={`url(#${fillId})`} opacity={0.75} />
-      <polyline
-        points={points}
-        fill="none"
-        stroke={`url(#${strokeId})`}
-        strokeWidth={1.75}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
+      <polyline className={css.sparklineBorder} points={points} stroke={`url(#${strokeId})`} />
     </svg>
   );
 }

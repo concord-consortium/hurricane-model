@@ -3,8 +3,6 @@ import { observer } from "mobx-react";
 import React from "react";
 
 import { log } from "../../../log";
-import { serializeSimulation } from "../../../models/simulation-serialization";
-import { namedRegions } from "../../../types";
 import { IRunState } from "../../../types/interactive-state";
 import { useStores } from "../../../stores-context";
 import { RunResult } from "./run-result";
@@ -23,30 +21,21 @@ interface IRunCardProps {
 
 export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   const { runs, simulation, ui } = useStores();
-  const selected = run.id === runs.selectedRunId;
+  const selected = runs.isSelected(run.id);
   const complete = runs.isRunComplete(run);
   const runNumber = runs.runs.indexOf(run) + 1;
 
   // The selected run's stored record can be stale — the live simulation is its source of truth.
-  const { season, startLocation, hurricane } = selected ? simulation : run.simulation;
-  const pressureSystems = selected
-    ? simulation.pressureSystemsSetup.map(ps => ps.serialize())
-    : run.simulation.pressureSystemsSetup ?? run.simulation.pressureSystems;
-  const temperatureAnomalies = selected
-    ? Object.fromEntries(namedRegions.map(r => [r, simulation.temperatureAnomalyAt(r)]))
-    : run.simulation.temperatureAnomalies;
+  const simulationState = runs.getSimulation(run);
+  const { season, startLocation, hurricane, temperatureAnomalies } = simulationState;
+  // A legacy run has no separate setup; its pressureSystems are the setup.
+  const pressureSystems = simulationState.pressureSystemsSetup ?? simulationState.pressureSystems;
   const setup: IRunSetup = {
     season, startLocation, startingCategory: hurricane.startingCategory, pressureSystems, temperatureAnomalies
   };
 
   // A completed run's outcome for the result column; null until the run completes.
-  const resultSim = !complete ? null
-    : selected ? serializeSimulation(simulation)
-    : run.simulation;
-  // The longest run's duration, so every card's sparkline width is comparable.
-  const maxDuration = Math.max(...runs.runs.map(r =>
-    (r.id === runs.selectedRunId ? simulation.hurricaneTrack : r.simulation.hurricaneTrack).length
-  ));
+  const resultSim = !complete ? null : simulationState;
 
   const handleSelect = () => {
     if (selected) return;
@@ -114,13 +103,8 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
           </div>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Result</div>
-            {resultSim
-              ? <div className={css.thumbnailCrop}>
-                  <RunThumbnail sim={resultSim} />
-                </div>
-              : <div className={css.resultPlaceholder}>Run to see result</div>
-            }
-            <RunResult sim={resultSim} runId={run.id} maxDuration={maxDuration} />
+            <RunThumbnail sim={resultSim} />
+            <RunResult sim={resultSim} runId={run.id} maxDuration={runs.maxDuration} />
           </div>
         </div>
       </div>

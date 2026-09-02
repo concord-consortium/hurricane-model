@@ -55,11 +55,14 @@ const BASE_IMAGES: Record<string, string> = {
 };
 
 interface IRunThumbnailProps {
-  sim: ISimulationState;
+  sim: ISimulationState | null;
 }
 
 export const RunThumbnail = observer(function RunThumbnail({ sim }: IRunThumbnailProps) {
   const { ui } = useStores();
+
+  if (!sim) return <div className={css.resultPlaceholder}>Run to see result</div>;
+
   const { hurricaneTrack, pressureSystems, season } = sim;
   const baseImage = BASE_IMAGES[ui.baseMap] || satelliteImg;
   const showSST = ui.overlay === "sst";
@@ -71,70 +74,72 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: IRunThumbnai
     hurricaneTrack.map(p => `${pixelX(p.position.lng).toFixed(1)},${pixelY(p.position.lat).toFixed(1)}`).join(" ");
 
   return (
-    <svg
-      className={css.thumb}
-      viewBox={`0 0 ${pixelWidth} ${pixelHeight}`}
-      preserveAspectRatio="none"
-      role="img"
-      aria-label="Run result map"
-    >
-      <image href={baseImage} x={0} y={0} width={pixelWidth} height={pixelHeight} preserveAspectRatio="none" />
+    <div className={css.thumbnailCrop}>
+      <svg
+        className={css.thumb}
+        viewBox={`0 0 ${pixelWidth} ${pixelHeight}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label="Run result map"
+      >
+        <image href={baseImage} x={0} y={0} width={pixelWidth} height={pixelHeight} preserveAspectRatio="none" />
 
-      {showSST && (
-        <>
-          <image
-            href={defaultSSTUrl}
-            x={imageX}
-            y={imageY}
-            width={imageWidth}
-            height={imageHeight}
-            preserveAspectRatio="none"
-            className={css.sstLayer}
-            style={{ opacity: accessibleSSTScale ? 0 : 0.72 }}
+        {showSST && (
+          <>
+            <image
+              href={defaultSSTUrl}
+              x={imageX}
+              y={imageY}
+              width={imageWidth}
+              height={imageHeight}
+              preserveAspectRatio="none"
+              className={css.sstLayer}
+              style={{ opacity: accessibleSSTScale ? 0 : 0.72 }}
+            />
+            <image
+              href={accessibleSSTUrl}
+              x={imageX}
+              y={imageY}
+              width={imageWidth}
+              height={imageHeight}
+              preserveAspectRatio="none"
+              className={css.sstLayer}
+              style={{ opacity: accessibleSSTScale ? 1 : 0 }}
+            />
+          </>
+        )}
+
+        {/* Track: dark casing under category-colored segments for contrast. */}
+        {hurricaneTrack.length > 1 && <polyline className={css.casing} points={casingPoints} />}
+        {hurricaneTrack.slice(1).map((p, i) => (
+          <line
+            className={css.hurricaneTrack}
+            key={`seg-${i}`}
+            x1={pixelX(hurricaneTrack[i].position.lng)}
+            y1={pixelY(hurricaneTrack[i].position.lat)}
+            x2={pixelX(p.position.lng)}
+            y2={pixelY(p.position.lat)}
+            stroke={categoryColors[p.category] || "#ffffff"}
           />
-          <image
-            href={accessibleSSTUrl}
-            x={imageX}
-            y={imageY}
-            width={imageWidth}
-            height={imageHeight}
-            preserveAspectRatio="none"
-            className={css.sstLayer}
-            style={{ opacity: accessibleSSTScale ? 1 : 0 }}
-          />
-        </>
-      )}
+        ))}
 
-      {/* Track: dark casing under category-colored segments for contrast. */}
-      {hurricaneTrack.length > 1 && <polyline className={css.casing} points={casingPoints} />}
-      {hurricaneTrack.slice(1).map((p, i) => (
-        <line
-          className={css.hurricaneTrack}
-          key={`seg-${i}`}
-          x1={pixelX(hurricaneTrack[i].position.lng)}
-          y1={pixelY(hurricaneTrack[i].position.lat)}
-          x2={pixelX(p.position.lng)}
-          y2={pixelY(p.position.lat)}
-          stroke={categoryColors[p.category] || "#ffffff"}
-        />
-      ))}
-
-      {pressureSystems.map((ps, i) => {
-        const x = pixelX(ps.center.lng);
-        const y = pixelY(ps.center.lat);
-        const high = ps.type === "high";
-        return (
-          <text
-            className={css.pressureSystem}
-            key={`ps-${i}`}
-            x={x}
-            y={y}
-            fill={high ? commonCss.highPressureMapColor : commonCss.lowPressureMapColor}
-          >
-            {high ? "H" : "L"}
-          </text>
-        );
-      })}
-    </svg>
+        {pressureSystems.map((ps, i) => {
+          const x = pixelX(ps.center.lng);
+          const y = pixelY(ps.center.lat);
+          const high = ps.type === "high";
+          return (
+            <text
+              className={css.pressureSystem}
+              key={`ps-${i}`}
+              x={x}
+              y={y}
+              fill={high ? commonCss.highPressureMapColor : commonCss.lowPressureMapColor}
+            >
+              {high ? "H" : "L"}
+            </text>
+          );
+        })}
+      </svg>
+    </div>
   );
 });

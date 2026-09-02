@@ -11,35 +11,60 @@
   }
 }
 
-.thumb {
-  display: block;
-  // 5px wider than the .thumbCrop frame and pulled back so ~2.5px is clipped off each side, keeping
-  // the map's proportions un-squished in the narrower frame. Border/radius live on .thumbCrop.
-  width: calc(100% + 5px);
+%thumbnail {
+  width: 100%;
   aspect-ratio: $thumbnailAspectRatio;
-  margin: -2px -2.5px;
+  box-sizing: border-box;
+  border-radius: 4px;
 }
 
-.casing {
-  fill: none;
-  stroke: #1a1a1a;
-  stroke-opacity: 0.55;
-  stroke-width: 2.6px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
+.resultPlaceholder {
+  @extend %thumbnail;
+  display: flex;
+  font-size: 14px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  text-align: center;
+  border: 1px dashed $charcoalMedium;
 }
 
-.hurricaneTrack {
-  stroke-width: 1.4px;
-  stroke-linecap: round;
-}
+.thumbnailCrop {
+  @extend %thumbnail;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: #14304a;
 
-.pressureSystem {
-  text-anchor: middle;
-  dominant-baseline: central;
-  font-size: 15px;
-  font-weight: 700;
-  stroke: #fff;
-  stroke-width: 1.2px;
-  paint-order: stroke;
+  .thumb {
+    display: block;
+    // 5px wider than the .thumbnailCrop frame and pulled back so ~2.5px is clipped off each side, keeping
+    // the map's proportions un-squished in the narrower frame. Border/radius live on .thumbnailCrop.
+    width: calc(100% + 5px);
+    aspect-ratio: $thumbnailAspectRatio;
+    margin: -2px -2.5px;
+  }
+
+  .casing {
+    fill: none;
+    stroke: #1a1a1a;
+    stroke-opacity: 0.55;
+    stroke-width: 2.6px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .hurricaneTrack {
+    stroke-width: 1.4px;
+    stroke-linecap: round;
+  }
+
+  .pressureSystem {
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-size: 15px;
+    font-weight: 700;
+    stroke: #fff;
+    stroke-width: 1.2px;
+    paint-order: stroke;
+  }
 }
