@@ -15,10 +15,6 @@ export function landfallSummary(sim: ISimulationState): ILandfallSummary {
   return { count: sim.landfalls.length, peakCategory: peak };
 }
 
-export function durationSteps(sim: ISimulationState): number {
-  return sim.hurricaneTrack.length;
-}
-
 export function intensitySeries(sim: ISimulationState, max = 40): number[] {
   const { hurricaneTrack } = sim;
 

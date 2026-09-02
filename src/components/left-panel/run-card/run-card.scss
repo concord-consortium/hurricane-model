@@ -112,3 +112,23 @@
     }
   }
 }
+
+.summaryColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 14px;
+  color: $charcoal;
+
+  .categoryRow {
+    align-items: center;
+    display: flex;
+    gap: 7px;
+  }
+
+  .icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}

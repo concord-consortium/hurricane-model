@@ -1,6 +1,6 @@
 import { defaultSimulationState } from "../models/simulation-serialization";
 import { ISimulationState } from "../types/interactive-state";
-import { durationSteps, intensitySeries, landfallSummary, peakCategory } from "./run-outcomes";
+import { intensitySeries, landfallSummary, peakCategory } from "./run-outcomes";
 
 const trackPoint = (category: number, lat = 20, lng = -40) => ({ position: { lat, lng }, category });
 
@@ -32,13 +32,6 @@ describe("landfallSummary", () => {
 
   it("reports no landfalls as count 0 and peak -1", () => {
     expect(landfallSummary(defaultSimulationState())).toEqual({ count: 0, peakCategory: -1 });
-  });
-});
-
-describe("durationSteps", () => {
-  it("is the number of track points", () => {
-    expect(durationSteps(simWithTrack([1, 1, 2]))).toBe(3);
-    expect(durationSteps(simWithTrack([]))).toBe(0);
   });
 });
 

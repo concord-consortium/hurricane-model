@@ -2,12 +2,13 @@ import React, { useRef } from "react";
 
 import { categoryColors } from "../../../utils/hurricane-categories";
 
+import commonCss from "../../common.scss";
 import css from "./category-sparkline.scss";
 
 let sparklineSeq = 0;
 
 const minWidth = 8;
-const height = 22;
+const height = parseFloat(commonCss.sparklineHeight);
 const pad = 2;
 
 const SPARK_STROKE = ["#9a9a9a", "#c9a400", "#e0a020", "#d97a1e", "#c85a10", "#e03b3b"];

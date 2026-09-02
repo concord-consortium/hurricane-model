@@ -59,6 +59,8 @@ $thumbnailWidth: 100;
 // Thumbnail height is computed using a formula saved in run-thumbnail.tsx
 $thumbnailHeight: 78;
 
+$sparklineHeight: 22;
+
 .error {
   padding: 8px 12px;
   background: #fff3cd;
@@ -99,4 +101,5 @@ $thumbnailHeight: 78;
   leftPanelTransitionSeconds: $leftPanelTransitionSeconds;
   thumbnailWidth: $thumbnailWidth;
   thumbnailHeight: $thumbnailHeight;
+  sparklineHeight: $sparklineHeight;
 }

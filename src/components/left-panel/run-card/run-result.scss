@@ -1,0 +1,24 @@
+@use "../../common" as *;
+
+.runResult {
+  margin-top: 6px;
+
+  .categoryRow {
+    min-height: 18px;
+  }
+
+  .sparklineRow {
+    min-height: #{$sparklineHeight}px;
+  }
+
+  .sparklineSlot {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .dash { color: $charcoal; }
+
+  .fillWhite { color: #fff; }
+}

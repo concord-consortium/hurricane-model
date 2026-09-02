@@ -17,6 +17,7 @@ import StormLocationIcon from "../../../assets/left-panel/storm-location.svg";
 import ThermometerIcon from "../../../assets/left-panel/thermometer.svg";
 
 import categoryCss from "../../hurricane-category.scss";
+import cardCss from "./run-card.scss";
 import css from "./run-setup-summary.scss";
 
 // The subset of a run's setup that a card summarizes.
@@ -47,22 +48,24 @@ export function RunSetupSummary({ setup }: IProps) {
     .filter(a => a.value !== 0);
   const report = pressureSystemReport(setup.startLocation, setup.pressureSystems);
 
+  const rowClasses = clsx(cardCss.categoryRow, css.categoryRow);
+
   return (
-    <div className={css.runSetupSummary} data-test="run-setup-summary">
-      <div className={css.categoryRow} data-test="setup-location">
-        <StormLocationIcon aria-hidden={true} className={css.icon} />
+    <div className={clsx(cardCss.summaryColumn, css.runSetupSummary)} data-test="run-setup-summary">
+      <div className={rowClasses} data-test="setup-location">
+        <StormLocationIcon aria-hidden={true} className={cardCss.icon} />
         <span>{formatLatLng(start.lat, start.lng)}</span>
       </div>
-      <div className={css.categoryRow} data-test="setup-category">
-        <HurricaneIcon aria-hidden={true} className={clsx(css.icon, categoryCss["category" + category])} />
+      <div className={rowClasses} data-test="setup-category">
+        <HurricaneIcon aria-hidden={true} className={clsx(cardCss.icon, categoryCss["category" + category])} />
         <span>{categoryLabel(category)}</span>
       </div>
-      <div className={css.categoryRow} data-test="setup-season">
-        <SeasonIcon aria-hidden={true} className={css.icon} />
+      <div className={rowClasses} data-test="setup-season">
+        <SeasonIcon aria-hidden={true} className={cardCss.icon} />
         <span>{seasonLabels[setup.season] ?? setup.season}</span>
       </div>
-      <div className={css.categoryRow} data-test="setup-anomalies">
-        <ThermometerIcon aria-hidden={true} className={css.icon} />
+      <div className={rowClasses} data-test="setup-anomalies">
+        <ThermometerIcon aria-hidden={true} className={cardCss.icon} />
         <span className={css.stackedLines}>
           {anomalies.length === 0 && <span>Baseline</span>}
           {anomalies.map(a => (
@@ -72,8 +75,8 @@ export function RunSetupSummary({ setup }: IProps) {
           ))}
         </span>
       </div>
-      <div className={css.categoryRow} data-test="setup-pressure-systems">
-        <PressureSystemIcon aria-hidden={true} className={css.icon} />
+      <div className={rowClasses} data-test="setup-pressure-systems">
+        <PressureSystemIcon aria-hidden={true} className={cardCss.icon} />
         <span className={css.stackedLines}>
           {report.map((r, i) => (
             <span key={i} className={css.pressureSystem}>

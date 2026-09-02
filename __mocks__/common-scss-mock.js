@@ -13,5 +13,6 @@ module.exports = {
   coldColor: "#2255cc",
   warmColor: "#c62828",
   thumbnailWidth: "100",
-  thumbnailHeight: "78"
+  thumbnailHeight: "78",
+  sparklineHeight: "22"
 };

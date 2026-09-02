@@ -1,48 +1,31 @@
 @use "../../common.scss" as *;
 
-.runSetupSummary {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 14px;
-  color: $charcoal;
-
-  .categoryRow {
-    align-items: center;
-    display: flex;
-    gap: 7px;
-    min-height: 16px;
-  }
-
-  .icon {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-  }
-
-  .stackedLines {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    white-space: nowrap;
-  }
-
-  .warm { color: $warmColor; }
-  .cool { color: $coldColor; }
-
-  .pressureSystem {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-  }
-
-  .pressureDetail {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .high { color: $highPressureColor; }
-  .low { color: $lowPressureColor; }
+.categoryRow {
+  min-height: 16px;
 }
+
+.stackedLines {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.warm { color: $warmColor; }
+.cool { color: $coldColor; }
+
+.pressureSystem {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.pressureDetail {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.high { color: $highPressureColor; }
+.low { color: $lowPressureColor; }
