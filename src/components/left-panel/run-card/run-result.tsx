@@ -30,7 +30,7 @@ export function RunResult({ sim, runId, maxDuration }: IRunResultProps) {
   const peak = sim ? peakCategory(sim) : null;
   const landfalls = sim ? landfallSummary(sim) : null;
   const series = sim ? intensitySeries(sim) : [];
-  const duration = sim?.hurricaneTrack.length ?? 0;
+  const duration = sim?.time ?? 0;
 
   // Measure the sparkline's slot (the flex space after the icon) so the longest-lived run's trace
   // fills it, with shorter runs scaled proportionally.

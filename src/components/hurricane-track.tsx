@@ -36,7 +36,7 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
   // Track points are only ever appended, so the finished segments don't change between renders.
   // Keeping their identity stable keeps Leaflet from redrawing the whole track every frame while the hurricane moves.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const segments = useMemo(() => buildSegments(hurricaneTrack), [trackLength]);
+  const segments = useMemo(() => buildSegments(hurricaneTrack), [hurricaneTrack, trackLength]);
 
   // Only the tail follows the live hurricane position.
   const lastPoint = trackLength > 0 ? hurricaneTrack[trackLength - 1] : null;

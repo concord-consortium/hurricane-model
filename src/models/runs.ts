@@ -33,22 +33,17 @@ export class RunsModel {
     return this.runs.find(run => this.isSelected(run.id));
   }
 
-  // The selected run's simulation can be stale — the live simulation is its source of truth.
-  public getSimulation(run: IRunState): ISimulationState {
-    return this.isSelected(run.id) ? serializeSimulation(this.simulation) : run.simulation;
+  @computed public get serializedSimulation(): ISimulationState {
+    return serializeSimulation(this.simulation);
   }
 
-  // Avoids a trip through serializeSimulation for clients that don't care if they're getting a model or state.
-  private getRawSimulation(run: IRunState): SimulationModel | ISimulationState {
-    return this.isSelected(run.id) ? this.simulation : run.simulation;
+  // The selected run's simulation can be stale — the live simulation is its source of truth.
+  public getSimulation(run: IRunState): ISimulationState {
+    return this.isSelected(run.id) ? this.serializedSimulation : run.simulation;
   }
 
   public isRunComplete(run: IRunState): boolean {
-    return this.getRawSimulation(run).simulationFinished;
-  }
-
-  public trackLength(run: IRunState): number {
-    return this.getRawSimulation(run).hurricaneTrack.length;
+    return this.getSimulation(run).simulationFinished;
   }
 
   @computed public get allComplete(): boolean {
@@ -65,7 +60,7 @@ export class RunsModel {
 
   // Returns the length of the longest track.
   @computed public get maxDuration(): number {
-    return Math.max(...this.runs.map(run => this.trackLength(run)));
+    return Math.max(...this.runs.map(run => this.getSimulation(run).time));
   }
 
   @action.bound public selectRun(id: string) {
@@ -98,7 +93,7 @@ export class RunsModel {
 
   // Discards every saved run and starts over from whatever state the simulation is in.
   @action.bound public reset() {
-    const first: IRunState = { id: this.makeRunId(), simulation: serializeSimulation(this.simulation) };
+    const first: IRunState = { id: this.makeRunId(), simulation: this.serializedSimulation };
     this.runs = [first];
     this.selectedRunId = first.id;
   }
@@ -150,7 +145,7 @@ export class RunsModel {
   @action private snapshotSelectedRun() {
     const run = this.selectedRun;
     if (!run) return;
-    const state = serializeSimulation(this.simulation);
+    const state = this.serializedSimulation;
     run.simulation = state.simulationStarted && !state.simulationFinished
       ? extractSetupState(state)
       : state;
