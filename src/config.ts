@@ -24,15 +24,15 @@ const pressureSystems = {
   atlantic: [
     {
       type: "high",
-      center: {lat: 28, lng: -30},
-      strength: 19.5,
-      label: "2"
-    },
-    {
-      type: "high",
       center: {lat: 28.8, lng: -62.4},
       strength: 13.6,
       label: "1"
+    },
+    {
+      type: "high",
+      center: {lat: 28, lng: -30},
+      strength: 19.5,
+      label: "2"
     },
     {
       type: "low",

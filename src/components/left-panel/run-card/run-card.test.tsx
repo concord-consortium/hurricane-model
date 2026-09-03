@@ -192,7 +192,7 @@ describe("RunCard", () => {
       const stored = stores.runs.runs[0].simulation;
       stored.pressureSystems = stored.pressureSystems.map(ps => ({ ...ps, strength: 3 }));
       renderPanels(stores);
-      expect(screen.getAllByTestId("setup-pressure-systems")[0]).toHaveTextContent("H1: Default, 1028 mb");
+      expect(screen.getAllByTestId("setup-pressure-systems")[0]).toHaveTextContent("H1: Default, 1023 mb");
     });
 
     it("shows a placeholder and dashes in the result column before the run completes", () => {
