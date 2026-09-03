@@ -38,16 +38,35 @@ $tabSetupLight: #f19e39;
 $coldColor: #2255cc;
 $warmColor: #c62828;
 
+$highPressureColor: #2a69d6;
+$lowPressureColor: #c93f22;
+
+// The map markers' raw H/L colors (the *PressureColor vars above are these, darkened for text).
+$highPressureMapColor: #327cfc;
+$lowPressureMapColor: #fc542d;
+
 $tabContents: rgba(255, 255, 255, 0.9);
 
 $rightTabVerticalSpacing: 10px;
 $tabWidth: 68px;
 $setupTabWidth: 76px;
 
-$leftPanelWidth: 296px;
-$leftPanelContainerWidth: calc($leftPanelWidth + 2px);
+$leftPanelFill: #fffaf2;
+
+$mapTabWidth: 68px;
+
+$leftPanelContentWidth: 296px;
+$leftPanelBandWidth: 6px;
+$leftPanelWidth: $leftPanelContentWidth + $leftPanelBandWidth;
 $leftPanelTransitionSeconds: 0.35s;
 $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.7, 1.0);
+
+$thumbnailWidth: 100;
+// Thumbnail height is computed using a formula saved in run-thumbnail.tsx
+$thumbnailHeight: 78;
+$thumbnailAspectRatio: #{$thumbnailWidth} / #{$thumbnailHeight};
+
+$sparklineHeight: 22;
 
 .error {
   padding: 8px 12px;
@@ -75,8 +94,19 @@ $leftPanelTransition: left $leftPanelTransitionSeconds cubic-bezier(0.3, 0.1, 0.
 // Renaming a key or removing the :export block silently yields `undefined` in JS.
 :export {
   fontColor: $charcoal;
+  cat0Color: $cat0Color;
+  cat1Color: $cat1Color;
+  cat2Color: $cat2Color;
+  cat3Color: $cat3Color;
+  cat4Color: $cat4Color;
+  cat5Color: $cat5Color;
+  highPressureMapColor: $highPressureMapColor;
+  lowPressureMapColor: $lowPressureMapColor;
   coldColor: $coldColor;
   warmColor: $warmColor;
   leftPanelWidth: $leftPanelWidth;
   leftPanelTransitionSeconds: $leftPanelTransitionSeconds;
+  thumbnailWidth: $thumbnailWidth;
+  thumbnailHeight: $thumbnailHeight;
+  sparklineHeight: $sparklineHeight;
 }

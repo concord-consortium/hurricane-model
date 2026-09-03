@@ -355,9 +355,11 @@ export class SimulationModel {
     }
     const currentCategory = this.hurricane.category;
     this.hurricane.updateStrength();
-    if (this.strengthChangePositions.length === 0 || currentCategory !== this.hurricane.category) {
-      // add an extra point to the hurricane track if the track did not get an extra point this tick
-      if (!trackSegmentThisTick) {
+    const categoryChanged = currentCategory !== this.hurricane.category;
+    if (this.strengthChangePositions.length === 0 || categoryChanged) {
+      // A change always gets its own point: any point pushed at the top of this tick predates both
+      // the move and the strength update, so it still carries the previous category.
+      if (categoryChanged || !trackSegmentThisTick) {
         this.hurricaneTrack.push({
           position: Object.assign({}, this.hurricane.center),
           category: this.hurricane.category

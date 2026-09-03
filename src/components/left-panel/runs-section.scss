@@ -1,6 +1,9 @@
 @use "../common" as *;
 
 .runsSection {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   padding-bottom: 10px;
 }
 

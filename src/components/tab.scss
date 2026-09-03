@@ -19,7 +19,7 @@ $setupInsideWidth: calc($setupTabWidth - 4px);
     transform: translateY(-50%);
 
     &.active {
-      left: calc(#{$leftPanelContainerWidth} - #{$setupTabWidth});
+      left: calc(#{$leftPanelWidth} - #{$setupTabWidth});
     }
   }
 

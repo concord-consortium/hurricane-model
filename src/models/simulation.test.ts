@@ -1,6 +1,6 @@
 import { isInsideRegion, signedDistanceToRegion } from "../utils/region";
 import { temperatureAnomalyRegions } from "../utils/regions";
-import { temperatureAnomalyFeatherHalfWidth } from "../constants";
+import { hurricaneMaxWindSpeedByCategory, temperatureAnomalyFeatherHalfWidth } from "../constants";
 import {
   SimulationModel, ISimulationOptions, windData, sstImages, minStepsOverSeaToDetectLandfall, extendedLandfallBounds
 } from "./simulation";
@@ -452,6 +452,27 @@ describe("SimulationModel store", () => {
       expect(sim.precipitationPoints.length).toBeGreaterThan(0);
     });
 
+    it("records a strength change at a track point carrying the new category", () => {
+      const sim = new SimulationModel(options);
+      sim.seaSurfaceTempAt = jest.fn().mockImplementation(() => 28);
+      sim.hurricaneWithinExtendedLandfallArea = jest.fn().mockImplementation(() => false);
+      sim.hurricane.setStrengthChangeFromSST = jest.fn();
+
+      // Advance so the next tick is one that pushes a track point of its own, before the strength update.
+      sim.tick();
+      while (sim.time % config.trackSegmentLength !== 0) sim.tick();
+
+      const previousCategory = sim.hurricane.category;
+      sim.hurricane.updateStrength = () => {
+        sim.hurricane.strength = hurricaneMaxWindSpeedByCategory[previousCategory] + 1;
+      };
+      sim.tick();
+      expect(sim.hurricane.category).toEqual(previousCategory + 1);
+
+      const changeIndex = sim.strengthChangePositions[sim.strengthChangePositions.length - 1];
+      expect(sim.hurricaneTrack[changeIndex].category).toEqual(sim.hurricane.category);
+    });
+
     it("handles landfall detection", () => {
       const sim = new SimulationModel(options);
       expect(sim.numberOfStepsOverSea).toEqual(0);
@@ -552,7 +573,7 @@ describe("SimulationModel store", () => {
       sim.restart();
 
       expect(sim.activePressureSystems).toBe(sim.pressureSystemsSetup);
-      expect(sim.activePressureSystems.map(ps => ps.serialize())).toEqual([
+      expect(sim.activePressureSystems.map(ps => ps.serialize())).toMatchObject([
         { type: "low", center: { lat: 30, lng: -40 }, strength: 10, label: "" },
         { type: "high", center: { lat: 20, lng: -60 }, strength: 8, label: "" }
       ]);

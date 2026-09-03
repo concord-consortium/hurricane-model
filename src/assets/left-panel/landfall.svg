@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Landfall</title>
+    <g id="Landfall" stroke="none" fill="none">
+        <rect id="Rectangle" fill-rule="nonzero" x="0" y="0" width="24" height="24"></rect>
+        <path d="M14.3801653,4.86 L9.91735537,10.8104132 L13.3090909,15.3327273 L11.4049587,16.7608264 C9.39371901,14.0831405 6.04958678,9.62033058 6.04958678,9.62033058 L0,19.1409917 L24,19.1409917 L14.3801653,4.86 Z" id="Path" fill="#797979" fill-rule="evenodd"></path>
+    </g>
+</svg>

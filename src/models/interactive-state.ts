@@ -2,7 +2,6 @@ import { runInAction, toJS } from "mobx";
 import config from "../config";
 import { appModes } from "../types";
 import { IHurricaneInteractiveState, IHurricaneInteractiveStateV1 } from "../types/interactive-state";
-import { serializeSimulation } from "./simulation-serialization";
 import { IStores } from "./stores";
 
 const CURRENT_VERSION = 2;
@@ -132,8 +131,8 @@ export function setInteractiveState(
  * won't re-run when those observables change, breaking auto-save.
  */
 export function getInteractiveState(stores: IStores): IHurricaneInteractiveState {
-  const { runs, simulation, ui } = stores;
-  const liveSimulation = serializeSimulation(simulation);
+  const { runs, ui } = stores;
+  const { serializedSimulation } = runs;
 
   return {
     version: 2,
@@ -141,7 +140,7 @@ export function getInteractiveState(stores: IStores): IHurricaneInteractiveState
     runs: runs.runs.map(run => ({
       id: run.id,
       // The selected run's record can be stale; the live simulation is its source of truth.
-      simulation: run.id === runs.selectedRunId ? liveSimulation : toJS(run.simulation)
+      simulation: runs.isSelected(run.id) ? serializedSimulation : toJS(run.simulation)
     })),
     selectedRunId: runs.selectedRunId,
     ui: {

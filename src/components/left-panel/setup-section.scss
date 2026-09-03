@@ -1,28 +1,34 @@
 @use "../common" as *;
 @use "./left-panel-common" as *;
 
+$verticalPadding: 8px;
+$horizontalPadding: 15px;
+
 .sectionHeader.sectionHeader {
   background-color: white;
   border-bottom: $leftPanelBorder;
   color: $charcoal;
-  height: 40px;
+  height: $leftPanelHeaderHeight;
+  padding: $verticalPadding $horizontalPadding;
 
   &:hover {
-    background-color: #dfdfdf;
+    background-color: $secondaryColorHover;
   }
 
   &.openSectionHeader {
-    background-color: #f0f0f0;
-    border-bottom: none;
+    background-color: #fff7e6;
+    // border-bottom: none would change the header's height,
+    // shifting the centered icon/title/caret when the section opens/closes.
+    border-bottom-color: transparent;
   }
 
   .sectionTitle.sectionTitle {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
   }
 
   .dropdownArrow {
-    margin-right: -12px;
+    margin-right: calc(5px - $horizontalPadding); // 5px from the panel edge.
     transform: rotate(-90deg);
     transition: transform 0.1s;
 
@@ -37,25 +43,27 @@
 }
 
 .section {
-  background-color: #fafafa;
+  background-color: white;
   border-bottom: $leftPanelBorder;
-  padding: 8px 16px 12px;
-
-  .hint, .postscript {
-    line-height: normal;
-  }
+  padding: $verticalPadding $horizontalPadding 12px;
 
   .hint {
+    font-size: 14px;
+    line-height: 1.3;
     margin-bottom: 11px;
-  }
 
-  .postscript {
-    font-size: 10.5px;
-    margin-top: 11px;
+    // When the hint is the only content (no controls follow, e.g. Sea Surface Temp), drop the
+    // trailing gap so the section keeps its standard 12px bottom padding, nothing extra.
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   .tip {
-    background-color: #f4f8e9;
+    background-color: #eaf3d6;
+    font-size: 12px;
+    line-height: 1.2;
+    margin-top: 11px;
     padding: 8px;
 
     .bold {

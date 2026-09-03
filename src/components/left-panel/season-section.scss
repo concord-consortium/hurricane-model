@@ -17,6 +17,7 @@
 
     &.selected {
       background-color: $secondaryColor;
+      border-color: $secondaryColor;
     }
   }
 }

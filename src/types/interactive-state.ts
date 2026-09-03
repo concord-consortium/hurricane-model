@@ -2,7 +2,7 @@ import { LatLngExpression } from "leaflet";
 import {
   AppMode, ICoordinates, IVector, ITrackPoint, ILandfall, IPrecipitationPoint, Season, StartLocation, NamedRegion
 } from "../types";
-import { PressureSystemType } from "../models/pressure-system";
+import { IPressureSystemInitialState, PressureSystemType } from "../models/pressure-system";
 import { MapTilesName } from "../map-layer-tiles";
 import { Overlay, ZoomedInViewProps } from "../models/ui";
 
@@ -14,6 +14,7 @@ export interface IPressureSystemState {
   center: ICoordinates;
   strength: number;
   label?: string;
+  initialState?: IPressureSystemInitialState;
 }
 
 /**
