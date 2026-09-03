@@ -12,19 +12,20 @@ interface ISegment {
 }
 
 // Consecutive points of the same category share a polyline, so the number of rendered paths follows
-// the number of category changes rather than the length of the track.
+// the number of category changes rather than the length of the track. Each point colors the edge
+// leaving it — the hurricane only reaches the next category at the next point — so a segment ends on
+// the first point of the following category, and neighbouring segments join there without a gap.
+// The last point starts no segment; the live tail draws its edge to the hurricane's current center.
 export const buildSegments = (track: ITrackPoint[]): ISegment[] => {
   const segments: ISegment[] = [];
-  track.forEach(point => {
+  for (let i = 0; i < track.length - 1; i++) {
     const last = segments[segments.length - 1];
-    if (last && last.category === point.category) {
-      last.positions.push(point.position);
+    if (last && last.category === track[i].category) {
+      last.positions.push(track[i + 1].position);
     } else {
-      // Repeat the previous point so neighbouring segments join without a gap.
-      const start = last ? [last.positions[last.positions.length - 1]] : [];
-      segments.push({ category: point.category, positions: [...start, point.position] });
+      segments.push({ category: track[i].category, positions: [track[i].position, track[i + 1].position] });
     }
-  });
+  }
   return segments;
 };
 

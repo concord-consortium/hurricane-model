@@ -62,18 +62,31 @@ describe("HurricaneTrack component", () => {
       const segments = buildSegments(track);
 
       expect(segments.map(s => s.category)).toEqual([1, 2]);
-      expect(segments[0].positions).toEqual(track.slice(0, 5).map(p => p.position));
+      // A point colors the edge leaving it, so the run ends on the first point of the next category.
+      expect(segments[0].positions).toEqual(track.slice(0, 6).map(p => p.position));
     });
 
-    it("repeats the previous point so neighbouring segments join without a gap", () => {
+    it("shares the junction point so neighbouring segments join without a gap", () => {
       const segments = buildSegments(track);
 
-      expect(segments[1].positions[0]).toEqual(track[4].position);
-      expect(segments[1].positions.length).toBe(6);
+      expect(segments[1].positions[0]).toEqual(track[5].position);
+      expect(segments[1].positions.length).toBe(5);
+    });
+
+    it("returns no segments for a single-point track, which the live tail draws", () => {
+      expect(buildSegments([track[0]])).toEqual([]);
     });
 
     it("returns no segments for an empty track", () => {
       expect(buildSegments([])).toEqual([]);
+    });
+
+    // A leading category change used to produce a one-position segment, which renders nothing.
+    it("draws no empty segment when the track starts with a category change", () => {
+      const segments = buildSegments([track[0], track[5], track[6]]);
+
+      expect(segments.map(s => s.category)).toEqual([1, 2]);
+      expect(segments.map(s => s.positions.length)).toEqual([2, 2]);
     });
   });
 });
