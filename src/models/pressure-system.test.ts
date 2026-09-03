@@ -19,7 +19,11 @@ describe("PressureSystem store", () => {
       strength: 5.5
     };
     const pressureSystem = new PressureSystem(options);
-    expect(pressureSystem.serialize()).toEqual({ ...options, label: "" });
+    expect(pressureSystem.serialize()).toEqual({
+      ...options,
+      label: "",
+      initialState: { center: {lat: 12, lng: -13}, strength: 5.5 }
+    });
   });
 
   it("serializes its label", () => {
@@ -29,7 +33,20 @@ describe("PressureSystem store", () => {
       strength: 5.5,
       label: "1"
     };
-    expect(new PressureSystem(options).serialize()).toEqual(options);
+    expect(new PressureSystem(options).serialize()).toMatchObject(options);
+  });
+
+  it("keeps its initial state across serialize and restore", () => {
+    const pressureSystem = new PressureSystem({ center: {lat: 12, lng: -13}, type: "high", strength: 5.5 });
+    pressureSystem.center = { lat: 20, lng: -20 };
+    pressureSystem.setStrength(10);
+
+    const restored = new PressureSystem(pressureSystem.serialize());
+    expect(restored.serialize().initialState).toEqual({ center: {lat: 12, lng: -13}, strength: 5.5 });
+
+    restored.reset();
+    expect(restored.center).toEqual({ lat: 12, lng: -13 });
+    expect(restored.strength).toBe(5.5);
   });
 
   describe("reset", () => {

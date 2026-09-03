@@ -1,0 +1,70 @@
+@use "../../common" as *;
+
+// The two SST scale images (default + accessible) are stacked; toggling the accessible key fades
+// their opacities so the swap cross-fades instead of hard-cutting.
+.sstLayer {
+  transition: opacity 0.2s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sstLayer {
+    transition: none;
+  }
+}
+
+%thumbnail {
+  width: 100%;
+  aspect-ratio: $thumbnailAspectRatio;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+.resultPlaceholder {
+  @extend %thumbnail;
+  display: flex;
+  font-size: 14px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  text-align: center;
+  border: 1px dashed $charcoalMedium;
+}
+
+.thumbnailCrop {
+  @extend %thumbnail;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: #14304a;
+
+  .thumb {
+    display: block;
+    // 5px wider than the .thumbnailCrop frame and pulled back so ~2.5px is clipped off each side, keeping
+    // the map's proportions un-squished in the narrower frame. Border/radius live on .thumbnailCrop.
+    width: calc(100% + 5px);
+    aspect-ratio: $thumbnailAspectRatio;
+    margin: -2px -2.5px;
+  }
+
+  .casing {
+    fill: none;
+    stroke: #1a1a1a;
+    stroke-opacity: 0.55;
+    stroke-width: 2.6px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .hurricaneTrack {
+    stroke-width: 1.4px;
+    stroke-linecap: round;
+  }
+
+  .pressureSystem {
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-size: 15px;
+    font-weight: 700;
+    stroke: #fff;
+    stroke-width: 1.2px;
+    paint-order: stroke;
+  }
+}

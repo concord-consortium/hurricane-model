@@ -1,4 +1,4 @@
-@use "../common.scss" as *;
+@use "../../common.scss" as *;
 
 .runCardContainer {
   font-family: $scaleFont;
@@ -11,7 +11,7 @@
     border-radius: 7px;
     cursor: pointer;
     min-height: 56px;
-    padding: 10px;
+    padding: 11px;
     position: relative;
 
     &:hover:not(.selected) {
@@ -27,6 +27,7 @@
       background-color: $secondaryColorLight;
       border: 2px solid $secondaryColor;
       cursor: default;
+      padding: 10px;
 
       .runCardHeader {
         .runLabel {
@@ -54,6 +55,25 @@
       .runStatus {
         text-align: center;
         width: 156px;
+      }
+    }
+
+    .runCardBody {
+      display: flex;
+      gap: 10px;
+      margin-top: 7px;
+
+      .cardColumn {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      .cardColumnHeading {
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 5px;
       }
     }
   }
@@ -91,5 +111,25 @@
         outline-offset: 1px;
       }
     }
+  }
+}
+
+.summaryColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 14px;
+  color: $charcoal;
+
+  .categoryRow {
+    align-items: center;
+    display: flex;
+    gap: 7px;
+  }
+
+  .icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
 }

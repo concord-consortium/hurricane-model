@@ -25,15 +25,25 @@ export class RunsModel {
     this.selectedRunId = first.id;
   }
 
-  @computed public get selectedRun(): IRunState | undefined {
-    return this.runs.find(run => run.id === this.selectedRunId);
+  public isSelected(runId: string) {
+    return runId === this.selectedRunId;
   }
 
-  // The selected run's record can be stale — the live simulation is its source of truth.
+  @computed public get selectedRun(): IRunState | undefined {
+    return this.runs.find(run => this.isSelected(run.id));
+  }
+
+  @computed public get serializedSimulation(): ISimulationState {
+    return serializeSimulation(this.simulation);
+  }
+
+  // The selected run's simulation can be stale — the live simulation is its source of truth.
+  public getSimulation(run: IRunState): ISimulationState {
+    return this.isSelected(run.id) ? this.serializedSimulation : run.simulation;
+  }
+
   public isRunComplete(run: IRunState): boolean {
-    return run.id === this.selectedRunId
-      ? this.simulation.simulationFinished
-      : !!run.simulation.simulationFinished;
+    return this.getSimulation(run).simulationFinished;
   }
 
   @computed public get allComplete(): boolean {
@@ -46,6 +56,11 @@ export class RunsModel {
 
   @computed public get canAddRun(): boolean {
     return this.allComplete && !this.atMaxRuns;
+  }
+
+  // Returns the length of the longest track.
+  @computed public get maxDuration(): number {
+    return Math.max(...this.runs.map(run => this.getSimulation(run).time));
   }
 
   @action.bound public selectRun(id: string) {
@@ -78,7 +93,7 @@ export class RunsModel {
 
   // Discards every saved run and starts over from whatever state the simulation is in.
   @action.bound public reset() {
-    const first: IRunState = { id: this.makeRunId(), simulation: serializeSimulation(this.simulation) };
+    const first: IRunState = { id: this.makeRunId(), simulation: this.serializedSimulation };
     this.runs = [first];
     this.selectedRunId = first.id;
   }
@@ -130,7 +145,7 @@ export class RunsModel {
   @action private snapshotSelectedRun() {
     const run = this.selectedRun;
     if (!run) return;
-    const state = serializeSimulation(this.simulation);
+    const state = this.serializedSimulation;
     run.simulation = state.simulationStarted && !state.simulationFinished
       ? extractSetupState(state)
       : state;

@@ -14,6 +14,7 @@ import coastalAfricaData from "../data/regions/coastal-africa-temp-anomaly-regio
 
 export interface NamedRegionData {
   label: string;
+  shortLabel: string;
   anchor: ICoordinates; // Where the centered map control is placed.
   region: Region;
 }
@@ -21,21 +22,25 @@ export interface NamedRegionData {
 export const temperatureAnomalyRegions: Record<NamedRegion, NamedRegionData> = {
   gulf: {
     label: "Gulf",
+    shortLabel: "Gulf",
     anchor: { lat: 24.7, lng: -89.7 },
     region: createRegion(gulfData as FeatureCollection)
   },
   caribbean: {
     label: "Caribbean",
+    shortLabel: "Caribbean",
     anchor: { lat: 17, lng: -74 },
     region: createRegion(caribbeanData as FeatureCollection)
   },
   centralAtlantic: {
     label: "Central Atlantic",
+    shortLabel: "C. Atlantic",
     anchor: { lat: 17, lng: -45 },
     region: createRegion(centralAtlanticData as FeatureCollection)
   },
   coastalAfrica: {
     label: "Coastal Africa",
+    shortLabel: "C. Africa",
     anchor: { lat: 17, lng: -20 },
     region: createRegion(coastalAfricaData as FeatureCollection)
   }

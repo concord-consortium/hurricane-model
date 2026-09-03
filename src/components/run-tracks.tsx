@@ -15,8 +15,7 @@ export const RunTracks = observer(function RunTracks() {
   const { runs, simulation, ui } = useStores();
   const [hoveredRunId, setHoveredRunId] = useState<string | null>(null);
 
-  const unselectedFinishedRuns = runs.runs.filter(run =>
-    run.id !== runs.selectedRunId && run.simulation.simulationFinished);
+  const unselectedFinishedRuns = runs.runs.filter(run => !runs.isSelected(run.id) && runs.isRunComplete(run));
 
   // Leaflet fires no mouseout for removed layers, so clear hover state when the
   // hovered run leaves the list (selection via map or panel, or deletion).
@@ -27,10 +26,13 @@ export const RunTracks = observer(function RunTracks() {
     }
   }, [clearHoverId]);
 
-  const positions = (run: IRunState) => [
-    ...run.simulation.hurricaneTrack.map(point => point.position),
-    run.simulation.hurricane.center
-  ];
+  const positions = (run: IRunState) => {
+    const simulationState = runs.getSimulation(run);
+    return [
+      ...simulationState.hurricaneTrack.map(point => point.position),
+      simulationState.hurricane.center
+    ];
+  };
 
   const eventHandlers = (run: IRunState) => ({
     click: () => {

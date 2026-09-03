@@ -19,14 +19,14 @@ interface ISetupSectionProps {
   hint?: string;
   Icon?: FunctionComponent;
   iconClassName?: string;
-  postscript?: string;
+  note?: string;
   setupMode: SetupMode;
   tip?: string;
   title: string;
 }
 
 export const SetupSection = observer(function SetupSection({
-  children, dataTest, hint, Icon, iconClassName, postscript, setupMode, tip, title
+  children, dataTest, hint, Icon, iconClassName, note, setupMode, tip, title
 }: ISetupSectionProps) {
   const { simulation, ui } = useStores();
   const open = ui.setupMode === setupMode;
@@ -63,8 +63,9 @@ export const SetupSection = observer(function SetupSection({
         <div className={css.section} data-test={`${dt}-section`}>
           {hint && <div className={css.hint}>{hint}</div>}
           {children}
-          {tip && <div className={css.tip}><span className={css.bold}>Tip:</span> {tip}</div>}
-          {postscript && <div className={css.postscript}>{postscript}</div>}
+          {(tip || note) && <div className={css.tip}>
+            <span className={css.bold}>{tip ? "Tip" : "Note"}:</span> {tip ?? note}
+          </div>}
         </div>
       </Collapse>
     </>

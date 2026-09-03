@@ -1,8 +1,9 @@
 @use "../common" as *;
 @use "./left-panel-common" as *;
 
-$leftPanelContainerWidth: calc($leftPanelWidth + 2px);
-$leftPanelBorderRadius: 5px;
+// Panel outer width = content + orange band (peek) + 1px map-facing gray border (shown when open).
+$leftPanelOuterWidth: $leftPanelWidth + 1px;
+$leftPanelContainerWidth: $leftPanelOuterWidth + 1px;
 
 .leftPanelContainer {
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
@@ -16,13 +17,10 @@ $leftPanelBorderRadius: 5px;
   z-index: 1000;
 
   .leftPanel {
-    background-color: #fdf5e8;
-    border: $leftPanelBorder;
-    border-bottom-right-radius: $leftPanelBorderRadius;
-    border-top-right-radius: $leftPanelBorderRadius;
+    border-top: $leftPanelBorder;
     color: $charcoal;
     height: 100%;
-    left: -$leftPanelContainerWidth;
+    left: -$leftPanelOuterWidth;
     pointer-events: all;
     position: absolute;
     top: 0;
@@ -31,37 +29,87 @@ $leftPanelBorderRadius: 5px;
 
     &.open {
       left: 0;
+      border-right: $leftPanelBorder;
+    }
+
+    .panelBack {
+      background-color: $secondaryColor;
+      bottom: 0;
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: $leftPanelWidth;
+    }
+
+    .panelContent {
+      background-color: $leftPanelFill;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      left: 0;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      position: absolute;
+      top: 0;
+      width: $leftPanelContentWidth;
+
+      .setupSectionList {
+        border-bottom: $leftPanelBorder;
+        flex-shrink: 0;
+        padding-bottom: 0;
+      }
     }
 
     .leftPanelHeader {
       align-items: center;
-      background-color: $secondaryColor;
+      background-color: $leftPanelFill;
       border-bottom: $leftPanelBorder;
-      border-top-right-radius: $leftPanelBorderRadius;
       color: $charcoal;
       display: flex;
-      height: 35px;
+      height: $leftPanelHeaderHeight;
       justify-content: center;
       position: relative;
 
       .leftPanelTitle {
+        align-items: center;
+        display: flex;
+        font-size: 14px;
         font-weight: bold;
       }
 
       .leftPanelCloseButton {
+        align-items: center;
         background: none;
         border: none;
-        color: $charcoal;
+        border-radius: 4px;
+        color: $charcoalMedium;
         cursor: pointer;
         display: inline-flex;
-        height: 24px;
+        height: 32px;
+        justify-content: center;
+        line-height: 1;
         padding: 0;
         position: absolute;
-        right: 5px;
-        width: 24px;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+
+        svg {
+          height: 24px;
+          width: 24px;
+        }
 
         &:hover {
-          color: $charcoalMedium;
+          background: $secondaryColorHover;
+          color: $charcoal;
+        }
+
+        &:active {
+          background: $secondaryColor;
+          color: $charcoal;
         }
 
         &:focus-visible {

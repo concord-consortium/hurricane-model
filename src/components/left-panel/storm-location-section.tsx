@@ -11,7 +11,7 @@ import StormLocationIcon from "../../assets/left-panel/storm-location.svg";
 
 import css from "./storm-location-section.scss";
 
-const hint = "Drag the storm to a starting position within the highlighted area on the map, "
+const hint = "Drag the storm on the map to a starting position within the highlighted area, "
   + "or type a latitude and longitude below.";
 
 type Axis = "lat" | "lng";
