@@ -8,6 +8,8 @@ import { SimulationModel } from "./simulation";
 import { UIModel } from "./ui";
 
 export const maxRuns = 6;
+// maxRuns keeps run letters inside A–F.
+const firstRunLetterCharCode = "A".charCodeAt(0);
 
 export class RunsModel {
   @observable public runs: IRunState[] = [];
@@ -44,6 +46,10 @@ export class RunsModel {
 
   public isRunComplete(run: IRunState): boolean {
     return this.getSimulation(run).simulationFinished;
+  }
+
+  public runLetter(run: IRunState): string {
+    return String.fromCharCode(firstRunLetterCharCode + this.runs.indexOf(run));
   }
 
   @computed public get allComplete(): boolean {

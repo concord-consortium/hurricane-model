@@ -389,6 +389,29 @@ describe("RunsModel", () => {
     });
   });
 
+  describe("runLetter", () => {
+    it("letters runs in order starting at A", () => {
+      const { runs } = stores;
+      completeCurrentRun(stores);
+      runs.addRun();
+      expect(runs.runLetter(runs.runs[0])).toBe("A");
+      expect(runs.runLetter(runs.runs[1])).toBe("B");
+    });
+
+    it("shifts later letters down when an earlier run is deleted", () => {
+      const { runs } = stores;
+      completeCurrentRun(stores);
+      runs.addRun();
+      const second = runs.runs[1];
+      expect(runs.runLetter(second)).toBe("B");
+
+      runs.deleteRun(runs.runs[0].id);
+
+      expect(runs.runs[0]).toBe(second);
+      expect(runs.runLetter(second)).toBe("A");
+    });
+  });
+
   it("ignores deleteRun with an unknown id", () => {
     const { runs } = stores;
     const originalId = runs.selectedRunId;
