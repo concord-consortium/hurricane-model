@@ -63,15 +63,17 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: IRunThumbnai
 
   if (!sim) return <div className={css.resultPlaceholder}>Run to see result</div>;
 
-  const { hurricaneTrack, pressureSystems, season } = sim;
+  const { hurricane, hurricaneTrack, pressureSystems, season } = sim;
   const baseImage = BASE_IMAGES[ui.baseMap] || satelliteImg;
   const showSST = ui.overlay === "sst";
   const { accessibleSSTScale } = ui.sstOverlay;
   const defaultSSTUrl = sstImages[config.defaultSSTScale][season];
   const accessibleSSTUrl = sstImages[config.accessibleSSTScale][season];
 
+  const finalCategory = hurricaneTrack[hurricaneTrack.length - 1]?.category ?? 0;
+  const allPoints = [...hurricaneTrack, { position: { ...hurricane.center }, category: finalCategory }];
   const casingPoints =
-    hurricaneTrack.map(p => `${pixelX(p.position.lng).toFixed(1)},${pixelY(p.position.lat).toFixed(1)}`).join(" ");
+    allPoints.map(p => `${pixelX(p.position.lng).toFixed(1)},${pixelY(p.position.lat).toFixed(1)}`).join(" ");
 
   return (
     <div className={css.thumbnailCrop}>
@@ -110,16 +112,16 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: IRunThumbnai
         )}
 
         {/* Track: dark casing under category-colored segments for contrast. */}
-        {hurricaneTrack.length > 1 && <polyline className={css.casing} points={casingPoints} />}
-        {hurricaneTrack.slice(1).map((p, i) => (
+        {allPoints.length > 1 && <polyline className={css.casing} points={casingPoints} />}
+        {allPoints.slice(1).map((p, i) => (
           <line
             className={css.hurricaneTrack}
             key={`seg-${i}`}
-            x1={pixelX(hurricaneTrack[i].position.lng)}
-            y1={pixelY(hurricaneTrack[i].position.lat)}
+            x1={pixelX(allPoints[i].position.lng)}
+            y1={pixelY(allPoints[i].position.lat)}
             x2={pixelX(p.position.lng)}
             y2={pixelY(p.position.lat)}
-            stroke={categoryColors[p.category] || "#ffffff"}
+            stroke={categoryColors[allPoints[i].category] || "#ffffff"}
           />
         ))}
 

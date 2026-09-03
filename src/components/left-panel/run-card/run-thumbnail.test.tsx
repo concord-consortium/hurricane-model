@@ -27,7 +27,7 @@ describe("RunThumbnail", () => {
     expect(screen.getByRole("img", { name: "Run result map" })).toBeInTheDocument();
   });
 
-  it("draws a track segment per point after the first", () => {
+  it("draws a track segment per point after the first, plus one for the hurricane location", () => {
     const sim = defaultSimulationState();
     sim.hurricaneTrack = [
       { position: { lat: 20, lng: -40 }, category: 1 },
@@ -35,7 +35,7 @@ describe("RunThumbnail", () => {
       { position: { lat: 24, lng: -44 }, category: 2 }
     ];
     const { container } = renderThumb(stores, sim);
-    expect(container.querySelectorAll("line").length).toBe(2);
+    expect(container.querySelectorAll("line").length).toBe(3);
   });
 
   it("marks each pressure system with an H or L", () => {
