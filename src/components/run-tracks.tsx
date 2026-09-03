@@ -5,6 +5,7 @@ import { Pane, Polyline } from "react-leaflet";
 import { log } from "../log";
 import { IRunState } from "../types/interactive-state";
 import { useStores } from "../stores-context";
+import { RunTrackLabel } from "./run-track-label";
 
 import css from "./run-tracks.scss";
 
@@ -15,17 +16,6 @@ export const RunTracks = observer(function RunTracks() {
   const { runs, simulation, ui } = useStores();
   const [hoveredRunId, setHoveredRunId] = useState<string | null>(null);
 
-  const unselectedFinishedRuns = runs.runs.filter(run => !runs.isSelected(run.id) && runs.isRunComplete(run));
-
-  // Leaflet fires no mouseout for removed layers, so clear hover state when the
-  // hovered run leaves the list (selection via map or panel, or deletion).
-  const clearHoverId = hoveredRunId != null && !unselectedFinishedRuns.some(run => run.id === hoveredRunId);
-  useEffect(() => {
-    if (clearHoverId) {
-      setHoveredRunId(null);
-    }
-  }, [clearHoverId]);
-
   const positions = (run: IRunState) => {
     const simulationState = runs.getSimulation(run);
     return [
@@ -34,42 +24,80 @@ export const RunTracks = observer(function RunTracks() {
     ];
   };
 
+  const finishedTracks = runs.runs
+    .filter(run => runs.isRunComplete(run))
+    .map(run => ({ run, trackPositions: positions(run) }));
+  const unselectedFinishedTracks = finishedTracks.filter(({ run }) => !runs.isSelected(run.id));
+
+  // Leaflet fires no mouseout for removed layers, so clear hover when the hovered run leaves
+  // unselectedFinishedTracks (selected via map or panel, or deleted) — hover is only ever set on
+  // an unselected run, and a selected label has no handler left to clear it.
+  const clearHoverId = hoveredRunId != null && !unselectedFinishedTracks.some(({ run }) => run.id === hoveredRunId);
+  useEffect(() => {
+    if (clearHoverId) {
+      setHoveredRunId(null);
+    }
+  }, [clearHoverId]);
+
+  const selectRun = (run: IRunState) => {
+    if (simulation.inProgress && !ui.isReadOnly) simulation.restart();
+    runs.selectRun(run.id);
+    ui.setNorthAtlanticView();
+    log("RunSelected", { runId: run.id, via: "map" });
+  };
+
+  const startHover = (run: IRunState) => setHoveredRunId(run.id);
+  const endHover = (run: IRunState) => setHoveredRunId(current => (current === run.id ? null : current));
+
   const eventHandlers = (run: IRunState) => ({
-    click: () => {
-      if (simulation.inProgress && !ui.isReadOnly) simulation.restart();
-      runs.selectRun(run.id);
-      ui.setNorthAtlanticView();
-      log("RunSelected", { runId: run.id, via: "map" });
-    },
-    mouseover: () => setHoveredRunId(run.id),
-    mouseout: () => setHoveredRunId(current => (current === run.id ? null : current))
+    click: () => selectRun(run),
+    mouseover: () => startHover(run),
+    mouseout: () => endHover(run)
   });
 
-  // Above overlayPane (z 400) and below the pane holding the selected run's track (z 430) and shadowPane (z 500).
   return (
-    <Pane name="unselectedTracks" style={{ zIndex: 410 }}>
-      {unselectedFinishedRuns.map(run =>
-        <Fragment key={run.id}>
-          <Polyline
-            positions={positions(run)}
-            eventHandlers={eventHandlers(run)}
-            pathOptions={{
-              bubblingMouseEvents: false,
-              color: css.borderColor,
-              weight: borderWeight
-            }}
-          />
-          <Polyline
-            positions={positions(run)}
-            eventHandlers={eventHandlers(run)}
-            pathOptions={{
-              bubblingMouseEvents: false,
-              color: hoveredRunId === run.id ? css.trackHoverColor : css.trackColor,
-              weight: trackWeight
-            }}
-          />
-        </Fragment>
+    <>
+      {/* Above overlayPane (z 400) and below the pane holding the selected run's track (z 430)
+          and shadowPane (z 500). */}
+      <Pane name="unselectedTracks" style={{ zIndex: 410 }}>
+        {unselectedFinishedTracks.map(({ run, trackPositions }) =>
+          <Fragment key={run.id}>
+            <Polyline
+              positions={trackPositions}
+              eventHandlers={eventHandlers(run)}
+              pathOptions={{
+                bubblingMouseEvents: false,
+                color: css.borderColor,
+                weight: borderWeight
+              }}
+            />
+            <Polyline
+              positions={trackPositions}
+              eventHandlers={eventHandlers(run)}
+              pathOptions={{
+                bubblingMouseEvents: false,
+                color: hoveredRunId === run.id ? css.trackHoverColor : css.trackColor,
+                weight: trackWeight
+              }}
+            />
+          </Fragment>
+        )}
+      </Pane>
+      {/* The selected run's track is drawn by HurricaneTrack, but its label belongs here with the
+          other labels so hovering a label and hovering a track share one piece of state.
+          No Pane: the labels belong in Leaflet's marker pane (z 600), above every track pane. */}
+      {finishedTracks.map(({ run, trackPositions }) =>
+        <RunTrackLabel
+          key={run.id}
+          letter={runs.runLetter(run)}
+          position={trackPositions[trackPositions.length - 1]}
+          selected={runs.isSelected(run.id)}
+          hovered={hoveredRunId === run.id}
+          onSelect={() => selectRun(run)}
+          onHoverStart={() => startHover(run)}
+          onHoverEnd={() => endHover(run)}
+        />
       )}
-    </Pane>
+    </>
   );
 });
