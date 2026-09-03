@@ -23,7 +23,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   const { runs, simulation, ui } = useStores();
   const selected = runs.isSelected(run.id);
   const complete = runs.isRunComplete(run);
-  const runNumber = runs.runs.indexOf(run) + 1;
+  const letter = runs.runLetter(run);
 
   // The selected run's stored record can be stale — the live simulation is its source of truth.
   // TODO: `getSimulation` calls serializeSimulation on the active simulation on every tick. It would be more better to
@@ -83,13 +83,13 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
         data-test="run-card"
         role="button"
         tabIndex={0}
-        aria-label={`Run ${runNumber}${labelStatusMessage}`}
+        aria-label={`Run ${letter}${labelStatusMessage}`}
         aria-pressed={selected}
         onClick={handleSelect}
         onKeyDown={handleKeyDown}
       >
         <div className={css.runCardHeader}>
-          <div className={css.runLabel} />
+          <div className={css.runLabel} data-test="run-label">{letter}</div>
           <div
             aria-label="Run status"
             className={clsx(css.runStatus, runsCss.runsMessage)}

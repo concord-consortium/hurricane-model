@@ -45,10 +45,15 @@
       display: flex;
 
       .runLabel {
+        align-items: center;
         background-color: #ccc;
         border-radius: 5px;
+        display: flex;
         font-family: $mainFont;
+        font-size: 18px;
+        font-weight: bold;
         height: 28px;
+        justify-content: center;
         width: 28px;
       }
 
