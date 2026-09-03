@@ -5,6 +5,7 @@ import { Pane, Polyline } from "react-leaflet";
 import { log } from "../log";
 import { IRunState } from "../types/interactive-state";
 import { useStores } from "../stores-context";
+import { HurricaneTrack } from "./hurricane-track";
 import { RunTrackLabel } from "./run-track-label";
 
 import css from "./run-tracks.scss";
@@ -83,9 +84,6 @@ export const RunTracks = observer(function RunTracks() {
           </Fragment>
         )}
       </Pane>
-      {/* The selected run's track is drawn by HurricaneTrack, but its label belongs here with the
-          other labels so hovering a label and hovering a track share one piece of state.
-          No Pane: the labels belong in Leaflet's marker pane (z 600), above every track pane. */}
       {finishedTracks.map(({ run, trackPositions }) =>
         <RunTrackLabel
           key={run.id}
@@ -98,6 +96,7 @@ export const RunTracks = observer(function RunTracks() {
           onHoverEnd={() => endHover(run)}
         />
       )}
+      <HurricaneTrack />
     </>
   );
 });
