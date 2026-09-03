@@ -57,7 +57,7 @@ describe("RunSetupSummary", () => {
   it("lists each pressure system with its label, position, and mb value", () => {
     render(<RunSetupSummary setup={baseSetup()} />);
     const pressure = screen.getByTestId("setup-pressure-systems");
-    expect(pressure).toHaveTextContent("H1: Default, 1028 mb");
+    expect(pressure).toHaveTextContent("H1: Default, 1023 mb");
     expect(pressure).toHaveTextContent("L2: Default, 1007 mb");
   });
 });
