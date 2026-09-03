@@ -26,6 +26,8 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   const runNumber = runs.runs.indexOf(run) + 1;
 
   // The selected run's stored record can be stale — the live simulation is its source of truth.
+  // TODO: This calls serializeSimulation on the active simulation on every tick. It would be more efficient to
+  // directly use `simulation` when the run is selected, but that would require processing individual fields separately.
   const simulationState = runs.getSimulation(run);
   const { season, startLocation, hurricane, temperatureAnomalies } = simulationState;
   // A legacy run has no separate setup; its pressureSystems are the setup.
