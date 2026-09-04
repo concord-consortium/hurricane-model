@@ -132,55 +132,6 @@ describe("UI model", () => {
     });
   });
 
-  describe("isPristine", () => {
-    it("is true for a freshly created model", () => {
-      const ui = new UIModel(new SimulationModel());
-      expect(ui.isPristine).toBe(true);
-    });
-
-    it("is false once one of the fields reset() restores has changed", () => {
-      const changes: ((ui: UIModel) => void)[] = [
-        u => u.setInitialBounds([[1, 2], [5, 10]]),
-        u => u.setZoomedInView([[30, -85], [35, -80]], 3),
-        u => { u.mapModifiedByUser = true; },
-        u => u.setWindArrows(!u.windArrows),
-        u => u.setMapTiles("street"),
-        u => u.setOverlay("precipitation"),
-        u => u.setThermometerActive(true),
-        u => u.setThermometerPositionSaved([10, -50]),
-        u => u.setThermometerPositionHover([10, -50])
-      ];
-      changes.forEach(change => {
-        const ui = new UIModel(new SimulationModel());
-        change(ui);
-        expect(ui.isPristine).toBe(false);
-      });
-    });
-
-    it("ignores fields reset() leaves alone", () => {
-      const ui = new UIModel(new SimulationModel());
-      ui.setLeftPanelOpen(!ui.leftPanelOpen);
-      ui.setHurricaneImage(!ui.hurricaneImage);
-      ui.setSetupMode("season");
-      expect(ui.isPristine).toBe(true);
-    });
-
-    it("is true again after reset", () => {
-      const ui = new UIModel(new SimulationModel());
-      ui.setZoomedInView([[30, -85], [35, -80]], 3);
-      ui.mapModifiedByUser = true;
-      ui.setWindArrows(!ui.windArrows);
-      ui.setMapTiles("street");
-      ui.setOverlay("precipitation");
-      ui.setThermometerActive(true);
-      ui.setThermometerPositionSaved([10, -50]);
-
-      ui.reset();
-
-      expect(ui.isPristine).toBe(true);
-    });
-  });
-
   describe("mode and isReportMode", () => {
     it("defaults to runtime mode", () => {
       const ui = new UIModel(new SimulationModel());

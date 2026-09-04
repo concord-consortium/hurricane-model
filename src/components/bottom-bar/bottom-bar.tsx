@@ -93,7 +93,7 @@ export class BottomBar extends BaseComponent<IProps, IState> {
       (config.lockSimulationWhileRunning && simulationStarted);
     const simulationControlsDisabled = isReadOnly;
     const restartDisabled = simulationControlsDisabled || (isStormMode && !simulationStarted);
-    const clearAllDisabled = simulationControlsDisabled || (isStormMode && runs.isPristine && ui.isPristine);
+    const clearAllDisabled = simulationControlsDisabled || (isStormMode && runs.isPristine);
     const startLocationButtonClasses = clsx(
       css.widgetGroup,
       startLocationButtonHoveredClass,
