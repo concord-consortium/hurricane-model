@@ -4,7 +4,6 @@ import React from "react";
 import config from "../../../config";
 import { sstImages } from "../../../models/sst-overlay";
 import { useStores } from "../../../stores-context";
-import { Season } from "../../../types";
 import { IRunResult, IRunState } from "../../../types/interactive-state";
 import { categoryColors } from "../../../utils/hurricane-categories";
 
@@ -58,15 +57,15 @@ const BASE_IMAGES: Record<string, string> = {
 interface IRunThumbnailProps {
   result: IRunResult | null;
   run: IRunState;
-  season: Season;
 }
 
-export const RunThumbnail = observer(function RunThumbnail({ result, run, season }: IRunThumbnailProps) {
+export const RunThumbnail = observer(function RunThumbnail({ result, run }: IRunThumbnailProps) {
   const { runs, ui } = useStores();
 
   if (!result) return <div className={css.resultPlaceholder}>Run to see result</div>;
 
   const letter = runs.runLetter(run);
+  const { season } = run.simulation;
   const { hurricane, hurricaneTrack, pressureSystems } = result;
   const baseImage = BASE_IMAGES[ui.baseMapType] || satelliteImg;
   const showSST = ui.overlay === "sst";

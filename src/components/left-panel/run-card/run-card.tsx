@@ -6,8 +6,7 @@ import { log } from "../../../log";
 import { IRunState } from "../../../types/interactive-state";
 import { useStores } from "../../../stores-context";
 import { RunResult } from "./run-result";
-import { RunSetupSummary } from "./run-setup-summary";
-import { RunThumbnail } from "./run-thumbnail";
+import { RunSetup } from "./run-setup";
 
 import DeleteIcon from "../../../assets/left-panel/delete.svg";
 import RestartIcon from "../../../assets/left-panel/restart.svg";
@@ -24,9 +23,6 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   const selected = runs.isSelected(run.id);
   const complete = runs.isRunComplete(run);
   const letter = runs.runLetter(run);
-
-  const setup = runs.getSimulationSetup(run);
-  const result = runs.getSimulationResult(run);
 
   const handleSelect = () => {
     if (selected) return;
@@ -90,12 +86,11 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
         <div className={css.runCardBody}>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Setup</div>
-            <RunSetupSummary setup={setup} />
+            <RunSetup run={run} />
           </div>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Result</div>
-            <RunThumbnail result={result} run={run} season={setup.season} />
-            <RunResult result={result} maxDuration={runs.maxDuration} />
+            <RunResult run={run} />
           </div>
         </div>
       </div>
