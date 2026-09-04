@@ -2,7 +2,7 @@
 """
 Regenerate the run-card thumbnail base-map crops in src/assets/basemap-thumbs/.
 
-The thumbnail (src/components/left-panel/run-thumbnail.tsx) draws a synthetic mini-map: a baked
+The thumbnail (src/components/left-panel/run-card/run-thumbnail.tsx) draws a synthetic mini-map: a baked
 base-map PNG ground with the storm track / H-L / SST-anomaly markers projected on top. The base-map
 PNGs are Web-Mercator crops of an exact lat/lng window, and that window MUST match the projection
 bounds in run-thumbnail.tsx (LAT_MAX / LAT_MIN / LNG_MIN / LNG_MAX) or the coastlines won't line up
