@@ -1,8 +1,4 @@
 export class BottomBar {
-  stormSetupButton() {
-    return cy.get(`[data-test="storm-setup-button"]`);
-  }
-
   startLocationButton() {
     return cy.get(`[data-test="start-location-button"]`);
   }

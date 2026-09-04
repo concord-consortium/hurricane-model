@@ -4,10 +4,9 @@ import * as React from "react";
 
 import { log } from "../../log";
 import { mapLayer, MapTilesName } from "../../map-layer-tiles";
-import { Overlay } from "../../models/ui";
+import { MapTabType, Overlay } from "../../models/ui";
 import { BaseComponent, IBaseProps } from "../base";
 import { MapButtonKey } from "./map-button-key";
-import { MapType } from "./right-panel";
 
 import ViewIcon from "../../assets/view-icon.svg";
 import baseMapTabImg from "../../assets/base-map-tab.png";
@@ -21,7 +20,7 @@ import css from "./map-button.scss";
 interface IProps extends IBaseProps {
   label: string;
   value: MapTilesName | Overlay;
-  mapType: MapType;
+  mapType: MapTabType;
   disabled?: boolean;
 }
 interface IState {}

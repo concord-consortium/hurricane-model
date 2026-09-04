@@ -105,7 +105,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
             type="button"
             aria-label="Reset run"
             data-test="reset-run-button"
-            disabled={!complete || simulation.simulationRunning || ui.isReadOnly}
+            disabled={!simulation.simulationStarted || ui.isReadOnly}
             onClick={handleReset}
           >
             <RestartIcon aria-hidden={true} />

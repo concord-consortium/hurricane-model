@@ -114,6 +114,24 @@ describe("UI model", () => {
     });
   });
 
+  describe("leftPanelOpen", () => {
+    let originalMode: typeof config.mode;
+    beforeEach(() => { originalMode = config.mode; });
+    afterEach(() => { config.mode = originalMode; });
+
+    it("starts open in storm mode", () => {
+      config.mode = "storm";
+      const ui = new UIModel(new SimulationModel());
+      expect(ui.leftPanelOpen).toBe(true);
+    });
+
+    it("starts closed in hurricane mode", () => {
+      config.mode = "hurricane";
+      const ui = new UIModel(new SimulationModel());
+      expect(ui.leftPanelOpen).toBe(false);
+    });
+  });
+
   describe("mode and isReportMode", () => {
     it("defaults to runtime mode", () => {
       const ui = new UIModel(new SimulationModel());

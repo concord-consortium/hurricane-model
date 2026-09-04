@@ -1,0 +1,27 @@
+@use "../common" as *;
+
+.labeledSwitch {
+  margin: 15px auto;
+  text-align: center;
+
+  .title {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 17.5px;
+    margin-bottom: 4px;
+  }
+
+  .switchRow {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    .sideLabel {
+      font-size: 14px;
+
+      &.active {
+        font-weight: bold;
+      }
+    }
+  }
+}

@@ -12,8 +12,8 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 | `SimulationStarted` | `{ startLocation, season, windArrows, hurricaneImage, baseMap, overlay, accessibleSSTScale, thermometerActive, pressureSystems: [{ type, label, center: { lat, lng }, strength }], hurricane: { strength, center: { lat, lng } }, deterministic, timestep, pressureSystemsLocked, lockSimulationWhileRunning, seaSurfaceTempOpacity, markLandfalls }` | User clicks Start — logged before `start()` to capture pre-simulation state |
 | `SimulationStopped` | `{ outcome: { initialPosition, finalPosition, strengthChanges, landfalls, trackPointCount } }` | User clicks Stop/Pause |
 | `SimulationEnded` | `{ reason: "ByItself" \| "SimulationRestarted" \| "SimulationReloaded" \| "TopBarReloadButtonClicked" \| "RunReset", outcome: { initialPosition, finalPosition, strengthChanges, landfalls, trackPointCount } }` | Simulation ends naturally (hurricane dissipates) or user triggers restart/reload |
-| `SimulationRestarted` | — | User clicks Restart (bottom bar) |
-| `SimulationReloaded` | — | User clicks Reload (bottom bar) |
+| `SimulationRestarted` | — | User clicks Restart (bottom bar; labeled "Restart/Edit" in storm mode) |
+| `SimulationReloaded` | — | User clicks Reload (bottom bar; labeled "Clear All" in storm mode) |
 | `TopBarReloadButtonClicked` | — | User clicks Reload (top bar) |
 
 ## Run Management
@@ -50,8 +50,8 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 | `BaseMapSet` | `{ type }` | User selects a base map (satellite, relief, street, population) |
 | `MapOverlaySet` | `{ type }` | User enables a map overlay (sst, precipitation, stormSurge) |
 | `MapOverlayDisabled` | — | User disables the active map overlay |
-| `MapTabOpened` | `{ type }` | User opens a map tab in the right panel |
-| `MapTabClosed` | `{ type }` | User closes a map tab in the right panel |
+| `MapTabOpened` | `{ type: "base" \| "overlay" \| "settings" }` | User opens a tab in the right panel |
+| `MapTabClosed` | `{ type: "base" \| "overlay" \| "settings" }` | User closes a tab in the right panel |
 | `ViewportUpdated` | `{ zoom, east, west, north, south }` | User pans or zooms the map (not programmatic) |
 | `ResetMapViewClicked` | — | User clicks the reset view button |
 | `FullscreenEnabled` | — | User enters fullscreen mode |
