@@ -2,13 +2,14 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 
 import { selectPressureSystems } from "../../../config";
-import { IRunSetup, RunSetupSummary } from "./run-setup-summary";
+import { IRunSetup } from "../../../types/interactive-state";
+import { RunSetupSummary } from "./run-setup-summary";
 
 const baseSetup = (): IRunSetup => ({
   season: "fall",
   startLocation: { lat: 10.5, lng: -20 },
   startingCategory: 3,
-  pressureSystems: selectPressureSystems("atlantic").map(ps => ({ ...ps, center: { ...ps.center } })),
+  pressureSystemsSetup: selectPressureSystems("atlantic").map(ps => ({ ...ps, center: { ...ps.center } })),
   temperatureAnomalies: {}
 });
 

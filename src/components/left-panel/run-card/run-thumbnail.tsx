@@ -4,7 +4,8 @@ import React from "react";
 import config from "../../../config";
 import { sstImages } from "../../../models/sst-overlay";
 import { useStores } from "../../../stores-context";
-import { ISimulationState } from "../../../types/interactive-state";
+import { Season } from "../../../types";
+import { IRunResult } from "../../../types/interactive-state";
 import { categoryColors } from "../../../utils/hurricane-categories";
 
 import reliefImg from "../../../assets/basemap-thumbs/relief.png";
@@ -55,15 +56,16 @@ const BASE_IMAGES: Record<string, string> = {
 };
 
 interface IRunThumbnailProps {
-  sim: ISimulationState | null;
+  result: IRunResult | null;
+  season: Season;
 }
 
-export const RunThumbnail = observer(function RunThumbnail({ sim }: IRunThumbnailProps) {
+export const RunThumbnail = observer(function RunThumbnail({ result, season }: IRunThumbnailProps) {
   const { ui } = useStores();
 
-  if (!sim) return <div className={css.resultPlaceholder}>Run to see result</div>;
+  if (!result) return <div className={css.resultPlaceholder}>Run to see result</div>;
 
-  const { hurricane, hurricaneTrack, pressureSystems, season } = sim;
+  const { hurricane, hurricaneTrack, pressureSystems } = result;
   const baseImage = BASE_IMAGES[ui.baseMapType] || satelliteImg;
   const showSST = ui.overlay === "sst";
   const { accessibleSSTScale } = ui.sstOverlay;

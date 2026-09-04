@@ -11,7 +11,7 @@ import { RunThumbnail } from "./run-thumbnail";
 const renderThumb = (stores: IStores, sim: ISimulationState = defaultSimulationState()) =>
   render(
     <StoresContext value={stores}>
-      <RunThumbnail sim={sim} />
+      <RunThumbnail result={sim} season={sim.season} />
     </StoresContext>
   );
 

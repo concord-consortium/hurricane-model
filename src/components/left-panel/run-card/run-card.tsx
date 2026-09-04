@@ -6,7 +6,7 @@ import { log } from "../../../log";
 import { IRunState } from "../../../types/interactive-state";
 import { useStores } from "../../../stores-context";
 import { RunResult } from "./run-result";
-import { IRunSetup, RunSetupSummary } from "./run-setup-summary";
+import { RunSetupSummary } from "./run-setup-summary";
 import { RunThumbnail } from "./run-thumbnail";
 
 import DeleteIcon from "../../../assets/left-panel/delete.svg";
@@ -25,19 +25,8 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
   const complete = runs.isRunComplete(run);
   const letter = runs.runLetter(run);
 
-  // The selected run's stored record can be stale — the live simulation is its source of truth.
-  // TODO: `getSimulation` calls serializeSimulation on the active simulation on every tick. It would be more better to
-  // directly use `simulation` when the run is selected, but that would require processing individual fields separately.
-  const simulationState = runs.getSimulation(run);
-  const { season, startLocation, hurricane, temperatureAnomalies } = simulationState;
-  // A legacy run has no separate setup; its pressureSystems are the setup.
-  const pressureSystems = simulationState.pressureSystemsSetup ?? simulationState.pressureSystems;
-  const setup: IRunSetup = {
-    season, startLocation, startingCategory: hurricane.startingCategory, pressureSystems, temperatureAnomalies
-  };
-
-  // A completed run's outcome for the result column; null until the run completes.
-  const resultSim = !complete ? null : simulationState;
+  const setup = runs.getSimulationSetup(run);
+  const result = runs.getSimulationResult(run);
 
   const handleSelect = () => {
     if (selected) return;
@@ -105,8 +94,8 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
           </div>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Result</div>
-            <RunThumbnail sim={resultSim} />
-            <RunResult sim={resultSim} runId={run.id} maxDuration={runs.maxDuration} />
+            <RunThumbnail result={result} season={setup.season} />
+            <RunResult result={result} runId={run.id} maxDuration={runs.maxDuration} />
           </div>
         </div>
       </div>

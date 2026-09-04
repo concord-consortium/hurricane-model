@@ -2,11 +2,22 @@ import { runInAction, toJS } from "mobx";
 import config, { getStartingCategory, startStrengths } from "../config";
 import { hurricaneCategoryInfo } from "../constants";
 import { isStartLocationName, namedRegions } from "../types";
-import { INormalizedSimulationState, ISimulationState } from "../types/interactive-state";
+import { IHurricaneState, INormalizedSimulationState, ISimulationState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
 import { seedTemperatureAnomalies } from "../utils/regions";
+import { Hurricane } from "./hurricane";
 import { IPressureSystemOptions, PressureSystem } from "./pressure-system";
 import { SimulationModel, extendedLandfallBounds, resolveStartLocation } from "./simulation";
+
+export function serializeHurricane(hurricane: Hurricane | IHurricaneState): IHurricaneState {
+  return {
+    center: { ...hurricane.center },
+    strength: hurricane.strength,
+    speed: { ...hurricane.speed },
+    startingCategory: hurricane.startingCategory,
+    cat3SSTThresholdReached: hurricane.cat3SSTThresholdReached
+  };
+}
 
 /**
  * Serializes the live simulation into the shape stored per run and in interactive state.
@@ -17,24 +28,18 @@ import { SimulationModel, extendedLandfallBounds, resolveStartLocation } from ".
  * won't re-run when those observables change, breaking auto-save.
  */
 export function serializeSimulation(simulation: SimulationModel): ISimulationState {
-  const { hurricane, pressureSystems, pressureSystemsSetup, startLocation } = simulation;
+  const { hurricane, pressureSystems, startLocation } = simulation;
   return {
     season: simulation.season,
     startLocation: safeStartLocation(startLocation),
     // Setup and run state are stored separately: the setup is what restart and duplicate rewind to,
     // the run state is what a finished run displays alongside its track.
-    pressureSystemsSetup: pressureSystemsSetup.map(system => system.serialize()),
+    pressureSystemsSetup: simulation.serializedPressureSystemsSetup,
     pressureSystems: pressureSystems.map(system => system.serialize()),
     simulationStarted: simulation.simulationStarted,
     simulationFinished: simulation.simulationFinished,
     time: simulation.time,
-    hurricane: {
-      center: { ...hurricane.center },
-      strength: hurricane.strength,
-      speed: { ...hurricane.speed },
-      startingCategory: hurricane.startingCategory,
-      cat3SSTThresholdReached: hurricane.cat3SSTThresholdReached
-    },
+    hurricane: serializeHurricane(hurricane),
     // Use toJS() for observable arrays to ensure clean serialization
     hurricaneTrack: toJS(simulation.hurricaneTrack),
     landfalls: toJS(simulation.landfalls),
@@ -46,7 +51,7 @@ export function serializeSimulation(simulation: SimulationModel): ISimulationSta
     consumedExtendedLandfallAreas: Object.keys(extendedLandfallBounds)
       .filter(key => !simulation.extendedLandfallAreas
         .some(area => area.equals(extendedLandfallBounds[key]))),
-    temperatureAnomalies: Object.fromEntries(simulation.temperatureAnomalies)
+    temperatureAnomalies: simulation.serializedTemperatureAnomalies
   };
 }
 
@@ -183,7 +188,7 @@ export function defaultSimulationState(): INormalizedSimulationState {
 
 export function extractSetupState(state: ISimulationState): ISimulationState {
   const setup = cloneSimulationState(state);
-  // A legacy run has no separate setup; its pressureSystems are the setup.
+  // Callers normally pass normalized state; guard in case a raw pre-split record arrives.
   setup.pressureSystemsSetup = setup.pressureSystemsSetup ?? setup.pressureSystems;
   setup.pressureSystems = [];
   setup.simulationStarted = false;

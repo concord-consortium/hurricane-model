@@ -21,7 +21,7 @@ export const RunTracks = observer(function RunTracks() {
     const simulationState = runs.getSimulation(run);
     return [
       ...simulationState.hurricaneTrack.map(point => point.position),
-      simulationState.hurricane.center
+      { ...simulationState.hurricane.center }
     ];
   };
 

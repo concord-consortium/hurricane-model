@@ -1,8 +1,9 @@
-import { action, computed, makeObservable, observable } from "mobx";
-import { IRunState, ISimulationState } from "../types/interactive-state";
+import { action, computed, makeObservable, observable, toJS } from "mobx";
+import { IRunResult, IRunSetup, IRunState, ISimulationState } from "../types/interactive-state";
+import { safeStartLocation } from "../utils/interactive-state";
 import {
   applySimulationState, cloneSimulationState, defaultSimulationState, extractSetupState,
-  normalizeSimulationState, serializeSimulation
+  normalizeSimulationState, serializeHurricane, serializeSimulation
 } from "./simulation-serialization";
 import { SimulationModel } from "./simulation";
 import { UIModel } from "./ui";
@@ -40,8 +41,43 @@ export class RunsModel {
   }
 
   // The selected run's simulation can be stale — the live simulation is its source of truth.
-  public getSimulation(run: IRunState): ISimulationState {
-    return this.isSelected(run.id) ? this.serializedSimulation : run.simulation;
+  public getSimulation(run: IRunState): ISimulationState | SimulationModel {
+    return this.isSelected(run.id) ? this.simulation : run.simulation;
+  }
+
+  public getSimulationSetup(run: IRunState): IRunSetup {
+    const selected = this.isSelected(run.id);
+    const { season, startLocation, hurricane } = this.getSimulation(run);
+    const pressureSystemsSetup = selected
+      ? this.simulation.serializedPressureSystemsSetup
+      : run.simulation.pressureSystemsSetup;
+    const temperatureAnomalies = selected
+      ? this.simulation.serializedTemperatureAnomalies
+      : run.simulation.temperatureAnomalies;
+    return {
+      season,
+      startLocation: safeStartLocation(startLocation),
+      startingCategory: hurricane.startingCategory,
+      pressureSystemsSetup,
+      temperatureAnomalies
+    };
+  }
+
+  public getSimulationResult(run: IRunState): IRunResult | null {
+    if (!this.isRunComplete(run)) return null;
+
+    const selected = this.isSelected(run.id);
+    const { hurricane, hurricaneTrack, landfalls, time } = this.getSimulation(run);
+    const pressureSystems = selected
+      ? this.simulation.pressureSystems.map(system => system.serialize())
+      : run.simulation.pressureSystems;
+    return {
+      pressureSystems,
+      time,
+      hurricane: serializeHurricane(hurricane),
+      hurricaneTrack: toJS(hurricaneTrack),
+      landfalls: toJS(landfalls)
+    };
   }
 
   public isRunComplete(run: IRunState): boolean {

@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { ISimulationState } from "../../../types/interactive-state";
+import { IRunResult } from "../../../types/interactive-state";
 import { categoryLabel } from "../../../utils/hurricane-categories";
 import { intensitySeries, landfallSummary, peakCategory } from "../../../utils/run-outcomes";
 import { CategorySparkline } from "./category-sparkline";
@@ -19,18 +19,18 @@ const fallbackSparklineWidth = 83;
 
 interface IRunResultProps {
   // A completed run's captured state; null before the run completes (every value reads "—").
-  sim: ISimulationState | null;
+  result: IRunResult | null;
   runId: string;
   // The longest run's duration across all runs, used to scale this sparkline's width so the cards
   // read relative to one another. When omitted the sparkline uses the full slot width.
   maxDuration?: number;
 }
 
-export function RunResult({ sim, runId, maxDuration }: IRunResultProps) {
-  const peak = sim ? peakCategory(sim) : null;
-  const landfalls = sim ? landfallSummary(sim) : null;
-  const series = sim ? intensitySeries(sim) : [];
-  const duration = sim?.time ?? 0;
+export function RunResult({ result, runId, maxDuration }: IRunResultProps) {
+  const peak = result ? peakCategory(result) : null;
+  const landfalls = result ? landfallSummary(result) : null;
+  const series = result ? intensitySeries(result) : [];
+  const duration = result?.time ?? 0;
 
   // Measure the sparkline's slot (the flex space after the icon) so the longest-lived run's trace
   // fills it, with shorter runs scaled proportionally.
