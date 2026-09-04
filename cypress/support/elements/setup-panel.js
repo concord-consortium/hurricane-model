@@ -1,4 +1,18 @@
 export class SetupPanel {
+  getStormSetupTab() {
+    // Target the tab back rather than the wrapper: the wrapper inherits
+    // pointer-events: none from the panel container, so Cypress refuses to click it.
+    return cy.get(`[data-test="tab-setup-back"]`);
+  }
+
+  confirmTabBehindPanel() {
+    this.getStormSetupTab().should("have.attr", "data-active", "true");
+  }
+
+  confirmTabVisible() {
+    this.getStormSetupTab().should("have.attr", "data-active", "false");
+  }
+
   getPanel() {
     return cy.get(`[data-test="left-panel"]`);
   }

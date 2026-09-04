@@ -76,7 +76,7 @@ context("Test the Hurricane Model app", () => {
   });
 
   it("colorblind friendly SST", () => {
-    cy.get(".map-tab--mapTabImage--__hurr-v1__.map-tab--impactMaps--__hurr-v1__")
+    cy.get('[data-test="tab-overlay"]')
       .click()
       .then(() => {
         cy.get('.sst-key--checkbox--__hurr-v1__ input[type="checkbox"]')

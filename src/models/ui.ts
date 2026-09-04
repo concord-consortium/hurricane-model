@@ -7,6 +7,8 @@ import { SSTOverlayModel } from "./sst-overlay";
 
 export type InteractiveMode = "runtime" | "authoring" | "report" | "reportItem";
 export type SetupMode = "stormLocation" | "stormCategory" | "season" | "seaSurfaceTemperatures" | "pressureSystems";
+export type MapTabType = "base" | "overlay";
+export type RightTabType = MapTabType | "settings";
 
 // Storm surge data bounds is limited to very specify area (Texas to Maine).
 // See: https://noaa.maps.arcgis.com/apps/MapSeries/index.html?appid=d9ed7904dbec441a9c4dd7b277935fad&entry=1
@@ -19,7 +21,7 @@ export class UIModel {
   @observable public sstOverlay: SSTOverlayModel;
   @observable public mode: InteractiveMode = "runtime";
   @observable public setupMode: SetupMode | undefined = undefined;
-  @observable public leftPanelOpen = false;
+  @observable public leftPanelOpen = config.mode === "storm";
   @observable public initialBounds = config.initialBounds;
   @observable public mapSize = { x: 0, y: 0 };
   @observable public zoomedInView: ZoomedInViewProps = false;

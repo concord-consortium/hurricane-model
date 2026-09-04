@@ -23,7 +23,7 @@ context("Test the Thermometer Icon", () => {
   it("thermometer disabled for other map types", () => {
 
     //check for precipitation map
-    cy.get(".map-tab--mapTabImage--__hurr-v1__.map-tab--impactMaps--__hurr-v1__")
+    cy.get('[data-test="tab-overlay"]')
       .click()
       .then(() => {
         cy.get('[data-test="map-button-precipitation"]')
@@ -34,7 +34,7 @@ context("Test the Thermometer Icon", () => {
       });
 
       //check for storm surge map
-      cy.get(".map-tab--mapTabImage--__hurr-v1__.map-tab--impactMaps--__hurr-v1__")
+      cy.get('[data-test="tab-overlay"]')
         .click()
         .then(() => {
           cy.get('[data-test="map-button-stormSurge"]')

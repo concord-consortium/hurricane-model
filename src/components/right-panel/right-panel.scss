@@ -3,11 +3,10 @@
 $rightPanelContainerWidth: 159px;
 $rightPanelWidth: 157px;
 $rightPanelInnerWidth: 151px;
-$mapTabVerticalSpacing: 10px;
 
 .rightPanelContainer {
   overflow-x: hidden;
-  width: $rightPanelContainerWidth + $mapTabWidth;
+  width: $rightPanelContainerWidth + $tabWidth;
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
   min-height: 551px;
   position: absolute;
@@ -18,6 +17,7 @@ $mapTabVerticalSpacing: 10px;
   overflow-y: hidden;
 
   .rightPanel {
+    color: #222;
     position: absolute;
     right: -$rightPanelWidth;
     top: 0;
@@ -40,11 +40,7 @@ $mapTabVerticalSpacing: 10px;
       margin-right: $rightPanelWidth;
       right: 0;
       list-style-type: none;
-      padding-top: $mapTabVerticalSpacing;
-    }
-
-    .rightPanelTab {
-      margin-top: $mapTabVerticalSpacing;
+      padding-top: $rightTabVerticalSpacing;
     }
 
     .tabContentBack {
@@ -63,6 +59,10 @@ $mapTabVerticalSpacing: 10px;
 
       &.impactMaps {
         background-color: $tabImpactLight;
+      }
+
+      &.settings {
+        background-color: $tabSettingsLight;
       }
 
       .tabContent {
@@ -91,6 +91,12 @@ $mapTabVerticalSpacing: 10px;
           letter-spacing: normal;
           text-align: center;
           color: $charcoal;
+        }
+
+        .divider {
+          border: 0;
+          border-top: 1px solid $secondaryColor;
+          margin: 15px 10px;
         }
       }
     }

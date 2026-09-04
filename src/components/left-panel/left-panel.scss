@@ -1,9 +1,7 @@
 @use "../common" as *;
 @use "./left-panel-common" as *;
 
-// Panel outer width = content + orange band (peek) + 1px map-facing gray border (shown when open).
-$leftPanelOuterWidth: $leftPanelWidth + 1px;
-$leftPanelContainerWidth: $leftPanelOuterWidth + 1px;
+$leftPanelBorderRadius: 5px;
 
 .leftPanelContainer {
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
@@ -13,14 +11,14 @@ $leftPanelContainerWidth: $leftPanelOuterWidth + 1px;
   pointer-events: none;
   position: absolute;
   top: $topBarHeight;
-  width: $leftPanelContainerWidth;
+  width: $leftPanelWidth;
   z-index: 1000;
 
   .leftPanel {
     border-top: $leftPanelBorder;
     color: $charcoal;
     height: 100%;
-    left: -$leftPanelOuterWidth;
+    left: -$leftPanelWidth;
     pointer-events: all;
     position: absolute;
     top: 0;

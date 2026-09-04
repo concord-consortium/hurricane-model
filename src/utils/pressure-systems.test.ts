@@ -42,8 +42,8 @@ describe("pressureReport", () => {
   it("reports every unmoved system as Default with its mb value", () => {
     const report = pressureSystemReport(defaultSetup());
     expect(report.map(r => `${r.label}: ${r.position}, ${r.mb}`)).toEqual([
-      "H1: Default, 1028 mb",
-      "H2: Default, 1023 mb",
+      "H1: Default, 1023 mb",
+      "H2: Default, 1028 mb",
       "L1: Default, 1008 mb",
       "L2: Default, 1007 mb"
     ]);

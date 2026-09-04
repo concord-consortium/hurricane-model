@@ -115,6 +115,8 @@ export function normalizeSimulationState(state?: Partial<ISimulationState>): INo
   const present = Object.fromEntries(
     Object.entries(clone).filter(([, value]) => value != null)
   ) as Partial<ISimulationState>;
+  const simulationStarted = present.simulationStarted ?? defaults.simulationStarted;
+  const simulationFinished = simulationStarted && (present.simulationFinished ?? defaults.simulationFinished);
   return {
     ...present,
     season: present.season ?? defaults.season,
@@ -122,8 +124,8 @@ export function normalizeSimulationState(state?: Partial<ISimulationState>): INo
     // A legacy run's setup lives in pressureSystems, so seed the setup from it when it's missing.
     pressureSystemsSetup: present.pressureSystemsSetup ?? present.pressureSystems ?? defaults.pressureSystemsSetup,
     pressureSystems: present.pressureSystems ?? defaults.pressureSystems,
-    simulationStarted: present.simulationStarted ?? defaults.simulationStarted,
-    simulationFinished: present.simulationFinished ?? defaults.simulationFinished,
+    simulationStarted,
+    simulationFinished,
     time: present.time ?? defaults.time,
     hurricane: { ...defaults.hurricane, ...present.hurricane },
     hurricaneTrack: present.hurricaneTrack ?? defaults.hurricaneTrack,

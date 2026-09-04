@@ -2,7 +2,7 @@ import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createStores } from "../../models/stores";
-import { Provider } from "mobx-react";
+import { StoresContext } from "../../stores-context";
 import { HurricaneImageToggle } from "./hurricane-image-toggle";
 
 describe("HurricaneImageToggle component", () => {
@@ -13,9 +13,9 @@ describe("HurricaneImageToggle component", () => {
 
   it("renders basic components", () => {
     render(
-      <Provider stores={stores}>
+      <StoresContext value={stores}>
         <HurricaneImageToggle />
-      </Provider>
+      </StoresContext>
     );
     expect(screen.getByRole("switch")).toBeInTheDocument();
     expect(screen.getByText(/Hurricane Image/)).toBeInTheDocument();
@@ -24,9 +24,9 @@ describe("HurricaneImageToggle component", () => {
   it("turns on or off the hurricane image", async () => {
     const user = userEvent.setup();
     render(
-      <Provider stores={stores}>
+      <StoresContext value={stores}>
         <HurricaneImageToggle />
-      </Provider>
+      </StoresContext>
     );
     const toggle = screen.getByRole("switch");
     expect(stores.ui.hurricaneImage).toEqual(false);

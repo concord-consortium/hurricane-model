@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, comparer, computed, makeObservable, observable } from "mobx";
 import { IRunState, ISimulationState } from "../types/interactive-state";
 import {
   applySimulationState, cloneSimulationState, defaultSimulationState, extractSetupState,
@@ -15,11 +15,13 @@ export class RunsModel {
   private simulation: SimulationModel;
   private ui: UIModel;
   private nextRunNumber = 1;
+  private initialSimulationState: ISimulationState;
 
   constructor(simulation: SimulationModel, ui: UIModel) {
     makeObservable(this);
     this.simulation = simulation;
     this.ui = ui;
+    this.initialSimulationState = serializeSimulation(simulation);
     const first: IRunState = { id: this.makeRunId(), simulation: serializeSimulation(simulation) };
     this.runs.push(first);
     this.selectedRunId = first.id;
@@ -56,6 +58,14 @@ export class RunsModel {
 
   @computed public get canAddRun(): boolean {
     return this.allComplete && !this.atMaxRuns;
+  }
+
+  // True while there is nothing to clear: a single, unstarted run still holding the default setup.
+  @computed public get isPristine(): boolean {
+    const { simulation } = this;
+    if (this.runs.length > 1) return false;
+    if (simulation.simulationStarted || simulation.simulationFinished) return false;
+    return comparer.structural(serializeSimulation(simulation), this.initialSimulationState);
   }
 
   // Returns the length of the longest track.

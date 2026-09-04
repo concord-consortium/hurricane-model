@@ -130,6 +130,10 @@ $overflowHeight: 11px;
       border-radius: 15px;
       margin: $bottomBarTopPadding auto 0 auto;
     }
+
+    .buttonLabel {
+      padding: 0 6px;
+    }
   }
 
   .playbackButton {
@@ -140,29 +144,29 @@ $overflowHeight: 11px;
     }
   }
 
-  .stormSetupButton {
-    font-size: 12px;
-    min-width: 84px;
+}
+
+.confirmActions {
+  display: flex;
+  font-size: 16px;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 1em;
+
+  button {
+    border: 1px solid $charcoalMedium;
+    min-width: 88px;
+    padding: 11px 8px;
 
     &:hover {
       background-color: $secondaryColorHover;
     }
 
-    &.open {
+    &:active {
       background-color: $secondaryColor;
-
-      svg {
-        box-shadow: 0 0 0 3px rgba(255,255,255,1);
-      }
+      border: none;
     }
   }
-}
-
-.confirmActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 1em;
 }
 
 @media (max-width: 1200px) {
