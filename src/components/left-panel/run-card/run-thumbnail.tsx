@@ -64,7 +64,7 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: IRunThumbnai
   if (!sim) return <div className={css.resultPlaceholder}>Run to see result</div>;
 
   const { hurricane, hurricaneTrack, pressureSystems, season } = sim;
-  const baseImage = BASE_IMAGES[ui.baseMap] || satelliteImg;
+  const baseImage = BASE_IMAGES[ui.baseMapType] || satelliteImg;
   const showSST = ui.overlay === "sst";
   const { accessibleSSTScale } = ui.sstOverlay;
   const defaultSSTUrl = sstImages[config.defaultSSTScale][season];
