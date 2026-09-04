@@ -51,7 +51,7 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
     <Pane name="selectedTrack" style={{ zIndex: 430 }}>
       {segments.map((segment, idx) =>
         <Polyline
-          key={`${idx}-border`}
+          key={`${idx}-${segment.category}-border`}
           className={css.hurricaneTrackBorder}
           positions={segment.positions}
           weight={7}
@@ -67,7 +67,7 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
       }
       {segments.map((segment, idx) =>
         <Polyline
-          key={`${idx}`}
+          key={`${idx}-${segment.category}`}
           className={segmentClass(segment.category)}
           pane="shadowPane"
           positions={segment.positions}
