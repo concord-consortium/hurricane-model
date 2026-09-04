@@ -5,13 +5,13 @@ import React from "react";
 import { defaultSimulationState } from "../../../models/simulation-serialization";
 import { createStores, IStores } from "../../../models/stores";
 import { StoresContext } from "../../../stores-context";
-import { ISimulationState } from "../../../types/interactive-state";
+import { IRunState, ISimulationState } from "../../../types/interactive-state";
 import { RunThumbnail } from "./run-thumbnail";
 
-const renderThumb = (stores: IStores, sim: ISimulationState = defaultSimulationState()) =>
+const renderThumb = (stores: IStores, sim: ISimulationState = defaultSimulationState(), run?: IRunState) =>
   render(
     <StoresContext value={stores}>
-      <RunThumbnail result={sim} season={sim.season} />
+      <RunThumbnail result={sim} run={run ?? { id: "run1", simulation: sim }} season={sim.season} />
     </StoresContext>
   );
 
@@ -23,8 +23,10 @@ describe("RunThumbnail", () => {
   });
 
   it("renders an accessible mini-map", () => {
-    renderThumb(stores);
-    expect(screen.getByRole("img", { name: "Run result map" })).toBeInTheDocument();
+    const simulation = defaultSimulationState();
+    stores.runs.addRun();
+    renderThumb(stores, simulation, stores.runs.runs[0]);
+    expect(screen.getByRole("img", { name: "Run A result map" })).toBeInTheDocument();
   });
 
   it("draws a track segment per point after the first, plus one for the hurricane location", () => {

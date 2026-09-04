@@ -16,29 +16,29 @@ const completedSim = () => {
 
 describe("RunResult", () => {
   it("shows dashes before a run completes", () => {
-    render(<RunResult result={null} runId="run-1" />);
+    render(<RunResult result={null} />);
     expect(screen.getAllByText("—").length).toBe(3);
   });
 
   it("shows the peak category", () => {
-    render(<RunResult result={completedSim()} runId="run-1" />);
+    render(<RunResult result={completedSim()} />);
     expect(screen.getByTestId("result-peak-category")).toHaveTextContent("Cat 3");
   });
 
   it("shows the landfall count", () => {
-    render(<RunResult result={completedSim()} runId="run-1" />);
+    render(<RunResult result={completedSim()} />);
     expect(screen.getByTestId("result-landfalls")).toHaveTextContent("1×");
   });
 
   it("shows None when there were no landfalls", () => {
     const sim = completedSim();
     sim.landfalls = [];
-    render(<RunResult result={sim} runId="run-1" />);
+    render(<RunResult result={sim} />);
     expect(screen.getByTestId("result-landfalls")).toHaveTextContent("None");
   });
 
   it("renders the category sparkline for a completed run", () => {
-    const { container } = render(<RunResult result={completedSim()} runId="run-1" />);
+    const { container } = render(<RunResult result={completedSim()} />);
     expect(container.querySelector("polyline")).toBeInTheDocument();
   });
 });

@@ -217,13 +217,13 @@ describe("RunCard", () => {
       renderPanels(stores);
       expect(screen.getByText("Run to see result")).toBeInTheDocument();
       expect(screen.getAllByText("—").length).toBe(3);
-      expect(screen.queryByRole("img", { name: "Run result map" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("img", { name: "Run A result map" })).not.toBeInTheDocument();
     });
 
     it("shows the thumbnail and results once the run is complete", () => {
       completeCurrentRun(stores);
       renderPanels(stores);
-      expect(screen.getByRole("img", { name: "Run result map" })).toBeInTheDocument();
+      expect(screen.getByRole("img", { name: "Run A result map" })).toBeInTheDocument();
       expect(screen.queryByText("Run to see result")).not.toBeInTheDocument();
       expect(screen.getByTestId("result-peak-category")).toHaveTextContent("Cat 2");
       expect(screen.getByTestId("result-landfalls")).toHaveTextContent("None");

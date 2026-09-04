@@ -1,11 +1,9 @@
-import React, { useRef } from "react";
+import React, { useId } from "react";
 
 import { categoryColors } from "../../../utils/hurricane-categories";
 
 import commonCss from "../../common.scss";
 import css from "./category-sparkline.scss";
-
-let sparklineSeq = 0;
 
 const minWidth = 8;
 const height = parseFloat(commonCss.sparklineHeight);
@@ -15,25 +13,22 @@ const SPARK_STROKE = ["#9a9a9a", "#c9a400", "#e0a020", "#d97a1e", "#c85a10", "#e
 
 interface ICategorySparklineProps {
   series: number[];
-  runId: string;
   widthPx: number;
 }
 
-export function CategorySparkline({ series, runId, widthPx }: ICategorySparklineProps) {
-  const seqRef = useRef<number>(0); // 0 = unassigned; the counter starts at 1
+export function CategorySparkline({ series, widthPx }: ICategorySparklineProps) {
+  const sparklineId = useId();
 
   const { length } = series;
   if (length === 0) return <span className={css.noData}>—</span>;
-
-  if (seqRef.current === 0) seqRef.current = ++sparklineSeq;
 
   const width = Math.max(minWidth, widthPx);
   const x = (i: number) => length <= 1 ? width / 2 : pad + (i / (length - 1)) * (width - 2 * pad);
   const y = (category: number) => height - pad - (category / 5) * (height - 2 * pad);
   const points = series.map((category, i) => `${x(i).toFixed(1)},${y(category).toFixed(1)}`).join(" ");
   const area = `${pad},${height - pad} ${points} ${(width - pad)},${height - pad}`;
-  const strokeId = `spk-s-${runId}-${seqRef.current}`;
-  const fillId = `spk-f-${runId}-${seqRef.current}`;
+  const strokeId = `spk-s-${sparklineId}`;
+  const fillId = `spk-f-${sparklineId}`;
 
   const stopColor = (palette: string[], category: number) =>
     palette[Math.max(0, Math.min(palette.length - 1, Math.round(category)))];

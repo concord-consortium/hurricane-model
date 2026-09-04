@@ -95,7 +95,7 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Result</div>
             <RunThumbnail result={result} run={run} season={setup.season} />
-            <RunResult result={result} runId={run.id} maxDuration={runs.maxDuration} />
+            <RunResult result={result} maxDuration={runs.maxDuration} />
           </div>
         </div>
       </div>
