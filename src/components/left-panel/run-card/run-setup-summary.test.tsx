@@ -20,8 +20,8 @@ describe("RunSetupSummary", () => {
   });
 
   it("resolves a named start location to its coordinates", () => {
-    render(<RunSetupSummary setup={{ ...baseSetup(), startLocation: "atlantic" }} />);
-    expect(screen.getByTestId("setup-location")).toHaveTextContent("°N");
+    render(<RunSetupSummary setup={{ ...baseSetup(), startLocation: "gulf" }} />);
+    expect(screen.getByTestId("setup-location")).toHaveTextContent("23.50°N");
   });
 
   it("shows the starting category", () => {
