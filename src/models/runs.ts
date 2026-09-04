@@ -64,9 +64,9 @@ export class RunsModel {
     return this.allComplete && !this.atMaxRuns;
   }
 
-  // Returns the length of the longest track.
+  // Returns the length of the longest complete track.
   @computed public get maxDuration(): number {
-    return Math.max(...this.runs.map(run => this.getSimulation(run).time));
+    return Math.max(...this.runs.filter(run => this.isRunComplete(run)).map(run => this.getSimulation(run).time));
   }
 
   @action.bound public selectRun(id: string) {
