@@ -1,3 +1,5 @@
+import { autorun, runInAction } from "mobx";
+
 import { maxRuns } from "./runs";
 import { createStores, IStores } from "./stores";
 import { PressureSystem } from "./pressure-system";
@@ -5,22 +7,26 @@ import { PressureSystem } from "./pressure-system";
 // Runs the simulation for a tick, then merges the low into the hurricane the way tick() does.
 const runAndMergeTheLow = (stores: IStores) => {
   const { simulation } = stores;
-  simulation.pressureSystemsSetup = [
-    new PressureSystem({ type: "low", center: { lat: 30, lng: -40 }, strength: 10 }),
-    new PressureSystem({ type: "high", center: { lat: 20, lng: -60 }, strength: 8 })
-  ];
+  runInAction(() => {
+    simulation.pressureSystemsSetup = [
+      new PressureSystem({ type: "low", center: { lat: 30, lng: -40 }, strength: 10 }),
+      new PressureSystem({ type: "high", center: { lat: 20, lng: -60 }, strength: 8 })
+    ];
+  });
   simulation.start();
   simulation.stop();
   simulation.removePressureSystem(simulation.activePressureSystems[0]);
-  simulation.simulationFinished = true;
+  runInAction(() => { simulation.simulationFinished = true; });
 };
 
 const systemTypes = (stores: IStores) => stores.simulation.activePressureSystems.map(ps => ps.type);
 
 const completeCurrentRun = (stores: IStores) => {
-  stores.simulation.simulationStarted = true;
-  stores.simulation.simulationFinished = true;
-  stores.simulation.hurricaneTrack.push({ position: { lat: 20, lng: -40 }, category: 2 });
+  runInAction(() => {
+    stores.simulation.simulationStarted = true;
+    stores.simulation.simulationFinished = true;
+    stores.simulation.hurricaneTrack.push({ position: { lat: 20, lng: -40 }, category: 2 });
+  });
 };
 
 describe("RunsModel", () => {
@@ -42,19 +48,104 @@ describe("RunsModel", () => {
     const { runs, simulation } = stores;
     expect(runs.isRunComplete(runs.runs[0])).toBe(false);
     expect(runs.allComplete).toBe(false);
-    simulation.simulationFinished = true;
+    runInAction(() => { simulation.simulationFinished = true; });
     expect(runs.isRunComplete(runs.runs[0])).toBe(true);
     expect(runs.allComplete).toBe(true);
+  });
+
+  describe("getSimulationSetup", () => {
+    it("reads the live simulation for the selected run, whose record is stale", () => {
+      const { runs, simulation } = stores;
+      const run = runs.runs[0];
+      simulation.setSeason("winter");
+      simulation.setTemperatureAnomaly("gulf", 2);
+
+      expect(runs.getSimulationSetup(run).season).toBe("winter");
+      expect(runs.getSimulationSetup(run).temperatureAnomalies?.gulf).toBe(2);
+      // The record is only snapshotted on switch-away, so it still holds the old setup.
+      expect(run.simulation.season).not.toBe("winter");
+    });
+
+    it("reads the stored record for an unselected run", () => {
+      const { runs, simulation } = stores;
+      const firstId = runs.selectedRunId;
+      simulation.setSeason("winter");
+      completeCurrentRun(stores);
+      runs.addRun();
+      simulation.setSeason("summer");
+
+      const first = runs.runs.find(run => run.id === firstId)!;
+      expect(runs.getSimulationSetup(first).season).toBe("winter");
+      expect(runs.getSimulationSetup(runs.runs[1]).season).toBe("summer");
+    });
+
+    it("carries the starting category from the hurricane", () => {
+      const { runs, simulation } = stores;
+      simulation.hurricane.setStartingCategory(3);
+      expect(runs.getSimulationSetup(runs.runs[0]).startingCategory).toBe(3);
+    });
+
+    // Reading the card's setup used to serialize the whole simulation, re-rendering every card on
+    // every tick. Nothing else here would notice a regression: the values are the same either way.
+    it("does not depend on the running simulation's track or time", () => {
+      const { runs, simulation } = stores;
+      const run = runs.runs[0];
+      let count = 0;
+      const dispose = autorun(() => {
+        runs.getSimulationSetup(run);
+        runs.isRunComplete(run);
+        count++;
+      });
+      expect(count).toBe(1);
+
+      runInAction(() => {
+        simulation.time = 50;
+        simulation.hurricaneTrack.push({ position: { lat: 20, lng: -40 }, category: 2 });
+        simulation.hurricane.setStrength(3);
+      });
+
+      expect(count).toBe(1);
+      dispose();
+    });
+  });
+
+  describe("getSimulationResult", () => {
+    it("is null until the run completes", () => {
+      const { runs, simulation } = stores;
+      const run = runs.runs[0];
+      expect(runs.getSimulationResult(run)).toBeNull();
+
+      completeCurrentRun(stores);
+
+      expect(runs.getSimulationResult(run)!.hurricaneTrack.length).toBe(1);
+      expect(runs.getSimulationResult(run)!.time).toBe(simulation.time);
+    });
+
+    it("reports the systems the run finished with, not the setup it started from", () => {
+      const { runs } = stores;
+      runAndMergeTheLow(stores);
+      const run = runs.runs[0];
+
+      expect(runs.getSimulationSetup(run).pressureSystemsSetup.map(ps => ps.type)).toEqual(["low", "high"]);
+      expect(runs.getSimulationResult(run)!.pressureSystems.map(ps => ps.type)).toEqual(["high"]);
+
+      // The same split holds once the run is no longer selected.
+      runs.addRun();
+      expect(runs.getSimulationSetup(run).pressureSystemsSetup.map(ps => ps.type)).toEqual(["low", "high"]);
+      expect(runs.getSimulationResult(run)!.pressureSystems.map(ps => ps.type)).toEqual(["high"]);
+    });
   });
 
   describe("selectRun", () => {
     it("snapshots the current run and hydrates the target run", () => {
       const { runs, simulation } = stores;
       const firstId = runs.selectedRunId;
-      simulation.season = "winter";
-      simulation.simulationStarted = true;
-      simulation.simulationFinished = true;
-      simulation.hurricaneTrack.push({ position: { lat: 20, lng: -40 }, category: 2 });
+      simulation.setSeason("winter");
+      runInAction(() => {
+        simulation.simulationStarted = true;
+        simulation.simulationFinished = true;
+        simulation.hurricaneTrack.push({ position: { lat: 20, lng: -40 }, category: 2 });
+      });
 
       runs.addRun();
       const secondId = runs.selectedRunId;
@@ -80,14 +171,16 @@ describe("RunsModel", () => {
     it("resets a started-but-unfinished run to setup only when switching away", () => {
       const { runs, simulation } = stores;
       const firstId = runs.selectedRunId;
-      simulation.simulationFinished = true;
+      runInAction(() => { simulation.simulationFinished = true; });
       runs.addRun();
       const secondId = runs.selectedRunId;
       // Start the second run but don't finish it.
-      simulation.simulationStarted = true;
-      simulation.simulationFinished = false;
-      simulation.hurricaneTrack.push({ position: { lat: 20, lng: -40 }, category: 2 });
-      simulation.time = 50;
+      runInAction(() => {
+        simulation.simulationStarted = true;
+        simulation.simulationFinished = false;
+        simulation.hurricaneTrack.push({ position: { lat: 20, lng: -40 }, category: 2 });
+        simulation.time = 50;
+      });
 
       runs.selectRun(firstId);
 
@@ -170,7 +263,7 @@ describe("RunsModel", () => {
   describe("duplicateSelectedRun", () => {
     it("copies the selected run's setup without its outcome", () => {
       const { runs, simulation } = stores;
-      simulation.season = "winter";
+      simulation.setSeason("winter");
       simulation.setTemperatureAnomaly("gulf", 2);
       completeCurrentRun(stores);
 
@@ -188,10 +281,10 @@ describe("RunsModel", () => {
     it("copies the older run's setup when an older run is selected", () => {
       const { runs, simulation } = stores;
       const firstId = runs.selectedRunId;
-      simulation.season = "winter";
+      simulation.setSeason("winter");
       completeCurrentRun(stores);
       runs.addRun();
-      simulation.season = "summer";
+      simulation.setSeason("summer");
       completeCurrentRun(stores);
       runs.selectRun(firstId);
 
@@ -255,7 +348,7 @@ describe("RunsModel", () => {
   describe("resetSelectedRun", () => {
     it("keeps setup and clears the outcome", () => {
       const { runs, simulation } = stores;
-      simulation.season = "winter";
+      simulation.setSeason("winter");
       completeCurrentRun(stores);
       runs.resetSelectedRun();
       expect(simulation.season).toBe("winter");
@@ -323,7 +416,7 @@ describe("RunsModel", () => {
     it("replaces a sole run with a fresh default run", () => {
       const { runs, simulation } = stores;
       const originalId = runs.selectedRunId;
-      simulation.season = "winter";
+      simulation.setSeason("winter");
       completeCurrentRun(stores);
       runs.deleteRun(originalId);
       expect(runs.runs.length).toBe(1);
@@ -360,7 +453,7 @@ describe("RunsModel", () => {
       const { runs, simulation } = stores;
       const state = { ...runs.runs[0].simulation, simulationFinished: true };
       runs.setRuns([{ id: "run-7", simulation: state }], "run-7");
-      simulation.simulationFinished = true;
+      runInAction(() => { simulation.simulationFinished = true; });
       runs.addRun();
       expect(runs.runs[1].id).toBe("run-8");
     });
