@@ -56,6 +56,7 @@ export class RunsModel {
     const temperatureAnomalies = selected
       ? this.simulation.serializedTemperatureAnomalies
       : run.simulation.temperatureAnomalies;
+
     return {
       season,
       startLocation: safeStartLocation(startLocation),
@@ -73,6 +74,7 @@ export class RunsModel {
     const pressureSystems = selected
       ? this.simulation.pressureSystems.map(system => system.serialize())
       : run.simulation.pressureSystems;
+
     return {
       pressureSystems,
       time,

@@ -28,9 +28,9 @@ export const RunResult = observer(function RunResult({ run }: IRunResultProps) {
   const { runs } = useStores();
   const { maxDuration } = runs;
   const result = runs.getSimulationResult(run);
-  const peak = result ? peakCategory(result) : null;
-  const landfalls = result ? landfallSummary(result) : null;
-  const series = result ? intensitySeries(result) : [];
+  const peak = peakCategory(result);
+  const landfalls = landfallSummary(result);
+  const series = intensitySeries(result);
   const duration = result?.time ?? 0;
 
   // Measure the sparkline's slot (the flex space after the icon) so the longest-lived run's trace

@@ -54,6 +54,7 @@ export interface IRunResult {
 
 /**
  * Serialized simulation state.
+ * In ISimulationState, the startingCategory is under hurricane instead of a top level field.
  */
 export interface ISimulationState extends Omit<IRunSetup, "startingCategory">, IRunResult {
   // Simulation progress
