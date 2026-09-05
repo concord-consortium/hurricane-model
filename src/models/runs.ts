@@ -112,7 +112,8 @@ export class RunsModel {
 
   // Returns the length of the longest complete track.
   @computed public get maxDuration(): number {
-    return Math.max(...this.runs.filter(run => this.isRunComplete(run)).map(run => this.getSimulation(run).time));
+    const max = Math.max(...this.runs.filter(run => this.isRunComplete(run)).map(run => this.getSimulation(run).time));
+    return isFinite(max) ? max : 0;
   }
 
   @action.bound public selectRun(id: string) {

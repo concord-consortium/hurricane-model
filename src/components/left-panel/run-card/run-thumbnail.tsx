@@ -65,7 +65,7 @@ export const RunThumbnail = observer(function RunThumbnail({ result, run }: IRun
   if (!result) return <div className={css.resultPlaceholder}>Run to see result</div>;
 
   const letter = runs.runLetter(run);
-  const { season } = run.simulation;
+  const { season } = runs.getSimulationSetup(run);
   const { hurricane, hurricaneTrack, pressureSystems } = result;
   const baseImage = BASE_IMAGES[ui.baseMapType] || satelliteImg;
   const showSST = ui.overlay === "sst";

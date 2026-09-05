@@ -36,7 +36,7 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
 
   // Track points are only ever appended, so the finished segments don't change between renders.
   // Keeping their identity stable keeps Leaflet from redrawing the whole track every frame while the hurricane moves.
-  // Appending segements to hurricaneTrack does not cause the memo to update, so we need trackLength as a dependency.
+  // Appending segments to hurricaneTrack does not cause the memo to update, so we need trackLength as a dependency.
   const segments = useMemo(() => buildSegments(hurricaneTrack.slice(0, trackLength)), [hurricaneTrack, trackLength]);
 
   // Only the tail follows the live hurricane position.
