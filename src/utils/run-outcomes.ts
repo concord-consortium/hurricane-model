@@ -1,22 +1,28 @@
-import { ISimulationState } from "../types/interactive-state";
+import { IRunResult } from "../types/interactive-state";
 
 export interface ILandfallSummary {
   count: number;
   peakCategory: number;
 }
 
-export function peakCategory(sim: ISimulationState): number {
-  return Math.max(...[0, ...sim.hurricaneTrack.map(p => p.category)]);
+export function peakCategory(result: IRunResult | null): number | null {
+  if (!result) return null;
+
+  return Math.max(...[0, ...result.hurricaneTrack.map(p => p.category)]);
 }
 
-export function landfallSummary(sim: ISimulationState): ILandfallSummary {
-  const peak = Math.max(...[-1, ...sim.landfalls.map(lf => lf.category)]);
+export function landfallSummary(result: IRunResult | null): ILandfallSummary | null {
+  if (!result) return null;
 
-  return { count: sim.landfalls.length, peakCategory: peak };
+  const peak = Math.max(...[-1, ...result.landfalls.map(lf => lf.category)]);
+
+  return { count: result.landfalls.length, peakCategory: peak };
 }
 
-export function intensitySeries(sim: ISimulationState, max = 40): number[] {
-  const { hurricaneTrack } = sim;
+export function intensitySeries(result: IRunResult | null, max = 40): number[] {
+  if (!result) return [];
+
+  const { hurricaneTrack } = result;
 
   if (max <= 0) return [];
   if (hurricaneTrack.length <= max) return hurricaneTrack.map(p => p.category);

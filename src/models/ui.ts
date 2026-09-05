@@ -64,10 +64,14 @@ export class UIModel {
   }
   @observable public latLngToContainerPoint: (arg: LatLngExpression) => Point = () => new Point(0, 0);
 
+  @computed public get baseMapType() {
+    return this.baseMap === "population" ? "street" : this.baseMap;
+  }
+
   @computed public get baseMapTileUrl() {
     // Special case for "population". Actually, population isn't a base map but overlay.
     // So, when it's selected, we need to use "street" map as a base.
-    return mapLayer(this.baseMap === "population" ? "street" : this.baseMap).url;
+    return mapLayer(this.baseMapType).url;
   }
 
   @computed public get baseMapTileAttribution() {

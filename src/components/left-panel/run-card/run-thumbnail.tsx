@@ -4,7 +4,7 @@ import React from "react";
 import config from "../../../config";
 import { sstImages } from "../../../models/sst-overlay";
 import { useStores } from "../../../stores-context";
-import { ISimulationState } from "../../../types/interactive-state";
+import { IRunResult, IRunState } from "../../../types/interactive-state";
 import { categoryColors } from "../../../utils/hurricane-categories";
 
 import reliefImg from "../../../assets/basemap-thumbs/relief.png";
@@ -55,16 +55,19 @@ const BASE_IMAGES: Record<string, string> = {
 };
 
 interface IRunThumbnailProps {
-  sim: ISimulationState | null;
+  result: IRunResult | null;
+  run: IRunState;
 }
 
-export const RunThumbnail = observer(function RunThumbnail({ sim }: IRunThumbnailProps) {
-  const { ui } = useStores();
+export const RunThumbnail = observer(function RunThumbnail({ result, run }: IRunThumbnailProps) {
+  const { runs, ui } = useStores();
 
-  if (!sim) return <div className={css.resultPlaceholder}>Run to see result</div>;
+  if (!result) return <div className={css.resultPlaceholder}>Run to see result</div>;
 
-  const { hurricane, hurricaneTrack, pressureSystems, season } = sim;
-  const baseImage = BASE_IMAGES[ui.baseMap] || satelliteImg;
+  const letter = runs.runLetter(run);
+  const { season } = runs.getSimulationSetup(run);
+  const { hurricane, hurricaneTrack, pressureSystems } = result;
+  const baseImage = BASE_IMAGES[ui.baseMapType] || satelliteImg;
   const showSST = ui.overlay === "sst";
   const { accessibleSSTScale } = ui.sstOverlay;
   const defaultSSTUrl = sstImages[config.defaultSSTScale][season];
@@ -82,7 +85,7 @@ export const RunThumbnail = observer(function RunThumbnail({ sim }: IRunThumbnai
         viewBox={`0 0 ${pixelWidth} ${pixelHeight}`}
         preserveAspectRatio="none"
         role="img"
-        aria-label="Run result map"
+        aria-label={`Run ${letter} result map`}
       >
         <image href={baseImage} x={0} y={0} width={pixelWidth} height={pixelHeight} preserveAspectRatio="none" />
 

@@ -291,6 +291,14 @@ export class SimulationModel {
     return sstImages[this.season];
   }
 
+  @computed get serializedPressureSystemsSetup() {
+    return this.pressureSystemsSetup.map(system => system.serialize());
+  }
+
+  @computed get serializedTemperatureAnomalies() {
+    return Object.fromEntries(this.temperatureAnomalies);
+  }
+
   @action.bound public setSeaSurfaceTempData(seaSurfaceTempData: PNG | null) {
     this.seaSurfaceTempData = seaSurfaceTempData;
   }

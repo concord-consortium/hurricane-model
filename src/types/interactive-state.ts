@@ -29,28 +29,39 @@ export interface IHurricaneState {
 }
 
 /**
- * Serialized simulation state.
+ * The subset of a run's state that a card summarizes as setup.
  */
-export interface ISimulationState {
-  // Core settings
+export interface IRunSetup {
   season: Season;
   startLocation: StartLocation;
+  startingCategory?: number;
   // What the student arranged before pressing start. The source of truth for the run's setup.
-  pressureSystemsSetup?: IPressureSystemState[];
+  pressureSystemsSetup: IPressureSystemState[];
+  temperatureAnomalies?: Partial<Record<NamedRegion, number>>;
+}
+
+/**
+ * The subset of a run's state that a card summarizes as results.
+ */
+export interface IRunResult {
+  hurricane: IHurricaneState;
+  hurricaneTrack: ITrackPoint[];
+  landfalls: ILandfall[];
   // The running simulation's own systems, which the run can mutate.
   pressureSystems: IPressureSystemState[];
+  time: number;
+}
 
+/**
+ * Serialized simulation state.
+ * In ISimulationState, the startingCategory is under hurricane instead of a top level field.
+ */
+export interface ISimulationState extends Omit<IRunSetup, "startingCategory">, IRunResult {
   // Simulation progress
   simulationStarted: boolean;
   simulationFinished: boolean;
-  time: number;
-
-  // Hurricane state (for mid-simulation restore)
-  hurricane: IHurricaneState;
 
   // Track data
-  hurricaneTrack: ITrackPoint[];
-  landfalls: ILandfall[];
   strengthChangePositions: number[];
   precipitationPoints: IPrecipitationPoint[];
 
@@ -58,9 +69,6 @@ export interface ISimulationState {
   numberOfStepsOverSea?: number;
   numberOfStepsOverLand?: number;
   consumedExtendedLandfallAreas?: string[];
-
-  // Per-region SST anomalies in °C.
-  temperatureAnomalies?: Partial<Record<NamedRegion, number>>;
 }
 
 /**

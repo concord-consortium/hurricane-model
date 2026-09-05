@@ -2,16 +2,23 @@ import * as React from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { runInAction } from "mobx";
+import { observer } from "mobx-react";
 
 import { defaultSimulationState } from "../../../models/simulation-serialization";
 import { createStores, IStores } from "../../../models/stores";
-import { StoresContext } from "../../../stores-context";
+import { StoresContext, useStores } from "../../../stores-context";
 import { RunCard } from "./run-card";
+
+// Mirrors RunsSection, so cards mount and unmount as runs are added and deleted.
+const RunCards = observer(function RunCards() {
+  const { runs } = useStores();
+  return <>{runs.runs.map(run => <RunCard key={run.id} run={run} />)}</>;
+});
 
 const renderPanels = (stores: IStores) =>
   render(
     <StoresContext value={stores}>
-      {stores.runs.runs.map(run => <RunCard key={run.id} run={run} />)}
+      <RunCards />
     </StoresContext>
   );
 
@@ -97,14 +104,25 @@ describe("RunCard", () => {
     expect(stores.simulation.season).toBe("winter");
   });
 
-  it("labels each panel by its run number", () => {
+  it("labels each panel by its run letter", () => {
     completeCurrentRun(stores);
     stores.runs.addRun();
     renderPanels(stores);
 
     const panels = screen.getAllByTestId("run-card");
-    expect(panels[0]).toHaveAttribute("aria-label", "Run 1");
-    expect(panels[1]).toHaveAttribute("aria-label", "Run 2, Not run yet - editable");
+    expect(panels[0]).toHaveAttribute("aria-label", "Run A");
+    expect(panels[1]).toHaveAttribute("aria-label", "Run B, Not run yet - editable");
+    expect(screen.getAllByTestId("run-label").map(label => label.textContent)).toEqual(["A", "B"]);
+  });
+
+  it("shifts the letters down when an earlier run is deleted", () => {
+    completeCurrentRun(stores);
+    stores.runs.addRun();
+    renderPanels(stores);
+
+    act(() => { stores.runs.deleteRun(stores.runs.runs[0].id); });
+    expect(screen.getAllByTestId("run-label").map(label => label.textContent)).toEqual(["A"]);
+    expect(screen.getByTestId("run-card")).toHaveAttribute("aria-label", "Run A, Not run yet - editable");
   });
 
   it("selects a run with Enter or Space on a focused panel", async () => {
@@ -199,13 +217,13 @@ describe("RunCard", () => {
       renderPanels(stores);
       expect(screen.getByText("Run to see result")).toBeInTheDocument();
       expect(screen.getAllByText("—").length).toBe(3);
-      expect(screen.queryByRole("img", { name: "Run result map" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("img", { name: "Run A result map" })).not.toBeInTheDocument();
     });
 
     it("shows the thumbnail and results once the run is complete", () => {
       completeCurrentRun(stores);
       renderPanels(stores);
-      expect(screen.getByRole("img", { name: "Run result map" })).toBeInTheDocument();
+      expect(screen.getByRole("img", { name: "Run A result map" })).toBeInTheDocument();
       expect(screen.queryByText("Run to see result")).not.toBeInTheDocument();
       expect(screen.getByTestId("result-peak-category")).toHaveTextContent("Cat 2");
       expect(screen.getByTestId("result-landfalls")).toHaveTextContent("None");

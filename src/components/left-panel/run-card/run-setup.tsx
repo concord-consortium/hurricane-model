@@ -1,11 +1,13 @@
 import { clsx } from "clsx";
+import { observer } from "mobx-react";
 import React from "react";
 
 import { clampCategory } from "../../../config";
 import { categoryLabel } from "../../../utils/hurricane-categories";
 import { resolveStartLocation } from "../../../models/simulation";
-import { NamedRegion, namedRegions, Season, seasonLabels, StartLocation } from "../../../types";
-import { IPressureSystemState } from "../../../types/interactive-state";
+import { useStores } from "../../../stores-context";
+import { namedRegions, seasonLabels } from "../../../types";
+import { IRunState } from "../../../types/interactive-state";
 import { formatLatLng } from "../../../utils/lat-long";
 import { pressureSystemReport } from "../../../utils/pressure-systems";
 import { temperatureAnomalyRegions } from "../../../utils/regions";
@@ -18,26 +20,19 @@ import ThermometerIcon from "../../../assets/left-panel/thermometer.svg";
 
 import categoryCss from "../../hurricane-category.scss";
 import cardCss from "./run-card.scss";
-import css from "./run-setup-summary.scss";
-
-// The subset of a run's setup that a card summarizes.
-export interface IRunSetup {
-  season: Season;
-  startLocation: StartLocation;
-  startingCategory?: number;
-  pressureSystems: IPressureSystemState[];
-  temperatureAnomalies?: Partial<Record<NamedRegion, number>>;
-}
+import css from "./run-setup.scss";
 
 function anomalyText(value: number): string {
   return `${value > 0 ? "+" : "−"}${Math.abs(value)}\u00A0°C`;
 }
 
 interface IProps {
-  setup: IRunSetup;
+  run: IRunState;
 }
 
-export function RunSetupSummary({ setup }: IProps) {
+export const RunSetup = observer(function RunSetup({ run }: IProps) {
+  const { runs } = useStores();
+  const setup = runs.getSimulationSetup(run);
   const start = resolveStartLocation(setup.startLocation);
   const category = clampCategory(setup.startingCategory ?? 0);
   const anomalies = namedRegions
@@ -46,7 +41,7 @@ export function RunSetupSummary({ setup }: IProps) {
       value: setup.temperatureAnomalies?.[region] ?? 0
     }))
     .filter(a => a.value !== 0);
-  const report = pressureSystemReport(setup.pressureSystems);
+  const report = pressureSystemReport(setup.pressureSystemsSetup);
 
   const rowClasses = clsx(cardCss.categoryRow, css.categoryRow);
 
@@ -93,4 +88,4 @@ export function RunSetupSummary({ setup }: IProps) {
       </div>
     </div>
   );
-}
+});

@@ -36,8 +36,8 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
 
   // Track points are only ever appended, so the finished segments don't change between renders.
   // Keeping their identity stable keeps Leaflet from redrawing the whole track every frame while the hurricane moves.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const segments = useMemo(() => buildSegments(hurricaneTrack), [hurricaneTrack, trackLength]);
+  // Appending segments to hurricaneTrack does not cause the memo to update, so we need trackLength as a dependency.
+  const segments = useMemo(() => buildSegments(hurricaneTrack.slice(0, trackLength)), [hurricaneTrack, trackLength]);
 
   // Only the tail follows the live hurricane position.
   const lastPoint = trackLength > 0 ? hurricaneTrack[trackLength - 1] : null;
@@ -51,7 +51,7 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
     <Pane name="selectedTrack" style={{ zIndex: 430 }}>
       {segments.map((segment, idx) =>
         <Polyline
-          key={`${idx}-border`}
+          key={`${idx}-${segment.category}-border`}
           className={css.hurricaneTrackBorder}
           positions={segment.positions}
           weight={7}
@@ -67,7 +67,7 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
       }
       {segments.map((segment, idx) =>
         <Polyline
-          key={`${idx}`}
+          key={`${idx}-${segment.category}`}
           className={segmentClass(segment.category)}
           pane="shadowPane"
           positions={segment.positions}

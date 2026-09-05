@@ -1,0 +1,25 @@
+@use "common" as *;
+
+// Leaflet anchors the default 12px DivIcon 6px off-center, so the badge is pulled back
+// by half its own size less those 6px to sit on the track's end point.
+$centeringOffset: $runLetterBadgeSize * 0.5 - 6px;
+
+.runTrackLabel {
+  @include runLetterBadge;
+
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+  color: $charcoal;
+  cursor: pointer;
+  transform: translate(-$centeringOffset, -$centeringOffset);
+
+  &.hovered:not(.selected) {
+    background-color: $secondaryColorHover;
+  }
+
+  &.selected {
+    background-color: $secondaryColor;
+    cursor: default;
+  }
+}

@@ -1,13 +1,16 @@
-import { action, comparer, computed, makeObservable, observable } from "mobx";
-import { IRunState, ISimulationState } from "../types/interactive-state";
+import { action, comparer, computed, makeObservable, observable, toJS } from "mobx";
+import { IRunResult, IRunSetup, IRunState, ISimulationState } from "../types/interactive-state";
+import { safeStartLocation } from "../utils/interactive-state";
 import {
   applySimulationState, cloneSimulationState, defaultSimulationState, extractSetupState,
-  normalizeSimulationState, serializeSimulation
+  normalizeSimulationState, serializeHurricane, serializeSimulation
 } from "./simulation-serialization";
 import { SimulationModel } from "./simulation";
 import { UIModel } from "./ui";
 
 export const maxRuns = 6;
+// maxRuns keeps run letters inside A–F.
+const firstRunLetterCharCode = "A".charCodeAt(0);
 
 export class RunsModel {
   @observable public runs: IRunState[] = [];
@@ -40,12 +43,53 @@ export class RunsModel {
   }
 
   // The selected run's simulation can be stale — the live simulation is its source of truth.
-  public getSimulation(run: IRunState): ISimulationState {
-    return this.isSelected(run.id) ? this.serializedSimulation : run.simulation;
+  public getSimulation(run: IRunState): ISimulationState | SimulationModel {
+    return this.isSelected(run.id) ? this.simulation : run.simulation;
+  }
+
+  public getSimulationSetup(run: IRunState): IRunSetup {
+    const selected = this.isSelected(run.id);
+    const { season, startLocation, hurricane } = this.getSimulation(run);
+    const pressureSystemsSetup = selected
+      ? this.simulation.serializedPressureSystemsSetup
+      : run.simulation.pressureSystemsSetup;
+    const temperatureAnomalies = selected
+      ? this.simulation.serializedTemperatureAnomalies
+      : run.simulation.temperatureAnomalies;
+
+    return {
+      season,
+      startLocation: safeStartLocation(startLocation),
+      startingCategory: hurricane.startingCategory,
+      pressureSystemsSetup,
+      temperatureAnomalies
+    };
+  }
+
+  public getSimulationResult(run: IRunState): IRunResult | null {
+    if (!this.isRunComplete(run)) return null;
+
+    const selected = this.isSelected(run.id);
+    const { hurricane, hurricaneTrack, landfalls, time } = this.getSimulation(run);
+    const pressureSystems = selected
+      ? this.simulation.pressureSystems.map(system => system.serialize())
+      : run.simulation.pressureSystems;
+
+    return {
+      pressureSystems,
+      time,
+      hurricane: serializeHurricane(hurricane),
+      hurricaneTrack: toJS(hurricaneTrack),
+      landfalls: toJS(landfalls)
+    };
   }
 
   public isRunComplete(run: IRunState): boolean {
     return this.getSimulation(run).simulationFinished;
+  }
+
+  public runLetter(run: IRunState): string {
+    return String.fromCharCode(firstRunLetterCharCode + this.runs.indexOf(run));
   }
 
   @computed public get allComplete(): boolean {
@@ -68,9 +112,10 @@ export class RunsModel {
     return comparer.structural(serializeSimulation(simulation), this.initialSimulationState);
   }
 
-  // Returns the length of the longest track.
+  // Returns the length of the longest complete track.
   @computed public get maxDuration(): number {
-    return Math.max(...this.runs.map(run => this.getSimulation(run).time));
+    const max = Math.max(...this.runs.filter(run => this.isRunComplete(run)).map(run => this.getSimulation(run).time));
+    return isFinite(max) ? max : 0;
   }
 
   @action.bound public selectRun(id: string) {
