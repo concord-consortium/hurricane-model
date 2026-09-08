@@ -16,7 +16,7 @@ export const AboutContent = ({ onBack }: IProps) => (
     <ul>
       <li>
         <strong>Wind.</strong> The model does not include upper atmosphere winds. Surface winds direct the storm
-        path. Wind data is based on a 30 year average for the region.
+        path. Wind data is based on a 30-year average for the region.
       </li>
       <li>
         <strong>Sea Surface Temperature (SST).</strong> SST is based on the 2025 average temperatures for each time
