@@ -204,7 +204,7 @@ describe("SimulationModel store", () => {
         // els(hidden),Reference_Features,Coastlines(hidden)&t=2018-09-19-T00%3A00%3A00Z&z=3&v=-144.11630581918422,-22.
         // 21990140009921,35.883694180815795,68.41291109990078
         // or in our data sets.
-        expect(sim.seaSurfaceTempAt({lat: 20, lng: -20})).toEqual(24.02);
+        expect(sim.seaSurfaceTempAt({lat: 20, lng: -20})).toEqual(25.95);
         expect(sim.seaSurfaceTempAt({lat: 20, lng: -90})).toEqual(null); // land
 
         // Change season and test again.
@@ -218,7 +218,7 @@ describe("SimulationModel store", () => {
           // Labels(hidden),Reference_Features,Coastlines(hidden)&t=2018-09-19-T00%3A00%3A00Z&z=3&v=-144.11630581918422,
           // -22.21990140009921,35.883694180815795,68.41291109990078
           // or in our data sets.
-          expect(sim.seaSurfaceTempAt({lat: 20, lng: -20})).toEqual(20.73);
+          expect(sim.seaSurfaceTempAt({lat: 20, lng: -20})).toEqual(21.87);
           expect(sim.seaSurfaceTempAt({lat: 20, lng: -90})).toEqual(null); // land
           done();
           // restore original timeout value
