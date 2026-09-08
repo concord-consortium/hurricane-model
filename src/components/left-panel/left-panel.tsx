@@ -2,7 +2,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import List from "@mui/material/List";
 import ListSubheader from "@mui/material/ListSubheader";
 import clsx from "clsx";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 
 import { Tab } from "../tab";

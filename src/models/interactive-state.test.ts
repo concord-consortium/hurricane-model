@@ -7,6 +7,7 @@ const v1SimulationFixture: ISimulationState = {
   season: "fall",
   startLocation: "atlantic",
   pressureSystems: [],
+  pressureSystemsSetup: [],
   simulationStarted: false,
   simulationFinished: false,
   time: 0,
@@ -201,7 +202,7 @@ describe("interactive-state", () => {
         landfalls: [],
         strengthChangePositions: [0, 100],
         precipitationPoints: []
-      });
+      } as any);
 
       setInteractiveState(stores, state);
 

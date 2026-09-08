@@ -119,7 +119,7 @@ describe("simulation-serialization", () => {
 
     it("seeds the setup from pressureSystems for runs saved before the split", () => {
       const { simulation } = createStores();
-      const legacy = serializeSimulation(simulation);
+      const legacy: any = serializeSimulation(simulation);
       delete legacy.pressureSystemsSetup;
       legacy.pressureSystems = [{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }];
 
@@ -127,7 +127,7 @@ describe("simulation-serialization", () => {
 
       // The legacy state has no label, so it is restored as an empty one.
       expect(simulation.pressureSystemsSetup.map(ps => ps.serialize()))
-        .toMatchObject(legacy.pressureSystems!.map(ps => ({ ...ps, label: "" })));
+        .toMatchObject(legacy.pressureSystems!.map((ps: any) => ({ ...ps, label: "" })));
     });
   });
 
@@ -196,7 +196,7 @@ describe("simulation-serialization", () => {
 
     it("keeps the setup of a legacy run that stored it in pressureSystems", () => {
       const { simulation } = createStores();
-      const legacy = serializeSimulation(simulation);
+      const legacy: any = serializeSimulation(simulation);
       delete legacy.pressureSystemsSetup;
       legacy.pressureSystems = [{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }];
       legacy.simulationStarted = true;
