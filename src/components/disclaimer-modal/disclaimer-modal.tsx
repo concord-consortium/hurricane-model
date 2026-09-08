@@ -1,12 +1,13 @@
 import { observer } from "mobx-react";
 import React, { useId, useState } from "react";
 
-import WarningIcon from "../assets/warning.svg";
-import config from "../config";
-import { log } from "../log";
-import { useStores } from "../stores-context";
-import { AboutStormExplorerContent } from "./about-storm-explorer-content";
-import { Dialog } from "./dialog";
+import config from "../../config";
+import { log } from "../../log";
+import { useStores } from "../../stores-context";
+import { Dialog } from "../dialog";
+import { AboutStormExplorerContent } from "./about-content";
+
+import WarningIcon from "../../assets/warning.svg";
 
 import css from "./disclaimer-modal.scss";
 

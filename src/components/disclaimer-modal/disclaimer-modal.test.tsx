@@ -3,10 +3,10 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { backdropClasses } from "@mui/material/Backdrop";
 
-import config from "../config";
-import * as logModule from "../log";
-import { createStores, IStores } from "../models/stores";
-import { StoresContext } from "../stores-context";
+import config from "../../config";
+import * as logModule from "../../log";
+import { createStores, IStores } from "../../models/stores";
+import { StoresContext } from "../../stores-context";
 import { DisclaimerModal } from "./disclaimer-modal";
 
 const logSpy = jest.spyOn(logModule, "log").mockImplementation(() => undefined);

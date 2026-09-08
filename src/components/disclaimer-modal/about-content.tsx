@@ -1,12 +1,12 @@
-import React, { FC } from "react";
+import React from "react";
 
-import css from "./about-storm-explorer-content.scss";
+import css from "./about-content.scss";
 
 interface IProps {
   onBack: () => void;
 }
 
-export const AboutStormExplorerContent: FC<IProps> = ({ onBack }) => (
+export const AboutStormExplorerContent = ({ onBack }: IProps) => (
   <div className={css.about} data-test="about-storm-explorer">
     <p>
       Storm Explorer, like many weather models, is simplified and does not include all possible variables. As such,

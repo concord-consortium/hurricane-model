@@ -8,7 +8,7 @@ import { log } from "../log";
 import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import { BaseComponent, IBaseProps } from "./base";
 import { BottomBar } from "./bottom-bar/bottom-bar";
-import { DisclaimerModal } from "./disclaimer-modal";
+import { DisclaimerModal } from "./disclaimer-modal/disclaimer-modal";
 import { LeftPanel } from "./left-panel/left-panel";
 import { MapView } from "./map-view";
 import { RightPanel } from "./right-panel/right-panel";
