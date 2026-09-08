@@ -49,8 +49,9 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
 
   public handlePressureSysDrag = (e: Leaflet.LeafletMouseEvent) => {
     const { model } = this.props;
-    this.stores.simulation.setPressureSysCenter(model, e.latlng);
-    if (config.mode === "storm") this.stores.ui.setSetupMode("pressureSystems");
+    const { simulation, ui } = this.stores;
+    simulation.setPressureSysCenter(model, e.latlng);
+    if (config.mode === "storm" && ui.setupMode !== "pressureSystems") ui.setSetupMode("pressureSystems");
   }
 
   public handlePressureSysDragEnd = () => {

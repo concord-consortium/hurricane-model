@@ -12,7 +12,7 @@ import SeasonIcon from "../../assets/left-panel/season.svg";
 import css from "./season-section.scss";
 
 const hint = "Select a season, which determines sea surface temperatures.";
-const postscript = "Sea surface temps peak in Fall, giving storms more energy to intensify.";
+const postscript = "Sea surface temperatures peak in Fall, giving storms more energy to intensify.";
 
 interface ISeasonButtonProps {
   season: Season;

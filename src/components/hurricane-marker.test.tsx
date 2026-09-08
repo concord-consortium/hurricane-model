@@ -130,6 +130,15 @@ describe("HurricaneMarker component", () => {
       config.mode = "storm";
     });
 
+    it("is not dimmed when not in a setup mode", async () => {
+      renderMarker();
+      await waitFor(() => {
+        const markerEl = document.querySelector(`[data-test="hurricane-marker"]`);
+        expect(markerEl).not.toBeNull();
+        expect(markerEl).not.toHaveClass("dimmed");
+      });
+    });
+
     it("is not dimmed in stormCategory setup mode", async () => {
       stores.ui.setSetupMode("stormCategory");
       renderMarker();

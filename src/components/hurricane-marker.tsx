@@ -31,7 +31,7 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
   const draggable = !ui.isReadOnly && !ui.thermometerActive && config.mode === "storm" && !simulationStarted;
 
   const handleDrag = (e: Leaflet.LeafletEvent) => {
-    stores.ui.setSetupMode("stormLocation");
+    if (stores.ui.setupMode !== "stormLocation") stores.ui.setSetupMode("stormLocation");
     const { hurricane, activePressureSystems } = stores.simulation;
     const marker = e.target as Leaflet.Marker;
     const raw = marker.getLatLng();
