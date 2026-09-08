@@ -6,11 +6,18 @@ import { isStartLocationName, StartLocation } from "../types";
 import { IPressureSystemState } from "../types/interactive-state";
 
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
-// High pressure reads 1015..1028 mb (stronger = higher); low reads 1010..997 mb (stronger = lower).
+// High pressure reads 1015 mb (weak) up to 1030 mb (strong); low reads 1010 mb (weak) down to 990 mb
+// (strong). Both ranges were WIDENED at the strong end only: we ADD reach past the shared slope anchor
+// (see maxStrengthHigh / maxStrengthLow) instead of compressing the scale, so the mb-per-strength slope
+// is unchanged and existing defaults keep BOTH their label AND their strength/physics.
 // Single source of truth for this mapping — pressure-system-icon.tsx re-exports these.
 export const minStrength = 3;
-export const maxStrength = 20;
-export const mbLabelRange = 13;
+export const maxStrength = 20;      // reference span anchoring the mb-per-strength slope (not a slider max)
+export const mbLabelRange = 13;     // mb over (maxStrength - minStrength) strength units => 13/17 per unit
+// Each slider extends past maxStrength so its strong end lands exactly on the widened label (1030 / 990).
+// Defaults sit well below these, so they're untouched.
+export const maxStrengthHigh = minStrength + (1030 - 1015) * (maxStrength - minStrength) / mbLabelRange; // ≈ 22.62
+export const maxStrengthLow  = minStrength + (1010 - 990)  * (maxStrength - minStrength) / mbLabelRange; // ≈ 29.15
 
 export function strengthToMb(type: PressureSystemType, strength: number): number {
   const norm = (strength - minStrength) / (maxStrength - minStrength);

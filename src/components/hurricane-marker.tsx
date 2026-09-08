@@ -32,6 +32,9 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
   const draggable = !simulationStarted && !multiTrack.setupLocked;
 
   const handleDrag = (e: Leaflet.LeafletEvent) => {
+    // Tuck the Temp reading away while dragging so it doesn't occlude the storm; the tool stays on and
+    // the reading reappears on drag end.
+    ui.setThermometerSuspended(true);
     // Reveal the Storm Location section as soon as the storm is being moved (no map reflow — only
     // opening the panel changes the map, which we defer to drag end).
     if (ui.setupMode !== "stormLocation") ui.setSetupMode("stormLocation");
@@ -52,6 +55,7 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
   };
 
   const handleDragEnd = (e: Leaflet.DragEndEvent) => {
+    ui.setThermometerSuspended(false);
     const { lat, lng } = (e.target as Leaflet.Marker).getLatLng();
     const startLocation = { lat, lng };
     stores.simulation.setStartLocation(startLocation);

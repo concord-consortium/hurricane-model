@@ -17,5 +17,8 @@ interface IProps {
 
 export function PolygonRegion({ region, pathOptions }: IProps) {
   const po = { ...defaultPathOptions, ...(pathOptions ?? {}) };
-  return <Polygon positions={region.latLngs} pathOptions={po} />;
+  // These regions are visual outlines only (the storm placement area, the SST anomaly regions). Making
+  // them non-interactive stops Leaflet from painting a pointer cursor across the whole filled area and
+  // from capturing clicks — so only the real controls (the storm symbol, the +/- buttons) respond.
+  return <Polygon positions={region.latLngs} pathOptions={po} interactive={false} />;
 }

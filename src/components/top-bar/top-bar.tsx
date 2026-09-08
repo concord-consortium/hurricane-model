@@ -10,8 +10,8 @@ import { getAppName } from "../../utils/app";
 import css from "./top-bar.scss";
 
 // StormExplorer version label shown at the top-left. Bump these when cutting a new version.
-const APP_VERSION_MAIN = "Storm Explorer: Multi-track · v0.8 · ";
-const APP_VERSION_UPDATED = "updated: 8/24/26";
+const APP_VERSION_MAIN = "Storm Explorer: Multi-track · v0.9 · ";
+const APP_VERSION_UPDATED = "updated: 8/26/26";
 
 interface IProps extends IBaseProps {}
 interface IState {
@@ -34,14 +34,17 @@ export class TopBar extends BaseComponent<IProps, IState> {
     return (
       <div className={css.topBar}>
         <span className={css.leftGroup}>
-          <span data-test="reload" className={css.textButton} onClick={this.handleReload}><RefreshIcon /></span>
+          <span data-test="reload" className={css.textButton} role="button" tabIndex={0} aria-label="Reload"
+            onClick={this.handleReload} onKeyDown={this.onActivateKey(this.handleReload)}><RefreshIcon /></span>
           <span data-test="version-label" className={css.versionLabel}>
             <span className={css.versionMain}>{APP_VERSION_MAIN}</span>{APP_VERSION_UPDATED}
           </span>
         </span>
         <span>
-          <span data-test="share" className={css.textButton} onClick={this.handleShareOpen}>Share</span>
-          <span data-test="about" className={css.textButton} onClick={this.handleAboutOpen}>About</span>
+          <span data-test="share" className={css.textButton} role="button" tabIndex={0}
+            onClick={this.handleShareOpen} onKeyDown={this.onActivateKey(this.handleShareOpen)}>Share</span>
+          <span data-test="about" className={css.textButton} role="button" tabIndex={0}
+            onClick={this.handleAboutOpen} onKeyDown={this.onActivateKey(this.handleAboutOpen)}>About</span>
         </span>
         <Dialog
           onClose={this.handleAboutClose}
@@ -60,6 +63,11 @@ export class TopBar extends BaseComponent<IProps, IState> {
       </div>
     );
   }
+
+  // Enter/Space activation for the role="button" spans, so they operate by keyboard like the click.
+  private onActivateKey = (fn: () => void) => (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fn(); }
+  };
 
   public handleReload = () => {
     log("SimulationEnded", {

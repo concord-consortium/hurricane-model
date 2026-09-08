@@ -8,12 +8,14 @@ import High from "../assets/high.svg";
 import Low from "../assets/low.svg";
 import config from "../config";
 import { log } from "../log";
-import { minStrength, maxStrength, mbLabelRange, strengthToMb } from "../utils/pressure";
+import {
+  minStrength, maxStrength, maxStrengthHigh, maxStrengthLow, mbLabelRange, strengthToMb
+} from "../utils/pressure";
 import { DraggableMapIcon } from "./draggable-map-icon";
 import css from "./pressure-system-icon.scss";
 
 // Re-exported from utils/pressure (the single source) so existing imports of these keep working.
-export { minStrength, maxStrength, mbLabelRange };
+export { minStrength, maxStrength, maxStrengthHigh, maxStrengthLow, mbLabelRange };
 
 const VerticalThumb = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
   (props, ref) => {
@@ -82,9 +84,9 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
           >
             <Slider
               classes={{ thumb: css.thumb, track: css.track, rail: css.rail, disabled: css.disabled }}
-              value={model.type === "high" ? model.strength : maxStrength + minStrength - model.strength}
+              value={model.type === "high" ? model.strength : maxStrengthLow + minStrength - model.strength}
               min={minStrength}
-              max={maxStrength}
+              max={model.type === "high" ? maxStrengthHigh : maxStrengthLow}
               onChange={this.handleStrengthChange}
               onChangeCommitted={this.handleSliderDragEnd}
               orientation="vertical"
@@ -110,7 +112,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     }
     const numericValue = Array.isArray(value) ? value[0] : value;
     if (model.type === "low") {
-      model.setStrength(maxStrength + minStrength - numericValue);
+      model.setStrength(maxStrengthLow + minStrength - numericValue);
     } else {
       model.setStrength(numericValue);
     }

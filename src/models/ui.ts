@@ -35,6 +35,10 @@ export class UIModel {
   @observable public overlay: Overlay | null = config.overlay;
   @observable public categoryChangeMarkers = config.categoryChangeMarkers;
   @observable public thermometerActive = false;
+  // Temporarily hides the thermometer reading while the user is actively dragging a map object (storm or
+  // pressure system), so it doesn't occlude what they're moving. The Temp tool STAYS on — the reading
+  // reappears on drag end. Only the Temp button toggles the tool itself off.
+  @observable public thermometerSuspended = false;
   @observable public thermometerPositionSaved: LatLngExpression | null = null;
   @observable public thermometerPositionHover: LatLngExpression | null = null;
 
@@ -156,6 +160,11 @@ export class UIModel {
     this.thermometerActive = enabled;
   }
 
+  // Hide/restore the reading during a drag of a map object; the tool itself stays active.
+  @action.bound public setThermometerSuspended(suspended: boolean) {
+    this.thermometerSuspended = suspended;
+  }
+
   @action.bound public setThermometerPositionSaved(position: LatLngExpression) {
     this.thermometerPositionSaved = position;
   }
@@ -166,6 +175,7 @@ export class UIModel {
 
   @action.bound public disableThermometer = () => {
     this.thermometerActive = false;
+    this.thermometerSuspended = false;
     this.thermometerPositionHover = null;
     this.thermometerPositionSaved = null;
   }

@@ -9,6 +9,18 @@
     height: calc(100% - #{$bottomBarHeight + $barTopGrowth + $bottomBarBorderWidth});
   }
 
+  // Temp (thermometer) tool active: show the custom temperature cursor across the map. It lives on the
+  // container (not the thermometer marker) so that display-only marker can be non-interactive and let
+  // clicks fall through. Scoped to the container only — NOT .leaflet-interactive — so the interactive
+  // controls (storm, pressure systems, anomaly buttons) keep their own pointer cursor, signalling that
+  // clicking them is a real action (which also hands off from the Temp tool).
+  &.tempActive :global(.leaflet-container) {
+    cursor: url("../assets/temp-cursor.png") 8 8, crosshair;
+    &:active {
+      cursor: url("../assets/temp-cursor-2.png") 8 8, crosshair;
+    }
+  }
+
   .highPressure, .lowPressure {
     color: white;
     font-size: 40px;
@@ -188,6 +200,9 @@
     align-items: center;
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 16px;
+    // Default cursor over the widget body (label + value); only the +/- buttons show a pointer (they set
+    // it themselves), so the pointer signals exactly where a click does something.
+    cursor: default;
     display: flex;
     flex-direction: column;
     justify-content: center;

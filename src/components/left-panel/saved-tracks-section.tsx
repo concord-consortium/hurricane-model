@@ -147,13 +147,16 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
     }
   };
 
-  // "Duplicate Last Run": add a card pre-loaded with the most recent completed run's settings.
-  const handleDuplicateRun = () => {
+  // "Copy Selected Run": add a card pre-loaded with the SELECTED run's setup. The Copy button only
+  // shows when every card is completed (no editable card), so the selected card is always a completed
+  // run here. Use its in-progress edits if it's mid-edit, else its captured setup.
+  const handleCopyRun = () => {
     if (!multiTrack.canAddRun) return;
-    const last = multiTrack.runs.filter(r => r.state).slice(-1)[0];
+    const src = multiTrack.selectedRun;
+    const srcState = src?.editDraft ?? src?.state;
     multiTrack.autoCaptureSuppressed = true;
     multiTrack.addRun();
-    if (last?.state) setInteractiveState(stores, last.state);
+    if (srcState) setInteractiveState(stores, srcState);
     simulation.restart(false);
     multiTrack.autoCaptureSuppressed = false;
   };
@@ -282,11 +285,11 @@ export const SavedTracksSection = observer(function SavedTracksSection() {
               <button
                 type="button"
                 className={css.newRunCard}
-                data-test="duplicate-run-card"
-                onClick={handleDuplicateRun}
+                data-test="copy-selected-run-card"
+                onClick={handleCopyRun}
               >
                 <span className={css.newRunPlus} aria-hidden="true">+</span>
-                <span className={css.newRunLabel}>Duplicate Last Run</span>
+                <span className={css.newRunLabel}>Copy Selected Run</span>
               </button>
               <button
                 type="button"

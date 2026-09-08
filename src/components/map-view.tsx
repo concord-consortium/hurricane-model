@@ -156,7 +156,11 @@ export class MapView extends BaseComponent<IProps, IState> {
     const tileLayerKey = ui.baseMap;
 
     return (
-      <div className={`${css.mapView} ${!config.topBarVisible ? css.noTopBar : ""}`} id="mapView">
+      <div
+        className={`${css.mapView} ${!config.topBarVisible ? css.noTopBar : ""} ` +
+          `${ui.thermometerActive ? css.tempActive : ""}`}
+        id="mapView"
+      >
         <MapContainer ref={this.mapRef}
           whenReady={this.handleMapReady as () => void}
           dragging={navigation}
@@ -297,11 +301,11 @@ export class MapView extends BaseComponent<IProps, IState> {
             </Control>
           }
           {
-            ui.thermometerActive && !setupInteractionLocked &&
+            ui.thermometerActive && !ui.thermometerSuspended && !setupInteractionLocked &&
               <ThermometerMarker position={ui.thermometerPositionSaved} saved={true} />
           }
           {
-            ui.thermometerActive && !setupInteractionLocked &&
+            ui.thermometerActive && !ui.thermometerSuspended && !setupInteractionLocked &&
               <ThermometerMarker position={ui.thermometerPositionHover} saved={false} />
           }
           {

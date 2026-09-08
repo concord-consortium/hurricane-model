@@ -26,7 +26,9 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     const { sliderDrag } = this.state;
     const { simulation, ui } = this.stores;
     const { isReportMode, setupMode } = ui;
-    const uiDisabled = isReportMode || config.pressureSystemsLocked || ui.thermometerActive ||
+    // Note: the Temp (thermometer) tool no longer disables systems — you can grab one directly while
+    // it's active, and doing so turns the thermometer off (see the click/drag handlers below).
+    const uiDisabled = isReportMode || config.pressureSystemsLocked ||
       (config.lockSimulationWhileRunning && simulation.simulationStarted);
     // Draggable whenever the setup is editable — no need to open Pressure Systems first; dragging a
     // marker opens that section (see the drag handlers). Only dim it when another section is active.
@@ -58,6 +60,9 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
 
   public handlePressureSysDrag = (e: Leaflet.LeafletMouseEvent) => {
     const { model } = this.props;
+    // Tuck the Temp reading away while dragging so it doesn't occlude the system; the tool stays on and
+    // the reading reappears on drag end.
+    this.stores.ui.setThermometerSuspended(true);
     // Reveal the Pressure Systems section as soon as a marker is being moved.
     if (this.stores.ui.setupMode !== "pressureSystems") this.stores.ui.setSetupMode("pressureSystems");
     this.stores.simulation.setPressureSysCenter(model, e.latlng);
@@ -71,6 +76,7 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
 
   public handlePressureSysDragEnd = () => {
     const { model } = this.props;
+    this.stores.ui.setThermometerSuspended(false);
     // Make sure the Pressure Systems section is visible in the setup panel.
     this.stores.ui.setLeftPanelOpen(true);
     this.stores.ui.setSetupMode("pressureSystems");
@@ -78,12 +84,14 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
   }
 
   private handleDrag = () => {
+    this.stores.ui.setThermometerSuspended(true);
     if (!this.state.sliderDrag) {
       this.setState({ sliderDrag: true });
     }
   }
 
   private handleDragEnd = () => {
+    this.stores.ui.setThermometerSuspended(false);
     this.setState({ sliderDrag: false });
   }
 }

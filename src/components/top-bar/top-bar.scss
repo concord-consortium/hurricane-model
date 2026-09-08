@@ -15,8 +15,12 @@
       margin-left: 11px;
     }
     cursor: pointer;
+    border-radius: 3px; // so the focus ring hugs the label with slightly rounded corners
     &:hover {
       color: $charcoal;
+    }
+    &:focus-visible {
+      @include focus-ring;
     }
   }
 

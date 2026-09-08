@@ -24,12 +24,14 @@ describe("RegionTemperatureControl", () => {
     renderControl(stores);
     expect(screen.getByText("Baseline")).toBeInTheDocument();
 
+    // statusText renders a non-breaking space (U+00A0) between value and unit — getByText's default
+    // normalizer collapses it to a regular space — and a true minus sign (U+2212) for negatives.
     inc();
     expect(stores.simulation.temperatureAnomalyAt("gulf")).toBe(1);
-    expect(screen.getByText("+1°C")).toBeInTheDocument();
+    expect(screen.getByText("+1 °C")).toBeInTheDocument();
 
     dec(); dec();
-    expect(screen.getByText("-1°C")).toBeInTheDocument();
+    expect(screen.getByText("−1 °C")).toBeInTheDocument();
   });
 
   it("disables the buttons at the clamp limits", () => {

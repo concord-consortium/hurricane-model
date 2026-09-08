@@ -24,7 +24,15 @@ export class ThermometerMarker extends BaseComponent<IProps, IState> {
       return null;
     }
     return (
-      <LeafletCustomMarker position={position} draggable={false}>
+      // Display-only: non-interactive so clicks pass through to the storm / pressure systems / anomaly
+      // controls beneath it, and stacked above everything (incl. the storm's zIndexOffset) so the
+      // readout is never hidden.
+      <LeafletCustomMarker
+        position={position}
+        draggable={false}
+        iconClassName={css.nonInteractive}
+        zIndexOffset={2000000}
+      >
         <div className={`${css.thermometerContainer} ${saved ? css.saved : ""}`}>
           <div className={css.thermometerReadout}>
             { temp.toFixed(1) } °C

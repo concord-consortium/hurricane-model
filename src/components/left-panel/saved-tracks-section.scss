@@ -307,13 +307,13 @@
     display: flex;
     gap: 8px;
 
+    // 50/50 split — each button 128px. "Copy Selected Run" (the longest label) still fits on one line
+    // at 128px; its side padding just tightens by ~2px. Both labels stay single-line, + circles align.
     .newRunCard {
       flex: 1 1 0;
       min-width: 0;
     }
 
-    // "Duplicate Last Run" fits on one line in Roboto Condensed, so keep both labels single-line —
-    // the content blocks match and the + circles line up naturally.
     .newRunLabel {
       white-space: nowrap;
       text-align: center;

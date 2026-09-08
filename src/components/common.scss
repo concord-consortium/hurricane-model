@@ -14,6 +14,21 @@ $secondaryColorHover: #ffdaa3;
 
 $hoverColor: #dfdfdf;
 
+// Keyboard focus indicators (borrowed from MassSims). Apply on :focus-visible only. `focus-ring` is
+// the default for light UI: a blue outline (never clipped by overflow:hidden, so it always shows)
+// plus a white halo. `focus-ring-dark` is for controls on the dark map — a white/blue/white ring
+// that reads on any dark surface. Elements with their own box-shadow should combine it, not replace.
+$focusRingColor: #005fcc; // accessible blue
+@mixin focus-ring {
+  outline: 2px solid $focusRingColor;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #fff;
+}
+@mixin focus-ring-dark {
+  outline: none;
+  box-shadow: 0 0 0 1px #fff, 0 0 0 3px $focusRingColor, 0 0 0 4px #fff;
+}
+
 $cat0Color: #f2f2f2;
 $cat1Color: #ffffcc;
 $cat2Color: #ffe775;

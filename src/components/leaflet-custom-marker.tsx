@@ -13,6 +13,9 @@ interface IProps {
   draggable?: boolean;
   // Overrides Leaflet's latitude-based marker stacking (higher = on top).
   zIndexOffset?: number;
+  // Extra class on the marker icon element. Used e.g. to make a display-only marker non-interactive
+  // (pointer-events: none) so clicks pass through to markers beneath it.
+  iconClassName?: string;
   onDrag?(event: Leaflet.LeafletEvent): void;
   onDragEnd?(event: Leaflet.DragEndEvent): void;
   onClick?(event: Leaflet.LeafletMouseEvent): void;
@@ -23,7 +26,7 @@ interface IState {}
 export class LeafletCustomMarker extends React.Component<IProps, IState> {
   private iconId = getIconID();
   private icon: Leaflet.DivIcon = new Leaflet.DivIcon({
-    className: "",
+    className: this.props.iconClassName ?? "",
     html: `<div id="${this.iconId}"></div>`
   });
 

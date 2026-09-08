@@ -28,7 +28,7 @@ describe("PressureSystemIcon component", () => {
         <PressureSystemIcon model={model}/>
       </Provider>
     );
-    const expected = 1015 + Math.round((1500000 - minStrength) / (maxStrength - minStrength) * mbLabelRange) + "mb";
+    const expected = 1015 + Math.round((1500000 - minStrength) / (maxStrength - minStrength) * mbLabelRange) + " mb";
     expect(screen.getByText(expected)).toBeInTheDocument();
   });
 
@@ -41,7 +41,7 @@ describe("PressureSystemIcon component", () => {
         <PressureSystemIcon model={model}/>
       </Provider>
     );
-    const expected = 1010 - Math.round((1000000 - minStrength) / (maxStrength - minStrength) * mbLabelRange) + "mb";
+    const expected = 1010 - Math.round((1000000 - minStrength) / (maxStrength - minStrength) * mbLabelRange) + " mb";
     expect(screen.getByText(expected)).toBeInTheDocument();
   });
 

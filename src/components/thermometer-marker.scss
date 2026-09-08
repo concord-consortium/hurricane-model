@@ -10,20 +10,22 @@ $background: rgba(255, 255, 255, 0.85);
   margin-left: -195px;
   margin-top: -200px;
   padding-top: 220px;
-  cursor: url("../assets/temp-cursor.png") 8 8, crosshair;
-  &:active {
-    cursor: url("../assets/temp-cursor-2.png") 8 8, crosshair;
-  }
+  // The custom temperature cursor now lives on the map container (see map-view.scss .tempActive) so this
+  // display-only marker can be non-interactive — otherwise this big box swallows clicks meant for the
+  // storm / pressure systems / anomaly controls beneath it.
   // ---
   display: flex;
   align-items: center;
   flex-direction: column;
+}
 
-  &.saved {
-    // Marker which is saved and locked in one place shouldn't change cursor to a custom one anymore.
-    // See the second bullet here: https://www.pivotaltracker.com/story/show/179739638/comments/227553974
-    pointer-events: none;
-  }
+// Applied to the marker's icon element (via LeafletCustomMarker iconClassName) so the readout never
+// intercepts pointer events: clicks fall through to the interactive markers below, and the readout
+// still renders on top.
+.nonInteractive {
+  // !important overrides Leaflet's own .leaflet-interactive rule (same element, equal specificity) which
+  // would otherwise restore pointer-events: auto and let this marker keep swallowing clicks.
+  pointer-events: none !important;
 }
 
 .thermometerReadout {

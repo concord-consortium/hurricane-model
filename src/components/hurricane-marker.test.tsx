@@ -23,11 +23,13 @@ describe("HurricaneMarker component", () => {
     renderMarker();
   });
 
-  it("is not draggable by default (outside of setup mode)", () => {
+  it("is draggable by default when editable (no setup mode needed)", () => {
     stores.ui.setSetupMode(undefined);
     renderMarker();
+    // The storm can be moved whenever the setup is editable — dragging it opens Storm Location for you,
+    // so it no longer requires opening that section first.
     const draggableEl = document.querySelector(".leaflet-marker-draggable");
-    expect(draggableEl).toBeNull();
+    expect(draggableEl).not.toBeNull();
   });
 
   it("is draggable while in stormLocation setup mode and simulation has not started", () => {
@@ -42,8 +44,9 @@ describe("HurricaneMarker component", () => {
     stores.ui.setSetupMode("stormCategory");
     stores.simulation.simulationStarted = false;
     renderMarker();
+    // Still draggable (editable); this case is about dimming, not draggability.
     const draggableEl = document.querySelector(".leaflet-marker-draggable");
-    expect(draggableEl).toBeNull();
+    expect(draggableEl).not.toBeNull();
     await waitFor(() => {
       const markerEl = document.querySelector(`[data-test="hurricane-marker"]`);
       expect(markerEl).not.toBeNull();
@@ -55,8 +58,9 @@ describe("HurricaneMarker component", () => {
     stores.ui.setSetupMode("season");
     stores.simulation.simulationStarted = false;
     renderMarker();
+    // Dimmed to focus the season markers, but still draggable (editable).
     const draggableEl = document.querySelector(".leaflet-marker-draggable");
-    expect(draggableEl).toBeNull();
+    expect(draggableEl).not.toBeNull();
     await waitFor(() => {
       const markerEl = document.querySelector(`[data-test="hurricane-marker"]`);
       expect(markerEl).not.toBeNull();

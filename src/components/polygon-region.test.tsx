@@ -27,8 +27,10 @@ describe("PolygonRegion component", () => {
       </MapContainer>
     );
     // react-leaflet renders polygons as SVG paths inside the leaflet overlay pane.
-    const paths = document.querySelectorAll("path.leaflet-interactive");
-    expect(paths.length).toBe(1);
-    expect(paths[0].getAttribute("d")).toBeTruthy();
+    const withGeometry = Array.from(document.querySelectorAll("path")).filter(p => p.getAttribute("d"));
+    expect(withGeometry.length).toBeGreaterThanOrEqual(1);
+    // The region is a non-interactive visual outline: no leaflet-interactive path means no pointer
+    // cursor across the filled area and no click capture — only the real controls respond.
+    expect(document.querySelectorAll("path.leaflet-interactive").length).toBe(0);
   });
 });

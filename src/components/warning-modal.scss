@@ -11,6 +11,75 @@
   text-align: center;
 }
 
+// The expanded "About Storm Explorer" view: left-aligned reading content, wider than the notice, with a
+// scrollable body so the list fits even on short viewports. Shares the close button, and reuses .okButton
+// for the "Back" action.
+.aboutBody {
+  position: relative; // anchor for the corner close button
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 44rem; // wider than the notice so the simplifications list fits (fewer wrapped lines = shorter)
+  max-width: 100%;
+  padding: 22px 24px 22px;
+  text-align: left;
+}
+
+.aboutTitle {
+  margin: 0;
+  padding-right: 44px; // clear the × in the corner
+  color: $charcoal;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.3;
+}
+
+.aboutContent {
+  max-height: 52vh;
+  overflow-y: auto;
+  color: $charcoal;
+  font-size: 16px; // meets the 16px minimum-font accessibility rule (subhead + list inherit this)
+  line-height: 1.4;
+
+  p { margin: 0 0 10px; }
+}
+
+.aboutSubhead {
+  font-weight: 600;
+}
+
+.aboutList {
+  margin: 0;
+  padding-left: 20px; // room for the disc markers
+  list-style: disc;
+
+  li { margin-bottom: 8px; }
+  li:last-child { margin-bottom: 0; }
+  strong { font-weight: bold; }
+}
+
+// Text link under "Got it" that opens the About view. A real button for keyboard access, styled as a
+// quiet underlined link.
+.learnMore {
+  margin-top: 2px;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 16px; // meets the 16px minimum-font accessibility rule
+  color: $charcoal; // full charcoal for AA contrast on white
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover { background-color: $secondaryColorHover; }
+  &:focus-visible {
+    outline: 2px solid $charcoal;
+    outline-offset: 1px;
+  }
+}
+
 // Close button matches the Compare table's × — a 24px icon in a 32x32 box with the orange
 // hover/press treatment — wrapped in a 44x44 touch target for accessibility.
 .closeButton {
