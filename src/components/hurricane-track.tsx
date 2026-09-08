@@ -6,6 +6,9 @@ import { useStores } from "../stores-context";
 import { ICoordinates, ITrackPoint } from "../types";
 import css from "./hurricane-track.scss";
 
+const outlineWeight = 7;
+const insideWeight = 5;
+
 interface ISegment {
   category: number;
   positions: ICoordinates[];
@@ -54,7 +57,7 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
           key={`${idx}-${segment.category}-border`}
           className={css.hurricaneTrackBorder}
           positions={segment.positions}
-          weight={7}
+          weight={outlineWeight}
         />
       )}
       {lastPoint &&
@@ -62,7 +65,7 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
           key="tail-border"
           className={css.hurricaneTrackBorder}
           positions={tail}
-          weight={7}
+          weight={outlineWeight}
         />
       }
       {segments.map((segment, idx) =>
@@ -71,16 +74,16 @@ export const HurricaneTrack = observer(function HurricaneTrack() {
           className={segmentClass(segment.category)}
           pane="shadowPane"
           positions={segment.positions}
-          weight={5}
+          weight={insideWeight}
         />
       )}
       {lastPoint &&
         <Polyline
-          key="tail"
+          key={`tail-${lastPoint.category}`}
           className={segmentClass(lastPoint.category)}
           pane="shadowPane"
           positions={tail}
-          weight={5}
+          weight={insideWeight}
         />
       }
     </Pane>
