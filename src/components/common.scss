@@ -90,6 +90,19 @@ $sparklineHeight: 22;
   }
 }
 
+@mixin outlinedDialogButton {
+  padding: 11px 20px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: $charcoal;
+  background: none;
+  border: 1px solid $charcoalMedium;
+  border-radius: 6px;
+  cursor: pointer;
+  @include dialogButton;
+}
+
 // Exported to JS via the :export block below and consumed by map-view.tsx.
 // Renaming a key or removing the :export block silently yields `undefined` in JS.
 :export {

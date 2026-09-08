@@ -16,14 +16,19 @@
   }
 
   .gotItButton {
-    padding: 11px 20px;
+    @include outlinedDialogButton;
+  }
+
+  .moreInfoButton {
+    margin-top: 24px;
+    padding: 4px 8px;
     font-family: inherit;
     font-size: 16px;
-    font-weight: 700;
     color: $charcoal;
     background: none;
-    border: 1px solid $charcoalMedium;
-    border-radius: 6px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: underline;
     cursor: pointer;
     @include dialogButton;
   }

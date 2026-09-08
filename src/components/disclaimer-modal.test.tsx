@@ -103,6 +103,43 @@ describe("DisclaimerModal component", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Got it" })).toHaveFocus());
   });
 
+  describe("Want to know more?", () => {
+    const openMoreInfo = async (user: ReturnType<typeof userEvent.setup>) => {
+      renderModal();
+      await user.click(screen.getByRole("button", { name: "Want to know more?" }));
+    };
+
+    it("swaps in the About Storm Explorer content and logs", async () => {
+      const user = userEvent.setup();
+      await openMoreInfo(user);
+      expect(screen.getByText("About Storm Explorer")).toBeInTheDocument();
+      expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
+      expect(logSpy).toHaveBeenCalledWith("DisclaimerMoreInfoOpened");
+    });
+
+    it("names the dialog with the About title", async () => {
+      const user = userEvent.setup();
+      await openMoreInfo(user);
+      expect(screen.getByRole("dialog")).toHaveAccessibleName("About Storm Explorer");
+    });
+
+    it("returns to the disclaimer when Back is clicked", async () => {
+      const user = userEvent.setup();
+      await openMoreInfo(user);
+      await user.click(screen.getByRole("button", { name: "Back" }));
+      expect(screen.getByText(MESSAGE)).toBeInTheDocument();
+      expect(screen.queryByText("About Storm Explorer")).not.toBeInTheDocument();
+    });
+
+    it("closes and logs when the close button is clicked from the About content", async () => {
+      const user = userEvent.setup();
+      await openMoreInfo(user);
+      await user.click(screen.getByRole("button", { name: "Close" }));
+      await waitFor(() => expect(screen.queryByText("About Storm Explorer")).not.toBeInTheDocument());
+      expect(logSpy).toHaveBeenCalledWith("DisclaimerDismissed", { source: "close" });
+    });
+  });
+
   it("stays open when the backdrop is clicked", async () => {
     const user = userEvent.setup();
     const { baseElement } = renderModal();

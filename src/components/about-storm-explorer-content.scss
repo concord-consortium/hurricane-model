@@ -1,0 +1,25 @@
+@use "common" as *;
+
+.about {
+  max-width: 700px;
+  font-size: 16px;
+  line-height: 1.4;
+  color: $charcoal;
+
+  p {
+    margin: 0 0 12px;
+  }
+
+  ul {
+    margin: 0 0 24px;
+    padding-left: 24px;
+
+    li {
+      margin-bottom: 12px;
+    }
+  }
+
+  .backButton {
+    @include outlinedDialogButton;
+  }
+}
