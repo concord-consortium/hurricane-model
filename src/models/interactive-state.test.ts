@@ -194,7 +194,6 @@ describe("interactive-state", () => {
         season: "winter",
         startLocation: "gulf",
         pressureSystems: [{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }],
-        pressureSystemsSetup: [{ type: "high", center: { lat: 30, lng: -80 }, strength: 10 }],
         simulationStarted: true,
         simulationFinished: false,
         time: 1000,
@@ -203,7 +202,7 @@ describe("interactive-state", () => {
         landfalls: [],
         strengthChangePositions: [0, 100],
         precipitationPoints: []
-      });
+      } as any);
 
       setInteractiveState(stores, state);
 

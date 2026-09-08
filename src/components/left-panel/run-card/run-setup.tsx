@@ -46,7 +46,7 @@ export const RunSetup = observer(function RunSetup({ run }: IProps) {
   const rowClasses = clsx(cardCss.categoryRow, css.categoryRow);
 
   return (
-    <div className={clsx(cardCss.summaryColumn, css.runSetupSummary)} data-test="run-setup-summary">
+    <div className={cardCss.summaryColumn} data-test="run-setup">
       <div className={rowClasses} data-test="setup-location">
         <StormLocationIcon aria-hidden={true} className={cardCss.icon} />
         <span>{formatLatLng(start.lat, start.lng)}</span>

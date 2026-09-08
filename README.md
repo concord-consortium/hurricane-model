@@ -127,10 +127,10 @@ python3 scripts/gen-basemap-thumbs.py
 The script needs network access to the Esri tile servers.
 
 **IMPORTANT**
-The crop window must match the projection bounds in `run-thumbnail.tsx` (`LAT_MAX`, `LAT_MIN`, `LNG_MIN`,
-`LNG_MAX`) or the coastlines won't line up with the markers. To change the framing, edit `LNG_MIN`,
-`LNG_MAX`, and `LAT_MAX` in the script, run it, then copy the bounds it prints into `run-thumbnail.tsx`
-(`LAT_MIN` is derived from the others to keep the 100:78 aspect ratio with the top edge fixed).
+The crop window must match the projection bounds in `run-thumbnail.tsx` (`latMax`, `latMin`, `lngMin`,
+`lngMax`) or the coastlines won't line up with the markers. To change the framing, edit `lngMin`,
+`lngMax`, and `latMax` in the script, run it, then copy the bounds it prints into `run-thumbnail.tsx`
+(`latMin` is derived from the others to keep the 100:78 aspect ratio with the top edge fixed).
 
 ## Sea Surface Temperature impact on the hurricane intensity
 

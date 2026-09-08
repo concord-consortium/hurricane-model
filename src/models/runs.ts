@@ -89,7 +89,7 @@ export class RunsModel {
   }
 
   public runLetter(run: IRunState): string {
-    return String.fromCharCode(firstRunLetterCharCode + this.runs.indexOf(run));
+    return String.fromCharCode(firstRunLetterCharCode + this.runs.findIndex(r => r.id === run.id));
   }
 
   @computed public get allComplete(): boolean {

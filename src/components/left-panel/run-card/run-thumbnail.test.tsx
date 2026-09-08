@@ -24,7 +24,6 @@ describe("RunThumbnail", () => {
 
   it("renders an accessible mini-map", () => {
     const simulation = defaultSimulationState();
-    stores.runs.addRun();
     renderThumb(stores, simulation, stores.runs.runs[0]);
     expect(screen.getByRole("img", { name: "Run A result map" })).toBeInTheDocument();
   });
