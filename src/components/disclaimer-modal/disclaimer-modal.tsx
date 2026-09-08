@@ -5,11 +5,8 @@ import config from "../../config";
 import { log } from "../../log";
 import { useStores } from "../../stores-context";
 import { Dialog } from "../dialog";
-import { AboutStormExplorerContent } from "./about-content";
-
-import WarningIcon from "../../assets/warning.svg";
-
-import css from "./disclaimer-modal.scss";
+import { AboutContent } from "./about-content";
+import { DisclaimerContent } from "./disclaimer-content";
 
 type DismissSource = "gotIt" | "close";
 type ModalContent = "disclaimer" | "about";
@@ -46,32 +43,8 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
     >
       {
         showAbout
-          ? <AboutStormExplorerContent onBack={() => setContent("disclaimer")} />
-          : (
-            <div className={css.disclaimer} data-test="disclaimer-modal">
-              <WarningIcon aria-hidden={true} focusable={false} />
-              <div id={messageId} className={css.message}>
-                This is a simulation and cannot be used to make a forecast.
-              </div>
-              <button
-                type="button"
-                autoFocus={true}
-                data-test="disclaimer-got-it-button"
-                className={css.gotItButton}
-                onClick={() => dismiss("gotIt")}
-              >
-                Got it
-              </button>
-              <button
-                type="button"
-                data-test="disclaimer-more-info-button"
-                className={css.moreInfoButton}
-                onClick={showMoreInfo}
-              >
-                Want to know more?
-              </button>
-            </div>
-          )
+          ? <AboutContent onBack={() => setContent("disclaimer")} />
+          : <DisclaimerContent id={messageId} onDismiss={() => dismiss("gotIt")} showMoreInfo={showMoreInfo} />
       }
     </Dialog>
   );

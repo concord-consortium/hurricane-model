@@ -6,7 +6,7 @@ interface IProps {
   onBack: () => void;
 }
 
-export const AboutStormExplorerContent = ({ onBack }: IProps) => (
+export const AboutContent = ({ onBack }: IProps) => (
   <div className={css.about} data-test="about-storm-explorer">
     <p>
       Storm Explorer, like many weather models, is simplified and does not include all possible variables. As such,
