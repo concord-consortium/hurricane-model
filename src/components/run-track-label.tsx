@@ -24,7 +24,7 @@ export function RunTrackLabel({
   letter, position, selected, hovered, onSelect, onHoverStart, onHoverEnd
 }: IProps) {
   return (
-    <LeafletCustomMarker position={position} zIndexOffset={selected ? selectedZIndexOffset : undefined}>
+    <LeafletCustomMarker position={position} zIndexOffset={selected ? selectedZIndexOffset : 0}>
       <div
         aria-hidden="true"
         className={clsx(css.runTrackLabel, { [css.selected]: selected, [css.hovered]: hovered })}

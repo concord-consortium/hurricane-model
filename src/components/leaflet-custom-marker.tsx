@@ -52,7 +52,7 @@ export class LeafletCustomMarker extends React.Component<IProps, IState> {
           position={position}
           eventHandlers={eventHandlers}
           draggable={draggable}
-          zIndexOffset={zIndexOffset}
+          zIndexOffset={zIndexOffset ?? 0}
         />,
         iconContainer && ReactDOM.createPortal(children, iconContainer)
       ]
