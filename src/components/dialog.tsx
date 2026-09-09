@@ -37,7 +37,7 @@ export const Dialog: FC<IProps> = ({ onClose, open, title, ariaLabel, ariaDescri
       aria-describedby={ariaDescribedBy}
     >
       <div className={css.dialogBody}>
-        { title && <div id={titleId} className={css.title}>{ title }</div> }
+        { title && <h2 id={titleId} className={css.title}>{ title }</h2> }
         <button
           type="button"
           aria-label="Close"

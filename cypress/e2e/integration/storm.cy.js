@@ -14,10 +14,17 @@ context("Test the Hurricane Model app", () => {
   });
 
   // The other tests suppress the disclaimer, so this one re-visits without skipDisclaimer.
-  it("shows the disclaimer on load and dismisses it with Got it", () => {
+  it("shows the disclaimer on load, can see more info, and dismisses it with Got it", () => {
     cy.visit("/?mode=storm");
     disclaimerModal.confirmOpen();
     disclaimerModal.checkMessage("This is a simulation and cannot be used to make a forecast.");
+
+    // Round trip to About Storm Explorer view
+    disclaimerModal.getKnowMoreButton().should("be.visible").click();
+    disclaimerModal.getAboutModal().should("contain.text", "Model simplifications include:");
+    disclaimerModal.getBackButton().should("be.visible").click();
+
+    // Close the modal
     disclaimerModal.getGotItButton().click();
     disclaimerModal.confirmClosed();
     cy.get(".app--app--__hurr-v1__").find(".leaflet-container").should("be.visible");
