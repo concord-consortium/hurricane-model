@@ -1,6 +1,7 @@
 import * as React from "react";
 import { MapView } from "./map-view";
 import { render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createStores, IStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { StoresContext } from "../stores-context";
@@ -112,6 +113,53 @@ describe("MapView component", () => {
       const img = sstImg();
       expect(img).not.toBeNull();
       expect(img!.src).toBe(resolved(staticUrl));
+    });
+  });
+
+  describe("show disclaimer button", () => {
+    const showDisclaimerBtn = () => document.querySelector("[data-test='show-disclaimer-button']");
+
+    let oldMode: string;
+    let oldSkipDisclaimer: boolean;
+
+    beforeEach(() => {
+      oldMode = config.mode;
+      oldSkipDisclaimer = config.skipDisclaimer;
+      config.mode = "storm";
+      config.skipDisclaimer = false;
+    });
+
+    afterEach(() => {
+      config.mode = oldMode;
+      config.skipDisclaimer = oldSkipDisclaimer;
+    });
+
+    it("is hidden while the disclaimer has not been dismissed", () => {
+      renderMapView(stores);
+      expect(showDisclaimerBtn()).toBeNull();
+    });
+
+    it("appears once the disclaimer has been dismissed", () => {
+      stores.ui.dismissDisclaimer();
+      renderMapView(stores);
+      expect(showDisclaimerBtn()).not.toBeNull();
+    });
+
+    it("is hidden when the disclaimer is not available at all", () => {
+      config.skipDisclaimer = true;
+      stores.ui.dismissDisclaimer();
+      renderMapView(stores);
+      expect(showDisclaimerBtn()).toBeNull();
+    });
+
+    it("reopens the disclaimer and logs when clicked", async () => {
+      const user = userEvent.setup();
+      (logModule.log as jest.Mock).mockClear();
+      stores.ui.dismissDisclaimer();
+      renderMapView(stores);
+      await user.click(showDisclaimerBtn()!);
+      expect(stores.ui.disclaimerDismissed).toBe(false);
+      expect(logModule.log).toHaveBeenCalledWith("DisclaimerReopened");
     });
   });
 

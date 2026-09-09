@@ -27,6 +27,7 @@ import { ThermometerMarker } from "./thermometer-marker";
 import { PolygonRegion } from "./polygon-region";
 import { stormPlacementRegion } from "../utils/storm-placement-region";
 import { LeafletCustomMarker } from "./leaflet-custom-marker";
+import WarningIcon from "../assets/warning.svg";
 import { RegionTemperatureControl } from "./region-temperature-control";
 import { namedRegions } from "../types";
 import { temperatureAnomalyRegions, anomalyFillColor } from "../utils/regions";
@@ -128,6 +129,11 @@ export class MapView extends BaseComponent<IProps, IState> {
     const resetButtonClasses = clsx(
       css.topLeftControl, css.resetViewContainer, "leaflet-bar",
       { [css.leftPanelOpen]: this.stores.ui.leftPanelOpen }
+    );
+
+    const disclaimerButtonClasses = clsx(
+      css.topLeftControl, css.disclaimerContainer, "leaflet-bar",
+      { [css.leftPanelOpen]: ui.leftPanelOpen }
     );
 
     // Change the TileLayer's key when the base map changes to force an update.
@@ -253,6 +259,18 @@ export class MapView extends BaseComponent<IProps, IState> {
             </Control>
           }
           {
+            ui.disclaimerAvailable && ui.disclaimerDismissed &&
+            <Control position="topleft" className={disclaimerButtonClasses}>
+              <a className={css.disclaimerBtn}
+                onClick={this.showDisclaimer}
+                title="Show disclaimer" role="button" aria-label="Show disclaimer"
+                data-test="show-disclaimer-button"
+              >
+                <WarningIcon aria-hidden={true} focusable={false} />
+              </a>
+            </Control>
+          }
+          {
             ui.thermometerActive && <ThermometerMarker position={ui.thermometerPositionSaved} saved={true} />
           }
           {
@@ -302,6 +320,11 @@ export class MapView extends BaseComponent<IProps, IState> {
     this.leafletMap?.flyToBounds(this.stores.ui.initialBounds);
     this.stores.ui.resetMapView();
     log("ResetMapViewClicked");
+  }
+
+  public showDisclaimer = () => {
+    this.stores.ui.showDisclaimer();
+    log("DisclaimerReopened");
   }
 
   private updateMaxBounds = () => {

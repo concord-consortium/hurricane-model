@@ -142,6 +142,29 @@ describe("DisclaimerModal component", () => {
     });
   });
 
+  describe("reopening from the map button", () => {
+    it("shows again when the store flag is cleared", async () => {
+      const user = userEvent.setup();
+      renderModal();
+      await user.click(screen.getByRole("button", { name: "Got it" }));
+      await waitFor(() => expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument());
+      act(() => stores.ui.showDisclaimer());
+      expect(screen.getByText(MESSAGE)).toBeInTheDocument();
+    });
+
+    it("returns to the disclaimer even if the user left off on the About content", async () => {
+      const user = userEvent.setup();
+      renderModal();
+      await user.click(screen.getByRole("button", { name: "Want to know more?" }));
+      await waitFor(() => expect(screen.queryByText("About Storm Explorer")).toBeInTheDocument());
+      await user.click(screen.getByRole("button", { name: "Close" }));
+      await waitFor(() => expect(screen.queryByText("About Storm Explorer")).not.toBeInTheDocument());
+      act(() => stores.ui.showDisclaimer());
+      expect(screen.getByText(MESSAGE)).toBeInTheDocument();
+      expect(screen.queryByText("About Storm Explorer")).not.toBeInTheDocument();
+    });
+  });
+
   it("stays open when the backdrop is clicked", async () => {
     const user = userEvent.setup();
     const { baseElement } = renderModal();

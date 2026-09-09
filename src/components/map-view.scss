@@ -58,6 +58,18 @@
     }
   }
 
+  .disclaimerBtn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
   .mapButtonLabel {
     color: #fff;
     font-size: 12px;
@@ -117,6 +129,10 @@
 
   .fullMapViewContainer {
     order: 2;
+  }
+
+  .topLeftControl.disclaimerContainer {
+    order: 3;
   }
 
   .temperatureControlMarker {
