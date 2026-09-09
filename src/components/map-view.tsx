@@ -11,7 +11,6 @@ import { PixiWindLayer } from "./pixi-wind-layer";
 import { PressureSystemMarker } from "./pressure-system-marker";
 import { HurricaneMarker } from "./hurricane-marker";
 import { HurricaneCategoryMarker } from "./hurricane-category-marker";
-import { HurricaneTrack } from "./hurricane-track";
 import { RunTracks } from "./run-tracks";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
@@ -201,7 +200,6 @@ export class MapView extends BaseComponent<IProps, IState> {
             ui.overlay === "precipitation" && <PrecipitationLayer/>
           }
           <RunTracks />
-          <HurricaneTrack />
           {
             config.markLandfalls && sim.simulationFinished && !ui.zoomedInView && sim.landfalls.map((lf, idx) =>
               <LandfallRectangle key={idx} position={lf.position} category={lf.category} />
