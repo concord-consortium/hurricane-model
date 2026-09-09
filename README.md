@@ -93,7 +93,7 @@ Original data is in NetCDF format (binary). It's been converted to PNG images us
 
 ```bash
 node --max-old-space-size=4092 scripts/convert-sea-surface-temp-to-png.js <dataset> <png-file-output>, e.g.:
-node --max-old-space-size=4092 scripts/convert-sea-surface-temp-to-png.js sea-surface-temp-netcdf/dec.nc sea-surface-temp-img/dec.png 
+node --max-old-space-size=4092 scripts/convert-sea-surface-temp-to-png.js sea-surface-temp-netcdf/dec.nc sea-surface-temp-img/dec-default.png 
 ```
  
 Note that `--max-old-space-size=4092` param is required, as reading converted files takes a lot of memory.
@@ -105,11 +105,13 @@ The same helper is used by the simulation engine to do the reverse mapping - col
 It lets us use the same image data for visualization and simulation needs. PNG has lots of advantages compared to raw
 JSON data. It's compressed and lets us cover area way more precisely than JSON data with similar size.
 
+After updating default maps using `convert-sea-surface-temp-to-png.js`, run `convert-all.sh` to generate color variants based on new defaults. Note that this script regenerates all maps, which might result in maps that need to be manually processed (see note below).
+
 **IMPORTANT**
 If you ever change anything in `src/temperature-scale.js`, remember to run all the conversion scripts and generate
 sea surface temperature images again. They need to stay in sync with temperature scale.
 
-**Note:** Maps downloaded in 2026 include temperature data in many inland areas, such as the Mississippi delta, the Amazon, and throughout Florida. This was inconsistent with older maps, which essentially had no data on continents. To address this issue, I opened a file without this inland data (such as `sep-rainbowCC.png`), selected all transparent pixels, then deleted those pixels in newer maps.
+**Note:** Maps downloaded in 2026 include temperature data in many inland areas, such as the Mississippi delta, the Amazon, and throughout Florida. This was inconsistent with older maps, which essentially had no data on continents. To address this issue, I opened `sea-surface-temp-source/sep-default.png` (which has inland data removed and does not get impacted by any scripts), selected all transparent pixels, then deleted those pixels in newer maps.
 
 ## Run card base map thumbnails
 

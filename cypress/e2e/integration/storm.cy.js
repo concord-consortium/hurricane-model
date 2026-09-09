@@ -80,16 +80,22 @@ context("Test the Hurricane Model app", () => {
     setupPanel.confirmTabBehindPanel();
   });
 
-  it("lets user start and stop the model", () => {
+  it("lets user start and stop the model; hurricane and pressure systems are enabled and disabled correctly", () => {
     cy.window().then((win) => {
+      simulation.hurricaneMarkerIsEnabled();
+      simulation.pressureSystemIsEnabled(0);
       const oldHurrLng = win.stores.simulation.hurricane.center.lng;
       bottomBar.startButton().should("be.visible");
       bottomBar.startButton().click();
+      simulation.hurricaneMarkerIsDisabled();
+      simulation.pressureSystemIsDisabled(0);
       cy.wait(500).then(() => {
         const newHurrLng = win.stores.simulation.hurricane.center.lng;
         // Wind always goes from east to west.
         expect(newHurrLng).to.be.below(oldHurrLng);
         bottomBar.startButton().click();
+        simulation.hurricaneMarkerIsDisabled();
+        simulation.pressureSystemIsDisabled(0);
       });
     });
   });
