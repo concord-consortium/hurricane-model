@@ -115,6 +115,7 @@ describe("DisclaimerModal component", () => {
       expect(screen.getByText("About Storm Explorer")).toBeInTheDocument();
       expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
       expect(logSpy).toHaveBeenCalledWith("DisclaimerMoreInfoOpened");
+      await waitFor(() => expect(screen.getByRole("button", { name: "Back" })).toHaveFocus());
     });
 
     it("names the dialog with the About title", async () => {
@@ -129,6 +130,7 @@ describe("DisclaimerModal component", () => {
       await user.click(screen.getByRole("button", { name: "Back" }));
       expect(screen.getByText(MESSAGE)).toBeInTheDocument();
       expect(screen.queryByText("About Storm Explorer")).not.toBeInTheDocument();
+      await waitFor(() => expect(screen.getByRole("button", { name: "Got it" })).toHaveFocus());
     });
 
     it("closes and logs when the close button is clicked from the About content", async () => {

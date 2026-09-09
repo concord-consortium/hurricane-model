@@ -3,8 +3,20 @@ export class DisclaimerModal {
     return cy.get(`[data-test="disclaimer-modal"]`);
   }
 
+  getAboutModal() {
+    return cy.get(`[data-test="about-storm-explorer"]`);
+  }
+
   getGotItButton() {
     return cy.get(`[data-test="disclaimer-got-it-button"]`);
+  }
+
+  getKnowMoreButton() {
+    return cy.get(`[data-test="disclaimer-more-info-button"]`);
+  }
+
+  getBackButton() {
+    return cy.get(`[data-test="about-storm-explorer-back-button"]`);
   }
 
   confirmOpen() {
