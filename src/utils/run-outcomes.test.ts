@@ -41,7 +41,11 @@ describe("intensitySeries", () => {
   });
 
   it("downsamples long tracks to at most max points", () => {
-    const series = intensitySeries(simWithTrack(Array.from({ length: 50 }, (_, i) => i % 6)), 40);
+    const track = simWithTrack(Array.from({ length: 50 }, (_, i) => i % 6));
+    const { hurricaneTrack } = track;
+    const series = intensitySeries(track, 40);
     expect(series.length).toBe(40);
+    expect(series[0]).toBe(hurricaneTrack[0].category);
+    expect(series[series.length - 1]).toBe(hurricaneTrack[hurricaneTrack.length - 1].category);
   });
 });

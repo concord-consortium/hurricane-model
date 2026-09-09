@@ -3,8 +3,9 @@ context("Pressure System", () => {
     cy.visit("/");
     // cy.window().then((win: any) => {
     cy.window().then((win) => { 
-      // Limit number of pressure systems to 1.
-      win.stores.simulation.pressureSystems.length = 1;
+      // Limit number of pressure systems to 1. Before the simulation starts the systems on the map
+      // are pressureSystemsSetup; pressureSystems is still empty.
+      win.stores.simulation.pressureSystemsSetup.length = 1;
 
       const oldStrength = win.stores.simulation.activePressureSystems[0].strength;
       cy.get("[data-test='pressure-system-slider'] svg").first()
