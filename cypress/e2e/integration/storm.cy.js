@@ -80,46 +80,52 @@ context("Test the Hurricane Model app", () => {
     setupPanel.confirmTabBehindPanel();
   });
 
-  it("lets user start and stop the model", () => {
+  it("lets user start and stop the model; hurricane and pressure systems are enabled and disabled correctly", () => {
     cy.window().then((win) => {
+      simulation.hurricaneMarkerIsEnabled();
+      simulation.pressureSystemIsEnabled(0);
       const oldHurrLng = win.stores.simulation.hurricane.center.lng;
       bottomBar.startButton().should("be.visible");
       bottomBar.startButton().click();
+      simulation.hurricaneMarkerIsDisabled();
+      simulation.pressureSystemIsDisabled(0);
       cy.wait(500).then(() => {
         const newHurrLng = win.stores.simulation.hurricane.center.lng;
         // Wind always goes from east to west.
         expect(newHurrLng).to.be.below(oldHurrLng);
         bottomBar.startButton().click();
+        simulation.hurricaneMarkerIsDisabled();
+        simulation.pressureSystemIsDisabled(0);
       });
     });
   });
 
-  it("hurricane marker and pressure systems are enabled, disabled, and dimmed properly", () => {
-    // Disabled but not dimmed by default
-    simulation.hurricaneMarkerIsDisabled();
+  it("hurricane marker and pressure systems are enabled and dimmed properly", () => {
+    // Both enabled before the simulation starts, neither dimmed by default
+    simulation.hurricaneMarkerIsEnabled();
     simulation.hurricaneMarkerIsNotDimmed();
-    simulation.pressureSystemIsDisabled(0);
+    simulation.pressureSystemIsEnabled(0);
     simulation.pressureSystemIsNotDimmed(0);
 
-    // HM enabled, not dimmed, PS disabled, dimmed when in storm location setup mode
+    // PS dimmed when in storm location setup mode
     setupPanel.getSectionButton("storm-location").click();
     simulation.hurricaneMarkerIsEnabled();
     simulation.hurricaneMarkerIsNotDimmed();
-    simulation.pressureSystemIsDisabled(0);
+    simulation.pressureSystemIsEnabled(0);
     simulation.pressureSystemIsDimmed(0);
 
-    // HM disabled, dimmed, PS enabled, not dimmed when in pressure system mode
+    // HM dimmed when in pressure system mode
     setupPanel.getSectionButton("pressure-systems").click();
-    simulation.hurricaneMarkerIsDisabled();
+    simulation.hurricaneMarkerIsEnabled();
     simulation.hurricaneMarkerIsDimmed();
     simulation.pressureSystemIsEnabled(0);
     simulation.pressureSystemIsNotDimmed(0);
 
-    // Both disabled, dimmed in another setup mode
+    // Both dimmed, still enabled, in another setup mode
     setupPanel.getSectionButton("season").click();
-    simulation.hurricaneMarkerIsDisabled();
+    simulation.hurricaneMarkerIsEnabled();
     simulation.hurricaneMarkerIsDimmed();
-    simulation.pressureSystemIsDisabled(0);
+    simulation.pressureSystemIsEnabled(0);
     simulation.pressureSystemIsDimmed(0);
   });
 });

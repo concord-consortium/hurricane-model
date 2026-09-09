@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import React from "react";
 import * as Leaflet from "leaflet";
 import { observer } from "mobx-react";
@@ -25,11 +26,12 @@ const HURRICANE_IMG_SCALE_FACTOR = 0.05;
 export const HurricaneMarker = observer(function HurricaneMarker() {
   const stores = useStores();
 
-  const { ui, simulation } = stores;
+  const { simulation, ui } = stores;
   const { hurricane, simulationStarted } = simulation;
-  const draggable = ui.setupMode === "stormLocation" && !simulationStarted;
+  const draggable = !ui.isReadOnly && !ui.thermometerActive && config.mode === "storm" && !simulationStarted;
 
   const handleDrag = (e: Leaflet.LeafletEvent) => {
+    if (config.mode === "storm" && stores.ui.setupMode !== "stormLocation") stores.ui.setSetupMode("stormLocation");
     const { hurricane, activePressureSystems } = stores.simulation;
     const marker = e.target as Leaflet.Marker;
     const raw = marker.getLatLng();
@@ -54,7 +56,7 @@ export const HurricaneMarker = observer(function HurricaneMarker() {
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
     >
-      <HurricaneIcon />
+      <HurricaneIcon draggable={draggable} />
     </LeafletCustomMarker>
   );
 });
@@ -69,9 +71,13 @@ const hurrStrengthToOpacity = (strength: number) => {
   return 1;
 };
 
+interface IHurricaneIconProps {
+  draggable: boolean;
+}
+
 // Keep it as separate class so it's easier to test it.
 // Note that LeafletCustomMarker does rendering in a pretty awkward way, so it's hard to test these components together.
-export const HurricaneIcon = observer(function HurricaneIcon() {
+export const HurricaneIcon = observer(function HurricaneIcon({ draggable }: IHurricaneIconProps) {
   const stores = useStores();
 
   const { hurricane } = stores.simulation;
@@ -80,7 +86,6 @@ export const HurricaneIcon = observer(function HurricaneIcon() {
 
   const { hurricaneImage, mapZoom, setupMode } = stores.ui;
   const dimmed = !!setupMode && !(setupMode === "stormLocation" || setupMode === "stormCategory");
-  const draggable = setupMode === "stormLocation";
 
   const { lat, lng } = hurricane.center;
   const latL = getDirectionLetter(lat, "lat");
@@ -94,7 +99,7 @@ export const HurricaneIcon = observer(function HurricaneIcon() {
   return (
     <DraggableMapIcon dataTest="hurricane-marker" dimmed={dimmed} disabled={!draggable} label={label}>
       <div className={css.hurricaneMarker}>
-        <div className={`${css.svgContainer} ${categoryCssClass}`} style={{ opacity }}>
+        <div className={clsx(css.svgContainer, categoryCssClass)} style={{ opacity }}>
           {
             hurricaneImage ?
               <img

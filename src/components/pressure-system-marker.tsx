@@ -25,11 +25,9 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
     const { sliderDrag } = this.state;
     const { simulation, ui } = this.stores;
     const { isReadOnly, setupMode } = ui;
-    const uiDisabled = isReadOnly || config.pressureSystemsLocked || ui.thermometerActive ||
+    const disabled = isReadOnly || config.pressureSystemsLocked || ui.thermometerActive ||
       (config.lockSimulationWhileRunning && simulation.simulationStarted);
-    const isStormDisabled = config.mode === "storm" && setupMode !== "pressureSystems";
-    const disabled = uiDisabled || isStormDisabled;
-    const dimmed = setupMode !== undefined && isStormDisabled;
+    const dimmed = config.mode === "storm" && !!setupMode && setupMode !== "pressureSystems";
     return (
       <LeafletCustomMarker
         position={model.center}
@@ -51,7 +49,9 @@ export class PressureSystemMarker extends BaseComponent<IProps, IState> {
 
   public handlePressureSysDrag = (e: Leaflet.LeafletMouseEvent) => {
     const { model } = this.props;
-    this.stores.simulation.setPressureSysCenter(model, e.latlng);
+    const { simulation, ui } = this.stores;
+    simulation.setPressureSysCenter(model, e.latlng);
+    if (config.mode === "storm" && ui.setupMode !== "pressureSystems") ui.setSetupMode("pressureSystems");
   }
 
   public handlePressureSysDragEnd = () => {
