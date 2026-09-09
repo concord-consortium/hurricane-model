@@ -87,3 +87,4 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 | `AboutDialogOpened` | — | User opens the About dialog |
 | `ModelShared` | `{ modelId }` | The Share dialog is opened and the simulation state is successfully saved to the cloud (`modelId` is the shareable id) |
 | `DisclaimerDismissed` | `{ source }` | User dismisses the load-time disclaimer modal (`source` is `"gotIt"` for the Got it button, or `"close"` for the close button or escape key) |
+| `DisclaimerMoreInfoOpened` | — | User clicks "Want to know more?" in the disclaimer modal to see the About Storm Explorer content |

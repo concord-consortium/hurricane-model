@@ -93,6 +93,19 @@ $runLetterBadgeColor: #ccc;
   }
 }
 
+@mixin outlinedDialogButton {
+  padding: 11px 20px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: $charcoal;
+  background: none;
+  border: 1px solid $charcoalMedium;
+  border-radius: 6px;
+  cursor: pointer;
+  @include dialogButton;
+}
+
 // Shared by the run letter badges on the run cards and on the map.
 @mixin runLetterBadge {
   align-items: center;
