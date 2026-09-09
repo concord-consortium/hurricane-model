@@ -199,11 +199,6 @@ describe("SimulationModel store", () => {
       sim._seaSurfaceTempDataParsed = () => {
         expect(sim.seaSurfaceTempData).not.toEqual(null); // real data, should be already parsed
         // Temperature in September at lat 20 lng -20 is 25.95*C.
-        // Can be checked here:
-        // https://worldview.earthdata.nasa.gov/?p=geographic&l=MODIS_Aqua_L3_SST_MidIR_4km_Night_Monthly,Reference_Lab
-        // els(hidden),Reference_Features,Coastlines(hidden)&t=2018-09-19-T00%3A00%3A00Z&z=3&v=-144.11630581918422,-22.
-        // 21990140009921,35.883694180815795,68.41291109990078
-        // or in our data sets.
         expect(sim.seaSurfaceTempAt({ lat: 20, lng: -20 })).toEqual(25.95);
         expect(sim.seaSurfaceTempAt({ lat: 20, lng: -90 })).toEqual(null); // land
         expect(sim.seaSurfaceTempAt({ lat: 29.664657, lng: -89.958366 })).toEqual(null); // Mississippi delta
@@ -216,11 +211,6 @@ describe("SimulationModel store", () => {
         sim._seaSurfaceTempDataParsed = () => {
           expect(sim.seaSurfaceTempData).not.toEqual(null); // real data, should be already parsed
           // Temperature in June at lat 20 lng -20 is 21.87*C (colder than in Sept).
-          // Can be checked here:
-          // https://worldview.earthdata.nasa.gov/?p=geographic&l=MODIS_Aqua_L3_SST_MidIR_4km_Night_Monthly,Reference_
-          // Labels(hidden),Reference_Features,Coastlines(hidden)&t=2018-09-19-T00%3A00%3A00Z&z=3&v=-144.11630581918422,
-          // -22.21990140009921,35.883694180815795,68.41291109990078
-          // or in our data sets.
           expect(sim.seaSurfaceTempAt({ lat: 20, lng: -20 })).toEqual(21.87);
           expect(sim.seaSurfaceTempAt({ lat: 20, lng: -90 })).toEqual(null); // land
           expect(sim.seaSurfaceTempAt({ lat: 29.664657, lng: -89.958366 })).toEqual(null); // Mississippi delta
