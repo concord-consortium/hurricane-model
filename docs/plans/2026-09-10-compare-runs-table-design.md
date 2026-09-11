@@ -94,7 +94,9 @@ Restarts an in-progress simulation (unless read-only), calls `runs.selectRun`,
 - `compare-runs-table.scss`.
 
 Mounted inside `MapView`'s root `.mapView` div (given `position: relative`) after `MapContainer`, so
-the drag bounds are the map area. `z-index: 900` — above Leaflet controls, below the left panel.
+the drag bounds are the map area. `z-index: 1100` — above the left panel, the right-panel tabs (both
+1000), and Leaflet's controls, so the table is never hidden behind them. `.mapView` gets
+`position: relative` without a `z-index` so it doesn't form its own stacking context.
 
 ### Logging
 
