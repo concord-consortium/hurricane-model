@@ -24,6 +24,48 @@ describe("UI model", () => {
     });
   });
 
+  describe("disclaimer", () => {
+    let oldMode: string;
+    let oldSkipDisclaimer: boolean;
+
+    beforeEach(() => {
+      oldMode = config.mode;
+      oldSkipDisclaimer = config.skipDisclaimer;
+      config.mode = "storm";
+      config.skipDisclaimer = false;
+    });
+
+    afterEach(() => {
+      config.mode = oldMode;
+      config.skipDisclaimer = oldSkipDisclaimer;
+    });
+
+    it("starts undismissed and toggles with dismissDisclaimer/showDisclaimer", () => {
+      const ui = new UIModel(new SimulationModel());
+      expect(ui.disclaimerDismissed).toEqual(false);
+      ui.dismissDisclaimer();
+      expect(ui.disclaimerDismissed).toEqual(true);
+      ui.showDisclaimer();
+      expect(ui.disclaimerDismissed).toEqual(false);
+    });
+
+    it("is available only in storm mode, when not skipped, and when not read only", () => {
+      const ui = new UIModel(new SimulationModel());
+      expect(ui.disclaimerAvailable).toEqual(true);
+
+      ui.setMode("report");
+      expect(ui.disclaimerAvailable).toEqual(false);
+      ui.setMode("runtime");
+
+      config.skipDisclaimer = true;
+      expect(ui.disclaimerAvailable).toEqual(false);
+      config.skipDisclaimer = false;
+
+      config.mode = "hurricane";
+      expect(ui.disclaimerAvailable).toEqual(false);
+    });
+  });
+
   describe("mapUpdated", () => {
     it("updates latLngToContainerPoint, mapModifiedByUser, and mapZoom", () => {
       const ui = new UIModel(new SimulationModel());

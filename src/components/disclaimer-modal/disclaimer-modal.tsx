@@ -1,7 +1,6 @@
 import { observer } from "mobx-react";
-import React, { useId, useState } from "react";
+import React, { useId, useLayoutEffect, useState } from "react";
 
-import config from "../../config";
 import { log } from "../../log";
 import { useStores } from "../../stores-context";
 import { Dialog } from "../dialog";
@@ -15,16 +14,23 @@ const ABOUT_TITLE = "About Storm Explorer";
 
 export const DisclaimerModal = observer(function DisclaimerModal() {
   const { ui } = useStores();
-  const [dismissed, setDismissed] = useState(false);
   const [content, setContent] = useState<ModalContent>("disclaimer");
   const messageId = useId();
 
   // Derived, not initial state: LaraAppWrapper sets ui.mode after the first render.
-  const open = !dismissed && !config.skipDisclaimer && config.mode === "storm" && !ui.isReadOnly;
+  const open = ui.disclaimerAvailable && !ui.disclaimerDismissed;
   const showAbout = content === "about";
 
+  // Reopening from the map button should land on the disclaimer, not wherever the user left off.
+  // Layout effect so the About content never paints during the opening transition.
+  useLayoutEffect(() => {
+    if (open) {
+      setContent("disclaimer");
+    }
+  }, [open]);
+
   const dismiss = (source: DismissSource) => {
-    setDismissed(true);
+    ui.dismissDisclaimer();
     log("DisclaimerDismissed", { source });
   };
 

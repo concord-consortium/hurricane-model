@@ -36,6 +36,7 @@ export class UIModel {
   @observable public baseMap: MapTilesName = config.map;
   @observable public overlay: Overlay | null = config.overlay;
   @observable public categoryChangeMarkers = config.categoryChangeMarkers;
+  @observable public disclaimerDismissed = false;
   @observable public thermometerActive = false;
   @observable public thermometerPositionSaved: LatLngExpression | null = null;
   @observable public thermometerPositionHover: LatLngExpression | null = null;
@@ -93,6 +94,10 @@ export class UIModel {
 
   @computed public get isReadOnly(): boolean {
     return this.isReportMode;
+  }
+
+  @computed public get disclaimerAvailable(): boolean {
+    return !config.skipDisclaimer && config.mode === "storm" && !this.isReadOnly;
   }
 
   @action.bound public setMode(mode: InteractiveMode) {
@@ -160,6 +165,14 @@ export class UIModel {
 
   @action.bound public setHurricaneImage(enabled: boolean) {
     this.hurricaneImage = enabled;
+  }
+
+  @action.bound public showDisclaimer() {
+    this.disclaimerDismissed = false;
+  }
+
+  @action.bound public dismissDisclaimer() {
+    this.disclaimerDismissed = true;
   }
 
   @action.bound public setThermometerActive(enabled: boolean) {
