@@ -160,6 +160,7 @@ describe("MapView component", () => {
       await user.click(showDisclaimerBtn()!);
       expect(stores.ui.disclaimerDismissed).toBe(false);
       expect(logModule.log).toHaveBeenCalledWith("DisclaimerReopened");
+      expect(showDisclaimerBtn()).toBeNull();
     });
   });
 

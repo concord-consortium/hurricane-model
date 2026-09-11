@@ -96,8 +96,6 @@ export class UIModel {
     return this.isReportMode;
   }
 
-  // The disclaimer is only relevant to students working in storm mode, so both the modal and the button
-  // that reopens it are hidden everywhere else.
   @computed public get disclaimerAvailable(): boolean {
     return !config.skipDisclaimer && config.mode === "storm" && !this.isReadOnly;
   }

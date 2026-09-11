@@ -125,14 +125,14 @@
     &.leftPanelOpen {
       left: $leftPanelWidth;
     }
+
+    &.disclaimerContainer {
+      order: 3;
+    }
   }
 
   .fullMapViewContainer {
     order: 2;
-  }
-
-  .topLeftControl.disclaimerContainer {
-    order: 3;
   }
 
   .temperatureControlMarker {

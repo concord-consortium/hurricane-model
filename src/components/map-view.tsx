@@ -126,14 +126,9 @@ export class MapView extends BaseComponent<IProps, IState> {
     const { sstOverlay } = ui;
     const navigation = !!ui.zoomedInView || config.navigation;
 
-    const resetButtonClasses = clsx(
-      css.topLeftControl, css.resetViewContainer, "leaflet-bar",
+    const topLeftClasses = clsx(
+      css.topLeftControl, "leaflet-bar",
       { [css.leftPanelOpen]: this.stores.ui.leftPanelOpen }
-    );
-
-    const disclaimerButtonClasses = clsx(
-      css.topLeftControl, css.disclaimerContainer, "leaflet-bar",
-      { [css.leftPanelOpen]: ui.leftPanelOpen }
     );
 
     // Change the TileLayer's key when the base map changes to force an update.
@@ -237,7 +232,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           { navigation && <ZoomControl position="topleft" ref={this.zoomRef} /> }
           {
             navigation && ui.mapModifiedByUser &&
-            <Control position="topleft" className={resetButtonClasses}>
+            <Control position="topleft" className={clsx(topLeftClasses, css.resetViewContainer)}>
               <a className={css.resetViewBtn}
                 onClick={this.resetView}
                 title="Reset view" role="button" aria-label="Reset view"
@@ -248,7 +243,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             ui.zoomedInView &&
-            <Control position="topleft" className={`${css.fullMapViewContainer} leaflet-bar`}>
+            <Control position="topleft" className={clsx(topLeftClasses, css.fullMapViewContainer)}>
               <a className={css.resetViewBtn}
                 onClick={this.stores.ui.setNorthAtlanticView}
                 title="Go to full map view" role="button" aria-label="Go to full map view"
@@ -260,7 +255,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           {
             ui.disclaimerAvailable && ui.disclaimerDismissed &&
-            <Control position="topleft" className={disclaimerButtonClasses}>
+            <Control position="topleft" className={clsx(topLeftClasses, css.disclaimerContainer)}>
               <a className={css.disclaimerBtn}
                 onClick={this.showDisclaimer}
                 title="Show disclaimer" role="button" aria-label="Show disclaimer"
