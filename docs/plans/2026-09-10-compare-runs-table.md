@@ -1258,21 +1258,21 @@ After `$runLetterBadgeColor`:
 ```scss
 // Compare Runs table run column width and horizontal cell padding, in px (unitless for the JS export).
 $compareRunColumnWidth: 128;
-$compareCellPadding: 10;
+$compareCellHorizontalPadding: 10;
 ```
 
 In the `:export` block:
 
 ```scss
   compareRunColumnWidth: $compareRunColumnWidth;
-  compareCellPadding: $compareCellPadding;
+  compareCellHorizontalPadding: $compareCellHorizontalPadding;
 ```
 
 In `__mocks__/common-scss-mock.js` add:
 
 ```js
   compareRunColumnWidth: "128",
-  compareCellPadding: "10"
+  compareCellHorizontalPadding: "10"
 ```
 
 **Step 2: Verify build still compiles**
@@ -1479,7 +1479,7 @@ Expected: FAIL — cannot find module.
 
 $labelColumnWidth: 190px;
 $runColumnWidth: #{$compareRunColumnWidth}px;
-$cellPadding: 6px #{$compareCellPadding}px;
+$cellPadding: 6px #{$compareCellHorizontalPadding}px;
 $headerHeight: 40px;
 $headerFill: #fafafa;
 $groupRowFill: #f0f0f0;
@@ -1722,7 +1722,7 @@ import DropdownArrowIcon from "../../assets/left-panel/dropdown-arrow.svg";
 import commonCss from "../common.scss";
 import css from "./compare-runs-table.scss";
 
-const maxSparklineWidth = parseFloat(commonCss.compareRunColumnWidth) - 2 * parseFloat(commonCss.compareCellPadding);
+const maxSparklineWidth = parseFloat(commonCss.compareRunColumnWidth) - 2 * parseFloat(commonCss.compareCellHorizontalPadding);
 
 interface IBox { left: number; top: number; width: number; height: number; }
 
