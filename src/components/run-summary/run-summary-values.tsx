@@ -30,7 +30,7 @@ export interface IRunSummaryValueProps {
   // Width the longest-lived run's sparkline fills; shorter runs scale down proportionally.
   // When omitted the value measures its own slot.
   maxSparklineWidth?: number;
-  showIcon?: boolean;
+  hideIcon?: boolean;
 }
 
 export function Dash() {
@@ -47,13 +47,13 @@ function anomalyText(value: number): string {
 
 interface ICategoryValueProps {
   category: number | null;
-  showIcon: boolean;
+  hideIcon?: boolean;
 }
 
-function CategoryValue({ category, showIcon }: ICategoryValueProps) {
+function CategoryValue({ category, hideIcon }: ICategoryValueProps) {
   return (
     <span className={css.categoryValue}>
-      {showIcon && <HurricaneIcon aria-hidden={true} className={clsx(css.icon, categoryIconClass(category))} />}
+      {!hideIcon && <HurricaneIcon aria-hidden={true} className={clsx(css.icon, categoryIconClass(category))} />}
       {category !== null ? <span>{categoryLabel(category)}</span> : <Dash />}
     </span>
   );
@@ -70,10 +70,10 @@ export function startingCategory(runs: RunsModel, run: IRunState): number {
 }
 
 export const StartingCategoryValue = observer(function StartingCategoryValue(
-  { run, showIcon = true }: IRunSummaryValueProps
+  { run, hideIcon }: IRunSummaryValueProps
 ) {
   const { runs } = useStores();
-  return <CategoryValue category={startingCategory(runs, run)} showIcon={showIcon} />;
+  return <CategoryValue category={startingCategory(runs, run)} hideIcon={hideIcon} />;
 });
 
 export const SeasonValue = observer(function SeasonValue({ run }: IRunSummaryValueProps) {
@@ -125,10 +125,10 @@ export const PressureSystemsValue = observer(function PressureSystemsValue({ run
 });
 
 export const PeakCategoryValue = observer(function PeakCategoryValue(
-  { run, showIcon = true }: IRunSummaryValueProps
+  { run, hideIcon }: IRunSummaryValueProps
 ) {
   const { runs } = useStores();
-  return <CategoryValue category={peakCategory(runs.getSimulationResult(run))} showIcon={showIcon} />;
+  return <CategoryValue category={peakCategory(runs.getSimulationResult(run))} hideIcon={hideIcon} />;
 });
 
 export const LandfallValue = observer(function LandfallValue({ run }: IRunSummaryValueProps) {

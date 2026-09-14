@@ -74,7 +74,7 @@ describe("run summary values", () => {
       stores.runs.setRuns([{ id: "run-1", simulation: setupSim() }], "run-1");
       render(
         <StoresContext value={stores}>
-          <span data-test="value"><StartingCategoryValue run={stores.runs.runs[0]} showIcon={false} /></span>
+          <span data-test="value"><StartingCategoryValue run={stores.runs.runs[0]} hideIcon /></span>
         </StoresContext>
       );
       expect(screen.getByTestId("value")).toHaveTextContent("Cat 3");
@@ -141,7 +141,7 @@ describe("run summary values", () => {
       stores.runs.setRuns([{ id: "run-1", simulation: completedSim() }], "run-1");
       render(
         <StoresContext value={stores}>
-          <span data-test="value"><PeakCategoryValue run={stores.runs.runs[0]} showIcon={false} /></span>
+          <span data-test="value"><PeakCategoryValue run={stores.runs.runs[0]} hideIcon /></span>
         </StoresContext>
       );
       expect(screen.getByTestId("value")).toHaveTextContent("Cat 3");

@@ -23,7 +23,7 @@ export const SummaryRows = observer(function SummaryRows({ rows, run, section }:
         return (
           <div key={key} className={cardCss.categoryRow} data-test={`${section}-${key}`}>
             <Icon aria-hidden={true} className={clsx(cardCss.icon, resolveIconClassName(row, runs, run))} />
-            <Value run={run} showIcon={false} />
+            <Value run={run} hideIcon />
           </div>
         );
       })}
