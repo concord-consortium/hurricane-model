@@ -1,6 +1,8 @@
 @use "common" as *;
 
 .mapView {
+  // Anchors the compare runs table and bounds its drag. No z-index, so the table can stack above the panels.
+  position: relative;
   width: 100%;
   height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight + 1});
 
