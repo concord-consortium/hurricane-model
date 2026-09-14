@@ -6,7 +6,7 @@ import { useStores } from "../../../stores-context";
 import { IRunState } from "../../../types/interactive-state";
 import { categoryLabel } from "../../../utils/hurricane-categories";
 import { intensitySeries, landfallSummary, peakCategory } from "../../../utils/run-outcomes";
-import { CategorySparkline } from "./category-sparkline";
+import { CategorySparkline } from "../../run-summary/category-sparkline";
 import { RunThumbnail } from "./run-thumbnail";
 
 import CategoryOverTimeIcon from "../../../assets/left-panel/category-over-time.svg";
