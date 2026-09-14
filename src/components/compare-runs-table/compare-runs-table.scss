@@ -134,6 +134,7 @@ $tablePadding: 6px;
 
   .corner, .rowLabel, .groupLabel {
     box-sizing: border-box;
+    color: $charcoalDark;
     width: $labelColumnWidth;
   }
 
@@ -195,6 +196,9 @@ $tablePadding: 6px;
 
   .runLetter {
     @include runLetterBadge;
+    font-size: 14px;
+    height: 22px;
+    width: 22px;
   }
 
   .runStatus {

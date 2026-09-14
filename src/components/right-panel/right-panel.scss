@@ -17,7 +17,7 @@ $rightPanelInnerWidth: 151px;
   overflow-y: hidden;
 
   .rightPanel {
-    color: #222;
+    color: $charcoalDark;
     position: absolute;
     right: -$rightPanelWidth;
     top: 0;
