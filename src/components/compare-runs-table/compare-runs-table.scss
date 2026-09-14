@@ -1,8 +1,8 @@
 @use "../common" as *;
 
 $labelColumnWidth: 190px;
-$runColumnWidth: #{$compareRunColumnWidth}px;
-$cellPadding: 6px #{$compareCellHorizontalPadding}px;
+$runColumnWidth: $compareRunColumnWidth * 1px;
+$cellPadding: 6px ($compareCellHorizontalPadding * 1px);
 $headerHeight: 40px;
 $headerFill: #fafafa;
 $groupRowFill: #f0f0f0;
@@ -33,7 +33,7 @@ $tablePadding: 6px;
     display: flex;
     height: $headerHeight;
     // The one-run table width, so expanding with a single run doesn't change the card's width.
-    min-width: $labelColumnWidth + $runColumnWidth + 2 * $tablePadding;
+    min-width: calc($labelColumnWidth + $runColumnWidth);
     padding: 0 4px 0 14px;
     position: relative;
     touch-action: none;
