@@ -7,7 +7,7 @@ import { useStores } from "../../stores-context";
 import { IBox } from "../../types";
 import { IRunState } from "../../types/interactive-state";
 import { selectRun } from "../../utils/multitrack";
-import { IRunSummaryRow, resultRows, setupRows } from "../run-summary/run-summary-rows";
+import { IRunSummaryRow, resolveIconClassName, resultRows, setupRows } from "../run-summary/run-summary-rows";
 import { Dash } from "../run-summary/run-summary-values";
 import { clampToParent, useDraggable } from "./use-draggable";
 
@@ -130,28 +130,31 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
     </tr>
   );
 
-  const renderRow = ({ key, label, Icon, iconClassName, Value }: IRunSummaryRow, section: Section) => (
-    <tr key={key} className={css.dataRow}>
-      <th scope="row" className={css.rowLabel}>
-        <span className={css.rowLabelContent}>
-          <Icon aria-hidden={true} className={clsx(css.rowIcon, iconClassName)} />
-          {label}
-        </span>
-      </th>
-      {runs.runs.map(run => (
-        <td
-          key={run.id}
-          className={clsx(css.runCell, columnClasses(run))}
-          data-test={`compare-cell-${key}`}
-          onClick={() => handleSelect(run)}
-        >
-          {section === "result" && !runs.isRunComplete(run)
-            ? <Dash />
-            : <Value run={run} maxSparklineWidth={maxSparklineWidth} />}
-        </td>
-      ))}
-    </tr>
-  );
+  const renderRow = (row: IRunSummaryRow, section: Section) => {
+    const { key, label, Icon, Value } = row;
+    return (
+      <tr key={key} className={css.dataRow}>
+        <th scope="row" className={css.rowLabel}>
+          <span className={css.rowLabelContent}>
+            <Icon aria-hidden={true} className={clsx(css.rowIcon, resolveIconClassName(row, runs))} />
+            {label}
+          </span>
+        </th>
+        {runs.runs.map(run => (
+          <td
+            key={run.id}
+            className={clsx(css.runCell, columnClasses(run))}
+            data-test={`compare-cell-${key}`}
+            onClick={() => handleSelect(run)}
+          >
+            {section === "result" && !runs.isRunComplete(run)
+              ? <Dash />
+              : <Value run={run} maxSparklineWidth={maxSparklineWidth} />}
+          </td>
+        ))}
+      </tr>
+    );
+  };
 
   return (
     <div

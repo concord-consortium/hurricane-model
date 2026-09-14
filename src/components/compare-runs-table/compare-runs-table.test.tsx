@@ -97,6 +97,7 @@ describe("CompareRunsTable", () => {
       renderTable(stores);
       const peaks = screen.getAllByTestId("compare-cell-peak-category");
       expect(peaks[0]).toHaveTextContent("Cat 2");
+      expect(peaks[0].querySelector("svg")).toHaveClass("category2");
       expect(peaks[1]).toHaveTextContent("—");
       expect(peaks[1].querySelector("svg")).not.toBeInTheDocument();
       expect(screen.getAllByTestId("compare-cell-landfalls")[0]).toHaveTextContent("None");

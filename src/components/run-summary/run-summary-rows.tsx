@@ -1,8 +1,12 @@
 import React from "react";
 
+import { RunsModel } from "../../models/runs";
+import { IRunState } from "../../types/interactive-state";
+import { peakCategory } from "../../utils/run-outcomes";
 import {
   CategoryOverTimeValue, IRunSummaryValueProps, LandfallValue, PeakCategoryValue, PressureSystemsValue,
-  SeaSurfaceTempValue, SeasonValue, StartLocationValue, StartingCategoryValue, SvgIcon
+  SeaSurfaceTempValue, SeasonValue, StartLocationValue, StartingCategoryValue, SvgIcon, categoryIconClass,
+  startingCategory
 } from "./run-summary-values";
 
 import CategoryOverTimeIcon from "../../assets/left-panel/category-over-time.svg";
@@ -16,22 +20,26 @@ import ThermometerIcon from "../../assets/left-panel/thermometer.svg";
 
 import css from "./run-summary.scss";
 
+type IconClassName = string | ((runs: RunsModel, run?: IRunState) => string);
+
 export interface IRunSummaryRow {
   // Suffix of the row's data-test attribute, e.g. "setup-location".
   key: string;
   label: string;
   Icon: SvgIcon;
-  iconClassName?: string;
+  iconClassName?: IconClassName;
   Value: React.ComponentType<IRunSummaryValueProps>;
-  // The value draws its own category-colored icon, so a host that puts icons beside values skips Icon.
-  valueHasIcon?: boolean;
+}
+
+export function resolveIconClassName({ iconClassName }: IRunSummaryRow, runs: RunsModel, run?: IRunState) {
+  return typeof iconClassName === "function" ? iconClassName(runs, run) : iconClassName;
 }
 
 export const setupRows: IRunSummaryRow[] = [
   { key: "location", label: "Storm Location", Icon: StormLocationIcon, Value: StartLocationValue },
   {
-    key: "category", label: "Storm Category", Icon: HurricaneIcon, iconClassName: css.fillWhite,
-    Value: StartingCategoryValue, valueHasIcon: true
+    key: "category", label: "Storm Category", Icon: HurricaneIcon, Value: StartingCategoryValue,
+    iconClassName: (runs, run) => categoryIconClass(run ? startingCategory(runs, run) : null)
   },
   { key: "season", label: "Season", Icon: SeasonIcon, Value: SeasonValue },
   { key: "anomalies", label: "Sea Surface Temp", Icon: ThermometerIcon, Value: SeaSurfaceTempValue },
@@ -40,8 +48,8 @@ export const setupRows: IRunSummaryRow[] = [
 
 export const resultRows: IRunSummaryRow[] = [
   {
-    key: "peak-category", label: "Peak Category", Icon: PeakCategoryIcon, iconClassName: css.fillWhite,
-    Value: PeakCategoryValue, valueHasIcon: true
+    key: "peak-category", label: "Peak Category", Icon: PeakCategoryIcon, Value: PeakCategoryValue,
+    iconClassName: (runs, run) => categoryIconClass(run ? peakCategory(runs.getSimulationResult(run)) : null)
   },
   { key: "landfalls", label: "Landfall", Icon: LandfallIcon, Value: LandfallValue },
   {

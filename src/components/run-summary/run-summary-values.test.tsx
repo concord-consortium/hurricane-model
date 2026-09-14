@@ -70,6 +70,17 @@ describe("run summary values", () => {
       expect(screen.getByTestId("value").querySelector("svg")).toHaveClass("category3");
     });
 
+    it("omits the icon when asked", () => {
+      stores.runs.setRuns([{ id: "run-1", simulation: setupSim() }], "run-1");
+      render(
+        <StoresContext value={stores}>
+          <span data-test="value"><StartingCategoryValue run={stores.runs.runs[0]} showIcon={false} /></span>
+        </StoresContext>
+      );
+      expect(screen.getByTestId("value")).toHaveTextContent("Cat 3");
+      expect(screen.getByTestId("value").querySelector("svg")).not.toBeInTheDocument();
+    });
+
     it("shows TS when the category is 0 or missing", () => {
       renderValue(stores, StartingCategoryValue, setupSim(sim => { sim.hurricane.startingCategory = 0; }));
       expect(screen.getByTestId("value")).toHaveTextContent("TS");
@@ -124,6 +135,17 @@ describe("run summary values", () => {
       renderValue(stores, PeakCategoryValue, completedSim());
       expect(screen.getByTestId("value")).toHaveTextContent("Cat 3");
       expect(screen.getByTestId("value").querySelector("svg")).toHaveClass("category3");
+    });
+
+    it("omits the icon when asked", () => {
+      stores.runs.setRuns([{ id: "run-1", simulation: completedSim() }], "run-1");
+      render(
+        <StoresContext value={stores}>
+          <span data-test="value"><PeakCategoryValue run={stores.runs.runs[0]} showIcon={false} /></span>
+        </StoresContext>
+      );
+      expect(screen.getByTestId("value")).toHaveTextContent("Cat 3");
+      expect(screen.getByTestId("value").querySelector("svg")).not.toBeInTheDocument();
     });
   });
 

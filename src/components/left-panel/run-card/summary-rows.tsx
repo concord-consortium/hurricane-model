@@ -1,8 +1,10 @@
 import { clsx } from "clsx";
+import { observer } from "mobx-react";
 import React from "react";
 
+import { useStores } from "../../../stores-context";
 import { IRunState } from "../../../types/interactive-state";
-import { IRunSummaryRow } from "../../run-summary/run-summary-rows";
+import { IRunSummaryRow, resolveIconClassName } from "../../run-summary/run-summary-rows";
 
 import cardCss from "./run-card.scss";
 
@@ -12,15 +14,19 @@ interface IProps {
   section: "setup" | "result";
 }
 
-export function SummaryRows({ rows, run, section }: IProps) {
+export const SummaryRows = observer(function SummaryRows({ rows, run, section }: IProps) {
+  const { runs } = useStores();
   return (
     <>
-      {rows.map(({ key, Icon, iconClassName, Value, valueHasIcon }) => (
-        <div key={key} className={cardCss.categoryRow} data-test={`${section}-${key}`}>
-          {!valueHasIcon && <Icon aria-hidden={true} className={clsx(cardCss.icon, iconClassName)} />}
-          <Value run={run} />
-        </div>
-      ))}
+      {rows.map(row => {
+        const { key, Icon, Value } = row;
+        return (
+          <div key={key} className={cardCss.categoryRow} data-test={`${section}-${key}`}>
+            <Icon aria-hidden={true} className={clsx(cardCss.icon, resolveIconClassName(row, runs, run))} />
+            <Value run={run} showIcon={false} />
+          </div>
+        );
+      })}
     </>
   );
-}
+});

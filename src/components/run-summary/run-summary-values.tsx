@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
 import { clampCategory } from "../../config";
+import { RunsModel } from "../../models/runs";
 import { resolveStartLocation } from "../../models/simulation";
 import { useStores } from "../../stores-context";
 import { namedRegions, seasonLabels } from "../../types";
@@ -15,7 +16,6 @@ import { intensitySeries, landfallSummary, peakCategory } from "../../utils/run-
 import { CategorySparkline } from "./category-sparkline";
 
 import HurricaneIcon from "../../assets/left-panel/hurricane.svg";
-import PeakCategoryIcon from "../../assets/left-panel/peak-category.svg";
 
 import categoryCss from "../hurricane-category.scss";
 import css from "./run-summary.scss";
@@ -30,10 +30,15 @@ export interface IRunSummaryValueProps {
   // Width the longest-lived run's sparkline fills; shorter runs scale down proportionally.
   // When omitted the value measures its own slot.
   maxSparklineWidth?: number;
+  showIcon?: boolean;
 }
 
 export function Dash() {
   return <span className={css.dash}>—</span>;
+}
+
+export function categoryIconClass(category: number | null): string {
+  return category !== null ? categoryCss["category" + category] : css.fillWhite;
 }
 
 function anomalyText(value: number): string {
@@ -41,15 +46,14 @@ function anomalyText(value: number): string {
 }
 
 interface ICategoryValueProps {
-  Icon: SvgIcon;
   category: number | null;
+  showIcon: boolean;
 }
 
-function CategoryValue({ Icon, category }: ICategoryValueProps) {
-  const fillClass = category !== null ? categoryCss["category" + category] : css.fillWhite;
+function CategoryValue({ category, showIcon }: ICategoryValueProps) {
   return (
     <span className={css.categoryValue}>
-      <Icon aria-hidden={true} className={clsx(css.icon, fillClass)} />
+      {showIcon && <HurricaneIcon aria-hidden={true} className={clsx(css.icon, categoryIconClass(category))} />}
       {category !== null ? <span>{categoryLabel(category)}</span> : <Dash />}
     </span>
   );
@@ -61,10 +65,15 @@ export const StartLocationValue = observer(function StartLocationValue({ run }: 
   return <span className={css.singleLine}>{formatLatLng(start.lat, start.lng)}</span>;
 });
 
-export const StartingCategoryValue = observer(function StartingCategoryValue({ run }: IRunSummaryValueProps) {
+export function startingCategory(runs: RunsModel, run: IRunState): number {
+  return clampCategory(runs.getSimulationSetup(run).startingCategory ?? 0);
+}
+
+export const StartingCategoryValue = observer(function StartingCategoryValue(
+  { run, showIcon = true }: IRunSummaryValueProps
+) {
   const { runs } = useStores();
-  const category = clampCategory(runs.getSimulationSetup(run).startingCategory ?? 0);
-  return <CategoryValue Icon={HurricaneIcon} category={category} />;
+  return <CategoryValue category={startingCategory(runs, run)} showIcon={showIcon} />;
 });
 
 export const SeasonValue = observer(function SeasonValue({ run }: IRunSummaryValueProps) {
@@ -115,9 +124,11 @@ export const PressureSystemsValue = observer(function PressureSystemsValue({ run
   );
 });
 
-export const PeakCategoryValue = observer(function PeakCategoryValue({ run }: IRunSummaryValueProps) {
+export const PeakCategoryValue = observer(function PeakCategoryValue(
+  { run, showIcon = true }: IRunSummaryValueProps
+) {
   const { runs } = useStores();
-  return <CategoryValue Icon={PeakCategoryIcon} category={peakCategory(runs.getSimulationResult(run))} />;
+  return <CategoryValue category={peakCategory(runs.getSimulationResult(run))} showIcon={showIcon} />;
 });
 
 export const LandfallValue = observer(function LandfallValue({ run }: IRunSummaryValueProps) {
