@@ -30,24 +30,22 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [hoveredRunId, setHoveredRunId] = useState<string | null>(null);
   const [selectedColumnBox, setSelectedColumnBox] = useState<IBox | null>(null);
-  const runCount = runs.runs.length;
 
   const handleDragStart = useDraggable({ elementRef: compareRunsTableRef, onMove: ui.setCompareTablePosition });
 
-  // A dragged table can end up outside the map when it grows or the window shrinks.
-  useLayoutEffect(() => {
+  // Keeps the table between the top and bottom bars and within the bounds of the view.
+  const keepInside = useCallback(() => {
     const table = compareRunsTableRef.current;
-    if (!table || !position) return;
-    const keepInside = () => {
-      const clamped = clampToParent(position, table);
-      if (clamped.left !== position.left || clamped.top !== position.top) ui.setCompareTablePosition(clamped);
-    };
-    keepInside();
-    window.addEventListener("resize", keepInside);
-    return () => window.removeEventListener("resize", keepInside);
-  }, [position, expanded, runCount, ui]);
+    const currentPosition = ui.compareTablePosition;
+    if (!currentPosition || !table) return;
 
-  // One box outlines the whole selected column, including the group rows a per-cell border can't span.
+    const clamped = clampToParent(currentPosition, table);
+    if (clamped.left !== currentPosition.left || clamped.top !== currentPosition.top) {
+      ui.setCompareTablePosition(clamped);
+    }
+  }, [ui]);
+
+  // Keeps the selected column indicator the correct size.
   const measureSelectedColumn = useCallback(() => {
     const container = tableContainerRef.current;
     const header = container?.querySelector<HTMLElement>(`[data-run-id="${runs.selectedRunId}"]`);
@@ -67,12 +65,26 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
     });
   }, [runs.selectedRunId]);
 
-  useLayoutEffect(measureSelectedColumn, [measureSelectedColumn, expanded, runCount]);
+  const fixTable = useCallback(() => {
+    keepInside();
+    measureSelectedColumn();
+  }, [keepInside, measureSelectedColumn]);
 
-  useEffect(() => {
-    window.addEventListener("resize", measureSelectedColumn);
-    return () => window.removeEventListener("resize", measureSelectedColumn);
-  }, [measureSelectedColumn]);
+  // Keeps the table properly positioned and looking good when the window or its size change.
+  useLayoutEffect(() => {
+    const table = compareRunsTableRef.current;
+    if (!table) return;
+
+    fixTable();
+    window.addEventListener("resize", fixTable);
+    const resizeObserver = new ResizeObserver(fixTable);
+    resizeObserver.observe(table);
+
+    return () => {
+      window.removeEventListener("resize", fixTable);
+      resizeObserver.disconnect();
+    };
+  }, [fixTable, ui]);
 
   const handleToggle = () => {
     const next = !expanded;

@@ -132,7 +132,7 @@ function useMeasuredWidth(ref: React.RefObject<HTMLElement | null>, enabled: boo
   const [width, setWidth] = useState(0);
   useLayoutEffect(() => {
     const element = ref.current;
-    if (!enabled || !element || typeof ResizeObserver === "undefined") return;
+    if (!enabled || !element) return;
     const measure = () => setWidth(element.clientWidth);
     measure();
     const observer = new ResizeObserver(measure);

@@ -31,6 +31,13 @@ fetchMock.mockResponse("", { status: 404 });
 // Initialize seedrandom to deterministic mode, so it's possible to write reasonable tests that use random values.
 seedrandom.initialize(true);
 
+// JSDOM has no layout, so ResizeObserver never fires; components only need it to exist.
+global.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 // Fix testing of some of the Leaflet elements. JSDOM doesn't fully support SVG.
 // See: https://stackoverflow.com/a/54384719/1548350
 const createElementNSOrig = global.document.createElementNS;
