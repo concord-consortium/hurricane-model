@@ -1740,20 +1740,20 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
   const stores = useStores();
   const { runs, ui } = stores;
   const { compareTableExpanded: expanded, compareTablePosition: position } = ui;
-  const cardRef = useRef<HTMLDivElement>(null);
+  const compareRunsTableRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [hoveredRunId, setHoveredRunId] = useState<string | null>(null);
   const [selectedColumnBox, setSelectedColumnBox] = useState<IBox | null>(null);
   const runCount = runs.runs.length;
 
-  const handleDragStart = useDraggable({ elementRef: cardRef, onMove: ui.setCompareTablePosition });
+  const handleDragStart = useDraggable({ elementRef: compareRunsTableRef, onMove: ui.setCompareTablePosition });
 
-  // A dragged card can end up outside the map when it grows or the window shrinks.
+  // A dragged table can end up outside the map when it grows or the window shrinks.
   useLayoutEffect(() => {
-    const card = cardRef.current;
-    if (!card || !position) return;
+    const table = compareRunsTableRef.current;
+    if (!table || !position) return;
     const keepInside = () => {
-      const clamped = clampToParent(position, card);
+      const clamped = clampToParent(position, table);
       if (clamped.left !== position.left || clamped.top !== position.top) ui.setCompareTablePosition(clamped);
     };
     keepInside();
@@ -1869,7 +1869,7 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
 
   return (
     <div
-      ref={cardRef}
+      ref={compareRunsTableRef}
       className={clsx(css.compareRunsTable, { [css.expanded]: expanded })}
       style={position ? { left: position.left, top: position.top, transform: "none" } : undefined}
       role="region"
