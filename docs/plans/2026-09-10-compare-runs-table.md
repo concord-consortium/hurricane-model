@@ -165,6 +165,7 @@ describe("selectRun", () => {
   it("selects the run, resets the map view, and logs where the selection came from", () => {
     const { runs, ui } = stores;
     ui.setZoomedInView([[30, -85], [35, -80]], 3);
+    expect(runs.selectedRunId).toBe(runs.runs[1].id);
 
     selectRun(stores, runs.runs[0], "table");
 
@@ -185,6 +186,7 @@ describe("selectRun", () => {
       simulation.simulationStarted = true;
       simulation.time = 50;
     });
+    expect(runs.runs[1].simulation.simulationStarted).toBe(true);
 
     selectRun(stores, runs.runs[0], "map");
 
@@ -496,6 +498,9 @@ describe("run summary values", () => {
     });
 
     it("shows TS when the category is 0 or missing", () => {
+      renderValue(stores, StartingCategoryValue, setupSim(sim => { sim.hurricane.startingCategory = 0; }));
+      expect(screen.getByTestId("value")).toHaveTextContent("TS");
+
       renderValue(stores, StartingCategoryValue, setupSim(sim => { delete sim.hurricane.startingCategory; }));
       expect(screen.getByTestId("value")).toHaveTextContent("TS");
     });
@@ -716,6 +721,12 @@ interface ICategoryValueProps {
   category: number | null;
 }
 
+export const StartLocationValue = observer(function StartLocationValue({ run }: IRunSummaryValueProps) {
+  const { runs } = useStores();
+  const start = resolveStartLocation(runs.getSimulationSetup(run).startLocation);
+  return <span className={css.singleLine}>{formatLatLng(start.lat, start.lng)}</span>;
+});
+
 function CategoryValue({ Icon, category }: ICategoryValueProps) {
   const fillClass = category !== null ? categoryCss["category" + category] : css.fillWhite;
   return (
@@ -725,26 +736,6 @@ function CategoryValue({ Icon, category }: ICategoryValueProps) {
     </span>
   );
 }
-
-function useMeasuredWidth(ref: React.RefObject<HTMLElement | null>, enabled: boolean) {
-  const [width, setWidth] = useState(0);
-  useLayoutEffect(() => {
-    const element = ref.current;
-    if (!enabled || !element || typeof ResizeObserver === "undefined") return;
-    const measure = () => setWidth(element.clientWidth);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [ref, enabled]);
-  return width;
-}
-
-export const StartLocationValue = observer(function StartLocationValue({ run }: IRunSummaryValueProps) {
-  const { runs } = useStores();
-  const start = resolveStartLocation(runs.getSimulationSetup(run).startLocation);
-  return <span className={css.singleLine}>{formatLatLng(start.lat, start.lng)}</span>;
-});
 
 export const StartingCategoryValue = observer(function StartingCategoryValue({ run }: IRunSummaryValueProps) {
   const { runs } = useStores();
@@ -811,6 +802,20 @@ export const LandfallValue = observer(function LandfallValue({ run }: IRunSummar
   if (!landfalls) return <Dash />;
   return <span>{landfalls.count === 0 ? "None" : `${landfalls.count}×`}</span>;
 });
+
+function useMeasuredWidth(ref: React.RefObject<HTMLElement | null>, enabled: boolean) {
+  const [width, setWidth] = useState(0);
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!enabled || !element || typeof ResizeObserver === "undefined") return;
+    const measure = () => setWidth(element.clientWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref, enabled]);
+  return width;
+}
 
 export const CategoryOverTimeValue = observer(function CategoryOverTimeValue(
   { run, maxSparklineWidth }: IRunSummaryValueProps
@@ -892,7 +897,6 @@ export interface IRunSummaryRow {
   key: string;
   label: string;
   Icon: SvgIcon;
-  // Two-tone icons need a white fill to show as neutral outlines.
   iconClassName?: string;
   Value: React.ComponentType<IRunSummaryValueProps>;
   // The value draws its own category-colored icon, so a host that puts icons beside values skips Icon.
