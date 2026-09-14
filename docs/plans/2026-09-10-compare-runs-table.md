@@ -1835,7 +1835,7 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
     );
   };
 
-  const renderGroupRow = (label: string) => (
+  const renderSectionHeaderRow = (label: string) => (
     <tr className={css.groupRow}>
       <th scope="row" className={css.groupLabel}>{label}</th>
       {runs.runs.map(run => (
@@ -1902,9 +1902,9 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
               </tr>
             </thead>
             <tbody>
-              {renderGroupRow("Setup")}
+              {renderSectionHeaderRow("Setup")}
               {setupRows.map(row => renderRow(row, "setup"))}
-              {renderGroupRow("Result")}
+              {renderSectionHeaderRow("Result")}
               {resultRows.map(row => renderRow(row, "result"))}
             </tbody>
           </table>
