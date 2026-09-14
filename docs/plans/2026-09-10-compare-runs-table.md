@@ -1068,7 +1068,8 @@ jsdom has no layout, so the tests stub `offsetParent`, `offsetWidth/Height`, `cl
 import { render, screen } from "@testing-library/react";
 import React, { useRef } from "react";
 
-import { clampToParent, IPosition, useDraggable } from "./use-draggable";
+import { IPosition } from "../../models/ui";
+import { clampToParent, useDraggable } from "./use-draggable";
 
 function Draggable({ onMove }: { onMove: (position: IPosition) => void }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -1168,8 +1169,6 @@ Expected: FAIL — cannot find module.
 import React, { useCallback } from "react";
 
 import { IPosition } from "../../models/ui";
-
-export type { IPosition };
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
