@@ -8,7 +8,7 @@ import { useStores } from "../../../stores-context";
 import { selectRun } from "../../../utils/multitrack";
 import { resultRows, setupRows } from "../../run-summary/run-summary-rows";
 import { RunThumbnail } from "./run-thumbnail";
-import { SummaryRows } from "./summary-rows";
+import { CardSummaryRows } from "./card-summary-rows";
 
 import DeleteIcon from "../../../assets/left-panel/delete.svg";
 import RestartIcon from "../../../assets/left-panel/restart.svg";
@@ -82,14 +82,14 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Setup</div>
             <div className={css.summaryColumn}>
-              <SummaryRows rows={setupRows} run={run} section="setup" />
+              <CardSummaryRows rows={setupRows} run={run} section="setup" />
             </div>
           </div>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Result</div>
             <RunThumbnail result={runs.getSimulationResult(run)} run={run} />
             <div className={clsx(css.summaryColumn, css.resultSummary)}>
-              <SummaryRows rows={resultRows} run={run} section="result" />
+              <CardSummaryRows rows={resultRows} run={run} section="result" />
             </div>
           </div>
         </div>

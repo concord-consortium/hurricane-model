@@ -5,8 +5,7 @@ import { IRunState } from "../../types/interactive-state";
 import { peakCategory } from "../../utils/run-outcomes";
 import {
   CategoryOverTimeValue, IRunSummaryValueProps, LandfallValue, PeakCategoryValue, PressureSystemsValue,
-  SeaSurfaceTempValue, SeasonValue, StartLocationValue, StartingCategoryValue, SvgIcon, categoryIconClass,
-  startingCategory
+  SeaSurfaceTempValue, SeasonValue, StartLocationValue, StartingCategoryValue, SvgIcon, categoryIconClass
 } from "./run-summary-values";
 
 import CategoryOverTimeIcon from "../../assets/left-panel/category-over-time.svg";
@@ -39,7 +38,7 @@ export const setupRows: IRunSummaryRow[] = [
   { key: "location", label: "Storm Location", Icon: StormLocationIcon, Value: StartLocationValue },
   {
     key: "category", label: "Storm Category", Icon: HurricaneIcon, Value: StartingCategoryValue,
-    iconClassName: (runs, run) => categoryIconClass(run ? startingCategory(runs, run) : null)
+    iconClassName: (runs, run) => categoryIconClass(run ? runs.getStartingCategory(run) : null)
   },
   { key: "season", label: "Season", Icon: SeasonIcon, Value: SeasonValue },
   { key: "anomalies", label: "Sea Surface Temp", Icon: ThermometerIcon, Value: SeaSurfaceTempValue },

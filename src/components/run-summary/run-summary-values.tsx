@@ -2,8 +2,6 @@ import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { clampCategory } from "../../config";
-import { RunsModel } from "../../models/runs";
 import { resolveStartLocation } from "../../models/simulation";
 import { useStores } from "../../stores-context";
 import { namedRegions, seasonLabels } from "../../types";
@@ -11,7 +9,7 @@ import { IRunState } from "../../types/interactive-state";
 import { categoryLabel } from "../../utils/hurricane-categories";
 import { formatLatLng } from "../../utils/lat-long";
 import { pressureSystemReport } from "../../utils/pressure-systems";
-import { temperatureAnomalyRegions } from "../../utils/regions";
+import { anomalyText, temperatureAnomalyRegions } from "../../utils/regions";
 import { intensitySeries, landfallSummary, peakCategory } from "../../utils/run-outcomes";
 import { CategorySparkline } from "./category-sparkline";
 
@@ -41,10 +39,6 @@ export function categoryIconClass(category: number | null): string {
   return category !== null ? categoryCss["category" + category] : css.fillWhite;
 }
 
-function anomalyText(value: number): string {
-  return `${value > 0 ? "+" : "−"}${Math.abs(value)}\u00A0°C`;
-}
-
 interface ICategoryValueProps {
   category: number | null;
   hideIcon?: boolean;
@@ -65,15 +59,11 @@ export const StartLocationValue = observer(function StartLocationValue({ run }: 
   return <span className={css.singleLine}>{formatLatLng(start.lat, start.lng)}</span>;
 });
 
-export function startingCategory(runs: RunsModel, run: IRunState): number {
-  return clampCategory(runs.getSimulationSetup(run).startingCategory ?? 0);
-}
-
 export const StartingCategoryValue = observer(function StartingCategoryValue(
   { run, hideIcon }: IRunSummaryValueProps
 ) {
   const { runs } = useStores();
-  return <CategoryValue category={startingCategory(runs, run)} hideIcon={hideIcon} />;
+  return <CategoryValue category={runs.getStartingCategory(run)} hideIcon={hideIcon} />;
 });
 
 export const SeasonValue = observer(function SeasonValue({ run }: IRunSummaryValueProps) {

@@ -83,7 +83,7 @@ describe("CompareRunsTable", () => {
       renderTable(stores);
       const seasons = screen.getAllByTestId("compare-cell-season");
       expect(seasons[0]).toHaveTextContent("Winter");
-      expect(seasons[1]).not.toHaveTextContent("Winter");
+      expect(seasons[1]).toHaveTextContent("Fall");
     });
 
     it("shows setup pressure systems, not the systems a run finished with", () => {

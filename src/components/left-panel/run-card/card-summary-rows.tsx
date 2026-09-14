@@ -14,7 +14,7 @@ interface IProps {
   section: "setup" | "result";
 }
 
-export const SummaryRows = observer(function SummaryRows({ rows, run, section }: IProps) {
+export const CardSummaryRows = observer(function CardSummaryRows({ rows, run, section }: IProps) {
   const { runs } = useStores();
   return (
     <>

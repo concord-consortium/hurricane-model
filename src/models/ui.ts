@@ -42,7 +42,7 @@ export class UIModel {
   @observable public thermometerPositionSaved: LatLngExpression | null = null;
   @observable public thermometerPositionHover: LatLngExpression | null = null;
   @observable public compareTableExpanded = false;
-  // null means the default dock (top-center of the map), set in CSS.
+  // null means the default dock (top-center of the view), set in CSS.
   @observable public compareTablePosition: IPosition | null = null;
 
   // These values are updated when the window size or initial bounds change.

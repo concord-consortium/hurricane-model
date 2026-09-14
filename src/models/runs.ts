@@ -1,6 +1,7 @@
 import { action, comparer, computed, makeObservable, observable, toJS } from "mobx";
 import { IRunResult, IRunSetup, IRunState, ISimulationState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
+import { clampCategory } from "../config";
 import {
   applySimulationState, cloneSimulationState, defaultSimulationState, extractSetupState,
   normalizeSimulationState, serializeHurricane, serializeSimulation
@@ -88,6 +89,10 @@ export class RunsModel {
 
   public isRunComplete(run: IRunState): boolean {
     return this.getSimulation(run).simulationFinished;
+  }
+
+  public getStartingCategory(run: IRunState): number {
+    return clampCategory(this.getSimulationSetup(run).startingCategory ?? 0);
   }
 
   public runLetter(run: IRunState): string {
