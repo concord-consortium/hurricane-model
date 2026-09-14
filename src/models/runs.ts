@@ -12,6 +12,8 @@ export const maxRuns = 6;
 // maxRuns keeps run letters inside A–F.
 const firstRunLetterCharCode = "A".charCodeAt(0);
 
+export type RunStatus = "" | "Not run yet" | "Running..." | "Paused";
+
 export class RunsModel {
   @observable public runs: IRunState[] = [];
   @observable public selectedRunId = "";
@@ -90,6 +92,14 @@ export class RunsModel {
 
   public runLetter(run: IRunState): string {
     return String.fromCharCode(firstRunLetterCharCode + this.runs.findIndex(r => r.id === run.id));
+  }
+
+  public runStatus(run: IRunState): RunStatus {
+    if (this.isRunComplete(run)) return "";
+    if (!this.isSelected(run.id)) return "Not run yet";
+    if (this.simulation.simulationRunning) return "Running...";
+    if (this.simulation.simulationStarted) return "Paused";
+    return "Not run yet";
   }
 
   @computed public get allComplete(): boolean {

@@ -55,10 +55,8 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
     log("RunDeleted", { runId: run.id });
   };
 
-  const statusMessage = complete ? ""
-    : selected && simulation.simulationRunning ? "Running..."
-    : selected && simulation.simulationStarted ? "Paused"
-    : "Not run yet - editable";
+  const status = runs.runStatus(run);
+  const statusMessage = status === "Not run yet" ? `${status} - editable` : status;
   const labelStatusMessage = statusMessage ? `, ${statusMessage}` : "";
 
   return (
