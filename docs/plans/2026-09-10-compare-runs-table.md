@@ -1174,7 +1174,7 @@ export type { IPosition };
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
 export function clampToParent(position: IPosition, element: HTMLElement): IPosition {
-  const parent = element.offsetParent as HTMLElement | null;
+  const parent = element.offsetParent;
   if (!parent) return position;
   return {
     left: clamp(position.left, 0, parent.clientWidth - element.offsetWidth),
@@ -1192,9 +1192,9 @@ interface IUseDraggableOptions {
 export function useDraggable({ elementRef, onMove }: IUseDraggableOptions) {
   return useCallback((event: React.PointerEvent<HTMLElement>) => {
     const element = elementRef.current;
-    const parent = element?.offsetParent as HTMLElement | null;
+    const parent = element?.offsetParent;
     if (!element || !parent) return;
-    if ((event.target as HTMLElement).closest("button")) return;
+    if (event.target instanceof Element && event.target.closest("button")) return;
 
     const handle = event.currentTarget;
     const parentRect = parent.getBoundingClientRect();
