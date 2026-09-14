@@ -5,6 +5,7 @@ import React from "react";
 import { log } from "../../../log";
 import { IRunState } from "../../../types/interactive-state";
 import { useStores } from "../../../stores-context";
+import { selectRun } from "../../../utils/multitrack";
 import { RunResult } from "./run-result";
 import { RunSetup } from "./run-setup";
 
@@ -19,18 +20,13 @@ interface IRunCardProps {
 }
 
 export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
-  const { runs, simulation, ui } = useStores();
+  const stores = useStores();
+  const { runs, simulation, ui } = stores;
   const selected = runs.isSelected(run.id);
   const complete = runs.isRunComplete(run);
   const letter = runs.runLetter(run);
 
-  const handleSelect = () => {
-    if (selected) return;
-    if (simulation.inProgress && !ui.isReadOnly) simulation.restart();
-    runs.selectRun(run.id);
-    ui.setNorthAtlanticView();
-    log("RunSelected", { runId: run.id, via: "panel" });
-  };
+  const handleSelect = () => selectRun(stores, run, "panel");
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.target !== event.currentTarget) return;

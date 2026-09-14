@@ -124,21 +124,21 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ### Task 2: Shared `selectRun` helper
 
 **Files:**
-- Create: `src/utils/select-run.ts`
-- Create: `src/utils/select-run.test.ts`
+- Create: `src/utils/multitrack.ts`
+- Create: `src/utils/multitrack.test.ts`
 - Modify: `src/components/left-panel/run-card/run-card.tsx:27-33`
 - Modify: `src/components/run-tracks.tsx:43-48`
 
 **Step 1: Write the failing tests**
 
-`src/utils/select-run.test.ts`:
+`src/utils/multitrack.test.ts`:
 
 ```ts
 import { runInAction } from "mobx";
 
 import { log } from "../log";
 import { createStores, IStores } from "../models/stores";
-import { selectRun } from "./select-run";
+import { selectRun } from "./multitrack";
 
 jest.mock("../log", () => ({
   log: jest.fn()
@@ -213,12 +213,12 @@ describe("selectRun", () => {
 
 **Step 2: Run to verify failure**
 
-Run: `npx jest src/utils/select-run.test.ts`
-Expected: FAIL — cannot find module `./select-run`.
+Run: `npx jest src/utils/multitrack.test.ts`
+Expected: FAIL — cannot find module `./multitrack`.
 
 **Step 3: Implement**
 
-`src/utils/select-run.ts`:
+`src/utils/multitrack.ts`:
 
 ```ts
 import { log } from "../log";
@@ -238,7 +238,7 @@ export function selectRun({ runs, simulation, ui }: IStores, run: IRunState, via
 
 **Step 4: Run to verify pass**
 
-Run: `npx jest src/utils/select-run.test.ts`
+Run: `npx jest src/utils/multitrack.test.ts`
 Expected: PASS.
 
 **Step 5: Use it in `RunCard` and `RunTracks`**
@@ -256,9 +256,9 @@ Change `const { runs, simulation, ui } = useStores();` to
   const { runs, simulation, ui } = stores;
 ```
 
-and add `import { selectRun } from "../../../utils/select-run";`. `log` is still used by reset/delete; keep the import.
+and add `import { selectRun } from "../../../utils/multitrack";`. `log` is still used by reset/delete; keep the import.
 
-`run-tracks.tsx`: delete the local `selectRun` (lines 43-48) and the `log` import; add `import { selectRun } from "../utils/select-run";`. Replace `const { runs, simulation, ui } = useStores();` with
+`run-tracks.tsx`: delete the local `selectRun` (lines 43-48) and the `log` import; add `import { selectRun } from "../utils/multitrack";`. Replace `const { runs, simulation, ui } = useStores();` with
 
 ```ts
   const stores = useStores();
@@ -275,7 +275,7 @@ Expected: PASS, no lint errors.
 **Step 7: Commit**
 
 ```bash
-git add src/utils/select-run.ts src/utils/select-run.test.ts src/components/left-panel/run-card/run-card.tsx src/components/run-tracks.tsx && git commit -m "Share the run selection flow between cards and map tracks.
+git add src/utils/multitrack.ts src/utils/multitrack.test.ts src/components/left-panel/run-card/run-card.tsx src/components/run-tracks.tsx && git commit -m "Share the run selection flow between cards and map tracks.
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -1721,7 +1721,7 @@ import { log } from "../../log";
 import { useStores } from "../../stores-context";
 import { IBox } from "../../types";
 import { IRunState } from "../../types/interactive-state";
-import { selectRun } from "../../utils/select-run";
+import { selectRun } from "../../utils/multitrack";
 import { IRunSummaryRow, resultRows, setupRows } from "../run-summary/run-summary-rows";
 import { Dash } from "../run-summary/run-summary-values";
 import { clampToParent, useDraggable } from "./use-draggable";

@@ -2,9 +2,9 @@ import { observer } from "mobx-react";
 import React, { Fragment, useEffect, useState } from "react";
 import { Pane, Polyline } from "react-leaflet";
 
-import { log } from "../log";
 import { IRunState } from "../types/interactive-state";
 import { useStores } from "../stores-context";
+import { selectRun } from "../utils/multitrack";
 import { HurricaneTrack } from "./hurricane-track";
 import { RunTrackLabel } from "./run-track-label";
 
@@ -14,7 +14,8 @@ const trackWeight = 5;
 const borderWeight = 7;
 
 export const RunTracks = observer(function RunTracks() {
-  const { runs, simulation, ui } = useStores();
+  const stores = useStores();
+  const { runs } = stores;
   const [hoveredRunId, setHoveredRunId] = useState<string | null>(null);
 
   const positions = (run: IRunState) => {
@@ -40,18 +41,11 @@ export const RunTracks = observer(function RunTracks() {
     }
   }, [clearHoverId]);
 
-  const selectRun = (run: IRunState) => {
-    if (simulation.inProgress && !ui.isReadOnly) simulation.restart();
-    runs.selectRun(run.id);
-    ui.setNorthAtlanticView();
-    log("RunSelected", { runId: run.id, via: "map" });
-  };
-
   const startHover = (run: IRunState) => setHoveredRunId(run.id);
   const endHover = (run: IRunState) => setHoveredRunId(current => (current === run.id ? null : current));
 
   const eventHandlers = (run: IRunState) => ({
-    click: () => selectRun(run),
+    click: () => selectRun(stores, run, "map"),
     mouseover: () => startHover(run),
     mouseout: () => endHover(run)
   });
@@ -91,7 +85,7 @@ export const RunTracks = observer(function RunTracks() {
           position={trackPositions[trackPositions.length - 1]}
           selected={runs.isSelected(run.id)}
           hovered={hoveredRunId === run.id}
-          onSelect={() => selectRun(run)}
+          onSelect={() => selectRun(stores, run, "map")}
           onHoverStart={() => startHover(run)}
           onHoverEnd={() => endHover(run)}
         />

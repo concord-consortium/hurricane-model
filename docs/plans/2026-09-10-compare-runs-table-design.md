@@ -63,7 +63,7 @@ so the current card tests remain valid.
 
 ### Shared select flow
 
-`src/utils/select-run.ts`:
+`src/utils/multitrack.ts`:
 ```ts
 export function selectRun(stores: IStores, run: IRunState, via: "panel" | "map" | "table"): void
 ```
@@ -146,6 +146,6 @@ All values come from `common.scss` (`$charcoal`, `$charcoalMedium`, `$secondaryC
   the run and logs `RunSelected` with `via: "table"`; clicking the selected column is a no-op;
   Pressure Systems reflects setup systems, not final systems; keyboard selection; not rendered outside
   storm mode.
-- `select-run.test.ts`: restarts an in-progress simulation; skips the restart in read-only mode; logs
+- `multitrack.test.ts`: restarts an in-progress simulation; skips the restart in read-only mode; logs
   the `via` it was given.
 - `ui.test.ts`, `runs.test.ts`: new observables/actions and `runStatus`.
