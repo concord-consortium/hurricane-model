@@ -11,6 +11,16 @@ export interface ICoordinates {
   lng: number;
 }
 
+export interface IPosition {
+  left: number;
+  top: number;
+}
+
+export interface IBox extends IPosition {
+  width: number;
+  height: number;
+}
+
 export const isCoordinates = (value: unknown): value is ICoordinates => {
   return typeof value === "object" && value !== null && "lat" in value && "lng" in value;
 };

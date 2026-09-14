@@ -211,4 +211,29 @@ describe("UI model", () => {
       expect(ui.isReportMode).toBe(false);
     });
   });
+
+  describe("compare table", () => {
+    it("starts collapsed at the default position", () => {
+      const ui = new UIModel(new SimulationModel());
+      expect(ui.compareTableExpanded).toBe(false);
+      expect(ui.compareTablePosition).toBeNull();
+    });
+
+    it("stores the expanded state and position", () => {
+      const ui = new UIModel(new SimulationModel());
+      ui.setCompareTableExpanded(true);
+      ui.setCompareTablePosition({ left: 40, top: 12 });
+      expect(ui.compareTableExpanded).toBe(true);
+      expect(ui.compareTablePosition).toEqual({ left: 40, top: 12 });
+    });
+
+    it("clears both on reset", () => {
+      const ui = new UIModel(new SimulationModel());
+      ui.setCompareTableExpanded(true);
+      ui.setCompareTablePosition({ left: 40, top: 12 });
+      ui.reset();
+      expect(ui.compareTableExpanded).toBe(false);
+      expect(ui.compareTablePosition).toBeNull();
+    });
+  });
 });
