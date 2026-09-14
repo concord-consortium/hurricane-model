@@ -285,6 +285,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ### Task 3: Compare-table state on `UIModel`
 
 **Files:**
+- Modify: `src/types.ts`
 - Modify: `src/models/ui.ts`
 - Modify: `src/models/ui.test.ts`
 
@@ -326,13 +327,21 @@ Expected: FAIL.
 
 **Step 3: Implement**
 
-In `src/models/ui.ts`, add after `ZoomedInViewProps`:
+In `src/types.ts`, add after `ICoordinates` (screen-space shapes, in px; `ICoordinates` is the map-space one):
 
 ```ts
-export interface IPosition { left: number; top: number; }
+export interface IPosition {
+  left: number;
+  top: number;
+}
+
+export interface IBox extends IPosition {
+  width: number;
+  height: number;
+}
 ```
 
-Add observables after `thermometerPositionHover`:
+In `src/models/ui.ts`, add `import { IPosition } from "../types";` and observables after `thermometerPositionHover`:
 
 ```ts
   @observable public compareTableExpanded = false;
@@ -367,7 +376,7 @@ Expected: PASS.
 **Step 5: Commit**
 
 ```bash
-git add src/models/ui.ts src/models/ui.test.ts && git commit -m "Add compare table UI state.
+git add src/types.ts src/models/ui.ts src/models/ui.test.ts && git commit -m "Add compare table UI state.
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -1068,7 +1077,7 @@ jsdom has no layout, so the tests stub `offsetParent`, `offsetWidth/Height`, `cl
 import { render, screen } from "@testing-library/react";
 import React, { useRef } from "react";
 
-import { IPosition } from "../../models/ui";
+import { IPosition } from "../../types";
 import { clampToParent, useDraggable } from "./use-draggable";
 
 function Draggable({ onMove }: { onMove: (position: IPosition) => void }) {
@@ -1168,7 +1177,7 @@ Expected: FAIL — cannot find module.
 ```ts
 import React, { useCallback } from "react";
 
-import { IPosition } from "../../models/ui";
+import { IPosition } from "../../types";
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
@@ -1710,6 +1719,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 
 import { log } from "../../log";
 import { useStores } from "../../stores-context";
+import { IBox } from "../../types";
 import { IRunState } from "../../types/interactive-state";
 import { selectRun } from "../../utils/select-run";
 import { IRunSummaryRow, resultRows, setupRows } from "../run-summary/run-summary-rows";
@@ -1723,8 +1733,6 @@ import commonCss from "../common.scss";
 import css from "./compare-runs-table.scss";
 
 const maxSparklineWidth = parseFloat(commonCss.compareRunColumnWidth) - 2 * parseFloat(commonCss.compareCellHorizontalPadding);
-
-interface IBox { left: number; top: number; width: number; height: number; }
 
 type Section = "setup" | "result";
 
