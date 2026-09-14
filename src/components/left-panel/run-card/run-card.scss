@@ -117,6 +117,10 @@
   font-size: 14px;
   color: $charcoal;
 
+  &.resultSummary {
+    margin-top: 6px;
+  }
+
   .categoryRow {
     align-items: center;
     display: flex;

@@ -6,8 +6,9 @@ import { log } from "../../../log";
 import { IRunState } from "../../../types/interactive-state";
 import { useStores } from "../../../stores-context";
 import { selectRun } from "../../../utils/multitrack";
-import { RunResult } from "./run-result";
-import { RunSetup } from "./run-setup";
+import { resultRows, setupRows } from "../../run-summary/run-summary-rows";
+import { RunThumbnail } from "./run-thumbnail";
+import { SummaryRows } from "./summary-rows";
 
 import DeleteIcon from "../../../assets/left-panel/delete.svg";
 import RestartIcon from "../../../assets/left-panel/restart.svg";
@@ -80,11 +81,16 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
         <div className={css.runCardBody}>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Setup</div>
-            <RunSetup run={run} />
+            <div className={css.summaryColumn}>
+              <SummaryRows rows={setupRows} run={run} section="setup" />
+            </div>
           </div>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Result</div>
-            <RunResult run={run} />
+            <RunThumbnail result={runs.getSimulationResult(run)} run={run} />
+            <div className={clsx(css.summaryColumn, css.resultSummary)}>
+              <SummaryRows rows={resultRows} run={run} section="result" />
+            </div>
           </div>
         </div>
       </div>
