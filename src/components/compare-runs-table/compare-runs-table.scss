@@ -1,0 +1,222 @@
+@use "../common" as *;
+
+$labelColumnWidth: 190px;
+$runColumnWidth: #{$compareRunColumnWidth}px;
+$cellPadding: 6px #{$compareCellHorizontalPadding}px;
+$headerHeight: 40px;
+$headerFill: #fafafa;
+$groupRowFill: #f0f0f0;
+// Darker than $secondaryColorLight so the hover step reads the same on the gray group rows.
+$groupRowHoverFill: #f6e5cb;
+$tablePadding: 6px;
+
+.compareRunsTable {
+  background: #fff;
+  border: 1px solid $charcoalMedium;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  color: $charcoal;
+  font-family: $mainFont;
+  left: 50%;
+  overflow: hidden;
+  position: absolute;
+  top: 10px;
+  transform: translateX(-50%);
+  width: fit-content;
+  // Above the left panel and right-panel tabs (1000) and Leaflet's controls.
+  z-index: 1100;
+
+  .header {
+    align-items: center;
+    background: $headerFill;
+    cursor: grab;
+    display: flex;
+    height: $headerHeight;
+    // The one-run table width, so expanding with a single run doesn't change the card's width.
+    min-width: $labelColumnWidth + $runColumnWidth + 2 * $tablePadding;
+    padding: 0 4px 0 14px;
+    position: relative;
+    touch-action: none;
+    user-select: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &.expanded .header {
+    border-bottom: 1px solid $hoverColor;
+  }
+
+  .title {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .dragHandle {
+    fill: $charcoalMedium;
+    height: 14px;
+    left: 50%;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+  }
+
+  .toggleButton {
+    align-items: center;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    color: $charcoalMedium;
+    cursor: pointer;
+    display: inline-flex;
+    height: 32px;
+    justify-content: center;
+    margin-left: auto;
+    padding: 0;
+    width: 32px;
+
+    &:hover {
+      background: $secondaryColorHover;
+      color: $charcoal;
+    }
+
+    &:active {
+      background: $secondaryColor;
+      color: $charcoal;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $charcoal;
+      outline-offset: 2px;
+    }
+
+    .chevron {
+      transition: transform 0.15s ease;
+
+      path:last-child {
+        fill: currentColor;
+      }
+    }
+  }
+
+  &.expanded .chevron {
+    transform: rotate(180deg);
+  }
+
+  .tableContainer {
+    padding: 0 $tablePadding $tablePadding;
+    position: relative;
+  }
+
+  .selectedColumnOutline {
+    border: 2px solid $secondaryColor;
+    border-radius: 6px;
+    box-sizing: border-box;
+    pointer-events: none;
+    position: absolute;
+    z-index: 2;
+  }
+
+  .table {
+    border-collapse: collapse;
+    font-size: 14px;
+
+    th, td {
+      padding: $cellPadding;
+      text-align: left;
+      vertical-align: middle;
+    }
+  }
+
+  .corner, .rowLabel, .groupLabel {
+    box-sizing: border-box;
+    width: $labelColumnWidth;
+  }
+
+  .rowLabel {
+    border-right: 1px solid $hoverColor;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .rowLabelContent {
+    align-items: center;
+    display: flex;
+    gap: 7px;
+  }
+
+  .rowIcon {
+    flex-shrink: 0;
+    height: 18px;
+    width: 18px;
+  }
+
+  .groupRow {
+    th, td {
+      background: $groupRowFill;
+    }
+  }
+
+  .groupLabel {
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .runHeader, .runCell, .groupCell {
+    box-sizing: border-box;
+    cursor: pointer;
+    max-width: $runColumnWidth;
+    min-width: $runColumnWidth;
+    overflow-wrap: anywhere;
+    width: $runColumnWidth;
+  }
+
+  .dataRow {
+    th, td {
+      border-top: 1px solid $groupRowFill;
+    }
+  }
+
+  .runCell {
+    font-family: $scaleFont;
+  }
+
+  .runHeaderContent {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .runLetter {
+    @include runLetterBadge;
+  }
+
+  .runStatus {
+    color: $secondaryColorDark;
+    font-family: $scaleFont;
+    font-weight: 700;
+  }
+
+  .selected {
+    cursor: default;
+
+    .runLetter {
+      background-color: $secondaryColor;
+    }
+  }
+
+  .runCell:hover, .runHeader:hover, .hovered,
+  .rowLabel:hover, .rowLabel:hover ~ td {
+    background: $secondaryColorLight;
+  }
+
+  .groupCell:hover, .groupRow .hovered,
+  .groupLabel:hover, .groupLabel:hover ~ td {
+    background: $groupRowHoverFill;
+  }
+}
