@@ -58,6 +58,8 @@ describe("PressureSystemIcon component", () => {
     // its strongest system is the lowest mb and sits at the bottom of the travel.
     const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
     expect(slider).toHaveAttribute("max", String(strengthRange.low.strong));
+    // Not an exact comparison: strong + weak - strong drifts off weak by ~4e-15, and MUI
+    // does not snap a controlled value to the step.
     expect(Number(slider?.value)).toBeCloseTo(strengthRange.low.weak);
   });
 
