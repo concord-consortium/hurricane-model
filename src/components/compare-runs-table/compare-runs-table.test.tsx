@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { runInAction } from "mobx";
 import React from "react";
@@ -19,6 +19,10 @@ const renderTable = (stores: IStores) =>
       <CompareRunsTable />
     </StoresContext>
   );
+
+// The clickable, focusable button inside each run's header cell.
+const headerButtons = () =>
+  screen.getAllByTestId("compare-run-header").map(header => within(header).getByRole("button"));
 
 const completeCurrentRun = (stores: IStores) => {
   runInAction(() => {
@@ -74,9 +78,10 @@ describe("CompareRunsTable", () => {
       renderTable(stores);
       const headers = screen.getAllByTestId("compare-run-header");
       expect(headers.map(h => h.textContent)).toEqual(["A", "BNot run yet"]);
-      expect(headers[0]).toHaveAttribute("aria-pressed", "false");
-      expect(headers[1]).toHaveAttribute("aria-pressed", "true");
       expect(headers[1]).toHaveAttribute("aria-label", "Run B, Not run yet");
+      const buttons = headerButtons();
+      expect(buttons[0]).toHaveAttribute("aria-pressed", "false");
+      expect(buttons[1]).toHaveAttribute("aria-pressed", "true");
     });
 
     it("shows the setup of every run", () => {
@@ -120,13 +125,13 @@ describe("CompareRunsTable", () => {
 
     it("selects a run when its header is clicked", () => {
       renderTable(stores);
-      fireEvent.click(screen.getAllByTestId("compare-run-header")[0]);
+      fireEvent.click(headerButtons()[0]);
       expect(stores.runs.selectedRunId).toBe(stores.runs.runs[0].id);
     });
 
     it("does nothing when the selected column is clicked", () => {
       renderTable(stores);
-      fireEvent.click(screen.getAllByTestId("compare-run-header")[1]);
+      fireEvent.click(headerButtons()[1]);
       fireEvent.click(screen.getAllByTestId("compare-cell-season")[1]);
       expect(mockLog).not.toHaveBeenCalledWith("RunSelected", expect.anything());
     });
@@ -134,13 +139,13 @@ describe("CompareRunsTable", () => {
     it("selects a run with Enter or Space on its focused header", async () => {
       const user = userEvent.setup();
       renderTable(stores);
-      const headers = screen.getAllByTestId("compare-run-header");
+      const buttons = headerButtons();
 
-      headers[0].focus();
+      buttons[0].focus();
       await user.keyboard("{Enter}");
       expect(stores.runs.selectedRunId).toBe(stores.runs.runs[0].id);
 
-      headers[1].focus();
+      buttons[1].focus();
       await user.keyboard(" ");
       expect(stores.runs.selectedRunId).toBe(stores.runs.runs[1].id);
     });
