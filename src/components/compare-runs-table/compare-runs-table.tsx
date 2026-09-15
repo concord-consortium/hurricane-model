@@ -94,13 +94,6 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
 
   const handleSelect = (run: IRunState) => selectRun(stores, run, "table");
 
-  const handleHeaderKeyDown = (event: React.KeyboardEvent, run: IRunState) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      handleSelect(run);
-    }
-  };
-
   const columnClasses = (run: IRunState) => ({
     [css.selected]: runs.isSelected(run.id),
     [css.hovered]: hoveredRunId === run.id
@@ -124,8 +117,7 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
           aria-pressed={runs.isSelected(run.id)}
           className={css.runHeaderButton}
           onClick={() => handleSelect(run)}
-          onKeyDown={event => handleHeaderKeyDown(event, run)}
-          role="button"
+          type="button"
         >
           <span className={css.runHeaderContent}>
             <span className={css.runLetter}>{letter}</span>
