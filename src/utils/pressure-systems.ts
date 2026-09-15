@@ -5,6 +5,8 @@ import { IPressureSystemState } from "../types/interactive-state";
 
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
 // High pressure reads 1015..1030 mb (stronger = higher); low reads 1010..990 mb (stronger = lower).
+// Previously, strengths were 3..20 and mb were 1015..123 for high and 1010..997 for low systems.
+// The strength maxima are now 22.6/29.2 to keep conversions consistent with those old ranges.
 export const strengthRange: Record<PressureSystemType, { min: number, max: number }> = {
   high: { min: 3, max: 22.6 },
   low: { min: 3, max: 29.2 }
