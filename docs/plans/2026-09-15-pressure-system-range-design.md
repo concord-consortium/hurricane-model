@@ -39,8 +39,8 @@ Each type gets its own strength maximum, chosen so the mb-per-m/s slope is uncha
 
 | type | strength (m/s) | mb |
 | --- | --- | --- |
-| high | 3 → 22.5 (was 20) | 1015 → 1030 |
-| low  | 3 → 29 (was 20)   | 1010 → 990  |
+| high | 3 → 22.6 (was 20) | 1015 → 1030 |
+| low  | 3 → 29.2 (was 20) | 1010 → 990  |
 
 Holding the slope constant is what makes the change safe. Every preset in `config.ts` keeps
 its exact current label:
@@ -55,9 +55,16 @@ its exact current label:
 | low  | 6    | 1008 | 1008 |
 | low  | 15   | 1001 | 1001 |
 
-Round maxima (22.5 / 29) are preferred over the exact-slope values (22.615 / 29.154). The
-cost is that an arbitrary saved strength can land on the other side of a rounding boundary
-and display 1 mb different than before; presets are unaffected.
+The maxima are not the exact-slope values (22.615 / 29.154), because those are unreadable
+constants. They are the tidiest values that still preserve every label a saved run can
+actually hold. That set is larger than the presets: the strength slider has no `step` prop,
+so MUI defaults to 1 and student-saved strengths are the integers 3..20 plus whichever
+non-integer preset a student never touched.
+
+The obvious round choices, 22.5 and 29, fail that test — both flip strength 18 by 1 mb
+(high 1026 → 1027, low 999 → 998). 22.6 and 29.2 preserve all 18 integer positions and all
+presets exactly, while still landing on 1030 and 990. The residual drift is confined to
+arbitrary non-integer strengths the slider cannot produce.
 
 ## Changes
 
@@ -94,7 +101,7 @@ Tests — `src/utils/pressure-systems.test.ts` (endpoints and mid-range cases) a
 ## Risk: range of influence grows faster than expected
 
 `PressureSystem.range` is derived from strength (`strength * 200000`), so a max-strength low's
-radius of influence grows from 4000 km to 5800 km. The visible region is only about 5000 km
+radius of influence grows from 4000 km to 5840 km. The visible region is only about 5000 km
 tall.
 
 `SimulationModel.wind` blends overlapping systems with a `1 - dist / range` weight rather than

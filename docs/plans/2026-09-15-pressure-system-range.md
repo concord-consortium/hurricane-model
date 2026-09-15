@@ -14,8 +14,10 @@
 
 | type | strength (m/s) | mb |
 | --- | --- | --- |
-| high | 3 → 22.5 (was 20) | 1015 → 1030 (was 1028) |
-| low  | 3 → 29 (was 20)   | 1010 → 990 (was 997)  |
+| high | 3 → 22.6 (was 20) | 1015 → 1030 (was 1028) |
+| low  | 3 → 29.2 (was 20) | 1010 → 990 (was 997)  |
+
+The maxima look arbitrary but are not. The slider has no `step` prop, so MUI defaults to 1 and saved student strengths are the integers 3..20. 22.6 and 29.2 are the tidiest values that keep every one of those positions — and every preset — on the label it already had, while still landing exactly on 1030 and 990. The rounder 22.5 and 29 both flip strength 18 by 1 mb.
 
 ---
 
@@ -50,6 +52,8 @@ describe("strengthToMb", () => {
   it("leaves the labels of pre-existing strengths unchanged", () => {
     expect(strengthToMb("high", 20)).toBe(1028);
     expect(strengthToMb("low", 20)).toBe(997);
+    expect(strengthToMb("high", 18)).toBe(1026);
+    expect(strengthToMb("low", 18)).toBe(999);
   });
 });
 ```
@@ -84,8 +88,8 @@ Replace `src/utils/pressure-systems.ts:6-17` with:
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
 // High pressure reads 1015..1030 mb (stronger = higher); low reads 1010..990 mb (stronger = lower).
 export const strengthRange: Record<PressureSystemType, { min: number, max: number }> = {
-  high: { min: 3, max: 22.5 },
-  low: { min: 3, max: 29 }
+  high: { min: 3, max: 22.6 },
+  low: { min: 3, max: 29.2 }
 };
 
 export const mbRange: Record<PressureSystemType, { min: number, max: number }> = {
@@ -280,7 +284,7 @@ Skip this step if the working tree is clean.
 
 This is the one part of the change that the tests cannot settle, and it is the reason to look at the running app before calling this done.
 
-`PressureSystem.range` is derived from strength (`strength * 200000` at `src/models/pressure-system.ts:55-57`), so a max-strength low's radius of influence grows from 4000 km to 5800 km — larger than the ~5000 km visible region. And `SimulationModel.wind` (`src/models/simulation.ts:221-231`) blends overlapping systems with a `1 - dist / range` weight rather than summing them, so a max-strength low does not merely become stronger: it out-weights every other system across nearly the whole map.
+`PressureSystem.range` is derived from strength (`strength * 200000` at `src/models/pressure-system.ts:55-57`), so a max-strength low's radius of influence grows from 4000 km to 5840 km — larger than the ~5000 km visible region. And `SimulationModel.wind` (`src/models/simulation.ts:221-231`) blends overlapping systems with a `1 - dist / range` weight rather than summing them, so a max-strength low does not merely become stronger: it out-weights every other system across nearly the whole map.
 
 **Step 1: Run the app**
 
