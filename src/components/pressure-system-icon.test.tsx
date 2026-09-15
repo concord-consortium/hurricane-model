@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import config from "../config";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
-import { maxStrength, mbLabelRange, minStrength } from "../utils/pressure-systems";
+import { strengthRange } from "../utils/pressure-systems";
 import { PressureSystemIcon } from "./pressure-system-icon";
 
 describe("PressureSystemIcon component", () => {
@@ -23,28 +23,42 @@ describe("PressureSystemIcon component", () => {
 
   it("label renders pressure in mb (high)", () => {
     const model = stores.simulation.pressureSystemsSetup[0];
-    model.setStrength(1500000);
     model.type = "high";
+    model.setStrength(strengthRange.high.strong);
     render(
       <Provider stores={stores}>
         <PressureSystemIcon model={model}/>
       </Provider>
     );
-    const expected = 1015 + Math.round((1500000 - minStrength) / (maxStrength - minStrength) * mbLabelRange) + "mb";
-    expect(screen.getByText(expected)).toBeInTheDocument();
+    expect(screen.getByText("1030mb")).toBeInTheDocument();
   });
 
   it("label renders pressure in mb (low)", () => {
     const model = stores.simulation.pressureSystemsSetup[0];
-    model.setStrength(1000000);
     model.type = "low";
+    model.setStrength(strengthRange.low.strong);
     render(
       <Provider stores={stores}>
         <PressureSystemIcon model={model}/>
       </Provider>
     );
-    const expected = 1010 - Math.round((1000000 - minStrength) / (maxStrength - minStrength) * mbLabelRange) + "mb";
-    expect(screen.getByText(expected)).toBeInTheDocument();
+    expect(screen.getByText("990mb")).toBeInTheDocument();
+  });
+
+  it("gives each pressure system type its own slider bounds", () => {
+    const model = stores.simulation.pressureSystemsSetup[0];
+    model.type = "low";
+    model.setStrength(strengthRange.low.strong);
+    render(
+      <Provider stores={stores}>
+        <PressureSystemIcon model={model}/>
+      </Provider>
+    );
+    // Both sliders read as pressure rather than strength, so the low one is inverted:
+    // its strongest system is the lowest mb and sits at the bottom of the travel.
+    const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
+    expect(slider).toHaveAttribute("max", String(strengthRange.low.strong));
+    expect(Number(slider?.value)).toBeCloseTo(strengthRange.low.weak);
   });
 
   describe("label badge", () => {

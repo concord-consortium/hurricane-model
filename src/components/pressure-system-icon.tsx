@@ -10,7 +10,7 @@ import Low from "../assets/low.svg";
 import config from "../config";
 import { log } from "../log";
 import { DraggableMapIcon } from "./draggable-map-icon";
-import { maxStrength, minStrength, strengthToMb } from "../utils/pressure-systems";
+import { strengthRange, strengthToMb } from "../utils/pressure-systems";
 import css from "./pressure-system-icon.scss";
 
 const VerticalThumb = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
@@ -42,7 +42,8 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public render() {
     const { model, dimmed, disabled } = this.props;
-    const strengthNorm = (model.strength - minStrength) / (maxStrength - minStrength) - 0.5; // [-0.5, 0.5]
+    const { weak, strong } = strengthRange[model.type];
+    const strengthNorm = (model.strength - weak) / (strong - weak) - 0.5; // [-0.5, 0.5]
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
     const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
     const uiDisabled = disabled ?? false;
@@ -77,9 +78,9 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
           >
             <Slider
               classes={{ thumb: css.thumb, track: css.track, rail: css.rail, disabled: css.disabled }}
-              value={model.type === "high" ? model.strength : maxStrength + minStrength - model.strength}
-              min={minStrength}
-              max={maxStrength}
+              value={model.type === "high" ? model.strength : strong + weak - model.strength}
+              min={weak}
+              max={strong}
               onChange={this.handleStrengthChange}
               onChangeCommitted={this.handleSliderDragEnd}
               orientation="vertical"
@@ -105,7 +106,8 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     }
     const numericValue = Array.isArray(value) ? value[0] : value;
     if (model.type === "low") {
-      model.setStrength(maxStrength + minStrength - numericValue);
+      const { weak, strong } = strengthRange.low;
+      model.setStrength(strong + weak - numericValue);
     } else {
       model.setStrength(numericValue);
     }
