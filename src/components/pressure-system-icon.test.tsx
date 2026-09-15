@@ -4,7 +4,8 @@ import config from "../config";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { strengthRange } from "../utils/pressure-systems";
-import { PressureSystemIcon } from "./pressure-system-icon";
+import { PressureSystemType } from "../models/pressure-system";
+import { invertLowStrength, PressureSystemIcon } from "./pressure-system-icon";
 
 describe("PressureSystemIcon component", () => {
   let stores = createStores();
@@ -45,7 +46,19 @@ describe("PressureSystemIcon component", () => {
     expect(screen.getByText("990mb")).toBeInTheDocument();
   });
 
-  it("gives each pressure system type its own slider bounds", () => {
+  it.each<PressureSystemType>(["high", "low"])("gives the %s pressure system its own slider bounds", type => {
+    const model = stores.simulation.pressureSystemsSetup[0];
+    model.type = type;
+    render(
+      <Provider stores={stores}>
+        <PressureSystemIcon model={model}/>
+      </Provider>
+    );
+    const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
+    expect(slider).toHaveAttribute("max", String(strengthRange[type].strong));
+  });
+
+  it("puts the strongest low system at the bottom of the slider", () => {
     const model = stores.simulation.pressureSystemsSetup[0];
     model.type = "low";
     model.setStrength(strengthRange.low.strong);
@@ -54,13 +67,24 @@ describe("PressureSystemIcon component", () => {
         <PressureSystemIcon model={model}/>
       </Provider>
     );
-    // Both sliders read as pressure rather than strength, so the low one is inverted:
-    // its strongest system is the lowest mb and sits at the bottom of the travel.
-    const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
-    expect(slider).toHaveAttribute("max", String(strengthRange.low.strong));
+    // Both sliders read as pressure rather than strength, so the low one is inverted: its
+    // strongest system is the lowest mb and sits at the bottom, where the slider value is weak.
     // Not an exact comparison: strong + weak - strong drifts off weak by ~4e-15, and MUI
     // does not snap a controlled value to the step.
+    const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
     expect(Number(slider?.value)).toBeCloseTo(strengthRange.low.weak);
+  });
+
+  describe("invertLowStrength", () => {
+    it("maps between the ends of the low range", () => {
+      expect(invertLowStrength(strengthRange.low.weak)).toBeCloseTo(strengthRange.low.strong);
+      expect(invertLowStrength(strengthRange.low.strong)).toBeCloseTo(strengthRange.low.weak);
+    });
+
+    it("is self-inverse, so it round-trips slider value back to strength", () => {
+      const strength = 12.5;
+      expect(invertLowStrength(invertLowStrength(strength))).toBe(strength);
+    });
   });
 
   describe("label badge", () => {
@@ -133,12 +157,9 @@ describe("PressureSystemIcon component", () => {
     expect(screen.getByTestId("pressure-system-icon")).not.toHaveClass("disabled");
   });
 
-  // Note: previous enzyme tests checked that sliders are enabled by default and
-  // PressureSystemStrengthUpdated was logged with type, position, and value on drag end.
-  // These tests called handleStrengthChange and handleSliderDragEnd
-  // directly on the component instance. Those exercised internal handler logic that is
-  // already covered by tests on the underlying model (PressureSystem.setStrength) and
-  // the log helper. Migrating them to RTL would require simulating Material-UI Slider's
-  // mouse-drag events, which is fragile. If we want explicit coverage of those handlers,
-  // extracting them to module-scope helper functions would let us test them directly.
+  // Note: a previous enzyme test checked that handleSliderDragEnd logs
+  // PressureSystemStrengthUpdated with type, position, and value, by calling the handler
+  // directly on the component instance. Covering it through RTL would mean simulating
+  // Material-UI Slider's mouse-drag events, which is fragile, so it stays uncovered here;
+  // the log helper itself is tested separately.
 });

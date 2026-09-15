@@ -36,14 +36,19 @@ interface IState {}
 
 const getPressureLabel = (ps: PressureSystem) => strengthToMb(ps.type, ps.strength) + "mb";
 
+// Low-pressure sliders read as pressure, not strength: up = higher mb = weaker system.
+// Self-inverse, so one call serves both model -> slider and slider -> model.
+export const invertLowStrength = (value: number) =>
+  strengthRange.low.strong + strengthRange.low.weak - value;
+
 @inject("stores")
 @observer
 export class PressureSystemIcon extends BaseComponent<IProps, IState> {
 
   public render() {
     const { model, dimmed, disabled } = this.props;
-    const { weak, strong } = strengthRange[model.type];
-    const strengthNorm = (model.strength - weak) / (strong - weak) - 0.5; // [-0.5, 0.5]
+    const range = strengthRange[model.type];
+    const strengthNorm = (model.strength - range.weak) / (range.strong - range.weak) - 0.5; // [-0.5, 0.5]
     const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
     const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
     const uiDisabled = disabled ?? false;
@@ -78,9 +83,9 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
           >
             <Slider
               classes={{ thumb: css.thumb, track: css.track, rail: css.rail, disabled: css.disabled }}
-              value={model.type === "high" ? model.strength : strong + weak - model.strength}
-              min={weak}
-              max={strong}
+              value={model.type === "high" ? model.strength : invertLowStrength(model.strength)}
+              min={range.weak}
+              max={range.strong}
               onChange={this.handleStrengthChange}
               onChangeCommitted={this.handleSliderDragEnd}
               orientation="vertical"
@@ -106,8 +111,7 @@ export class PressureSystemIcon extends BaseComponent<IProps, IState> {
     }
     const numericValue = Array.isArray(value) ? value[0] : value;
     if (model.type === "low") {
-      const { weak, strong } = strengthRange.low;
-      model.setStrength(strong + weak - numericValue);
+      model.setStrength(invertLowStrength(numericValue));
     } else {
       model.setStrength(numericValue);
     }
