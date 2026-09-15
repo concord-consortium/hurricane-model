@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { observer } from "mobx-react";
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import { log } from "../../log";
 import { useStores } from "../../stores-context";
@@ -113,29 +113,32 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
       <th
         key={run.id}
         scope="col"
-        role="button"
-        tabIndex={0}
         aria-label={`Run ${letter}${status ? `, ${status}` : ""}`}
-        aria-pressed={runs.isSelected(run.id)}
         className={clsx(css.runHeader, columnClasses(run))}
         data-run-id={run.id}
         data-test="compare-run-header"
-        onClick={() => handleSelect(run)}
-        onKeyDown={event => handleHeaderKeyDown(event, run)}
         onMouseEnter={() => setHoveredRunId(run.id)}
         onMouseLeave={() => setHoveredRunId(null)}
       >
-        <span className={css.runHeaderContent}>
-          <span className={css.runLetter}>{letter}</span>
-          {status && <span className={css.runStatus}>{status}</span>}
-        </span>
+        <button
+          aria-pressed={runs.isSelected(run.id)}
+          className={css.runHeaderButton}
+          onClick={() => handleSelect(run)}
+          onKeyDown={event => handleHeaderKeyDown(event, run)}
+          role="button"
+        >
+          <span className={css.runHeaderContent}>
+            <span className={css.runLetter}>{letter}</span>
+            {status && <span className={css.runStatus}>{status}</span>}
+          </span>
+        </button>
       </th>
     );
   };
 
   const renderSectionHeaderRow = (label: string) => (
     <tr className={css.groupRow}>
-      <th scope="row" className={css.groupLabel}>{label}</th>
+      <th scope="row" className={clsx(css.groupLabel, css.rowHeader)}>{label}</th>
       {runs.runs.map(run => (
         <td key={run.id} className={clsx(css.groupCell, columnClasses(run))} onClick={() => handleSelect(run)} />
       ))}
@@ -146,7 +149,7 @@ export const CompareRunsTable = observer(function CompareRunsTable() {
     const { key, label, Icon, Value } = row;
     return (
       <tr key={key} className={css.dataRow}>
-        <th scope="row" className={css.rowLabel}>
+        <th scope="row" className={clsx(css.rowLabel, css.rowHeader)}>
           <span className={css.rowLabelContent}>
             <Icon aria-hidden={true} className={clsx(css.rowIcon, resolveIconClassName(row, runs))} />
             {label}

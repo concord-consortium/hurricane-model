@@ -125,8 +125,11 @@ $tablePadding: 6px;
     border-collapse: collapse;
     font-size: 14px;
 
-    th, td {
+    td, .rowHeader {
       padding: $cellPadding;
+    }
+
+    th, td {
       text-align: left;
       vertical-align: middle;
     }
@@ -185,6 +188,17 @@ $tablePadding: 6px;
 
   .runCell {
     font-family: $scaleFont;
+  }
+
+  .runHeaderButton {
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    height: 100%;
+    padding: $cellPadding;
+    width: 100%;
   }
 
   .runHeaderContent {
