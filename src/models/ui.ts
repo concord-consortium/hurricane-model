@@ -106,6 +106,9 @@ export class UIModel {
 
   @action.bound public setSetupMode(mode: SetupMode | undefined) {
     this.setupMode = mode;
+    if (mode) {
+      this.disableThermometer();
+    }
   }
 
   @action.bound public setLeftPanelOpen(open: boolean) {
