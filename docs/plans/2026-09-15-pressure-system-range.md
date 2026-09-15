@@ -36,20 +36,20 @@ Replace the `strengthToMb` describe block at `src/utils/pressure-systems.test.ts
 ```ts
 describe("strengthToMb", () => {
   it("maps high-pressure strength to 1015..1030 mb", () => {
-    expect(strengthToMb("high", strengthRange.high.min)).toBe(1015);
-    expect(strengthToMb("high", strengthRange.high.max)).toBe(1030);
+    expect(strengthToMb("high", strengthRange.high.weak)).toBe(1015);
+    expect(strengthToMb("high", strengthRange.high.strong)).toBe(1030);
     expect(strengthToMb("high", 19.5)).toBe(1028);
     expect(strengthToMb("high", 13.6)).toBe(1023);
   });
 
   it("maps low-pressure strength to 1010..990 mb (stronger = lower)", () => {
-    expect(strengthToMb("low", strengthRange.low.min)).toBe(1010);
-    expect(strengthToMb("low", strengthRange.low.max)).toBe(990);
+    expect(strengthToMb("low", strengthRange.low.weak)).toBe(1010);
+    expect(strengthToMb("low", strengthRange.low.strong)).toBe(990);
     expect(strengthToMb("low", 6)).toBe(1008);
     expect(strengthToMb("low", 7)).toBe(1007);
   });
 
-  it("leaves the labels of pre-existing strengths unchanged", () => {
+  it("keeps the old mb labels at strengths 18 and 20", () => {
     expect(strengthToMb("high", 20)).toBe(1028);
     expect(strengthToMb("low", 20)).toBe(997);
     expect(strengthToMb("high", 18)).toBe(1026);
@@ -67,7 +67,7 @@ import { pressureSystemReport, strengthRange, strengthToMb } from "./pressure-sy
 And line 61, which used `minStrength` on a high-pressure system:
 
 ```ts
-    systems[0].strength = strengthRange.high.min;
+    systems[0].strength = strengthRange.high.weak;
 ```
 
 Leave the rest of `pressureReport` alone. Its expected values (`1023`, `1028`, `1008`, `1007` at lines 45-48) are deliberately unchanged — if they start failing, the slope was not preserved and the implementation is wrong.
@@ -87,22 +87,30 @@ Replace `src/utils/pressure-systems.ts:6-17` with:
 ```ts
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
 // High pressure reads 1015..1030 mb (stronger = higher); low reads 1010..990 mb (stronger = lower).
-export const strengthRange: Record<PressureSystemType, { min: number, max: number }> = {
-  high: { min: 3, max: 22.6 },
-  low: { min: 3, max: 29.2 }
+interface IRange {
+  weak: number;
+  strong: number;
+}
+
+export const strengthRange: Record<PressureSystemType, IRange> = {
+  high: { weak: 3, strong: 22.6 },
+  low: { weak: 3, strong: 29.2 }
 };
 
-export const mbRange: Record<PressureSystemType, { min: number, max: number }> = {
-  high: { min: 1015, max: 1030 },
-  low: { min: 1010, max: 990 }
+export const mbRange: Record<PressureSystemType, IRange> = {
+  high: { weak: 1015, strong: 1030 },
+  low: { weak: 1010, strong: 990 }
 };
 
 export function strengthToMb(type: PressureSystemType, strength: number): number {
-  const strengths = strengthRange[type];
-  const mb = mbRange[type];
-  const norm = (strength - strengths.min) / (strengths.max - strengths.min);
-  return Math.round(mb.min + norm * (mb.max - mb.min));
+  const strengthBounds = strengthRange[type];
+  const mbBounds = mbRange[type];
+  const norm = (strength - strengthBounds.weak) / (strengthBounds.strong - strengthBounds.weak);
+  return Math.round(mbBounds.weak + norm * (mbBounds.strong - mbBounds.weak));
 }
+```
+
+The fields are `weak`/`strong` rather than `min`/`max` because `min`/`max` cannot be truthful for both types — a low's strong end is 990, the *smaller* number. `mbRange` is exported, so a consumer writing the obvious clamp against a lying `max` would get silent nonsense. Do not add `as const` or `readonly`: no Record-typed constant in this codebase is frozen.
 ```
 
 **Step 4: Run the tests to verify they pass**
@@ -123,7 +131,9 @@ git add src/utils/pressure-systems.ts src/utils/pressure-systems.test.ts && git 
 
 ### Task 2: Per-type ranges in the icon component
 
-`PressureSystemIcon` reads the shared constants in four places. Each needs the range for the model's own type. Note the low-pressure slider is inverted — dragging up means a *lower* mb value — via `max + min - strength`, and that inversion appears twice (rendering the value, and reading it back).
+`PressureSystemIcon` reads the shared constants in four places. Each needs the range for the model's own type. Note the low-pressure slider is inverted — dragging up means a *lower* mb value — via `strong + weak - strength`, and that inversion appears twice (rendering the value, and reading it back).
+
+**A decision this task carries, already made — do not revisit.** One of those four call sites is `strengthNorm`, which sizes the H/L letter rather than labeling anything. Per-type ranges mean the letter tracks the slider handle: dragged to the top always looks maximal, whichever type it is. The accepted cost is that every existing system's letter renders slightly smaller than before (a default low at 15 m/s shrinks about 7%, a high about 3%), and an L and an H at the same wind speed no longer render at the same size. That shrink is intended. Do not "fix" it, and do not introduce a separate fixed reference to preserve the old sizes.
 
 **Files:**
 - Modify: `src/components/pressure-system-icon.tsx:13`, `:45`, `:80-82`, `:101-112`
@@ -137,7 +147,7 @@ The two label tests currently set absurd strengths (`1500000`) and re-derive the
   it("label renders pressure in mb (high)", () => {
     const model = stores.simulation.pressureSystemsSetup[0];
     model.type = "high";
-    model.setStrength(strengthRange.high.max);
+    model.setStrength(strengthRange.high.strong);
     render(
       <Provider stores={stores}>
         <PressureSystemIcon model={model}/>
@@ -149,7 +159,7 @@ The two label tests currently set absurd strengths (`1500000`) and re-derive the
   it("label renders pressure in mb (low)", () => {
     const model = stores.simulation.pressureSystemsSetup[0];
     model.type = "low";
-    model.setStrength(strengthRange.low.max);
+    model.setStrength(strengthRange.low.strong);
     render(
       <Provider stores={stores}>
         <PressureSystemIcon model={model}/>
@@ -161,7 +171,7 @@ The two label tests currently set absurd strengths (`1500000`) and re-derive the
   it("gives each pressure system type its own slider bounds", () => {
     const model = stores.simulation.pressureSystemsSetup[0];
     model.type = "low";
-    model.setStrength(strengthRange.low.max);
+    model.setStrength(strengthRange.low.strong);
     render(
       <Provider stores={stores}>
         <PressureSystemIcon model={model}/>
@@ -169,8 +179,8 @@ The two label tests currently set absurd strengths (`1500000`) and re-derive the
     );
     // The low slider is inverted: the strongest system sits at the top of its travel.
     const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
-    expect(slider).toHaveAttribute("max", String(strengthRange.low.max));
-    expect(slider).toHaveValue(String(strengthRange.low.min));
+    expect(slider).toHaveAttribute("max", String(strengthRange.low.strong));
+    expect(slider).toHaveValue(String(strengthRange.low.weak));
   });
 ```
 
@@ -199,24 +209,24 @@ import { strengthRange, strengthToMb } from "../utils/pressure-systems";
 In `render`, replace line 45 and add the destructure the rest of the method needs:
 
 ```ts
-    const { min, max } = strengthRange[model.type];
-    const strengthNorm = (model.strength - min) / (max - min) - 0.5; // [-0.5, 0.5]
+    const { weak, strong } = strengthRange[model.type];
+    const strengthNorm = (model.strength - weak) / (strong - weak) - 0.5; // [-0.5, 0.5]
 ```
 
 Replace the three Slider props at lines 80-82:
 
 ```tsx
-              value={model.type === "high" ? model.strength : max + min - model.strength}
-              min={min}
-              max={max}
+              value={model.type === "high" ? model.strength : strong + weak - model.strength}
+              min={weak}
+              max={strong}
 ```
 
 And in `handleStrengthChange`, replace line 108:
 
 ```ts
     if (model.type === "low") {
-      const { min, max } = strengthRange.low;
-      model.setStrength(max + min - numericValue);
+      const { weak, strong } = strengthRange.low;
+      model.setStrength(strong + weak - numericValue);
     } else {
 ```
 
