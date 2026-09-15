@@ -1,20 +1,22 @@
 import { selectPressureSystems } from "../config";
 import { IPressureSystemState } from "../types/interactive-state";
-import { maxStrength, minStrength, pressureSystemReport, strengthToMb } from "./pressure-systems";
+import { pressureSystemReport, strengthRange, strengthToMb } from "./pressure-systems";
 
 describe("strengthToMb", () => {
-  it("maps high-pressure strength to 1015..1028 mb", () => {
-    expect(strengthToMb("high", minStrength)).toBe(1015);
-    expect(strengthToMb("high", maxStrength)).toBe(1028);
+  it("maps high-pressure strength to 1015..1030 mb", () => {
+    expect(strengthToMb("high", strengthRange.high.min)).toBe(1015);
+    expect(strengthToMb("high", strengthRange.high.max)).toBe(1030);
     expect(strengthToMb("high", 19.5)).toBe(1028);
     expect(strengthToMb("high", 13.6)).toBe(1023);
+    expect(strengthToMb("high", 20)).toBe(1028);
   });
 
-  it("maps low-pressure strength to 1010..997 mb (stronger = lower)", () => {
-    expect(strengthToMb("low", minStrength)).toBe(1010);
-    expect(strengthToMb("low", maxStrength)).toBe(997);
+  it("maps low-pressure strength to 1010..990 mb (stronger = lower)", () => {
+    expect(strengthToMb("low", strengthRange.low.min)).toBe(1010);
+    expect(strengthToMb("low", strengthRange.low.max)).toBe(990);
     expect(strengthToMb("low", 6)).toBe(1008);
     expect(strengthToMb("low", 7)).toBe(1007);
+    expect(strengthToMb("low", 20)).toBe(997);
   });
 });
 
@@ -58,7 +60,7 @@ describe("pressureReport", () => {
 
   it("reports a strength change through the mb value", () => {
     const systems = defaultSetup();
-    systems[0].strength = minStrength;
+    systems[0].strength = strengthRange.high.min;
     expect(pressureSystemReport(systems)[0].mb).toBe("1015 mb");
   });
 

@@ -4,16 +4,22 @@ import { PressureSystemType } from "../models/pressure-system";
 import { IPressureSystemState } from "../types/interactive-state";
 
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
-// High pressure reads 1015..1028 mb (stronger = higher); low reads 1010..997 mb (stronger = lower).
-export const minStrength = 3;
-export const maxStrength = 20;
-export const mbLabelRange = 13;
+// High pressure reads 1015..1030 mb (stronger = higher); low reads 1010..990 mb (stronger = lower).
+export const strengthRange: Record<PressureSystemType, { min: number, max: number }> = {
+  high: { min: 3, max: 22.5 },
+  low: { min: 3, max: 29 }
+};
+
+export const mbRange: Record<PressureSystemType, { min: number, max: number }> = {
+  high: { min: 1015, max: 1030 },
+  low: { min: 1010, max: 990 }
+};
 
 export function strengthToMb(type: PressureSystemType, strength: number): number {
-  const norm = (strength - minStrength) / (maxStrength - minStrength);
-  return type === "high"
-    ? Math.round(1015 + norm * mbLabelRange)
-    : Math.round(1010 - norm * mbLabelRange);
+  const strengths = strengthRange[type];
+  const mb = mbRange[type];
+  const norm = (strength - strengths.min) / (strengths.max - strengths.min);
+  return Math.round(mb.min + norm * (mb.max - mb.min));
 }
 
 // 16-point compass label for a heading in degrees (0 = N, clockwise), e.g. "SSW".
