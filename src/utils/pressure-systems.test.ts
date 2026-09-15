@@ -8,7 +8,6 @@ describe("strengthToMb", () => {
     expect(strengthToMb("high", strengthRange.high.max)).toBe(1030);
     expect(strengthToMb("high", 19.5)).toBe(1028);
     expect(strengthToMb("high", 13.6)).toBe(1023);
-    expect(strengthToMb("high", 20)).toBe(1028);
   });
 
   it("maps low-pressure strength to 1010..990 mb (stronger = lower)", () => {
@@ -16,7 +15,13 @@ describe("strengthToMb", () => {
     expect(strengthToMb("low", strengthRange.low.max)).toBe(990);
     expect(strengthToMb("low", 6)).toBe(1008);
     expect(strengthToMb("low", 7)).toBe(1007);
+  });
+
+  it("maps to the same values as the old 1015..1028 and 1010..997 ranges", () => {
+    expect(strengthToMb("high", 20)).toBe(1028);
     expect(strengthToMb("low", 20)).toBe(997);
+    expect(strengthToMb("high", 18)).toBe(1026);
+    expect(strengthToMb("low", 18)).toBe(999);
   });
 });
 
