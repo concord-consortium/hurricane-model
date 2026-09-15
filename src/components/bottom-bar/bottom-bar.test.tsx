@@ -293,5 +293,14 @@ describe("BottomBar component", () => {
       act(() => stores.simulation.start());
       expect(screen.getByTestId("temp-button")).not.toBeDisabled();
     });
+
+    it("is disabled while a setup section is open", () => {
+      renderBottomBar();
+      expect(screen.getByTestId("temp-button")).not.toBeDisabled();
+      act(() => stores.ui.setSetupMode("season"));
+      expect(screen.getByTestId("temp-button")).toBeDisabled();
+      act(() => stores.ui.setSetupMode(undefined));
+      expect(screen.getByTestId("temp-button")).not.toBeDisabled();
+    });
   });
 });

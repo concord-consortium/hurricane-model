@@ -174,6 +174,22 @@ describe("UI model", () => {
     });
   });
 
+  describe("setSetupMode", () => {
+    it("deactivates the thermometer when a setup mode is opened", () => {
+      const ui = new UIModel(new SimulationModel());
+      ui.setThermometerActive(true);
+      ui.setThermometerPositionSaved([10, -50]);
+      ui.setThermometerPositionHover([11, -51]);
+
+      ui.setSetupMode("season");
+
+      expect(ui.setupMode).toBe("season");
+      expect(ui.thermometerActive).toBe(false);
+      expect(ui.thermometerPositionSaved).toBeNull();
+      expect(ui.thermometerPositionHover).toBeNull();
+    });
+  });
+
   describe("mode and isReportMode", () => {
     it("defaults to runtime mode", () => {
       const ui = new UIModel(new SimulationModel());
