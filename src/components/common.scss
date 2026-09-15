@@ -73,9 +73,14 @@ $sparklineHeight: 22;
 $runLetterBadgeSize: 28px;
 $runLetterBadgeColor: #ccc;
 
-// Compare Runs table run column width and horizontal cell padding, in px (unitless for the JS export).
 $compareRunColumnWidth: 128;
 $compareCellHorizontalPadding: 10;
+
+// z-index stacking order
+$zPanels: 1000;
+$zCompareRunsTable: 1100;
+$zModal: 10000;
+
 
 .error {
   padding: 8px 12px;

@@ -24,8 +24,7 @@ $tablePadding: 6px;
   transform: translateX(-50%);
   // max-content, not fit-content: a table clamped near the map's right edge must not squeeze its columns.
   width: max-content;
-  // Above the left panel and right-panel tabs (1000) and Leaflet's controls.
-  z-index: 1100;
+  z-index: $zCompareRunsTable;
 
   .header {
     align-items: center;

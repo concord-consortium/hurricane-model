@@ -39,7 +39,7 @@ $overflowHeight: 11px;
   .widgetGroup {
     height: $bottomBarHeight + $overflowHeight;
     margin-top: -$overflowHeight;
-    z-index: 1000;
+    z-index: $zPanels;
     background: #fff;
     border-radius: 0;
     border-top: $bottomBarBorderStyle;
