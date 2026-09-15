@@ -111,7 +111,6 @@ export function strengthToMb(type: PressureSystemType, strength: number): number
 ```
 
 The fields are `weak`/`strong` rather than `min`/`max` because `min`/`max` cannot be truthful for both types — a low's strong end is 990, the *smaller* number. `mbRange` is exported, so a consumer writing the obvious clamp against a lying `max` would get silent nonsense. Do not add `as const` or `readonly`: no Record-typed constant in this codebase is frozen.
-```
 
 **Step 4: Run the tests to verify they pass**
 
@@ -131,7 +130,7 @@ git add src/utils/pressure-systems.ts src/utils/pressure-systems.test.ts && git 
 
 ### Task 2: Per-type ranges in the icon component
 
-`PressureSystemIcon` reads the shared constants in four places. Each needs the range for the model's own type. Note the low-pressure slider is inverted — dragging up means a *lower* mb value — via `strong + weak - strength`, and that inversion appears twice (rendering the value, and reading it back).
+`PressureSystemIcon` reads the shared constants in four places. Each needs the range for the model's own type. Note the low-pressure slider is inverted via `strong + weak - strength`, and that inversion appears twice (rendering the value, and reading it back). The inversion exists so that *both* sliders read as pressure: mb increases as you drag up, whichever type it is. A consequence worth holding onto — the strongest low is the lowest mb, so it sits at the **bottom** of its slider, not the top.
 
 **A decision this task carries, already made — do not revisit.** One of those four call sites is `strengthNorm`, which sizes the H/L letter rather than labeling anything. Per-type ranges mean the letter tracks the slider handle: dragged to the top always looks maximal, whichever type it is. The accepted cost is that every existing system's letter renders slightly smaller than before (a default low at 15 m/s shrinks about 7%, a high about 3%), and an L and an H at the same wind speed no longer render at the same size. That shrink is intended. Do not "fix" it, and do not introduce a separate fixed reference to preserve the old sizes.
 
@@ -177,10 +176,13 @@ The two label tests currently set absurd strengths (`1500000`) and re-derive the
         <PressureSystemIcon model={model}/>
       </Provider>
     );
-    // The low slider is inverted: the strongest system sits at the top of its travel.
+    // Both sliders read as pressure rather than strength, so the low one is inverted:
+    // its strongest system is the lowest mb and sits at the bottom of the travel.
     const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
     expect(slider).toHaveAttribute("max", String(strengthRange.low.strong));
-    expect(slider).toHaveValue(String(strengthRange.low.weak));
+    // strong + weak - strong drifts off `weak` by ~4e-15 in IEEE 754, and MUI does not
+    // snap a controlled value to the step.
+    expect(Number(slider?.value)).toBeCloseTo(strengthRange.low.weak);
   });
 ```
 
