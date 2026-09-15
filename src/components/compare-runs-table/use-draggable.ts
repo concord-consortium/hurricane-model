@@ -7,9 +7,12 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 export function clampToParent(position: IPosition, element: HTMLElement): IPosition {
   const parent = element.offsetParent;
   if (!parent) return position;
+  const horizontalSpace = parent.clientWidth - element.offsetWidth;
+  const verticalSpace = parent.clientHeight - element.offsetHeight;
   return {
-    left: clamp(position.left, 0, parent.clientWidth - element.offsetWidth),
-    top: clamp(position.top, 0, parent.clientHeight - element.offsetHeight)
+    // If the element is bigger than its parent, do not clamp it.
+    left: horizontalSpace > 0 ? clamp(position.left, 0, horizontalSpace) : position.left,
+    top: verticalSpace > 0 ? clamp(position.top, 0, verticalSpace) : position.top
   };
 }
 
