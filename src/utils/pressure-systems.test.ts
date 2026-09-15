@@ -4,20 +4,20 @@ import { pressureSystemReport, strengthRange, strengthToMb } from "./pressure-sy
 
 describe("strengthToMb", () => {
   it("maps high-pressure strength to 1015..1030 mb", () => {
-    expect(strengthToMb("high", strengthRange.high.min)).toBe(1015);
-    expect(strengthToMb("high", strengthRange.high.max)).toBe(1030);
+    expect(strengthToMb("high", strengthRange.high.weak)).toBe(1015);
+    expect(strengthToMb("high", strengthRange.high.strong)).toBe(1030);
     expect(strengthToMb("high", 19.5)).toBe(1028);
     expect(strengthToMb("high", 13.6)).toBe(1023);
   });
 
   it("maps low-pressure strength to 1010..990 mb (stronger = lower)", () => {
-    expect(strengthToMb("low", strengthRange.low.min)).toBe(1010);
-    expect(strengthToMb("low", strengthRange.low.max)).toBe(990);
+    expect(strengthToMb("low", strengthRange.low.weak)).toBe(1010);
+    expect(strengthToMb("low", strengthRange.low.strong)).toBe(990);
     expect(strengthToMb("low", 6)).toBe(1008);
     expect(strengthToMb("low", 7)).toBe(1007);
   });
 
-  it("maps to the same values as the old 1015..1028 and 1010..997 ranges", () => {
+  it("keeps the old mb labels at strengths 18 and 20", () => {
     expect(strengthToMb("high", 20)).toBe(1028);
     expect(strengthToMb("low", 20)).toBe(997);
     expect(strengthToMb("high", 18)).toBe(1026);
@@ -65,7 +65,7 @@ describe("pressureReport", () => {
 
   it("reports a strength change through the mb value", () => {
     const systems = defaultSetup();
-    systems[0].strength = strengthRange.high.min;
+    systems[0].strength = strengthRange.high.weak;
     expect(pressureSystemReport(systems)[0].mb).toBe("1015 mb");
   });
 

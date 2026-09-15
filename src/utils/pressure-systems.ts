@@ -5,23 +5,28 @@ import { IPressureSystemState } from "../types/interactive-state";
 
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
 // High pressure reads 1015..1030 mb (stronger = higher); low reads 1010..990 mb (stronger = lower).
-// Previously, strengths were 3..20 and mb were 1015..123 for high and 1010..997 for low systems.
+// Previously, strengths were 3..20 and mb were 1015..1028 for high and 1010..997 for low systems.
 // The strength maxima are now 22.6/29.2 to keep conversions consistent with those old ranges.
-export const strengthRange: Record<PressureSystemType, { min: number, max: number }> = {
-  high: { min: 3, max: 22.6 },
-  low: { min: 3, max: 29.2 }
+interface IRange {
+  weak: number;
+  strong: number;
+}
+
+export const strengthRange: Record<PressureSystemType, IRange> = {
+  high: { weak: 3, strong: 22.6 },
+  low: { weak: 3, strong: 29.2 }
 };
 
-export const mbRange: Record<PressureSystemType, { min: number, max: number }> = {
-  high: { min: 1015, max: 1030 },
-  low: { min: 1010, max: 990 }
+export const mbRange: Record<PressureSystemType, IRange> = {
+  high: { weak: 1015, strong: 1030 },
+  low: { weak: 1010, strong: 990 }
 };
 
 export function strengthToMb(type: PressureSystemType, strength: number): number {
-  const strengths = strengthRange[type];
-  const mb = mbRange[type];
-  const norm = (strength - strengths.min) / (strengths.max - strengths.min);
-  return Math.round(mb.min + norm * (mb.max - mb.min));
+  const strengthBounds = strengthRange[type];
+  const mbBounds = mbRange[type];
+  const norm = (strength - strengthBounds.weak) / (strengthBounds.strong - strengthBounds.weak);
+  return Math.round(mbBounds.weak + norm * (mbBounds.strong - mbBounds.weak));
 }
 
 // 16-point compass label for a heading in degrees (0 = N, clockwise), e.g. "SSW".
