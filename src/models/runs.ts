@@ -1,6 +1,7 @@
 import { action, comparer, computed, makeObservable, observable, toJS } from "mobx";
 import { IRunResult, IRunSetup, IRunState, ISimulationState } from "../types/interactive-state";
 import { safeStartLocation } from "../utils/interactive-state";
+import { clampCategory } from "../config";
 import {
   applySimulationState, cloneSimulationState, defaultSimulationState, extractSetupState,
   normalizeSimulationState, serializeHurricane, serializeSimulation
@@ -11,6 +12,8 @@ import { UIModel } from "./ui";
 export const maxRuns = 6;
 // maxRuns keeps run letters inside A–F.
 const firstRunLetterCharCode = "A".charCodeAt(0);
+
+export type RunStatus = "" | "Not run yet" | "Running..." | "Paused";
 
 export class RunsModel {
   @observable public runs: IRunState[] = [];
@@ -88,8 +91,20 @@ export class RunsModel {
     return this.getSimulation(run).simulationFinished;
   }
 
+  public getStartingCategory(run: IRunState): number {
+    return clampCategory(this.getSimulationSetup(run).startingCategory ?? 0);
+  }
+
   public runLetter(run: IRunState): string {
     return String.fromCharCode(firstRunLetterCharCode + this.runs.findIndex(r => r.id === run.id));
+  }
+
+  public runStatus(run: IRunState): RunStatus {
+    if (this.isRunComplete(run)) return "";
+    if (!this.isSelected(run.id)) return "Not run yet";
+    if (this.simulation.simulationRunning) return "Running...";
+    if (this.simulation.simulationStarted) return "Paused";
+    return "Not run yet";
   }
 
   @computed public get allComplete(): boolean {

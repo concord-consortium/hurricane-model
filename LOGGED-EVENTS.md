@@ -20,11 +20,12 @@ All lat/lng values are in decimal degrees, strength in m/s, temperature in °C, 
 
 | Event | Parameters | When |
 |-------|-----------|------|
-| `RunSelected` | `{ runId, via: "panel" \| "map" }` | User selects a different run by clicking its setup panel or its track on the map |
+| `RunSelected` | `{ runId, via: "panel" \| "map" \| "table" }` | User selects a different run by clicking its setup panel, its track on the map, or its column in the Compare Runs table |
 | `RunAdded` | `{ runId }` | User clicks New Run |
 | `RunDuplicated` | `{ runId, duplicatedRunId }` | User clicks Copy Selected Run (`runId` is the new run, `duplicatedRunId` the run whose setup was copied) |
 | `RunReset` | `{ runId }` | User clicks the reset button on the selected run's panel |
 | `RunDeleted` | `{ runId }` | User clicks the delete button on the selected run's panel |
+| `CompareTableToggled` | `{ expanded: boolean }` | User expands or collapses the Compare Runs table |
 
 ## Mouse Interaction
 

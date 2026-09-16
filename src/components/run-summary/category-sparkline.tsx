@@ -1,8 +1,8 @@
 import React, { useId } from "react";
 
-import { categoryColors } from "../../../utils/hurricane-categories";
+import { categoryColors } from "../../utils/hurricane-categories";
 
-import commonCss from "../../common.scss";
+import commonCss from "../common.scss";
 import css from "./category-sparkline.scss";
 
 const minWidth = 8;

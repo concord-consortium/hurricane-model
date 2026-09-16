@@ -576,4 +576,34 @@ describe("RunsModel", () => {
     expect(runs.runs.map(run => run.id)).toEqual([originalId]);
     expect(runs.selectedRunId).toBe(originalId);
   });
+
+  describe("runStatus", () => {
+    it("is 'Not run yet' for a fresh run", () => {
+      expect(stores.runs.runStatus(stores.runs.runs[0])).toBe("Not run yet");
+    });
+
+    it("follows the live simulation for the selected run", () => {
+      const { runs, simulation } = stores;
+      runInAction(() => {
+        simulation.simulationStarted = true;
+        simulation.simulationRunning = true;
+      });
+      expect(runs.runStatus(runs.runs[0])).toBe("Running...");
+      runInAction(() => { simulation.simulationRunning = false; });
+      expect(runs.runStatus(runs.runs[0])).toBe("Paused");
+    });
+
+    it("is empty once the run is complete", () => {
+      completeCurrentRun(stores);
+      expect(stores.runs.runStatus(stores.runs.runs[0])).toBe("");
+    });
+
+    it("is 'Not run yet' for an unselected, incomplete run", () => {
+      const { runs } = stores;
+      completeCurrentRun(stores);
+      runs.addRun();
+      runs.selectRun(runs.runs[0].id);
+      expect(runs.runStatus(runs.runs[1])).toBe("Not run yet");
+    });
+  });
 });

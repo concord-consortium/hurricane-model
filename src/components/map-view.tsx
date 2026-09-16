@@ -15,6 +15,7 @@ import { RunTracks } from "./run-tracks";
 import { LandfallRectangle } from "./landfall-rectangle";
 import { PrecipitationLayer } from "./precipitation-layer";
 import config from "../config";
+import { CompareRunsTable } from "./compare-runs-table/compare-runs-table";
 import CenterFocusStrong from "@mui/icons-material/CenterFocusStrong";
 import Home from "@mui/icons-material/Home";
 import { mapLayer } from "../map-layer-tiles";
@@ -295,6 +296,7 @@ export class MapView extends BaseComponent<IProps, IState> {
           }
           <AttributionControl position="topright" />
         </MapContainer>
+        {config.mode === "storm" && <CompareRunsTable />}
       </div>
     );
   }

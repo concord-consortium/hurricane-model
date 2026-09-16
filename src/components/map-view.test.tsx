@@ -64,6 +64,22 @@ describe("MapView component", () => {
     config.topBarVisible = oldTopBarVisible;
   });
 
+  it("shows the compare runs table in storm mode", () => {
+    const oldMode = config.mode;
+    config.mode = "storm";
+    renderMapView(stores);
+    expect(document.querySelector("[data-test='compare-runs-table']")).toBeInTheDocument();
+    config.mode = oldMode;
+  });
+
+  it("hides the compare runs table outside storm mode", () => {
+    const oldMode = config.mode;
+    config.mode = "hurricane";
+    renderMapView(stores);
+    expect(document.querySelector("[data-test='compare-runs-table']")).not.toBeInTheDocument();
+    config.mode = oldMode;
+  });
+
   describe("storm placement region overlay", () => {
     it("renders the polygon overlay when setupMode is 'stormLocation'", () => {
       stores.ui.setSetupMode("stormLocation");
