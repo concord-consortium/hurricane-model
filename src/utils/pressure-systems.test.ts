@@ -1,6 +1,6 @@
 import { selectPressureSystems } from "../config";
 import { IPressureSystemState } from "../types/interactive-state";
-import { pressureSystemReport, strengthRange, strengthToMb } from "./pressure-systems";
+import { invertLowStrength, pressureSystemReport, strengthRange, strengthToMb } from "./pressure-systems";
 
 describe("strengthToMb", () => {
   it("maps high-pressure strength to 1015..1030 mb", () => {
@@ -72,5 +72,17 @@ describe("pressureReport", () => {
   it("renders a bare H or L for unlabeled systems", () => {
     const systems = defaultSetup().map(ps => ({ ...ps, label: undefined }));
     expect(pressureSystemReport(systems).map(r => r.label)).toEqual(["H", "H", "L", "L"]);
+  });
+});
+
+describe("invertLowStrength", () => {
+  it("maps between the ends of the low range", () => {
+    expect(invertLowStrength(strengthRange.low.weak)).toBeCloseTo(strengthRange.low.strong);
+    expect(invertLowStrength(strengthRange.low.strong)).toBeCloseTo(strengthRange.low.weak);
+  });
+
+  it("is self-inverse, so it round-trips slider value back to strength", () => {
+    const strength = 12.5;
+    expect(invertLowStrength(invertLowStrength(strength))).toBe(strength);
   });
 });

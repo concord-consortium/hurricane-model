@@ -49,6 +49,12 @@ export interface IPressureSystemReport {
   mb: string;
 }
 
+export function pressureLabel(type: PressureSystemType, strength: number, includeSpace = false) {
+  // Non-breaking space so the value and its "mb" unit never split across a wrap.
+  const space = includeSpace ? `\u00A0` : "";
+  return `${strengthToMb(type, strength)}${space}mb`;
+}
+
 export function pressureSystemReport(systems: IPressureSystemState[]): IPressureSystemReport[] {
   return systems.map(ps => {
     let position = "Default";
@@ -64,8 +70,11 @@ export function pressureSystemReport(systems: IPressureSystemState[]): IPressure
       type: ps.type,
       label: `${ps.type === "high" ? "H" : "L"}${ps.label ?? ""}`,
       position,
-      // Non-breaking space so the value and its "mb" unit never split across a wrap.
-      mb: `${strengthToMb(ps.type, ps.strength)}\u00A0mb`
+      mb: pressureLabel(ps.type, ps.strength, true)
     };
   });
 }
+
+// Low-pressure sliders read as pressure, not strength: up = higher mb = weaker system.
+// Self-inverse, so one call serves both model -> slider and slider -> model.
+export const invertLowStrength = (value: number) => strengthRange.low.strong + strengthRange.low.weak - value;

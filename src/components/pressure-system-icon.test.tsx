@@ -5,7 +5,7 @@ import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { strengthRange } from "../utils/pressure-systems";
 import { PressureSystem, PressureSystemType } from "../models/pressure-system";
-import { invertLowStrength, PressureSystemIcon } from "./pressure-system-icon";
+import { PressureSystemIcon } from "./pressure-system-icon";
 
 describe("PressureSystemIcon component", () => {
   let stores = createStores();
@@ -61,18 +61,6 @@ describe("PressureSystemIcon component", () => {
     // does not snap a controlled value to the step.
     const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
     expect(Number(slider?.value)).toBeCloseTo(strengthRange.low.weak);
-  });
-
-  describe("invertLowStrength", () => {
-    it("maps between the ends of the low range", () => {
-      expect(invertLowStrength(strengthRange.low.weak)).toBeCloseTo(strengthRange.low.strong);
-      expect(invertLowStrength(strengthRange.low.strong)).toBeCloseTo(strengthRange.low.weak);
-    });
-
-    it("is self-inverse, so it round-trips slider value back to strength", () => {
-      const strength = 12.5;
-      expect(invertLowStrength(invertLowStrength(strength))).toBe(strength);
-    });
   });
 
   describe("label badge", () => {
