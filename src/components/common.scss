@@ -1,3 +1,4 @@
+$charcoalDark: #222222;
 $charcoal: #434343;
 $charcoalMedium: #797979;
 
@@ -11,6 +12,7 @@ $bottomBarBorderRadius: 9px;
 $secondaryColor: #ff9900;
 $secondaryColorHover: #ffdaa3;
 $secondaryColorLight: #fff6e6;
+$secondaryColorDark: #a35a12;
 
 $hoverColor: #dfdfdf;
 
@@ -70,6 +72,15 @@ $sparklineHeight: 22;
 
 $runLetterBadgeSize: 28px;
 $runLetterBadgeColor: #ccc;
+
+$compareRunColumnWidth: 128;
+$compareCellHorizontalPadding: 10;
+
+// z-index stacking order
+$zPanels: 1000;
+$zCompareRunsTable: 1100;
+$zModal: 10000;
+
 
 .error {
   padding: 8px 12px;
@@ -139,4 +150,6 @@ $runLetterBadgeColor: #ccc;
   thumbnailWidth: $thumbnailWidth;
   thumbnailHeight: $thumbnailHeight;
   sparklineHeight: $sparklineHeight;
+  compareRunColumnWidth: $compareRunColumnWidth;
+  compareCellHorizontalPadding: $compareCellHorizontalPadding;
 }

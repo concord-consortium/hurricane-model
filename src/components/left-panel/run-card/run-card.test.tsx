@@ -179,6 +179,17 @@ describe("RunCard", () => {
       expect(screen.getByText("Result")).toBeInTheDocument();
     });
 
+    it("colors the category row icons by the run's categories", () => {
+      renderPanels(stores);
+      expect(screen.getByTestId("setup-category").querySelector("svg")).toHaveClass("category0");
+      expect(screen.getByTestId("result-peak-category").querySelector("svg")).toHaveClass("fillWhite");
+      // Only the row icon is drawn; the value has no icon of its own.
+      expect(screen.getByTestId("result-peak-category").querySelectorAll("svg").length).toBe(1);
+
+      act(() => runInAction(() => completeCurrentRun(stores)));
+      expect(screen.getByTestId("result-peak-category").querySelector("svg")).toHaveClass("category2");
+    });
+
     it("summarizes the selected run from the live simulation", () => {
       stores.simulation.season = "winter";
       renderPanels(stores);

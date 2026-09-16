@@ -70,3 +70,7 @@ export function seedTemperatureAnomalies(): Partial<Record<NamedRegion, number>>
   }
   return next;
 }
+
+export function anomalyText(value: number): string {
+  return `${value > 0 ? "+" : "−"}${Math.abs(value)}\u00A0°C`;
+}

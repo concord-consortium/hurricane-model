@@ -1,3 +1,5 @@
+@use "common" as *;
+
 .index {
   height: 100%;
 
@@ -5,7 +7,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    z-index: 10000;
+    z-index: $zModal;
     color: #ffb60f;
   }
 
@@ -18,6 +20,6 @@
     position: absolute;
     top: 14px;
     left: 70px;
-    z-index: 10000;
+    z-index: $zModal;
   }
 }

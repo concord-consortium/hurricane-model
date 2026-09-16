@@ -5,8 +5,10 @@ import React from "react";
 import { log } from "../../../log";
 import { IRunState } from "../../../types/interactive-state";
 import { useStores } from "../../../stores-context";
-import { RunResult } from "./run-result";
-import { RunSetup } from "./run-setup";
+import { selectRun } from "../../../utils/multitrack";
+import { resultRows, setupRows } from "../../run-summary/run-summary-rows";
+import { RunThumbnail } from "./run-thumbnail";
+import { CardSummaryRows } from "./card-summary-rows";
 
 import DeleteIcon from "../../../assets/left-panel/delete.svg";
 import RestartIcon from "../../../assets/left-panel/restart.svg";
@@ -19,18 +21,13 @@ interface IRunCardProps {
 }
 
 export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
-  const { runs, simulation, ui } = useStores();
+  const stores = useStores();
+  const { runs, simulation, ui } = stores;
   const selected = runs.isSelected(run.id);
   const complete = runs.isRunComplete(run);
   const letter = runs.runLetter(run);
 
-  const handleSelect = () => {
-    if (selected) return;
-    if (simulation.inProgress && !ui.isReadOnly) simulation.restart();
-    runs.selectRun(run.id);
-    ui.setNorthAtlanticView();
-    log("RunSelected", { runId: run.id, via: "panel" });
-  };
+  const handleSelect = () => selectRun(stores, run, "panel");
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.target !== event.currentTarget) return;
@@ -55,10 +52,8 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
     log("RunDeleted", { runId: run.id });
   };
 
-  const statusMessage = complete ? ""
-    : selected && simulation.simulationRunning ? "Running..."
-    : selected && simulation.simulationStarted ? "Paused"
-    : "Not run yet - editable";
+  const status = runs.runStatus(run);
+  const statusMessage = status === "Not run yet" ? `${status} - editable` : status;
   const labelStatusMessage = statusMessage ? `, ${statusMessage}` : "";
 
   return (
@@ -86,11 +81,16 @@ export const RunCard = observer(function RunCard({ run }: IRunCardProps) {
         <div className={css.runCardBody}>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Setup</div>
-            <RunSetup run={run} />
+            <div className={css.summaryColumn}>
+              <CardSummaryRows rows={setupRows} run={run} section="setup" />
+            </div>
           </div>
           <div className={css.cardColumn}>
             <div className={css.cardColumnHeading}>Result</div>
-            <RunResult run={run} />
+            <RunThumbnail result={runs.getSimulationResult(run)} run={run} />
+            <div className={clsx(css.summaryColumn, css.resultSummary)}>
+              <CardSummaryRows rows={resultRows} run={run} section="result" />
+            </div>
           </div>
         </div>
       </div>

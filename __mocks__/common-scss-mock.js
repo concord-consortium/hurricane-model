@@ -14,5 +14,7 @@ module.exports = {
   warmColor: "#c62828",
   thumbnailWidth: "100",
   thumbnailHeight: "78",
-  sparklineHeight: "22"
+  sparklineHeight: "22",
+  compareRunColumnWidth: "128",
+  compareCellHorizontalPadding: "10"
 };

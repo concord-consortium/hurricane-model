@@ -1,0 +1,52 @@
+@use "../common.scss" as *;
+
+.icon {
+  flex-shrink: 0;
+  height: 18px;
+  width: 18px;
+}
+
+.singleLine { white-space: nowrap; }
+
+.categoryValue {
+  align-items: center;
+  display: inline-flex;
+  gap: 7px;
+}
+
+.stackedLines {
+  align-items: flex-start;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.warm { color: $warmColor; }
+.cool { color: $coldColor; }
+
+.pressureSystem {
+  align-items: baseline;
+  display: flex;
+  gap: 4px;
+}
+
+.pressureDetail {
+  align-items: flex-start;
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.high { color: $highPressureColor; }
+.low { color: $lowPressureColor; }
+
+.sparklineSlot {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.dash { color: $charcoal; }
+
+.fillWhite { color: #fff; }

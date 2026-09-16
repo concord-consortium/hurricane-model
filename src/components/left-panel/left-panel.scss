@@ -12,7 +12,7 @@ $leftPanelBorderRadius: 5px;
   position: absolute;
   top: $topBarHeight;
   width: $leftPanelWidth;
-  z-index: 1000;
+  z-index: $zPanels;
 
   .leftPanel {
     border-top: $leftPanelBorder;
