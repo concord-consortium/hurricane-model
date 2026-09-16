@@ -7,17 +7,17 @@ import { IPressureSystemState } from "../types/interactive-state";
 // High pressure reads 1015..1030 mb (stronger = higher); low reads 1010..990 mb (stronger = lower).
 // Previously, strengths were 3..20 and mb were 1015..1028 for high and 1010..997 for low systems.
 // The strength maxima are now 22.6/29.2 to keep conversions consistent with those old ranges.
-interface IRange {
+interface IPressureRange {
   weak: number;
   strong: number;
 }
 
-export const strengthRange: Record<PressureSystemType, IRange> = {
+export const strengthRange: Record<PressureSystemType, IPressureRange> = {
   high: { weak: 3, strong: 22.6 },
   low: { weak: 3, strong: 29.2 }
 };
 
-export const mbRange: Record<PressureSystemType, IRange> = {
+export const mbRange: Record<PressureSystemType, IPressureRange> = {
   high: { weak: 1015, strong: 1030 },
   low: { weak: 1010, strong: 990 }
 };

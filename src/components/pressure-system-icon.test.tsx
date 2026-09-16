@@ -4,7 +4,7 @@ import config from "../config";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { strengthRange } from "../utils/pressure-systems";
-import { PressureSystemType } from "../models/pressure-system";
+import { PressureSystem, PressureSystemType } from "../models/pressure-system";
 import { invertLowStrength, PressureSystemIcon } from "./pressure-system-icon";
 
 describe("PressureSystemIcon component", () => {
@@ -13,12 +13,16 @@ describe("PressureSystemIcon component", () => {
     stores = createStores();
   });
 
-  it("renders Slider", () => {
+  const renderIcon = (model: PressureSystem, disabled?: boolean) => {
     render(
       <Provider stores={stores}>
-        <PressureSystemIcon model={stores.simulation.pressureSystemsSetup[0]}/>
+        <PressureSystemIcon model={model} disabled={disabled} />
       </Provider>
     );
+  };
+
+  it("renders Slider", () => {
+    renderIcon(stores.simulation.pressureSystemsSetup[0]);
     expect(screen.getByTestId("pressure-system-slider")).toBeInTheDocument();
   });
 
@@ -26,11 +30,7 @@ describe("PressureSystemIcon component", () => {
     const model = stores.simulation.pressureSystemsSetup[0];
     model.type = "high";
     model.setStrength(strengthRange.high.strong);
-    render(
-      <Provider stores={stores}>
-        <PressureSystemIcon model={model}/>
-      </Provider>
-    );
+    renderIcon(model);
     expect(screen.getByText("1030mb")).toBeInTheDocument();
   });
 
@@ -38,22 +38,14 @@ describe("PressureSystemIcon component", () => {
     const model = stores.simulation.pressureSystemsSetup[0];
     model.type = "low";
     model.setStrength(strengthRange.low.strong);
-    render(
-      <Provider stores={stores}>
-        <PressureSystemIcon model={model}/>
-      </Provider>
-    );
+    renderIcon(model);
     expect(screen.getByText("990mb")).toBeInTheDocument();
   });
 
   it.each<PressureSystemType>(["high", "low"])("gives the %s pressure system its own slider bounds", type => {
     const model = stores.simulation.pressureSystemsSetup[0];
     model.type = type;
-    render(
-      <Provider stores={stores}>
-        <PressureSystemIcon model={model}/>
-      </Provider>
-    );
+    renderIcon(model);
     const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
     expect(slider).toHaveAttribute("max", String(strengthRange[type].strong));
   });
@@ -62,11 +54,7 @@ describe("PressureSystemIcon component", () => {
     const model = stores.simulation.pressureSystemsSetup[0];
     model.type = "low";
     model.setStrength(strengthRange.low.strong);
-    render(
-      <Provider stores={stores}>
-        <PressureSystemIcon model={model}/>
-      </Provider>
-    );
+    renderIcon(model);
     // Both sliders read as pressure rather than strength, so the low one is inverted: its
     // strongest system is the lowest mb and sits at the bottom, where the slider value is weak.
     // Not an exact comparison: strong + weak - strong drifts off weak by ~4e-15, and MUI
@@ -97,11 +85,7 @@ describe("PressureSystemIcon component", () => {
       config.mode = "storm";
       const model = stores.simulation.pressureSystemsSetup[0];
       model.label = "2";
-      render(
-        <Provider stores={stores}>
-          <PressureSystemIcon model={model}/>
-        </Provider>
-      );
+      renderIcon(model);
       expect(screen.getByTestId("pressure-system-label")).toHaveTextContent("2");
     });
 
@@ -109,11 +93,7 @@ describe("PressureSystemIcon component", () => {
       config.mode = "storm";
       const model = stores.simulation.pressureSystemsSetup[0];
       model.label = "";
-      render(
-        <Provider stores={stores}>
-          <PressureSystemIcon model={model}/>
-        </Provider>
-      );
+      renderIcon(model);
       expect(screen.queryByTestId("pressure-system-label")).not.toBeInTheDocument();
     });
 
@@ -121,39 +101,23 @@ describe("PressureSystemIcon component", () => {
       config.mode = "hurricane";
       const model = stores.simulation.pressureSystemsSetup[0];
       model.label = "2";
-      render(
-        <Provider stores={stores}>
-          <PressureSystemIcon model={model}/>
-        </Provider>
-      );
+      renderIcon(model);
       expect(screen.queryByTestId("pressure-system-label")).not.toBeInTheDocument();
     });
   });
 
   it("icon is disabled when disabled prop is true", () => {
-    render(
-      <Provider stores={stores}>
-        <PressureSystemIcon model={stores.simulation.pressureSystemsSetup[0]} disabled={true}/>
-      </Provider>
-    );
+    renderIcon(stores.simulation.pressureSystemsSetup[0], true);
     expect(screen.getByTestId("pressure-system-icon")).toHaveClass("disabled");
   });
 
   it("icon is enabled when disabled prop is false", () => {
-    render(
-      <Provider stores={stores}>
-        <PressureSystemIcon model={stores.simulation.pressureSystemsSetup[0]} disabled={false}/>
-      </Provider>
-    );
+    renderIcon(stores.simulation.pressureSystemsSetup[0], false);
     expect(screen.getByTestId("pressure-system-icon")).not.toHaveClass("disabled");
   });
 
   it("icon is enabled by default when disabled prop is not provided", () => {
-    render(
-      <Provider stores={stores}>
-        <PressureSystemIcon model={stores.simulation.pressureSystemsSetup[0]}/>
-      </Provider>
-    );
+    renderIcon(stores.simulation.pressureSystemsSetup[0]);
     expect(screen.getByTestId("pressure-system-icon")).not.toHaveClass("disabled");
   });
 
