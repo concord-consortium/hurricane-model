@@ -111,6 +111,8 @@ export const PressureSystemIcon = observer(function PressureSystemIcon({
             orientation="vertical"
             slots={{ thumb: VerticalThumb }}
             disabled={uiDisabled}
+            aria-label={`Pressure of ${model.type} pressure system${model.label ? ` ${model.label}` : ""}`}
+            getAriaValueText={() => pressureLabel(model.type, model.strength)}
             data-test="pressure-system-slider"
           />
         </div>
