@@ -108,10 +108,4 @@ describe("PressureSystemIcon component", () => {
     renderIcon(stores.simulation.pressureSystemsSetup[0]);
     expect(screen.getByTestId("pressure-system-icon")).not.toHaveClass("disabled");
   });
-
-  // Note: a previous enzyme test checked that handleSliderDragEnd logs
-  // PressureSystemStrengthUpdated with type, position, and value, by calling the handler
-  // directly on the component instance. Covering it through RTL would mean simulating
-  // Material-UI Slider's mouse-drag events, which is fragile, so it stays uncovered here;
-  // the log helper itself is tested separately.
 });
