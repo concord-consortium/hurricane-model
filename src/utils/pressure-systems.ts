@@ -3,17 +3,30 @@ import { distanceTo, headingTo } from "geolocation-utils";
 import { PressureSystemType } from "../models/pressure-system";
 import { IPressureSystemState } from "../types/interactive-state";
 
+interface IPressureRange {
+  weak: number;
+  strong: number;
+}
+
 // Strength (m/s) -> barometric-pressure label (mb): the user-facing unit shown on the map markers.
-// High pressure reads 1015..1028 mb (stronger = higher); low reads 1010..997 mb (stronger = lower).
-export const minStrength = 3;
-export const maxStrength = 20;
-export const mbLabelRange = 13;
+// High pressure reads 1015..1030 mb (stronger = higher); low reads 1010..990 mb (stronger = lower).
+export const mbRange: Record<PressureSystemType, IPressureRange> = {
+  high: { weak: 1015, strong: 1030 },
+  low: { weak: 1010, strong: 990 }
+};
+
+// Previously, strengths were 3..20 and mb were 1015..1028 for high and 1010..997 for low systems.
+// The strength maxima are now 22.6/29.2 to keep conversions consistent with those old ranges.
+export const strengthRange: Record<PressureSystemType, IPressureRange> = {
+  high: { weak: 3, strong: 22.6 },
+  low: { weak: 3, strong: 29.2 }
+};
 
 export function strengthToMb(type: PressureSystemType, strength: number): number {
-  const norm = (strength - minStrength) / (maxStrength - minStrength);
-  return type === "high"
-    ? Math.round(1015 + norm * mbLabelRange)
-    : Math.round(1010 - norm * mbLabelRange);
+  const strengthBounds = strengthRange[type];
+  const mbBounds = mbRange[type];
+  const norm = (strength - strengthBounds.weak) / (strengthBounds.strong - strengthBounds.weak);
+  return Math.round(mbBounds.weak + norm * (mbBounds.strong - mbBounds.weak));
 }
 
 // 16-point compass label for a heading in degrees (0 = N, clockwise), e.g. "SSW".
@@ -36,6 +49,12 @@ export interface IPressureSystemReport {
   mb: string;
 }
 
+export function pressureLabel(type: PressureSystemType, strength: number, includeSpace = false) {
+  // Non-breaking space so the value and its "mb" unit never split across a wrap.
+  const space = includeSpace ? `\u00A0` : "";
+  return `${strengthToMb(type, strength)}${space}mb`;
+}
+
 export function pressureSystemReport(systems: IPressureSystemState[]): IPressureSystemReport[] {
   return systems.map(ps => {
     let position = "Default";
@@ -51,8 +70,11 @@ export function pressureSystemReport(systems: IPressureSystemState[]): IPressure
       type: ps.type,
       label: `${ps.type === "high" ? "H" : "L"}${ps.label ?? ""}`,
       position,
-      // Non-breaking space so the value and its "mb" unit never split across a wrap.
-      mb: `${strengthToMb(ps.type, ps.strength)}\u00A0mb`
+      mb: pressureLabel(ps.type, ps.strength, true)
     };
   });
 }
+
+// Low-pressure sliders read as pressure, not strength: up = higher mb = weaker system.
+// Self-inverse, so one call serves both model -> slider and slider -> model.
+export const invertLowStrength = (value: number) => strengthRange.low.strong + strengthRange.low.weak - value;

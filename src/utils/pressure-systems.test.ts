@@ -1,20 +1,27 @@
 import { selectPressureSystems } from "../config";
 import { IPressureSystemState } from "../types/interactive-state";
-import { maxStrength, minStrength, pressureSystemReport, strengthToMb } from "./pressure-systems";
+import { invertLowStrength, pressureSystemReport, strengthRange, strengthToMb } from "./pressure-systems";
 
 describe("strengthToMb", () => {
-  it("maps high-pressure strength to 1015..1028 mb", () => {
-    expect(strengthToMb("high", minStrength)).toBe(1015);
-    expect(strengthToMb("high", maxStrength)).toBe(1028);
+  it("maps high-pressure strength to 1015..1030 mb", () => {
+    expect(strengthToMb("high", strengthRange.high.weak)).toBe(1015);
+    expect(strengthToMb("high", strengthRange.high.strong)).toBe(1030);
     expect(strengthToMb("high", 19.5)).toBe(1028);
     expect(strengthToMb("high", 13.6)).toBe(1023);
   });
 
-  it("maps low-pressure strength to 1010..997 mb (stronger = lower)", () => {
-    expect(strengthToMb("low", minStrength)).toBe(1010);
-    expect(strengthToMb("low", maxStrength)).toBe(997);
+  it("maps low-pressure strength to 1010..990 mb (stronger = lower)", () => {
+    expect(strengthToMb("low", strengthRange.low.weak)).toBe(1010);
+    expect(strengthToMb("low", strengthRange.low.strong)).toBe(990);
     expect(strengthToMb("low", 6)).toBe(1008);
     expect(strengthToMb("low", 7)).toBe(1007);
+  });
+
+  it("keeps the old mb labels at strengths 18 and 20", () => {
+    expect(strengthToMb("high", 20)).toBe(1028);
+    expect(strengthToMb("low", 20)).toBe(997);
+    expect(strengthToMb("high", 18)).toBe(1026);
+    expect(strengthToMb("low", 18)).toBe(999);
   });
 });
 
@@ -58,12 +65,24 @@ describe("pressureReport", () => {
 
   it("reports a strength change through the mb value", () => {
     const systems = defaultSetup();
-    systems[0].strength = minStrength;
+    systems[0].strength = strengthRange.high.weak;
     expect(pressureSystemReport(systems)[0].mb).toBe("1015 mb");
   });
 
   it("renders a bare H or L for unlabeled systems", () => {
     const systems = defaultSetup().map(ps => ({ ...ps, label: undefined }));
     expect(pressureSystemReport(systems).map(r => r.label)).toEqual(["H", "H", "L", "L"]);
+  });
+});
+
+describe("invertLowStrength", () => {
+  it("maps between the ends of the low range", () => {
+    expect(invertLowStrength(strengthRange.low.weak)).toBeCloseTo(strengthRange.low.strong);
+    expect(invertLowStrength(strengthRange.low.strong)).toBeCloseTo(strengthRange.low.weak);
+  });
+
+  it("is self-inverse, so it round-trips slider value back to strength", () => {
+    const strength = 12.5;
+    expect(invertLowStrength(invertLowStrength(strength))).toBe(strength);
   });
 });
