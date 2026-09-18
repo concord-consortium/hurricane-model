@@ -48,6 +48,7 @@ describe("PressureSystemIcon component", () => {
     renderIcon(model);
     const slider = screen.getByTestId("pressure-system-slider").querySelector("input");
     expect(slider).toHaveAttribute("max", String(strengthRange[type].strong));
+    expect(slider).toHaveAttribute("min", String(strengthRange[type].weak));
   });
 
   it("puts the strongest low system at the bottom of the slider", () => {
