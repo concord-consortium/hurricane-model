@@ -43,7 +43,6 @@ export const PressureSystemIcon = observer(function PressureSystemIcon({
   const letterScale = 1 + strengthNorm * 0.3; // adjust level of visual scaling
   const letterStyle = { transform: `scale3d(${letterScale},${letterScale},${letterScale})` };
   const uiDisabled = disabled ?? false;
-  const label = pressureLabel(model.type, model.strength);
 
   const handleStrengthChange = (e: any, value: number | number[]) => {
     if (onSliderDrag) {
@@ -70,7 +69,7 @@ export const PressureSystemIcon = observer(function PressureSystemIcon({
       label: model.label,
       lat: model.center.lat,
       lng: model.center.lng,
-      value: label
+      value: pressureLabel(model.type, model.strength)
     });
   }
 
@@ -79,7 +78,7 @@ export const PressureSystemIcon = observer(function PressureSystemIcon({
       dataTest="pressure-system-icon"
       dimmed={dimmed}
       disabled={uiDisabled}
-      label={label}
+      label={pressureLabel(model.type, model.strength)}
     >
       {
         model.type === "high" ?
