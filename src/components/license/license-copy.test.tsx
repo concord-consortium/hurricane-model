@@ -66,17 +66,16 @@ describe.each([
   it("shows the approved copy and the current year", async () => {
     await renderContent();
     const copy = screen.getByTestId("license-copy");
-    expect(copy).toHaveTextContent(
+    const paragraphs = [...copy.querySelectorAll("p")].map(p => p.textContent?.replace(/\s+/g, " ").trim());
+    expect(paragraphs).toEqual([
       "Hurricane Explorer is free, open-source software. The Hurricane Explorer source code is released under " +
-      "the MIT License (opens in a new tab), so you’re welcome to use, modify, and build on it."
-    );
-    expect(copy).toHaveTextContent(
+      "the MIT License (opens in a new tab), so you’re welcome to use, modify, and build on it.",
       "Your use of Hurricane Explorer at hurricane.concord.org is governed by our Terms of Use (opens in a new " +
       "tab). The hosted version is free for non-commercial use; commercial use requires a separate written " +
       "agreement. For more information, visit concord.org/licensing (opens in a new tab) or contact " +
-      "licensing@concord.org."
-    );
-    expect(copy).toHaveTextContent("© 2031 The Concord Consortium, Inc.");
+      "licensing@concord.org.",
+      "© 2031 The Concord Consortium, Inc."
+    ]);
     expect([...copy.querySelectorAll("strong")].map(s => s.textContent)).toEqual([
       "Hurricane Explorer is free, open-source software.",
       "Your use of Hurricane Explorer at hurricane.concord.org"
@@ -100,6 +99,11 @@ describe.each([
     } finally {
       config.mode = originalMode;
     }
+  });
+
+  it("is the last block in the dialog", async () => {
+    await renderContent();
+    expect(screen.getByTestId("license-copy").nextElementSibling).toBeNull();
   });
 
   it("drops the old Creative Commons copyright block", async () => {

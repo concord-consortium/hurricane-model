@@ -208,17 +208,16 @@ describe.each([
   it("shows the approved copy and the current year", async () => {
     await renderContent();
     const copy = screen.getByTestId("license-copy");
-    expect(copy).toHaveTextContent(
+    const paragraphs = [...copy.querySelectorAll("p")].map(p => p.textContent?.replace(/\s+/g, " ").trim());
+    expect(paragraphs).toEqual([
       "Hurricane Explorer is free, open-source software. The Hurricane Explorer source code is released under " +
-      "the MIT License (opens in a new tab), so you’re welcome to use, modify, and build on it."
-    );
-    expect(copy).toHaveTextContent(
+      "the MIT License (opens in a new tab), so you’re welcome to use, modify, and build on it.",
       "Your use of Hurricane Explorer at hurricane.concord.org is governed by our Terms of Use (opens in a new " +
       "tab). The hosted version is free for non-commercial use; commercial use requires a separate written " +
       "agreement. For more information, visit concord.org/licensing (opens in a new tab) or contact " +
-      "licensing@concord.org."
-    );
-    expect(copy).toHaveTextContent("© 2031 The Concord Consortium, Inc.");
+      "licensing@concord.org.",
+      "© 2031 The Concord Consortium, Inc."
+    ]);
     expect([...copy.querySelectorAll("strong")].map(s => s.textContent)).toEqual([
       "Hurricane Explorer is free, open-source software.",
       "Your use of Hurricane Explorer at hurricane.concord.org"
@@ -242,6 +241,11 @@ describe.each([
     } finally {
       config.mode = originalMode;
     }
+  });
+
+  it("is the last block in the dialog", async () => {
+    await renderContent();
+    expect(screen.getByTestId("license-copy").nextElementSibling).toBeNull();
   });
 
   it("drops the old Creative Commons copyright block", async () => {
@@ -334,7 +338,7 @@ describe.each([
 **Throwaway build of both steps on master** (since removed):
 
 - The new and changed tests pass: `src/components/license` and `src/components/top-bar`.
-- Mutations that the tests catch: `rel="noopener"` alone; a hardcoded copyright year (caught only by the second pinned year); the copy built from `getAppName()` (caught only by the storm-mode case); a straight apostrophe in "you're"; dropping `<LicenseCopy />` from Share alone; `disableRestoreFocus` on the MUI dialog; About back to a `<span>` (no button role); the mailto link rendered through `ExternalLink`; `<Copyright />` left beside `<LicenseCopy />`.
+- Mutations that the tests catch: `rel="noopener"` alone; a hardcoded copyright year (caught only by the second pinned year); the copy built from `getAppName()` (caught only by the storm-mode case); a straight apostrophe in "you're"; dropping `<LicenseCopy />` from Share alone; `disableRestoreFocus` on the MUI dialog; About back to a `<span>` (no button role); the mailto link rendered through `ExternalLink`; `<Copyright />` left beside `<LicenseCopy />`; the two paragraphs swapped; `<LicenseCopy />` moved above the About dialog's credits.
 - Full Jest suite: the only failure is `app.test.tsx` ("shows the actual error message when loading fails", `log is not a function` from `MapView.handleViewportChanged`). It fails the same way on master in full runs and passes when run alone, so it is not caused by this change.
 - `tsc --noEmit`: clean. Production webpack build: succeeds.
 - `npm run lint`: 0 errors; its 4 warnings are unused `eslint-disable` directives in files this change does not touch. `LINT_BUILD=1` ESLint over the touched files: clean. `npm run lint:unused` reports one existing error in `bottom-bar/select-button.tsx`, also on master.
