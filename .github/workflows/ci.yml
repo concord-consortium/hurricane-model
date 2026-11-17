@@ -24,11 +24,11 @@ jobs:
         with:
           flags: jest
   cypress:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: cypress-io/github-action@v6
+      - uses: cypress-io/github-action@v7
         with:
           install-command: npm ci --legacy-peer-deps
           start: npm start
