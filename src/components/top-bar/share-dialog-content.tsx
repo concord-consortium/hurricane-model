@@ -5,7 +5,7 @@ import { getInteractiveState } from "../../models/interactive-state";
 import { useStores } from "../../stores-context";
 import { getAppName } from "../../utils/app";
 import { saveModelToCloud } from "../../utils/cloud-storage";
-import { Copyright } from "./copyright";
+import { LicenseCopy } from "../license/license-copy";
 
 import css from "./share-dialog-content.scss";
 
@@ -75,7 +75,7 @@ export const ShareDialogContent: React.FC = () => {
             />
           </>}
       </p>
-      <Copyright/>
+      <LicenseCopy />
     </div>
   );
 };
