@@ -18,6 +18,16 @@
     &:hover {
       color: $charcoal;
     }
+    @include focusOutline;
+  }
+
+  button.textButton {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    line-height: normal;
+    color: inherit;
   }
 
 }

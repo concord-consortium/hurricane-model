@@ -31,7 +31,9 @@ export class TopBar extends BaseComponent<IProps, IState> {
         <span data-test="reload" className={css.textButton} onClick={this.handleReload}><RefreshIcon /></span>
         <span>
           <span data-test="share" className={css.textButton} onClick={this.handleShareOpen}>Share</span>
-          <span data-test="about" className={css.textButton} onClick={this.handleAboutOpen}>About</span>
+          <button type="button" data-test="about" className={css.textButton} onClick={this.handleAboutOpen}>
+            About
+          </button>
         </span>
         <Dialog
           onClose={this.handleAboutClose}

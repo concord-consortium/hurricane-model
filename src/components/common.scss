@@ -89,6 +89,13 @@ $zModal: 10000;
   border-bottom: 1px solid #ffeeba;
 }
 
+@mixin focusOutline {
+  &:focus-visible {
+    outline: 2px solid $charcoal;
+    outline-offset: 2px;
+  }
+}
+
 @mixin dialogButton {
   &:hover {
     background-color: $secondaryColorHover;
@@ -98,10 +105,7 @@ $zModal: 10000;
     // Recolor the border rather than removing it so the button keeps its size.
     border-color: transparent;
   }
-  &:focus-visible {
-    outline: 2px solid $charcoal;
-    outline-offset: 2px;
-  }
+  @include focusOutline;
 }
 
 @mixin outlinedDialogButton {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import { createStores } from "../../models/stores";
@@ -81,6 +81,19 @@ describe("TopBar component", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       await user.click(screen.getByTestId("about"));
       expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("is a keyboard-reachable button that gets focus back when the dialog closes", async () => {
+      const user = userEvent.setup();
+      renderTopBar();
+      const about = screen.getByRole("button", { name: "About" });
+      await user.tab();
+      expect(about).toHaveFocus();
+      await user.keyboard("{Enter}");
+      expect(screen.getByRole("dialog")).toHaveAccessibleName("About: Hurricane Explorer");
+      await user.keyboard("{Escape}");
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      expect(about).toHaveFocus();
     });
   });
 });
