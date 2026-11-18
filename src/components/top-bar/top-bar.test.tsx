@@ -104,7 +104,7 @@ describe("TopBar component", () => {
     { name: "Share", tabs: 2 },
     { name: "About", tabs: 3 }
   ])("$name button keyboard access", ({ name, tabs }) => {
-    it("is reachable by Tab, opens with Enter, and gets focus back when the dialog closes", async () => {
+    it("is reachable by Tab, opens with Enter focusing Close, and gets focus back when the dialog closes", async () => {
       const user = userEvent.setup();
       renderTopBar();
       const button = screen.getByRole("button", { name });
@@ -114,6 +114,7 @@ describe("TopBar component", () => {
       expect(button).toHaveFocus();
       await user.keyboard("{Enter}");
       expect(await screen.findByRole("dialog")).toHaveAccessibleName(`${name}: Hurricane Explorer`);
+      expect(screen.getByRole("button", { name: "Close" })).toHaveFocus();
       await user.keyboard("{Escape}");
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
       expect(button).toHaveFocus();

@@ -10,10 +10,14 @@ interface IProps {
   // Accessible name for a dialog with no visible title. Ignored when title is set.
   ariaLabel?: string;
   ariaDescribedBy?: string;
+  // Focuses Close on open, for dialogs whose content has nothing that takes focus itself.
+  focusCloseOnOpen?: boolean;
   children?: ReactNode;
 }
 
-export const Dialog: FC<IProps> = ({ onClose, open, title, ariaLabel, ariaDescribedBy, children }) => {
+export const Dialog: FC<IProps> = ({
+  onClose, open, title, ariaLabel, ariaDescribedBy, focusCloseOnOpen, children
+}) => {
   const titleId = useId();
 
   // Escape is the only MUI-reported reason we honor, so a reason MUI adds later cannot
@@ -42,6 +46,7 @@ export const Dialog: FC<IProps> = ({ onClose, open, title, ariaLabel, ariaDescri
           type="button"
           aria-label="Close"
           className={css.closeButton}
+          autoFocus={focusCloseOnOpen}
           onClick={onClose}
         >
           <CloseIcon />
