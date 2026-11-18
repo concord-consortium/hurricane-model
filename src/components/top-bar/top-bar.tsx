@@ -28,7 +28,15 @@ export class TopBar extends BaseComponent<IProps, IState> {
   public render() {
     return (
       <div className={css.topBar}>
-        <span data-test="reload" className={css.textButton} onClick={this.handleReload}><RefreshIcon /></span>
+        <button
+          type="button"
+          data-test="reload"
+          className={`${css.textButton} ${css.iconButton}`}
+          aria-label="Reload"
+          onClick={this.handleReload}
+        >
+          <RefreshIcon />
+        </button>
         <span>
           <button type="button" data-test="share" className={css.textButton} onClick={this.handleShareOpen}>
             Share

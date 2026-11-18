@@ -62,6 +62,20 @@ describe("TopBar component", () => {
 
       reloadSpy.mockRestore();
     });
+
+    it("is the first Tab stop, is named Reload, and reloads on Enter", async () => {
+      const user = userEvent.setup();
+      const reloadSpy = jest.spyOn((TopBar as any).wrappedComponent.prototype, "reloadWindow")
+        .mockImplementation(() => undefined);
+
+      renderTopBar();
+      await user.tab();
+      expect(screen.getByRole("button", { name: "Reload" })).toHaveFocus();
+      await user.keyboard("{Enter}");
+      await waitFor(() => expect(reloadSpy).toHaveBeenCalled());
+
+      reloadSpy.mockRestore();
+    });
   });
 
   describe("Share button", () => {
@@ -85,8 +99,8 @@ describe("TopBar component", () => {
   });
 
   describe.each([
-    { name: "Share", tabs: 1 },
-    { name: "About", tabs: 2 }
+    { name: "Share", tabs: 2 },
+    { name: "About", tabs: 3 }
   ])("$name button keyboard access", ({ name, tabs }) => {
     it("is reachable by Tab, opens with Enter, and gets focus back when the dialog closes", async () => {
       const user = userEvent.setup();
