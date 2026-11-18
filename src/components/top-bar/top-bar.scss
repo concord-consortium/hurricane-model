@@ -1,5 +1,7 @@
 @use "../common" as *;
 
+$textButtonOutlineOffset: 1px;
+
 .topBar {
   height: $topBarHeight;
   background: #fff;
@@ -18,7 +20,7 @@
     &:hover {
       color: $charcoal;
     }
-    @include focusOutline;
+    @include focusOutline($textButtonOutlineOffset);
   }
 
   button.textButton {
@@ -26,7 +28,8 @@
     border: none;
     background: none;
     font: inherit;
-    line-height: normal;
+    // Sized so the focus outline fits inside the top bar instead of being clipped by it.
+    line-height: $topBarHeight - 2 * ($focusOutlineWidth + $textButtonOutlineOffset);
     color: inherit;
   }
 

@@ -6,7 +6,7 @@
 
 ## Overview
 
-Hurricane Explorer's About and Share dialogs get the license and Terms of Use copy approved for CODAP's About dialog, replacing the old CC BY-NC copyright block, so that every Geo app states the same thing: the source is MIT, and use of the hosted site is governed by Concord's Terms of Use. Embeds that hide the top bar stay as they are today. The top bar's About control becomes a real, keyboard-reachable button.
+Hurricane Explorer's About and Share dialogs get the license and Terms of Use copy approved for CODAP's About dialog, replacing the old CC BY-NC copyright block, so that every Geo app states the same thing: the source is MIT, and use of the hosted site is governed by Concord's Terms of Use. Embeds that hide the top bar stay as they are today. The top bar's About and Share controls become real, keyboard-reachable buttons.
 
 HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (HURR-70, SE-4, TE-10, WM-67, FM-5). The decisions shared by all five are in the global oob doc `streams/terms-of-use/geo-common.md` (decisions 1 to 11). Doug took all but four; Kiley Brown decided 3, 5, 6 and 9 on 2026-11-17. This spec applies them to Hurricane rather than re-deciding them.
 
@@ -38,11 +38,11 @@ HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (H
 
 - **R9. Hidden top bar is unchanged**: with `topBarVisible` false the app renders exactly as today, with no corner link, About control or top-bar change (decision 3, Kiley: "Don't add anything").
 - **R10. No other new surface**: no top-bar Terms of Use item, no heading over the copy, no CODAP-style links row (decision 6; Kiley confirmed the link inside the dialogs counts as visible).
-- **R11. About is a `<button type="button">`**, styled as the current text control (same font, color, spacing and hover; no default button border or background), keeping `data-test="about"` and the `AboutDialogOpened` log. It shows a visible focus indicator on keyboard focus (the `:focus-visible` outline the dialog buttons use). Reload and Share stay as they are (decision 4).
+- **R11. About and Share are `<button type="button">`s**, styled as the current text controls (same font, color, spacing and hover; no default button border or background), keeping `data-test="about"` and `data-test="share"` and the `AboutDialogOpened` and `ShareDialogOpened` logs. Each shows a visible focus indicator on keyboard focus (the `:focus-visible` outline the dialog buttons use), drawn entirely inside the 22px top bar. Reload stays as it is. Share goes beyond decision 4, which kept it a span (see Decisions).
 
 ### Dialog behavior
 
-- **R12. About dialog**: keeps today's `Dialog` behavior (`role="dialog"` named "About: Hurricane Explorer", focus trap, Esc closes, Close button) and returns focus to the About button when it closes.
+- **R12. About dialog**: keeps today's `Dialog` behavior (`role="dialog"` named "About: Hurricane Explorer", focus trap, Esc closes, Close button) and returns focus to the About button when it closes. The Share dialog likewise returns focus to the Share button.
 
 ### Unchanged
 
@@ -50,7 +50,7 @@ HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (H
 
 ### Tests
 
-- **R14.** Unit tests render the real About and Share content (not the copy component alone) and cover, for each: the four hrefs, asserted as literal URLs rather than the constants module's values; `target` and `rel` on the three web links and their absence on the mailto link; each web link's accessible name including the " (opens in a new tab)" hint, and the mailto link's name as its text alone; the R2 copy word for word and in order, including the curly apostrophe and the two bold lead-in phrases; that the copy is the dialog's last block (R1); the copyright line, with the clock pinned to a fixed date and the year asserted as a literal, under two different pinned years so neither a year computed as the code computes it nor a hardcoded year passes; that the R5 text is absent; and, with `mode=storm`, that the copy still names Hurricane Explorer at hurricane.concord.org (R3). Tests also cover that About is a button reachable by Tab that opens the dialog with Enter and gets focus back when the dialog closes.
+- **R14.** Unit tests render the real About and Share content (not the copy component alone) and cover, for each: the four hrefs, asserted as literal URLs rather than the constants module's values; `target` and `rel` on the three web links and their absence on the mailto link; each web link's accessible name including the " (opens in a new tab)" hint, and the mailto link's name as its text alone; the R2 copy word for word and in order, including the curly apostrophe and the two bold lead-in phrases; that the copy is the dialog's last block (R1); the copyright line, with the clock pinned to a fixed date and the year asserted as a literal, under two different pinned years so neither a year computed as the code computes it nor a hardcoded year passes; that the R5 text is absent; and, with `mode=storm`, that the copy still names Hurricane Explorer at hurricane.concord.org (R3). Tests also cover that About and Share are buttons reachable by Tab that open their dialogs with Enter and get focus back when the dialog closes.
 
 ### Review
 
@@ -58,20 +58,20 @@ HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (H
 
 ## Technical Notes
 
-- **Where the code lives**: the copy, the `ExternalLink` component and the link constants are in `src/components/license/` (`license-constants.ts`, `external-link.tsx`, `license-copy.tsx`, with `license-copy.test.tsx` running against both dialogs). The About button is in `src/components/top-bar/top-bar.tsx`; its focus outline comes from the `focusOutline` mixin in `src/components/common.scss`, which `dialogButton` also includes.
+- **Where the code lives**: the copy, the `ExternalLink` component and the link constants are in `src/components/license/` (`license-constants.ts`, `external-link.tsx`, `license-copy.tsx`, with `license-copy.test.tsx` running against both dialogs). The About and Share buttons are in `src/components/top-bar/top-bar.tsx`; their focus outline comes from the `focusOutline` mixin in `src/components/common.scss`, which `dialogButton` also includes.
 - **Reference implementation**: CODAP's About dialog (CODAP-1595 / codap#2758): strings `V3.AboutDialog.*` in `v3/src/utilities/translation/lang/en-US.json5`, links in `about-dialog-constants.ts`, new-tab links in `components/common/external-link.tsx` with hint `V3.ExternalLink.opensInNewTab`. The constants module and copy match CODAP's apart from the product, host and MIT URL.
 - **No shared package**: the Geo apps share no component library, so Hurricane implements the copy locally; sameness comes from geo-common.md and an identical constants module.
 - **Dialog**: `src/components/dialog.tsx` needed no change. It wraps MUI 9's `Dialog`, which already meets the CODAP-1595 pattern (`role="dialog"` labeled by its title, focus trap, Esc closes, a real Close button). MUI's focus trap restores focus to the element focused before opening, so R12's focus return follows from R11 once About can hold focus.
 - **Top bar and embeds**: `config.topBarVisible` (URL parameter or authored `urlParams`) makes `index-page.tsx` skip `<TopBar />` entirely, and with it every route to the About dialog. Running in Activity Player does not change it, so the full top bar shows there unless the activity's authored `urlParams` set `topBarVisible=false`.
 - **Storm mode**: `getAppName()` returns "Storm Explorer" in storm mode, so the copy names the product directly rather than calling it.
-- **Button reset**: the About button needs `line-height: normal`; without it, it inherits the top bar's 13px line height and its focus outline hugs the glyphs instead of matching Share's 21px box.
+- **Button reset**: the top-bar buttons set their line height from `$topBarHeight` minus the outline's width and offset on both sides (16px with a 1px offset), so the focus outline fills the 22px bar without being clipped by the window edge above or the side panels below.
 - **Logging**: no new log events, so `LOGGED-EVENTS.md` is unchanged.
 - **CLUE-750 differences**: CLUE keeps a heading and a links row because its story and mockup require them; the Geo apps do not (decision 6).
 
 ## Out of Scope
 
 - From the story: a third-party library acknowledgements list, usage tracking, changing the software license, localizing the legal copy, and a cookie banner.
-- Converting Reload and Share to buttons (decision 4).
+- Converting Reload to a button (decision 4).
 - Existing credit links in the About dialog, including their missing `rel` (geo-common "How links open").
 - The disclaimer modal's "About Storm Explorer" view (decision 9).
 - Embeds that hide the top bar (`topBarVisible=false`): no corner Terms of Use link, corner About control or top-bar change, so the About dialog and the copy stay unreachable there, as before (decision 3).
@@ -200,6 +200,13 @@ HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (H
 **Context**: Pasting `outline: 2px solid $charcoal; outline-offset: 2px` into `.textButton` beside the identical block in `dialogButton` would let the two focus styles drift apart.
 
 **Decision**: A `focusOutline` mixin in `common.scss` holds the outline, and both `dialogButton` and `.textButton` include it. The compiled CSS of `dialogButton`'s three users (`dialog.scss`, `disclaimer-content.scss`, and `about-content.scss` through `outlinedDialogButton`) is byte-identical to before.
+
+---
+
+### Should Share become a button too?
+**Context**: Decision 4 kept Share a span because every link in Share's copy is also reachable through About. PR review asked for Share to be keyboard reachable as well.
+
+**Decision**: Yes. Share is a button styled and tested like About; Reload stays a span. The other Geo stories still follow decision 4 unless they choose otherwise.
 
 ---
 

@@ -89,10 +89,12 @@ $zModal: 10000;
   border-bottom: 1px solid #ffeeba;
 }
 
-@mixin focusOutline {
+$focusOutlineWidth: 2px;
+
+@mixin focusOutline($offset: 2px) {
   &:focus-visible {
-    outline: 2px solid $charcoal;
-    outline-offset: 2px;
+    outline: $focusOutlineWidth solid $charcoal;
+    outline-offset: $offset;
   }
 }
 
