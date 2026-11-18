@@ -38,7 +38,7 @@ HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (H
 
 - **R9. Hidden top bar is unchanged**: with `topBarVisible` false the app renders exactly as today, with no corner link, About control or top-bar change (decision 3, Kiley: "Don't add anything").
 - **R10. No other new surface**: no top-bar Terms of Use item, no heading over the copy, no CODAP-style links row (decision 6; Kiley confirmed the link inside the dialogs counts as visible).
-- **R11. Reload, Share and About are `<button type="button">`s**, styled as the current controls (same icon, font, color, spacing and hover; no default button border or background), keeping their `data-test` values and their logs. Reload, which shows only an icon, is named "Reload" by `aria-label`. Each shows a visible focus indicator on keyboard focus (the `:focus-visible` outline the dialog buttons use), drawn entirely inside the 22px top bar. Reload and Share go beyond decision 4, which kept them spans (see Decisions).
+- **R11. Reload, Share and About are `<button type="button">`s**, styled as the current controls (same icon, font, color, spacing and hover; no default button border or background), keeping their `data-test` values and their logs. Reload, which shows only an icon, is named "Reload" by `aria-label` and has a matching `title` tooltip for mouse users. Each shows a visible focus indicator on keyboard focus (the `:focus-visible` outline the dialog buttons use), drawn entirely inside the 22px top bar. Reload and Share go beyond decision 4, which kept them spans (see Decisions).
 
 ### Dialog behavior
 

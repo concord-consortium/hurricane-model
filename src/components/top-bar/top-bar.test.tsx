@@ -63,14 +63,16 @@ describe("TopBar component", () => {
       reloadSpy.mockRestore();
     });
 
-    it("is the first Tab stop, is named Reload, and reloads on Enter", async () => {
+    it("is the first Tab stop, is named Reload with a matching tooltip, and reloads on Enter", async () => {
       const user = userEvent.setup();
       const reloadSpy = jest.spyOn((TopBar as any).wrappedComponent.prototype, "reloadWindow")
         .mockImplementation(() => undefined);
 
       renderTopBar();
       await user.tab();
-      expect(screen.getByRole("button", { name: "Reload" })).toHaveFocus();
+      const reload = screen.getByRole("button", { name: "Reload" });
+      expect(reload).toHaveFocus();
+      expect(reload).toHaveAttribute("title", "Reload");
       await user.keyboard("{Enter}");
       await waitFor(() => expect(reloadSpy).toHaveBeenCalled());
 

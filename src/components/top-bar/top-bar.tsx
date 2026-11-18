@@ -33,6 +33,7 @@ export class TopBar extends BaseComponent<IProps, IState> {
           data-test="reload"
           className={`${css.textButton} ${css.iconButton}`}
           aria-label="Reload"
+          title="Reload"
           onClick={this.handleReload}
         >
           <RefreshIcon />
