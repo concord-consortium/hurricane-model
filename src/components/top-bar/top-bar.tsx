@@ -80,12 +80,15 @@ export class TopBar extends BaseComponent<IProps, IState> {
     window.location.reload();
   }
 
-  public handleShareOpen = () => {
+  // Safari does not focus a button on click, so focus it here for the dialog to restore focus to on close.
+  public handleShareOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.currentTarget.focus();
     this.setState({ shareOpen: true });
     log("ShareDialogOpened");
   }
 
-  public handleAboutOpen = () => {
+  public handleAboutOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.currentTarget.focus();
     this.setState({ aboutOpen: true });
     log("AboutDialogOpened");
   }

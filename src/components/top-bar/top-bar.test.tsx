@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import { createStores } from "../../models/stores";
@@ -113,6 +113,17 @@ describe("TopBar component", () => {
       }
       expect(button).toHaveFocus();
       await user.keyboard("{Enter}");
+      expect(await screen.findByRole("dialog")).toHaveAccessibleName(`${name}: Hurricane Explorer`);
+      await user.keyboard("{Escape}");
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      expect(button).toHaveFocus();
+    });
+
+    it("gets focus back after a click that does not focus it, as in Safari", async () => {
+      const user = userEvent.setup();
+      renderTopBar();
+      const button = screen.getByRole("button", { name });
+      fireEvent.click(button);
       expect(await screen.findByRole("dialog")).toHaveAccessibleName(`${name}: Hurricane Explorer`);
       await user.keyboard("{Escape}");
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
