@@ -18,7 +18,7 @@ HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (H
 - **R2. Copy, word for word** (geo-common "Copy"; CODAP `V3.AboutDialog.*` with the product and host swapped), in this order:
   - Paragraph 1: **Hurricane Explorer is free, open-source software.** The Hurricane Explorer source code is released under the [MIT License], so you’re welcome to use, modify, and build on it.
   - Paragraph 2: **Your use of Hurricane Explorer at hurricane.concord.org** is governed by our [Terms of Use]. The hosted version is free for non-commercial use; commercial use requires a separate written agreement. For more information, visit [concord.org/licensing] or contact [licensing@concord.org].
-  - Copyright line, in the existing small copyright style (0.8em): `© {current year} The Concord Consortium, Inc.`
+  - Copyright line at 12px, the same size in every Geo app: `© {current year} The Concord Consortium, Inc.`
   - The leading phrase of each paragraph is bold. "you’re" uses the curly apostrophe U+2019 (decision 1).
 - **R3. Product name is always "Hurricane Explorer"** and the host always `hurricane.concord.org`, in storm mode too (decision 10).
 - **R4. Year** is `new Date().getFullYear()` at render time. No range and no build-time constant (decision 1).
