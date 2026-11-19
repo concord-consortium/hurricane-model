@@ -46,7 +46,7 @@ HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (H
 
 ### Unchanged
 
-- **R13.** The storm-mode "About Storm Explorer" disclaimer view is unchanged (decision 9). The About dialog's descriptive paragraphs and its creator and NSF credit line are unchanged; their links keep their current attributes.
+- **R13.** The storm-mode disclaimer's model-simplifications view gets no license copy (decision 9). Its title is "Why can’t Storm Explorer be used for weather forecasting?", worded by Kiley Brown. The About dialog's descriptive paragraphs and its creator and NSF credit line are unchanged; their links keep their current attributes.
 
 ### Tests
 
@@ -72,7 +72,7 @@ HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (H
 
 - From the story: a third-party library acknowledgements list, usage tracking, changing the software license, localizing the legal copy, and a cookie banner.
 - Existing credit links in the About dialog, including their missing `rel` (geo-common "How links open").
-- The disclaimer modal's "About Storm Explorer" view (decision 9).
+- License copy in the disclaimer modal's model-simplifications view (decision 9).
 - Embeds that hide the top bar (`topBarVisible=false`): no corner Terms of Use link, corner About control or top-bar change, so the About dialog and the copy stay unreachable there, as before (decision 3).
 - Changing the dialog titles or `getAppName()` for storm mode (decision 10).
 - The other four Geo apps and Boreal Forest Fire Explorer.
@@ -101,7 +101,7 @@ HURR-70 is the Hurricane Explorer story in a set of five matching Geo stories (H
 
 ---
 
-### Can the storm-mode "About Storm Explorer" view go without the copy? (geo-common decision 9)
+### Can the storm-mode model-simplifications view go without the copy? (geo-common decision 9)
 **Context**: The disclaimer modal's About view lists model simplifications and is a second "About" surface in storm mode.
 
 **Decision**: Yes. Kiley on 2026-11-17: "Agreed." R13 follows.

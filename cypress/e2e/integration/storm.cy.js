@@ -19,7 +19,7 @@ context("Test the Hurricane Model app", () => {
     disclaimerModal.confirmOpen();
     disclaimerModal.checkMessage("This is a simulation and cannot be used to make a forecast.");
 
-    // Round trip to About Storm Explorer view
+    // Round trip to the forecasting explanation
     disclaimerModal.getKnowMoreButton().should("be.visible").click();
     disclaimerModal.getAboutModal().should("contain.text", "Model simplifications include:");
     disclaimerModal.getBackButton().should("be.visible").click();

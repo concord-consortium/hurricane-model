@@ -12,6 +12,7 @@ import { DisclaimerModal } from "./disclaimer-modal";
 const logSpy = jest.spyOn(logModule, "log").mockImplementation(() => undefined);
 
 const MESSAGE = "This is a simulation and cannot be used to make a forecast.";
+const MORE_INFO_TITLE = "Why can’t Storm Explorer be used for weather forecasting?";
 
 describe("DisclaimerModal component", () => {
   let stores: IStores;
@@ -109,19 +110,19 @@ describe("DisclaimerModal component", () => {
       await user.click(screen.getByRole("button", { name: "Want to know more?" }));
     };
 
-    it("swaps in the About Storm Explorer content and logs", async () => {
+    it("swaps in the forecasting explanation and logs", async () => {
       const user = userEvent.setup();
       await openMoreInfo(user);
-      expect(screen.getByText("About Storm Explorer")).toBeInTheDocument();
+      expect(screen.getByText(MORE_INFO_TITLE)).toBeInTheDocument();
       expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
       expect(logSpy).toHaveBeenCalledWith("DisclaimerMoreInfoOpened");
       await waitFor(() => expect(screen.getByRole("button", { name: "Back" })).toHaveFocus());
     });
 
-    it("names the dialog with the About title", async () => {
+    it("names the dialog with the forecasting question", async () => {
       const user = userEvent.setup();
       await openMoreInfo(user);
-      expect(screen.getByRole("dialog")).toHaveAccessibleName("About Storm Explorer");
+      expect(screen.getByRole("dialog")).toHaveAccessibleName(MORE_INFO_TITLE);
     });
 
     it("returns to the disclaimer when Back is clicked", async () => {
@@ -129,15 +130,15 @@ describe("DisclaimerModal component", () => {
       await openMoreInfo(user);
       await user.click(screen.getByRole("button", { name: "Back" }));
       expect(screen.getByText(MESSAGE)).toBeInTheDocument();
-      expect(screen.queryByText("About Storm Explorer")).not.toBeInTheDocument();
+      expect(screen.queryByText(MORE_INFO_TITLE)).not.toBeInTheDocument();
       await waitFor(() => expect(screen.getByRole("button", { name: "Got it" })).toHaveFocus());
     });
 
-    it("closes and logs when the close button is clicked from the About content", async () => {
+    it("closes and logs when the close button is clicked from the forecasting explanation", async () => {
       const user = userEvent.setup();
       await openMoreInfo(user);
       await user.click(screen.getByRole("button", { name: "Close" }));
-      await waitFor(() => expect(screen.queryByText("About Storm Explorer")).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByText(MORE_INFO_TITLE)).not.toBeInTheDocument());
       expect(logSpy).toHaveBeenCalledWith("DisclaimerDismissed", { source: "close" });
     });
   });
@@ -152,16 +153,16 @@ describe("DisclaimerModal component", () => {
       expect(screen.getByText(MESSAGE)).toBeInTheDocument();
     });
 
-    it("returns to the disclaimer even if the user left off on the About content", async () => {
+    it("returns to the disclaimer even if the user left off on the forecasting explanation", async () => {
       const user = userEvent.setup();
       renderModal();
       await user.click(screen.getByRole("button", { name: "Want to know more?" }));
-      await waitFor(() => expect(screen.queryByText("About Storm Explorer")).toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByText(MORE_INFO_TITLE)).toBeInTheDocument());
       await user.click(screen.getByRole("button", { name: "Close" }));
-      await waitFor(() => expect(screen.queryByText("About Storm Explorer")).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByText(MORE_INFO_TITLE)).not.toBeInTheDocument());
       act(() => stores.ui.showDisclaimer());
       expect(screen.getByText(MESSAGE)).toBeInTheDocument();
-      expect(screen.queryByText("About Storm Explorer")).not.toBeInTheDocument();
+      expect(screen.queryByText(MORE_INFO_TITLE)).not.toBeInTheDocument();
     });
   });
 

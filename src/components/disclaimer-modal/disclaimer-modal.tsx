@@ -10,7 +10,7 @@ import { DisclaimerContent } from "./disclaimer-content";
 type DismissSource = "gotIt" | "close";
 type ModalContent = "disclaimer" | "about";
 
-const ABOUT_TITLE = "About Storm Explorer";
+const MORE_INFO_TITLE = "Why can’t Storm Explorer be used for weather forecasting?";
 
 export const DisclaimerModal = observer(function DisclaimerModal() {
   const { ui } = useStores();
@@ -43,7 +43,7 @@ export const DisclaimerModal = observer(function DisclaimerModal() {
     <Dialog
       open={open}
       onClose={() => dismiss("close")}
-      title={showAbout ? ABOUT_TITLE : undefined}
+      title={showAbout ? MORE_INFO_TITLE : undefined}
       ariaLabel="Disclaimer"
       ariaDescribedBy={showAbout ? undefined : messageId}
     >
