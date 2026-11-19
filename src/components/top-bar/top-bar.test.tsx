@@ -120,15 +120,31 @@ describe("TopBar component", () => {
       expect(button).toHaveFocus();
     });
 
-    it("gets focus back after a click that does not focus it, as in Safari", async () => {
+    it.each(["Escape", "Close"])("gets focus back on %s after a click that does not focus it (Safari)", async (how) => {
       const user = userEvent.setup();
       renderTopBar();
       const button = screen.getByRole("button", { name });
       fireEvent.click(button);
       expect(await screen.findByRole("dialog")).toHaveAccessibleName(`${name}: Hurricane Explorer`);
-      await user.keyboard("{Escape}");
+      if (how === "Escape") {
+        await user.keyboard("{Escape}");
+      } else {
+        fireEvent.click(screen.getByRole("button", { name: "Close" }));
+      }
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
       expect(button).toHaveFocus();
+    });
+
+    it("focuses Close when reopened while the dialog is still closing", async () => {
+      const user = userEvent.setup();
+      renderTopBar();
+      const button = screen.getByRole("button", { name });
+      await user.click(button);
+      await screen.findByRole("dialog");
+      await user.keyboard("{Escape}");
+      expect(screen.getByRole("dialog", { hidden: true })).toBeInTheDocument();
+      await user.click(button);
+      await waitFor(() => expect(screen.getByRole("button", { name: "Close" })).toHaveFocus());
     });
   });
 });

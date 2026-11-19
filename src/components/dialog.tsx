@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useId } from "react";
+import React, { FC, ReactNode, useId, useRef } from "react";
 import MuiDialog, { DialogProps } from "@mui/material/Dialog";
 import CloseIcon from "@mui/icons-material/Close";
 import css from "./dialog.scss";
@@ -19,6 +19,7 @@ export const Dialog: FC<IProps> = ({
   onClose, open, title, ariaLabel, ariaDescribedBy, focusCloseOnOpen, children
 }) => {
   const titleId = useId();
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   // Escape is the only MUI-reported reason we honor, so a reason MUI adds later cannot
   // dismiss a dialog by default.
@@ -34,10 +35,14 @@ export const Dialog: FC<IProps> = ({
       maxWidth="lg"
       // MUI's own aria-labelledby prop fabricates a dangling id when undefined. Label the paper
       // instead: slotProps override MUI's internal value even when explicitly undefined.
-      slotProps={{ paper: {
-        "aria-labelledby": title ? titleId : undefined,
-        "aria-label": title ? undefined : ariaLabel ?? "Untitled Dialog"
-      } }}
+      slotProps={{
+        paper: {
+          "aria-labelledby": title ? titleId : undefined,
+          "aria-label": title ? undefined : ariaLabel ?? "Untitled Dialog"
+        },
+        // Not autoFocus: a reopen during the exit fade reuses the mounted dialog, so autoFocus would not run.
+        transition: { onEnter: focusCloseOnOpen ? () => closeRef.current?.focus() : undefined }
+      }}
       aria-describedby={ariaDescribedBy}
     >
       <div className={css.dialogBody}>
@@ -45,8 +50,8 @@ export const Dialog: FC<IProps> = ({
         <button
           type="button"
           aria-label="Close"
+          ref={closeRef}
           className={css.closeButton}
-          autoFocus={focusCloseOnOpen}
           onClick={onClose}
         >
           <CloseIcon />
