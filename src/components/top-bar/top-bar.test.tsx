@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import { createStores } from "../../models/stores";
@@ -62,6 +62,22 @@ describe("TopBar component", () => {
 
       reloadSpy.mockRestore();
     });
+
+    it("is the first Tab stop, is named Reload with a matching tooltip, and reloads on Enter", async () => {
+      const user = userEvent.setup();
+      const reloadSpy = jest.spyOn((TopBar as any).wrappedComponent.prototype, "reloadWindow")
+        .mockImplementation(() => undefined);
+
+      renderTopBar();
+      await user.tab();
+      const reload = screen.getByRole("button", { name: "Reload" });
+      expect(reload).toHaveFocus();
+      expect(reload).toHaveAttribute("title", "Reload");
+      await user.keyboard("{Enter}");
+      await waitFor(() => expect(reloadSpy).toHaveBeenCalled());
+
+      reloadSpy.mockRestore();
+    });
   });
 
   describe("Share button", () => {
@@ -81,6 +97,54 @@ describe("TopBar component", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       await user.click(screen.getByTestId("about"));
       expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+  });
+
+  describe.each([
+    { name: "Share", tabs: 2 },
+    { name: "About", tabs: 3 }
+  ])("$name button keyboard access", ({ name, tabs }) => {
+    it("is reachable by Tab, opens with Enter focusing Close, and gets focus back when the dialog closes", async () => {
+      const user = userEvent.setup();
+      renderTopBar();
+      const button = screen.getByRole("button", { name });
+      for (let i = 0; i < tabs; i++) {
+        await user.tab();
+      }
+      expect(button).toHaveFocus();
+      await user.keyboard("{Enter}");
+      expect(await screen.findByRole("dialog")).toHaveAccessibleName(`${name}: Hurricane Explorer`);
+      expect(screen.getByRole("button", { name: "Close" })).toHaveFocus();
+      await user.keyboard("{Escape}");
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      expect(button).toHaveFocus();
+    });
+
+    it.each(["Escape", "Close"])("gets focus back on %s after a click that does not focus it (Safari)", async (how) => {
+      const user = userEvent.setup();
+      renderTopBar();
+      const button = screen.getByRole("button", { name });
+      fireEvent.click(button);
+      expect(await screen.findByRole("dialog")).toHaveAccessibleName(`${name}: Hurricane Explorer`);
+      if (how === "Escape") {
+        await user.keyboard("{Escape}");
+      } else {
+        fireEvent.click(screen.getByRole("button", { name: "Close" }));
+      }
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      expect(button).toHaveFocus();
+    });
+
+    it("focuses Close when reopened while the dialog is still closing", async () => {
+      const user = userEvent.setup();
+      renderTopBar();
+      const button = screen.getByRole("button", { name });
+      await user.click(button);
+      await screen.findByRole("dialog");
+      await user.keyboard("{Escape}");
+      expect(screen.getByRole("dialog", { hidden: true })).toBeInTheDocument();
+      await user.click(button);
+      await waitFor(() => expect(screen.getByRole("button", { name: "Close" })).toHaveFocus());
     });
   });
 });

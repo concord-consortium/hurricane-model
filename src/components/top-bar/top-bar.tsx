@@ -28,15 +28,29 @@ export class TopBar extends BaseComponent<IProps, IState> {
   public render() {
     return (
       <div className={css.topBar}>
-        <span data-test="reload" className={css.textButton} onClick={this.handleReload}><RefreshIcon /></span>
+        <button
+          type="button"
+          data-test="reload"
+          className={`${css.textButton} ${css.iconButton}`}
+          aria-label="Reload"
+          title="Reload"
+          onClick={this.handleReload}
+        >
+          <RefreshIcon />
+        </button>
         <span>
-          <span data-test="share" className={css.textButton} onClick={this.handleShareOpen}>Share</span>
-          <span data-test="about" className={css.textButton} onClick={this.handleAboutOpen}>About</span>
+          <button type="button" data-test="share" className={css.textButton} onClick={this.handleShareOpen}>
+            Share
+          </button>
+          <button type="button" data-test="about" className={css.textButton} onClick={this.handleAboutOpen}>
+            About
+          </button>
         </span>
         <Dialog
           onClose={this.handleAboutClose}
           open={this.state.aboutOpen}
           title="About: Hurricane Explorer"
+          focusCloseOnOpen={true}
         >
           <AboutDialogContent />
         </Dialog>
@@ -44,6 +58,7 @@ export class TopBar extends BaseComponent<IProps, IState> {
           onClose={this.handleShareClose}
           open={this.state.shareOpen}
           title="Share: Hurricane Explorer"
+          focusCloseOnOpen={true}
         >
           <ShareDialogContent />
         </Dialog>
@@ -67,12 +82,15 @@ export class TopBar extends BaseComponent<IProps, IState> {
     window.location.reload();
   }
 
-  public handleShareOpen = () => {
+  // Safari does not focus a button on click, so focus it here for the dialog to restore focus to on close.
+  public handleShareOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.currentTarget.focus();
     this.setState({ shareOpen: true });
     log("ShareDialogOpened");
   }
 
-  public handleAboutOpen = () => {
+  public handleAboutOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.currentTarget.focus();
     this.setState({ aboutOpen: true });
     log("AboutDialogOpened");
   }

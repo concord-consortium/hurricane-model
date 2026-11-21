@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: cypress-io/github-action@v6
+      - uses: cypress-io/github-action@v7
         with:
           install-command: npm ci --legacy-peer-deps
           start: npm start

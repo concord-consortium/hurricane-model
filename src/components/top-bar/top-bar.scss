@@ -1,5 +1,10 @@
 @use "../common" as *;
 
+$textButtonOutlineOffset: 1px;
+$textButtonLineHeight: $topBarHeight - 2 * ($focusOutlineWidth + $textButtonOutlineOffset);
+// MUI's default icon size; its glyphs leave blank space around them inside that box.
+$iconSize: 24px;
+
 .topBar {
   height: $topBarHeight;
   background: #fff;
@@ -17,6 +22,25 @@
     cursor: pointer;
     &:hover {
       color: $charcoal;
+    }
+    @include focusOutline($textButtonOutlineOffset);
+  }
+
+  button.textButton {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    // Sized so the focus outline fits inside the top bar instead of being clipped by it.
+    line-height: $textButtonLineHeight;
+    color: inherit;
+  }
+
+  .iconButton {
+    height: $textButtonLineHeight;
+    svg {
+      display: block;
+      margin: ($textButtonLineHeight - $iconSize) * 0.5 0;
     }
   }
 

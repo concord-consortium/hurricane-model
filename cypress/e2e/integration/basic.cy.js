@@ -92,4 +92,11 @@ context("Test the Hurricane Model app", () => {
       });
 
   });
+
+  it("shows the copyright line at 12px in the About dialog", () => {
+    cy.get('[data-test="about"]').click();
+    cy.get('[data-test="license-copy"] p').last()
+      .should("contain.text", "The Concord Consortium, Inc.")
+      .and("have.css", "font-size", "12px");
+  });
 });

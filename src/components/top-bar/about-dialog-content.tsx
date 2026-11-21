@@ -1,6 +1,6 @@
 import * as React from "react";
 import config from "../../config";
-import {Copyright} from "./copyright";
+import { LicenseCopy } from "../license/license-copy";
 
 export class AboutDialogContent extends React.Component {
   public render() {
@@ -35,7 +35,7 @@ export class AboutDialogContent extends React.Component {
           was developed under <a href="https://nsf.gov/" target="_blank">National Science Foundation</a> grant
           DRL-1812362.
         </p>
-        <Copyright />
+        <LicenseCopy />
       </div>
     );
   }
